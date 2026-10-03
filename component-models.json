@@ -216,15 +216,16 @@
     ]
   },
   {
-  "id": "blog-list",
-  "title": "Blog List",
-  "group": "Blocks",
-  "fields": [
-    {
-      "inputType": "text",
-      "name": "heading",
-      "label": "Heading (Optional)"
-    }
-  ]
-}
+    "id": "blog-list",
+    "title": "Blog List",
+    "group": "Blocks",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading (Optional)"
+      }
+    ]
+  }
 ]
