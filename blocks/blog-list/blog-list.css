@@ -1,0 +1,80 @@
+.blog-list {
+  display: block;
+  width: 100%;
+}
+
+.blog-list .blog-controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.blog-list .blog-controls select {
+  padding: 10px 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  background-color: #fff;
+  cursor: pointer;
+  outline: none;
+}
+
+.blog-list .blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.blog-list .blog-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blog-list .blog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.blog-list .blog-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.blog-list .card-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.blog-list .card-content span {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.blog-list .card-content h3 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.blog-list .card-content h3 a {
+  text-decoration: none;
+  color: #333;
+}
+
+.blog-list .card-content p {
+  margin: 0;
+  font-size: 16px;
+  color: #555;
+  line-height: 1.5;
+}

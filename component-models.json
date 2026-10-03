@@ -214,5 +214,17 @@
         "valueType": "string"
       }
     ]
-  }
+  },
+  {
+  "id": "blog-list",
+  "title": "Blog List",
+  "group": "Blocks",
+  "fields": [
+    {
+      "inputType": "text",
+      "name": "heading",
+      "label": "Heading (Optional)"
+    }
+  ]
+}
 ]
