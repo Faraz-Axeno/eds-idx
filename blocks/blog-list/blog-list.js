@@ -144,8 +144,15 @@ export default async function decorate(block) {
       card.className = 'blog-card';
 
       const img = document.createElement('img');
-      img.src = article.image;
-      img.alt = article.title;
+
+      // Fallback Logic: Check if AEM returned the default placeholder
+      if (article.image && article.image.includes('default-meta-image.png')) {
+        img.src = '/blogs/frontend/media_117fe35dbf013f56649517555c10a4e809c585d79.png?width=750&format=webply&optimize=medium';
+      } else {
+        img.src = article.image;
+      }
+
+      img.alt = article.title || 'Blog article image';
 
       const contentDiv = document.createElement('div');
       contentDiv.className = 'card-content';
