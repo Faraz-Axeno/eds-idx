@@ -46,17 +46,23 @@ const arrow = () => el('span', { class: 'header-arrow', 'aria-hidden': 'true' })
 /** plus / minus glyph (UI chrome) */
 const plus = () => el('span', { class: 'header-plus', 'aria-hidden': 'true' });
 
+/**
+ * Brand section: light + dark logo images and the home link. The logos are separate
+ * paragraphs (xwalk turns a link-only paragraph into a Button, which drops a linked image);
+ * logos authored inside the link are still accepted.
+ */
 function buildBrand(section) {
   const brand = el('div', { class: 'header-brand' });
-  const links = [...section.querySelectorAll('a')];
-  if (!links.length) return brand;
-  const link = el('a', { href: links[0].getAttribute('href'), class: 'header-brand-link' });
-  const [light, dark] = links.map((a) => a.querySelector('img')).filter(Boolean);
+  const [light, dark] = section.querySelectorAll('img');
+  const home = section.querySelector('a');
+  if (!light && !home) return brand;
+  const link = el('a', { href: home?.getAttribute('href') || '/', class: 'header-brand-link' });
+  if (!light) link.textContent = home.textContent.trim();
   if (light) {
     light.classList.add('header-logo', 'header-logo-light');
     light.loading = 'eager';
     link.append(light);
-    link.setAttribute('aria-label', light.alt);
+    link.setAttribute('aria-label', light.alt || home?.textContent.trim() || 'Home');
   }
   if (dark) {
     dark.classList.add('header-logo', 'header-logo-dark');
@@ -67,12 +73,17 @@ function buildBrand(section) {
   return brand;
 }
 
+/** tool links; each icon is the image inside the link or the standalone image before it */
 function buildTools(section) {
   const tools = el('div', { class: 'header-tools' });
-  section?.querySelectorAll('a').forEach((a) => {
+  const looseIcons = [...(section?.querySelectorAll('img') || [])].filter((img) => !img.closest('a'));
+  section?.querySelectorAll('a').forEach((a, i) => {
+    a.classList.remove('button');
+    a.closest('.button-container')?.classList.remove('button-container');
     a.classList.add('header-tool');
-    const img = a.querySelector('img');
+    const img = a.querySelector('img') || looseIcons[i];
     if (img) {
+      if (!a.contains(img)) a.prepend(img);
       img.alt = '';
       img.classList.add('header-tool-icon');
     }

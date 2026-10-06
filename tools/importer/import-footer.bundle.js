@@ -69,11 +69,12 @@ var CustomImportScript = (() => {
         return s;
       };
       const logoLink = footer.querySelector(".footer__logo a");
+      const logoAlt = ((_a = footer.querySelector(".footer__logo img")) == null ? void 0 : _a.alt) || "MG Select";
       const s1 = section();
       const logoA = document.createElement("a");
       logoA.href = (logoLink == null ? void 0 : logoLink.getAttribute("href")) || "/";
-      logoA.append(img(document, "images/mg-select-logo-light.png", ((_a = footer.querySelector(".footer__logo img")) == null ? void 0 : _a.alt) || "MG Select"));
-      s1.append(para(document, logoA));
+      logoA.textContent = logoAlt;
+      s1.append(para(document, img(document, "images/mg-select-logo-light.png", logoAlt)), para(document, logoA));
       const nl = footer.querySelector(".newsletter__form");
       const s2 = section();
       const nlTitle = document.createElement("strong");

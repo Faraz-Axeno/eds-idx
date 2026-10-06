@@ -54,24 +54,28 @@ var CustomImportScript = (() => {
   }
   var import_nav_default = {
     transform: ({ document }) => {
+      var _a;
       const header = document.querySelector(".header-section");
       const main = document.createElement("div");
       const sections = [];
       const brand = [];
-      header.querySelectorAll(".header__logo a").forEach((a) => {
+      const logoLinks = [...header.querySelectorAll(".header__logo a")];
+      logoLinks.forEach((a) => {
         const img = a.querySelector("img");
-        const out = document.createElement("a");
-        out.href = a.getAttribute("href") || "/";
-        out.append(localImage(document, img));
-        brand.push(el(document, "p", out));
+        if (img) brand.push(el(document, "p", localImage(document, img)));
       });
+      if (logoLinks.length) {
+        const home = document.createElement("a");
+        home.href = logoLinks[0].getAttribute("href") || "/";
+        home.textContent = ((_a = logoLinks[0].querySelector("img")) == null ? void 0 : _a.getAttribute("alt")) || "MG Select";
+        brand.push(el(document, "p", home));
+      }
       sections.push(brand);
       const tools = [];
       header.querySelectorAll(".header__user__info a").forEach((a) => {
-        const out = link(document, a);
         const icon = header.querySelector(".header__user__info img");
-        if (icon) out.prepend(localImage(document, icon), " ");
-        tools.push(el(document, "p", out));
+        if (icon) tools.push(el(document, "p", localImage(document, icon)));
+        tools.push(el(document, "p", link(document, a)));
       });
       sections.push(tools);
       const tabs = [...header.querySelectorAll(".header__main--tab")];

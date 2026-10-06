@@ -68,13 +68,23 @@ function toHeading(p, level, className) {
   return heading;
 }
 
+/**
+ * Brand section: logo image and home link as separate paragraphs (xwalk turns a link-only
+ * paragraph into a Button, which drops a linked image); a logo inside the link still works.
+ */
 function buildBrand(section) {
   const brand = el('div', { class: 'footer-brand' });
-  const link = section.querySelector('a');
-  if (link) {
-    link.classList.add('footer-brand-link');
-    brand.append(link);
+  const home = section.querySelector('a');
+  const logo = section.querySelector('img');
+  if (!home && !logo) return brand;
+  const link = el('a', { href: home?.getAttribute('href') || '/', class: 'footer-brand-link' });
+  if (logo) {
+    link.append(logo.closest('picture') || logo);
+    if (!logo.alt) logo.alt = home?.textContent.trim() || 'Home';
+  } else {
+    link.textContent = home.textContent.trim();
   }
+  brand.append(link);
   return brand;
 }
 

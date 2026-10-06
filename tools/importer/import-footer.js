@@ -60,13 +60,15 @@ export default {
     const sections = [];
     const section = () => { const s = document.createElement('div'); sections.push(s); return s; };
 
-    // 1. brand
+    // 1. brand: logo image, then the home link (blocks/footer wraps the logo in it).
+    // Kept apart because in xwalk a link-only paragraph becomes a Button and drops the image.
     const logoLink = footer.querySelector('.footer__logo a');
+    const logoAlt = footer.querySelector('.footer__logo img')?.alt || 'MG Select';
     const s1 = section();
     const logoA = document.createElement('a');
     logoA.href = logoLink?.getAttribute('href') || '/';
-    logoA.append(img(document, 'images/mg-select-logo-light.png', footer.querySelector('.footer__logo img')?.alt || 'MG Select'));
-    s1.append(para(document, logoA));
+    logoA.textContent = logoAlt;
+    s1.append(para(document, img(document, 'images/mg-select-logo-light.png', logoAlt)), para(document, logoA));
 
     // 2. newsletter (text only — footer.js builds the form)
     const nl = footer.querySelector('.newsletter__form');

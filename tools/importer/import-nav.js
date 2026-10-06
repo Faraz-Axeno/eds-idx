@@ -7,8 +7,8 @@
  * ids or nested layout divs) — blocks/header builds the bar, tabs and panels.
  *
  * Sections:
- *   1. brand  — logo link with light + dark logo variants
- *   2. tools  — header-bar links shown while the menu is open (showroom locator)
+ *   1. brand  — light + dark logo images, then the home link
+ *   2. tools  — header-bar links shown while the menu is open (icon image, then link)
  *   3..n      — one section per menu tab:
  *                 <p><strong>Tab label</strong></p>
  *                 <ul> one <li> per left-column category:
@@ -60,24 +60,30 @@ export default {
     const main = document.createElement('div');
     const sections = [];
 
-    // 1. brand
+    // Images and links stay in separate paragraphs: in xwalk a link-only paragraph becomes a
+    // Button (href + text only), so an image inside the link would be dropped on sync.
+
+    // 1. brand: light logo, dark logo, then the home link (blocks/header wraps the logos in it)
     const brand = [];
-    header.querySelectorAll('.header__logo a').forEach((a) => {
+    const logoLinks = [...header.querySelectorAll('.header__logo a')];
+    logoLinks.forEach((a) => {
       const img = a.querySelector('img');
-      const out = document.createElement('a');
-      out.href = a.getAttribute('href') || '/';
-      out.append(localImage(document, img));
-      brand.push(el(document, 'p', out));
+      if (img) brand.push(el(document, 'p', localImage(document, img)));
     });
+    if (logoLinks.length) {
+      const home = document.createElement('a');
+      home.href = logoLinks[0].getAttribute('href') || '/';
+      home.textContent = logoLinks[0].querySelector('img')?.getAttribute('alt') || 'MG Select';
+      brand.push(el(document, 'p', home));
+    }
     sections.push(brand);
 
-    // 2. tools
+    // 2. tools: icon paragraph, then its text link
     const tools = [];
     header.querySelectorAll('.header__user__info a').forEach((a) => {
-      const out = link(document, a);
       const icon = header.querySelector('.header__user__info img');
-      if (icon) out.prepend(localImage(document, icon), ' ');
-      tools.push(el(document, 'p', out));
+      if (icon) tools.push(el(document, 'p', localImage(document, icon)));
+      tools.push(el(document, 'p', link(document, a)));
     });
     sections.push(tools);
 
