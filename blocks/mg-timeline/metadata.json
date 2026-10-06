@@ -1,0 +1,14 @@
+{
+  "variantName": "mg-timeline",
+  "baseBlock": "carousel",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Our Heritage: interactive horizontal timeline. Prominent top timeline bar with clickable year buttons (18 entries); clicking a year activates its slide (image, title, description). Active year highlighted, bar progress indicator, prev/next. Active slide centered and enlarged, neighbours visible on either side.",
+  "contentPattern": "One row per milestone: image | richtext with year (p or h3, a bare 3-4 digit year), title (heading or bold paragraph), description paragraph(s). A separate year cell is also accepted.",
+  "usage": {
+    "pagesUsing": ["https://www.mgselect.co.in/"],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-05"
+  },
+  "options": [],
+  "memberVariantIds": ["mg-timeline"]
+}

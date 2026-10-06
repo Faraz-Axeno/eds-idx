@@ -1,0 +1,329 @@
+/*
+ * mg-masonry-grid: the MG Select manifesto panel.
+ * Greeting (eyebrow + logo), a stage where the heading and the copy swap places on the
+ * first scroll, and a bottom-aligned strip of equal-width tiles showing each image at its
+ * own ratio, all inside one 100svh panel.
+ * Values extracted from https://www.mgselect.co.in/ (section.brand-manifesto).
+ */
+
+main > .section.mg-masonry-grid-container {
+  --mg-masonry-ease: cubic-bezier(0.57, 0, 0.14, 1);
+  --mg-masonry-reveal: 1.4s var(--mg-masonry-ease);
+
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: var(--mg-panel-height, 100svh);
+  padding-bottom: 6.43svh;
+  overflow: hidden;
+}
+
+/* image strip */
+.mg-masonry-grid {
+  --mg-masonry-gap: 9.5px;
+  --mg-masonry-height: 21.63svh;
+  --mg-masonry-tile-vh: 24; /* nominal tile width in svh, stretched by JS to fit whole gaps */
+  --mg-masonry-duration: calc(var(--mg-masonry-count, 10) * 3s); /* 3s per tile */
+
+  height: var(--mg-masonry-height);
+  overflow: hidden;
+}
+
+.mg-masonry-grid .mg-masonry-grid-items {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--mg-masonry-gap);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* equal-width tiles; the image keeps its own ratio (16:9 short, 4:3 tall) on the bottom edge */
+.mg-masonry-grid .mg-masonry-grid-item {
+  flex: none;
+  width: var(--mg-masonry-tile, calc(var(--mg-masonry-tile-vh) * 1svh));
+  height: 100%;
+  margin: 0;
+  transform: translateY(100%);
+  transition: transform var(--mg-masonry-reveal);
+}
+
+.mg-masonry-grid .mg-masonry-grid-item picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mg-masonry-grid .mg-masonry-grid-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  user-select: none;
+}
+
+/* continuous strip: shift by exactly one set (N tiles + N gaps), then loop */
+@keyframes mg-masonry-marquee {
+  to {
+    transform: translateX(calc((var(--mg-masonry-tile, 0px) + var(--mg-masonry-gap)) * var(--mg-masonry-count, 0) * -1));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mg-masonry-grid[data-marquee='true'] .mg-masonry-grid-items {
+    animation: mg-masonry-marquee var(--mg-masonry-duration) linear infinite;
+  }
+}
+
+/* intro default content */
+main > .section.mg-masonry-grid-container > .default-content-wrapper {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  color: var(--mg-color-black);
+  font-family: var(--mg-font-body);
+  text-align: center;
+}
+
+main > .section.mg-masonry-grid-container > .mg-masonry-grid-wrapper {
+  flex: none;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* greeting: "WELCOME TO" + logo, slides down on entry */
+main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 36px;
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: opacity var(--mg-masonry-reveal), transform var(--mg-masonry-reveal);
+}
+
+main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting > p {
+  margin: 0;
+  font-family: var(--mg-font-display);
+  font-size: 24px;
+  font-weight: var(--mg-font-weight-regular);
+  font-variation-settings: 'wght' 312;
+  line-height: 26px;
+}
+
+main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting > picture {
+  display: block;
+  height: 4.4svh;
+}
+
+main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting > picture img {
+  display: block;
+  width: auto;
+  height: 100%;
+}
+
+/* stage: heading centred in the free band, copy takes its place on the first scroll */
+main > .section.mg-masonry-grid-container .mg-masonry-grid-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+main > .section.mg-masonry-grid-container .mg-masonry-grid-heading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--mg-masonry-reveal), transform var(--mg-masonry-reveal);
+}
+
+main > .section.mg-masonry-grid-container .mg-masonry-grid-heading > :is(h1, h2, h3) {
+  width: 90%;
+  margin: 0;
+  color: var(--mg-color-black);
+  font-family: var(--mg-font-display);
+  font-size: 24px;
+  font-weight: var(--mg-font-weight-bold);
+  font-variation-settings: 'wght' 312;
+  line-height: 26px;
+  opacity: 0;
+  transition: opacity var(--mg-masonry-reveal);
+}
+
+main > .section.mg-masonry-grid-container .mg-masonry-grid-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 16px;
+  opacity: 0;
+  transform: translateY(40svh);
+  transition: opacity var(--mg-masonry-reveal), transform var(--mg-masonry-reveal);
+  pointer-events: none;
+}
+
+main > .section.mg-masonry-grid-container .mg-masonry-grid-text > p {
+  margin: 0;
+  color: var(--mg-color-ink);
+  font-size: var(--mg-font-size-body);
+  font-weight: var(--mg-font-weight-regular);
+  font-variation-settings: 'wght' 500;
+  letter-spacing: -0.02em;
+  line-height: 20px;
+}
+
+main > .section.mg-masonry-grid-container .mg-masonry-grid-text > p:first-child {
+  color: var(--mg-color-black);
+  letter-spacing: normal;
+}
+
+/* entry reveal */
+main > .section.mg-masonry-grid-container[data-masonry-entered='true'] .mg-masonry-grid-greeting {
+  opacity: 1;
+  transform: none;
+}
+
+main > .section.mg-masonry-grid-container[data-masonry-entered='true'] .mg-masonry-grid-heading > :is(h1, h2, h3) {
+  opacity: 1;
+}
+
+main > .section.mg-masonry-grid-container[data-masonry-entered='true'] .mg-masonry-grid-item {
+  transform: none;
+}
+
+/* second step: heading leaves upwards, copy rises into place */
+main > .section.mg-masonry-grid-container[data-masonry-step='text'] .mg-masonry-grid-heading {
+  opacity: 0;
+  transform: translateY(-40svh);
+  pointer-events: none;
+}
+
+main > .section.mg-masonry-grid-container[data-masonry-step='text'] .mg-masonry-grid-text {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* Universal Editor: everything visible and in flow */
+main > .section.mg-masonry-grid-container[data-masonry-step='static'] {
+  height: auto;
+  min-height: var(--mg-panel-height, 100svh);
+}
+
+main > .section.mg-masonry-grid-container[data-masonry-step='static'] :is(.mg-masonry-grid-greeting, .mg-masonry-grid-heading, .mg-masonry-grid-heading > *, .mg-masonry-grid-text, .mg-masonry-grid-item) {
+  position: static;
+  opacity: 1;
+  transform: none;
+  transition: none;
+  pointer-events: auto;
+}
+
+main > .section.mg-masonry-grid-container[data-masonry-step='static'] .mg-masonry-grid-heading {
+  padding: 24px 0;
+}
+
+main > .section.mg-masonry-grid-container[data-masonry-step='static'] .mg-masonry-grid-text {
+  padding-bottom: 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main > .section.mg-masonry-grid-container :is(.mg-masonry-grid-greeting, .mg-masonry-grid-heading, .mg-masonry-grid-heading > *, .mg-masonry-grid-text, .mg-masonry-grid-item) {
+    transition: none;
+  }
+
+  .mg-masonry-grid .mg-masonry-grid-item[data-clone='true'] {
+    display: none;
+  }
+}
+
+@media (width >= 576px) {
+  main > .section.mg-masonry-grid-container .mg-masonry-grid-text {
+    padding: 0 58.5px;
+  }
+}
+
+@media (width >= 768px) {
+  .mg-masonry-grid {
+    --mg-masonry-gap: 16px;
+  }
+
+  main > .section.mg-masonry-grid-container .mg-masonry-grid-heading > :is(h1, h2, h3) {
+    font-size: 40px;
+    line-height: 46px;
+  }
+}
+
+@media (width >= 1024px) {
+  main > .section.mg-masonry-grid-container {
+    padding-bottom: 5.95svh;
+  }
+
+  .mg-masonry-grid {
+    --mg-masonry-height: 35.64svh;
+    --mg-masonry-tile-vh: 39.71;
+  }
+
+  main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting {
+    gap: 16px;
+    padding-top: 8.7svh;
+  }
+
+  main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting > p {
+    font-size: 20px;
+  }
+
+  main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting > picture {
+    height: 5.45svh;
+  }
+
+  /* copy sits on the bottom of the stage, just above the strip */
+  main > .section.mg-masonry-grid-container .mg-masonry-grid-text {
+    inset: auto 0 0;
+    display: block;
+    width: 57.17%;
+    max-width: 936px;
+    margin: 0 auto;
+    padding: 0 0 24px;
+  }
+}
+
+@media (width >= 1320px) {
+  main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting > p {
+    font-size: 30px;
+    line-height: 35px;
+  }
+
+  main > .section.mg-masonry-grid-container .mg-masonry-grid-heading > :is(h1, h2, h3) {
+    font-size: 60px;
+    line-height: 65px;
+  }
+
+  main > .section.mg-masonry-grid-container .mg-masonry-grid-text > p {
+    font-size: 24px;
+    line-height: 30px;
+  }
+
+  main > .section.mg-masonry-grid-container .mg-masonry-grid-text > p:first-child {
+    line-height: 26px;
+  }
+}
+
+@media (width >= 1440px) {
+  .mg-masonry-grid {
+    --mg-masonry-gap: 19px;
+  }
+}

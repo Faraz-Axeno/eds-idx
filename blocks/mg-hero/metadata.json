@@ -1,0 +1,14 @@
+{
+  "variantName": "mg-hero",
+  "baseBlock": "hero",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Standalone full-viewport (100vh/100svh) hero, NOT a carousel. Background picture (desktop + optional mobile portrait). Heading \"MG SELECT x GAURAV GUPTA\" cleaned of list bullets/hyphens. EXPLORE outlined button with arrow. \"Book M9 Couture Edition\" / \"Book Cyberster Couture Edition\" pills anchored with position:absolute to top-right of the mg-hero block (block is position:relative). Dismissible pills.",
+  "contentPattern": "Row 1: background image (desktop); optional Row 2: mobile/portrait image; last row: richtext with heading + links. First link = primary CTA (EXPLORE); every subsequent link = top-right dismissible pill.",
+  "usage": {
+    "pagesUsing": ["https://www.mgselect.co.in/"],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-05"
+  },
+  "options": [],
+  "memberVariantIds": ["mg-hero"]
+}

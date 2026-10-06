@@ -1,0 +1,14 @@
+{
+  "variantName": "mg-vehicles",
+  "baseBlock": "carousel",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Full-viewport horizontal vehicle carousel (MG Cyberster, MG M9). Each slide: day + night car image, title, tagline, EXPLORE NOW + DOWNLOAD BROCHURE buttons. Optional first row with day/night background images. Left/right round arrow buttons; bottom-left day/night theme toggle switching images via data-theme attribute; bottom slider progress bar. Keyboard accessible, aria-live.",
+  "contentPattern": "Optional leading row(s) with only images = day | night background. One row per vehicle: day car image (+ optional night car image) | richtext with title, tagline, first link = outlined CTA (EXPLORE NOW), further links = text links (DOWNLOAD BROCHURE).",
+  "usage": {
+    "pagesUsing": ["https://www.mgselect.co.in/"],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-05"
+  },
+  "options": [],
+  "memberVariantIds": ["mg-vehicles"]
+}

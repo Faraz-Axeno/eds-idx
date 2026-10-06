@@ -1,0 +1,99 @@
+/*
+ * mg-section-nav: fixed vertical segmented section indicator.
+ * Values extracted from source .mg-select__pagination-container / -indicator:
+ * fixed, right 35px, bottom 38px, z-index 4, column, gap 3px;
+ * segment 3px x 29px, #d9d9d9, idle opacity 0.3, active opacity 1.
+ * Colour is constant on dark and light panels; hidden below 768px (d-md-flex).
+ */
+
+/* The host section only carries the nav; don't let it add an empty panel. */
+main > .section.mg-section-nav-host:has(> .mg-section-nav-wrapper:only-child) {
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+main > .section > .mg-section-nav-wrapper {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mg-section-nav {
+  --mg-section-nav-color: var(--mg-color-grey-200, #d9d9d9);
+  --mg-section-nav-segment-width: 3px;
+  --mg-section-nav-segment-height: 29px;
+  --mg-section-nav-segment-gap: 3px;
+  --mg-section-nav-idle-opacity: 0.3;
+
+  position: static;
+  height: 0;
+}
+
+.mg-section-nav .mg-section-nav-indicator {
+  display: none;
+  position: fixed;
+  right: 35px;
+  bottom: 38px;
+  z-index: 4;
+  color: var(--mg-section-nav-color);
+}
+
+.mg-section-nav .mg-section-nav-segments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mg-section-nav-segment-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mg-section-nav .mg-section-nav-segment {
+  display: block;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+}
+
+/* the visible dash */
+.mg-section-nav .mg-section-nav-button {
+  position: relative;
+  display: block;
+  width: var(--mg-section-nav-segment-width);
+  height: var(--mg-section-nav-segment-height);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  color: inherit;
+  background-color: currentcolor;
+  opacity: var(--mg-section-nav-idle-opacity);
+}
+
+/* invisible, wider hit area for pointer users */
+.mg-section-nav .mg-section-nav-button::after {
+  content: '';
+  position: absolute;
+  inset: 0 -8px;
+}
+
+.mg-section-nav .mg-section-nav-button[data-active='true'] {
+  opacity: 1;
+}
+
+.mg-section-nav .mg-section-nav-button:focus-visible {
+  opacity: 1;
+  outline: 1px solid currentcolor;
+  outline-offset: 3px;
+}
+
+@media (width >= 768px) {
+  .mg-section-nav .mg-section-nav-indicator {
+    display: block;
+  }
+
+  .mg-section-nav[data-empty='true'] .mg-section-nav-indicator {
+    display: none;
+  }
+}

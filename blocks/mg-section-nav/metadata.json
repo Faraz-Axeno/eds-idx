@@ -1,0 +1,14 @@
+{
+  "variantName": "mg-section-nav",
+  "baseBlock": "columns",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Fixed vertical indicator on right viewport edge: dashed/segmented line with one segment per page section (main > .section); highlights the active section via IntersectionObserver as user scrolls; segments clickable to scroll to section. NOT a carousel. Colour flips for light sections via data-section-theme.",
+  "contentPattern": "No authored content required (empty block table, placed in the last section). JS builds one segment per main > .section, excluding a host section that contains only this block.",
+  "usage": {
+    "pagesUsing": ["https://www.mgselect.co.in/"],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-05"
+  },
+  "options": [],
+  "memberVariantIds": ["mg-section-nav"]
+}

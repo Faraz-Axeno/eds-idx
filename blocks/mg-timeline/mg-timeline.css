@@ -1,0 +1,398 @@
+/*
+ * mg-timeline: interactive horizontal heritage timeline.
+ * Values extracted from https://www.mgselect.co.in/ (.timeline-swiper-container, 1440px).
+ */
+
+/* ---------- owning section: one white full-viewport panel ---------- */
+main > .section.mg-timeline-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: var(--mg-panel-height, 100svh);
+  padding-top: var(--nav-height, 64px);
+  overflow: hidden;
+  background-color: var(--mg-color-white);
+  color: var(--mg-color-black);
+}
+
+/* auto margins from the global `.section > div` rule disable flex stretching */
+main > .section.mg-timeline-container > div {
+  width: 100%;
+  margin: 0;
+}
+
+main > .section > .mg-timeline-wrapper {
+  max-width: none;
+  padding: 0;
+}
+
+/* section intro: centred "OUR HERITAGE" tab label + left-aligned heading */
+main > .section.mg-timeline-container .default-content-wrapper {
+  box-sizing: border-box;
+  max-width: none;
+  padding: 0 var(--mg-space-edge);
+}
+
+main > .section.mg-timeline-container .default-content-wrapper > ol,
+main > .section.mg-timeline-container .default-content-wrapper > ul {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+main > .section.mg-timeline-container .default-content-wrapper > ol > li,
+main > .section.mg-timeline-container .default-content-wrapper > ul > li {
+  margin: 0;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--mg-color-black);
+  font-family: var(--mg-font-body);
+  font-size: var(--mg-font-size-caption);
+  font-weight: var(--mg-font-weight-regular);
+  line-height: 16px;
+  letter-spacing: var(--mg-letter-spacing);
+  text-align: center;
+  color: var(--mg-color-ink);
+  cursor: pointer;
+}
+
+main > .section.mg-timeline-container .default-content-wrapper > h2 {
+  margin: 24px 0 0;
+  font-family: var(--mg-font-display);
+  font-size: var(--mg-font-size-heading);
+  font-weight: var(--mg-font-weight-bold);
+  line-height: 1.122;
+  letter-spacing: var(--mg-letter-spacing);
+  text-align: left;
+  color: var(--mg-color-black);
+}
+
+/* ---------- block ---------- */
+.mg-timeline {
+  --mg-timeline-progress: 0;
+  --mg-timeline-count: 1;
+  --mg-timeline-edge: var(--mg-space-edge, 16px);
+  --mg-timeline-card: 140px;
+  --mg-timeline-card-active: min(260px, 68vw);
+  --mg-timeline-card-pad: 10px;
+  --mg-timeline-gap: 24px;
+  --mg-timeline-year-offset: 54px;
+  --mg-timeline-slide-max: 300px;
+  --mg-timeline-tick-gap: 350px;
+  --mg-timeline-transition: var(--mg-transition-duration, 600ms);
+  --mg-timeline-ease: var(--mg-transition-ease, ease);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'viewport'
+    'bar';
+  row-gap: 16px;
+  width: 100%;
+  margin-top: 16px;
+  font-family: var(--mg-font-body);
+  letter-spacing: var(--mg-letter-spacing);
+  color: var(--mg-color-black);
+}
+
+/* ---------- ruler under the cards (source .timeline-scales: ticks only, no year labels) ---------- */
+.mg-timeline .mg-timeline-bar {
+  grid-area: bar;
+  position: relative;
+  display: none;
+  min-width: 0;
+  height: 35px;
+  margin: 0 var(--mg-timeline-edge);
+  overflow: clip visible;
+}
+
+/* 3 copies of the tick set; translated so the active (middle-copy) tick sits at the centre */
+.mg-timeline .mg-timeline-ruler {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: calc(var(--mg-timeline-tick-gap) * var(--mg-timeline-count) * 3);
+  height: 100%;
+
+  /* minor ticks: 1px #a9a9a9, 10px tall, 20 between majors */
+  background: linear-gradient(to right, var(--mg-color-grey-300) 1px, transparent 1px)
+    left bottom / calc(var(--mg-timeline-tick-gap) / 21) 10px repeat-x;
+  transform: translateX(calc(var(--mg-timeline-ruler-index, 0) * var(--mg-timeline-tick-gap) * -1));
+  transition: transform var(--mg-timeline-transition) var(--mg-timeline-ease);
+}
+
+/* major tick per milestone: 1px #a9a9a9, 25px; clickable (21px hit area) */
+.mg-timeline .mg-timeline-tick {
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--mg-timeline-tick-index) * var(--mg-timeline-tick-gap) - 10px);
+  width: 21px;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mg-timeline .mg-timeline-tick::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  width: 1px;
+  height: 25px;
+  background-color: var(--mg-color-grey-300);
+  transition: height var(--mg-timeline-transition) var(--mg-timeline-ease),
+    background-color var(--mg-timeline-transition) var(--mg-timeline-ease);
+}
+
+/* active milestone: tall dark marker (source: 40px, rgb(11 10 6)) */
+.mg-timeline .mg-timeline-tick[data-active='true']::after {
+  height: 40px;
+  background-color: var(--mg-color-night, #0b0906);
+}
+
+.mg-timeline .mg-timeline-tick:focus-visible {
+  outline: 1px solid var(--mg-color-black);
+  outline-offset: -1px;
+}
+
+/* year / title stay available to assistive tech only */
+.mg-timeline .mg-timeline-tick-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- slides ---------- */
+.mg-timeline .mg-timeline-viewport {
+  grid-area: viewport;
+  position: relative;
+  min-width: 0;
+  margin: 0 var(--mg-timeline-edge);
+  overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.mg-timeline .mg-timeline-viewport img {
+  -webkit-user-drag: none;
+}
+
+.mg-timeline .mg-timeline-viewport:focus-visible {
+  outline: 2px solid var(--mg-color-black);
+  outline-offset: 2px;
+}
+
+.mg-timeline .mg-timeline-slides {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mg-timeline-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  cursor: grab;
+  transition: transform var(--mg-timeline-transition) var(--mg-timeline-ease);
+}
+
+.mg-timeline .mg-timeline-viewport[data-dragging='true'] .mg-timeline-slides {
+  transition: none;
+}
+
+.mg-timeline .mg-timeline-slide {
+  position: relative;
+  box-sizing: content-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  flex: 0 0 var(--mg-timeline-card);
+  width: var(--mg-timeline-card);
+  margin: 0;
+  max-height: var(--mg-timeline-slide-max);
+  padding: var(--mg-timeline-card-pad);
+
+  /* source drag cursor (hotspot 55 30), `grab` fallback */
+  cursor: url('drag.svg') 55 30, grab;
+  overflow: hidden;
+}
+
+/* mouse held down: enlarged / darker drag cursor */
+.mg-timeline .mg-timeline-viewport[data-pressed='true'] .mg-timeline-slide,
+.mg-timeline .mg-timeline-viewport[data-dragging='true'] .mg-timeline-slide {
+  cursor: url('../../icons/drag-active.svg') 63 35, grabbing;
+}
+
+.mg-timeline .mg-timeline-slide[data-active='true'] {
+  z-index: 1;
+  flex-basis: var(--mg-timeline-card-active);
+  width: var(--mg-timeline-card-active);
+}
+
+/* year label sits right-aligned just above the image */
+.mg-timeline .mg-timeline-slide-year {
+  grid-area: 1 / 1;
+  margin: var(--mg-timeline-year-offset) 2px 4px 0;
+  font-family: var(--mg-font-display);
+  font-size: 16.2px;
+  font-weight: var(--mg-font-weight-regular);
+  line-height: 16.2px;
+  letter-spacing: var(--mg-letter-spacing);
+  text-align: right;
+  color: var(--mg-color-black);
+}
+
+.mg-timeline .mg-timeline-slide[data-active='true'] .mg-timeline-slide-year {
+  margin: 0 2px -4px 0;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 41.4px;
+}
+
+.mg-timeline .mg-timeline-slide-image {
+  grid-area: 2 / 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.mg-timeline .mg-timeline-slide-image picture,
+.mg-timeline .mg-timeline-slide-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* "+ TITLE" frosted bar over the top of the image */
+.mg-timeline .mg-timeline-slide-content {
+  grid-area: 2 / 1;
+  align-self: start;
+  position: relative;
+  z-index: 1;
+  margin: 16px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  backdrop-filter: blur(24px);
+  cursor: pointer;
+  font-size: 10.8px;
+  line-height: 13px;
+  color: var(--mg-color-white);
+}
+
+.mg-timeline .mg-timeline-slide-title {
+  margin: 0;
+  font-family: var(--mg-font-body);
+  font-size: inherit;
+  font-weight: var(--mg-font-weight-regular);
+  line-height: inherit;
+  letter-spacing: var(--mg-letter-spacing);
+  color: inherit;
+}
+
+.mg-timeline .mg-timeline-slide-title::before {
+  content: '+ ';
+}
+
+/* description: revealed inside the bar on the active milestone (hover / focus / touch) */
+.mg-timeline .mg-timeline-slide-text {
+  display: none;
+  margin: 0;
+  padding-top: 8px;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+.mg-timeline .mg-timeline-slide[data-active='true']:hover .mg-timeline-slide-text,
+.mg-timeline .mg-timeline-slide[data-active='true']:focus-within .mg-timeline-slide-text {
+  display: block;
+}
+
+@media (hover: none) {
+  .mg-timeline .mg-timeline-slide[data-active='true'] .mg-timeline-slide-text {
+    display: block;
+  }
+}
+
+.mg-timeline .mg-timeline-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (width >= 600px) {
+  .mg-timeline {
+    --mg-timeline-card: 200px;
+    --mg-timeline-card-active: 340px;
+    --mg-timeline-year-offset: 66px;
+    --mg-timeline-slide-max: 380px;
+  }
+}
+
+@media (width >= 900px) {
+  main > .section.mg-timeline-container {
+    padding-top: 101px;
+  }
+
+  main > .section.mg-timeline-container .default-content-wrapper > h2 {
+    margin-top: 42px;
+  }
+
+  /* the source sizes the slide band from the viewport height (its "handle-vh" swiper):
+     band above the slides = 8vh, slide box = 46vh (414px @900px tall), ruler 40px below.
+     Card widths / year offset scale with the box (430px / 250px / 98px @900px tall). */
+  .mg-timeline {
+    --mg-timeline-box: 46svh;
+    --mg-timeline-card-active: calc(var(--mg-timeline-box) * 1.04);
+    --mg-timeline-card: calc(var(--mg-timeline-box) * 0.604);
+    --mg-timeline-year-offset: calc(var(--mg-timeline-box) * 0.237);
+    --mg-timeline-slide-max: calc(var(--mg-timeline-box) - 2 * var(--mg-timeline-card-pad));
+
+    row-gap: 40px;
+    margin-top: 8svh;
+  }
+
+  /* the slide band keeps its full height so the ruler sits at the same place as the source */
+  .mg-timeline .mg-timeline-viewport {
+    height: var(--mg-timeline-box);
+  }
+
+  /* source active image starts 46px below the card top */
+  .mg-timeline .mg-timeline-slide[data-active='true'] .mg-timeline-slide-year {
+    margin-bottom: -5px;
+  }
+
+
+  /* the ruler is desktop-only, as on the source */
+  .mg-timeline .mg-timeline-bar {
+    display: block;
+  }
+}
+
+/* short desktop viewports: compact spacing + smaller cards so the panel still fits 100svh */
+
+/* short desktop viewports: the source keeps the label / heading where they are and
+   tightens only the band above the slides (5vh, e.g. 31px @625px tall) */
+@media (width >= 900px) and (height < 820px) {
+  .mg-timeline {
+    --mg-timeline-box: 44svh;
+
+    margin-top: 5svh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-timeline .mg-timeline-slides,
+  .mg-timeline .mg-timeline-ruler,
+  .mg-timeline .mg-timeline-tick::after {
+    transition: none;
+  }
+}

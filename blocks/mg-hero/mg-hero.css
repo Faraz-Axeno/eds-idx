@@ -1,0 +1,262 @@
+/* mg-hero: standalone full-viewport hero. Values extracted from source computed styles. */
+main > .section > .mg-hero-wrapper {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mg-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  box-sizing: border-box;
+  color: var(--mg-color-white, #fff);
+  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  background-color: var(--mg-color-dark, #111);
+}
+
+/* media layer: picture covers the whole block */
+.mg-hero .mg-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.mg-hero .mg-hero-media picture {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.mg-hero .mg-hero-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+.mg-hero .mg-hero-media .mg-hero-media-mobile {
+  display: none;
+}
+
+@media (width < 768px) {
+  .mg-hero[data-has-mobile-media='true'] .mg-hero-media .mg-hero-media-desktop {
+    display: none;
+  }
+
+  .mg-hero[data-has-mobile-media='true'] .mg-hero-media .mg-hero-media-mobile {
+    display: flex;
+  }
+}
+
+/* content: bottom-centered */
+.mg-hero .mg-hero-content {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 828px;
+  padding: 0 24px;
+  box-sizing: border-box;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.mg-hero .mg-hero-title {
+  margin: 0;
+  padding: 0;
+  font-family: var(--mg-font-display, sequel, 'Helvetica Neue', arial, sans-serif);
+  font-size: 24.9px;
+  font-weight: var(--mg-font-weight-bold, 700);
+  line-height: 32px;
+  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  color: var(--mg-color-white, #fff);
+  list-style: none;
+}
+
+.mg-hero .mg-hero-title::before,
+.mg-hero .mg-hero-title::marker {
+  content: none;
+}
+
+.mg-hero .mg-hero-text {
+  margin: 0;
+}
+
+.mg-hero .mg-hero-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* outlined EXPLORE CTA */
+.mg-hero a.mg-hero-cta:any-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-sizing: border-box;
+  height: var(--mg-button-height, 50px);
+  margin: 0;
+  padding: var(--mg-button-padding, 8px 20px);
+  border: var(--mg-button-border, 1px solid #f4f0ee);
+  border-radius: 0;
+  color: var(--mg-color-white, #fff);
+  text-decoration: none;
+  background: transparent;
+}
+
+.mg-hero a.mg-hero-cta:hover,
+.mg-hero a.mg-hero-cta:focus-visible {
+  text-decoration: none;
+}
+
+.mg-hero .mg-hero-cta-label {
+  display: inline-block;
+  font-family: var(--mg-font-label, roboto, 'Helvetica Neue', arial, sans-serif);
+  font-size: var(--mg-font-size-label, 14px);
+  font-weight: var(--mg-font-weight-regular, 400);
+  line-height: 32px;
+  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  white-space: nowrap;
+}
+
+.mg-hero .mg-hero-cta-icon {
+  display: block;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background-color: currentcolor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 13'%3E%3Cpath fill-rule='evenodd' d='M1.538 1.019c-.292.008-.671.016-.842.018l-.312.003.012.276c.014.339.06.5.154.545.118.055.326.067 1.476.081 2.054.025 8.003-.1 8.569-.18l.098-.014-1.829 1.84-5.177 5.204-3.348 3.365.345.346c.19.19.351.343.358.34a878 878 0 0 0 3.326-3.288c3.797-3.763 6.413-6.347 6.687-6.606.107-.101.2-.172.214-.164.017.011.022 1.346.016 4.916-.007 4.635-.005 4.903.03 4.958.047.07.124.093.443.127.292.031.355.014.404-.108.071-.177.124-.987.189-2.874.046-1.353.087-8.175.051-8.399-.012-.069-.027-.084-.125-.129a1 1 0 0 1-.227-.16l-.116-.108-4.933-.002c-2.712-.001-5.171.005-5.463.013'/%3E%3C/svg%3E") center / 13px 13px no-repeat;
+}
+
+/* Book pills: sticky on every panel like the source (position: fixed, top-right, z 9999).
+   On the live page the list is moved to <body> by the block JS, so selectors use .mg-hero-pills */
+.mg-hero-pills {
+  position: fixed;
+  top: 120px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mg-hero-pills .mg-hero-pill {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mg-hero-pills .mg-hero-pill::before,
+.mg-hero-pills .mg-hero-pill::marker {
+  content: none;
+}
+
+/* a dismissed pill keeps its slot, so the other one stays where it was (as on the source) */
+.mg-hero-pills .mg-hero-pill[hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+.mg-hero-pills a.mg-hero-pill-link:any-link {
+  display: inline-block;
+  margin: 0;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 0;
+
+  /* source asks for "Dienstag", which never loads, so browsers show their default serif */
+  font-family: dienstag, 'Times New Roman', times, serif;
+  font-size: 13px;
+  font-weight: var(--mg-font-weight-bold, 700);
+  line-height: normal;
+  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  text-align: start;
+  text-decoration: none;
+  white-space: nowrap;
+  color: var(--mg-color-white, #fff);
+  background-color: var(--mg-pill-bg, #828282);
+  box-shadow: 0 4px 12px 0 rgb(0 0 0 / 20%);
+}
+
+.mg-hero-pills a.mg-hero-pill-link:hover {
+  text-decoration: none;
+}
+
+.mg-hero-pills .mg-hero-pill:nth-child(2) a.mg-hero-pill-link:any-link {
+  background-color: var(--mg-color-grey-600, #5f5f5f);
+}
+
+.mg-hero-pills .mg-hero-pill-close {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  font-family: var(--mg-font-body, inter, 'Helvetica Neue', arial, sans-serif);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--mg-color-white, #fff);
+  background-color: var(--mg-color-black, #000);
+}
+
+.mg-hero-pills .mg-hero-pill-close::before {
+  content: '\2715';
+}
+
+@media (width >= 768px) {
+  .mg-hero .mg-hero-content {
+    padding: 0;
+  }
+
+  .mg-hero .mg-hero-actions {
+    flex-direction: row;
+    gap: 24px;
+    margin-top: 28px;
+  }
+}
+
+@media (width >= 1024px) {
+  .mg-hero .mg-hero-content {
+    bottom: 7.5%;
+  }
+
+  .mg-hero-pills {
+    gap: 17px;
+  }
+
+  .mg-hero-pills a.mg-hero-pill-link:any-link {
+    padding: var(--mg-pill-padding, 12px 24px);
+    font-size: var(--mg-font-size-body, 16px);
+  }
+}
+
+@media (width >= 1440px) {
+  .mg-hero .mg-hero-actions {
+    margin-top: 44px;
+  }
+}

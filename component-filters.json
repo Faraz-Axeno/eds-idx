@@ -16,6 +16,12 @@
       "cards",
       "columns",
       "fragment",
+      "mg-hero",
+      "mg-vehicles",
+      "mg-masonry-grid",
+      "mg-cards",
+      "mg-timeline",
+      "mg-section-nav",
       "blog-list"
     ]
   },
@@ -38,6 +44,30 @@
       "image",
       "button",
       "title"
+    ]
+  },
+  {
+    "id": "mg-cards",
+    "components": [
+      "mg-cards-item"
+    ]
+  },
+  {
+    "id": "mg-masonry-grid",
+    "components": [
+      "mg-masonry-grid-item"
+    ]
+  },
+  {
+    "id": "mg-timeline",
+    "components": [
+      "mg-timeline-item"
+    ]
+  },
+  {
+    "id": "mg-vehicles",
+    "components": [
+      "mg-vehicles-item"
     ]
   }
 ]

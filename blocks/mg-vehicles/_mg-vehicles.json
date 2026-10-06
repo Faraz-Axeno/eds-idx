@@ -1,0 +1,104 @@
+{
+  "definitions": [
+    {
+      "title": "Mg Vehicles",
+      "id": "mg-vehicles",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Mg Vehicles",
+              "model": "mg-vehicles",
+              "filter": "mg-vehicles"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "MG Vehicle Slide",
+      "id": "mg-vehicles-item",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "MG Vehicle Slide",
+              "model": "mg-vehicles-item"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "mg-vehicles",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "dayBackground",
+          "label": "Day Background Image",
+          "multi": false
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "nightBackground",
+          "label": "Night Background Image",
+          "multi": false
+        }
+      ]
+    },
+    {
+      "id": "mg-vehicles-item",
+      "fields": [
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "media_dayImage",
+          "label": "Vehicle Image (day)",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "media_dayImageAlt",
+          "value": "",
+          "label": "Vehicle Image Alt (day)"
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "media_nightImage",
+          "label": "Vehicle Image (night)",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "media_nightImageAlt",
+          "value": "",
+          "label": "Vehicle Image Alt (night)"
+        },
+        {
+          "component": "richtext",
+          "name": "content_text",
+          "value": "",
+          "label": "Title, tagline and links",
+          "valueType": "string"
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "mg-vehicles",
+      "components": [
+        "mg-vehicles-item"
+      ]
+    }
+  ]
+}

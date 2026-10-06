@@ -1,0 +1,113 @@
+/*
+ * MG Select brand tokens
+ * Extracted from https://www.mgselect.co.in/ (computed styles, 1440px viewport).
+ * Loaded first by styles.css; blocks reference these via var(--mg-*, fallback).
+ */
+
+:root {
+  /* palette */
+  --mg-color-black: #000;
+  --mg-color-white: #fff;
+  --mg-color-dark: #111;
+  --mg-color-light: #fff;
+  --mg-color-ink: #1e1e1e;
+  --mg-color-charcoal: #1e1e20;
+  --mg-color-night: #0b0906;
+  --mg-color-grey-900: #191919;
+  --mg-color-grey-600: #5f5f5f;
+  --mg-color-grey-500: #787879;
+  --mg-color-grey-400: #828282;
+  --mg-color-grey-300: #a9a9a9;
+  --mg-color-grey-200: #d9d9d9;
+  --mg-color-grey-100: #efefef;
+  --mg-color-sand-100: #f4f0ee;
+  --mg-color-overlay: rgb(0 0 0 / 40%);
+  --mg-color-frost: rgb(217 217 217 / 30%);
+  --mg-color-footer: #111;
+
+  /* typography */
+  --mg-font-display: sequel, 'Helvetica Neue', arial, sans-serif;
+  --mg-font-body: inter, 'Helvetica Neue', arial, sans-serif;
+  --mg-font-label: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace; /* source serves a monospace face named "Roboto" */
+  --mg-letter-spacing: 0.16px;
+  --mg-font-weight-regular: 400;
+  --mg-font-weight-bold: 700;
+
+  /* type scale (mobile first) */
+  --mg-font-size-display: 36px; /* manifesto h2 */
+  --mg-font-size-title: 28px; /* vehicle title */
+  --mg-font-size-heading: 24px; /* heritage h2 */
+  --mg-font-size-hero: 20px; /* hero heading */
+  --mg-font-size-eyebrow: 24px; /* WELCOME TO */
+  --mg-font-size-lead: 18px;
+  --mg-font-size-body: 16px;
+  --mg-font-size-label: 14px;
+  --mg-font-size-caption: 12px;
+  --mg-line-height-tight: 1.08;
+  --mg-line-height-heading: 1.2;
+  --mg-line-height-body: 1.35;
+
+  /* spacing */
+  --mg-space-edge: 16px;
+  --mg-space-gutter: 12px;
+  --mg-space-xs: 4px;
+  --mg-space-s: 8px;
+  --mg-space-m: 20px;
+  --mg-space-l: 40px;
+  --mg-space-xl: 60px;
+
+  /* components */
+  --mg-button-padding: 8px 20px;
+  --mg-button-height: 50px;
+  --mg-button-border: 1px solid var(--mg-color-sand-100);
+  --mg-pill-bg: var(--mg-color-grey-400);
+  --mg-pill-padding: 12px 24px;
+  --mg-arrow-size: 56px;
+  --mg-arrow-bg: var(--mg-color-grey-400);
+
+  /* motion */
+  --mg-transition-duration: 600ms;
+  --mg-transition-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* layout */
+  --mg-panel-height: 100svh;
+  --mg-nav-height: 0px; /* header is a fixed overlay */
+}
+
+@media (width >= 600px) {
+  :root {
+    --mg-space-edge: 24px;
+  }
+}
+
+@media (width >= 900px) {
+  :root {
+    --mg-font-size-display: 48px;
+    --mg-font-size-title: 36px;
+    --mg-font-size-heading: 30px;
+    --mg-font-size-hero: 22px;
+    --mg-font-size-eyebrow: 20px;
+    --mg-space-edge: 36px;
+    --mg-space-gutter: 20px;
+    --mg-arrow-size: 60px; /* source slider arrows: 60px below 1440px */
+  }
+}
+
+@media (width >= 1200px) {
+  :root {
+    --mg-font-size-display: 60px; /* 60px / 65px */
+    --mg-font-size-title: 44.7px; /* 44.7px / 53.64px */
+    --mg-font-size-heading: 36.9px; /* 36.9px / 41.4px */
+    --mg-font-size-hero: 24.9px; /* 24.9px / 32px */
+    --mg-font-size-eyebrow: 30px; /* 30px / 35px */
+    --mg-font-size-lead: 24px;
+    --mg-space-edge: 60px;
+  }
+}
+
+/* source slider arrows grow to 99px from 1440px wide */
+@media (width >= 1440px) {
+  :root {
+    --mg-arrow-size: 99px;
+  }
+}

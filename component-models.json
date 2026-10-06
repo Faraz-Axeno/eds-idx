@@ -136,10 +136,44 @@
           {
             "name": "Highlight",
             "value": "highlight"
+          },
+          {
+            "name": "Light",
+            "value": "light"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "header",
+        "label": "Header Theme",
+        "description": "Header appearance while this section is in view",
+        "valueType": "string",
+        "value": "",
+        "options": [
+          {
+            "name": "Default (dark)",
+            "value": ""
+          },
+          {
+            "name": "Light (white logo)",
+            "value": "light"
+          },
+          {
+            "name": "Dark (black logo)",
+            "value": "dark"
+          },
+          {
+            "name": "Hidden",
+            "value": "hidden"
           }
         ]
       }
     ]
+  },
+  {
+    "id": "blog-list",
+    "fields": []
   },
   {
     "id": "card",
@@ -216,15 +250,203 @@
     ]
   },
   {
-    "id": "blog-list",
-    "title": "Blog List",
-    "group": "Blocks",
+    "id": "mg-cards",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "background",
+        "label": "Background Image (map)",
+        "multi": false
+      }
+    ]
+  },
+  {
+    "id": "mg-cards-item",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "image",
+        "label": "Artwork Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "value": "",
+        "label": "Alt (city name)"
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Link to experience centre",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "mg-hero",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "image",
+        "label": "Background Image (desktop)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Background Image Alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "mobileImage",
+        "label": "Background Image (mobile / portrait)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "mobileImageAlt",
+        "label": "Mobile Image Alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Title and links (first link = primary CTA, further links = top-right pills)",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "mg-masonry-grid-item",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "value": "",
+        "label": "Alt"
+      }
+    ]
+  },
+  {
+    "id": "mg-section-nav",
     "fields": [
       {
         "component": "text",
         "valueType": "string",
-        "name": "heading",
-        "label": "Heading (Optional)"
+        "name": "label",
+        "value": "",
+        "label": "Label (optional, not rendered; segments are generated from page sections)"
+      }
+    ]
+  },
+  {
+    "id": "mg-timeline-item",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "value": "",
+        "label": "Alt"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "year",
+        "value": "",
+        "label": "Year"
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Title and description",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "mg-vehicles",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "dayBackground",
+        "label": "Day Background Image",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "nightBackground",
+        "label": "Night Background Image",
+        "multi": false
+      }
+    ]
+  },
+  {
+    "id": "mg-vehicles-item",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "media_dayImage",
+        "label": "Vehicle Image (day)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_dayImageAlt",
+        "value": "",
+        "label": "Vehicle Image Alt (day)"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "media_nightImage",
+        "label": "Vehicle Image (night)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_nightImageAlt",
+        "value": "",
+        "label": "Vehicle Image Alt (night)"
+      },
+      {
+        "component": "richtext",
+        "name": "content_text",
+        "value": "",
+        "label": "Title, tagline and links",
+        "valueType": "string"
       }
     ]
   }

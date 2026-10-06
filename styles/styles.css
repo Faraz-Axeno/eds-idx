@@ -1,3 +1,5 @@
+@import url('brand.css');
+
 /*
  * Copyright 2020 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -12,16 +14,16 @@
 
 :root {
   /* colors */
-  --background-color: white;
-  --light-color: #f8f8f8;
-  --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
+  --background-color: var(--mg-color-white);
+  --light-color: var(--mg-color-white);
+  --dark-color: var(--mg-color-dark);
+  --text-color: var(--mg-color-black);
+  --link-color: currentcolor;
+  --link-hover-color: currentcolor;
 
   /* fonts */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+  --body-font-family: var(--mg-font-body);
+  --heading-font-family: var(--mg-font-display);
 
   /* body sizes */
   --body-font-size-m: 22px;
@@ -37,7 +39,7 @@
   --heading-font-size-xs: 22px;
 
   /* nav height */
-  --nav-height: 64px;
+  --nav-height: var(--mg-nav-height);
 }
 
 /* fallback fonts */
@@ -76,8 +78,9 @@ body {
   background-color: var(--background-color);
   color: var(--text-color);
   font-family: var(--body-font-family);
-  font-size: var(--body-font-size-m);
-  line-height: 1.6;
+  font-size: var(--mg-font-size-body);
+  letter-spacing: var(--mg-letter-spacing);
+  line-height: var(--mg-line-height-body);
 }
 
 body.appear {
@@ -107,8 +110,8 @@ h6 {
   margin-top: 0.8em;
   margin-bottom: 0.25em;
   font-family: var(--heading-font-family);
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: var(--mg-font-weight-bold);
+  line-height: var(--mg-line-height-heading);
   scroll-margin: 40px;
 }
 
@@ -278,6 +281,42 @@ button.button.accent:disabled:focus-visible {
   color: var(--dark-color);
 }
 
+/* MG Select CTA treatment: square, outlined, Roboto label */
+main .button-container {
+  display: inline;
+}
+
+main a.button:any-link {
+  min-height: var(--mg-button-height);
+  border: var(--mg-button-border);
+  border-radius: 0;
+  padding: var(--mg-button-padding);
+  background: none;
+  color: inherit;
+  font-family: var(--mg-font-label);
+  font-size: var(--mg-font-size-label);
+  font-weight: var(--mg-font-weight-regular);
+  letter-spacing: var(--mg-letter-spacing);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+/* source CTAs have no hover colour change */
+main a.button:any-link:hover,
+main a.button:any-link:focus-visible {
+  text-decoration: none;
+}
+
+main .section.light a.button:any-link {
+  border-color: var(--mg-color-black);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+}
+
 main img {
   max-width: 100%;
   width: auto;
@@ -295,31 +334,74 @@ main img {
   width: 100%;
 }
 
-/* sections */
+/* hide the scrollbar on every browser; scrolling still works */
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* sections: full-viewport vertical scroll-snap panels */
+html.panels-ready:has(main > .section) {
+  scroll-snap-type: y mandatory;
+}
+
+/* while GSAP eases between panels (scripts/delayed.js) snapping and smooth behaviour pause */
+html.panels-ready.gsap-scrolling:has(main > .section) {
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+}
+
 main > .section {
-  margin: 40px 0;
+  box-sizing: border-box;
+  position: relative;
+  min-height: var(--mg-panel-height);
+  margin: 0;
+  padding: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 main > .section > div {
-  max-width: 1200px;
+  max-width: none;
   margin: auto;
-  padding: 0 24px;
+  padding: 0;
 }
 
-main > .section:first-of-type {
-  margin-top: 0;
+main > .section > .default-content-wrapper {
+  max-width: 1200px;
+  padding: 0 var(--mg-space-edge);
 }
 
-@media (width >= 900px) {
-  main > .section > div {
-    padding: 0 32px;
-  }
+/* the fixed section indicator's host is not a panel */
+main > .section.mg-section-nav-container {
+  min-height: 0;
+  scroll-snap-align: none;
+}
+
+footer {
+  scroll-snap-align: end;
 }
 
 /* section metadata */
 main .section.light,
 main .section.highlight {
   background-color: var(--light-color);
-  margin: 0;
-  padding: 40px 0;
+  color: var(--text-color);
+}
+
+main .section.dark {
+  background-color: var(--dark-color);
+  color: var(--mg-color-white);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.gsap-scrolling) {
+    scroll-behavior: smooth;
+  }
 }

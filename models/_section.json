@@ -33,6 +33,36 @@
             {
               "name": "Highlight",
               "value": "highlight"
+            },
+            {
+              "name": "Light",
+              "value": "light"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "name": "header",
+          "label": "Header Theme",
+          "description": "Header appearance while this section is in view",
+          "valueType": "string",
+          "value": "",
+          "options": [
+            {
+              "name": "Default (dark)",
+              "value": ""
+            },
+            {
+              "name": "Light (white logo)",
+              "value": "light"
+            },
+            {
+              "name": "Dark (black logo)",
+              "value": "dark"
+            },
+            {
+              "name": "Hidden",
+              "value": "hidden"
             }
           ]
         }
@@ -50,7 +80,14 @@
         "hero",
         "cards",
         "columns",
-        "fragment"
+        "fragment",
+        "mg-hero",
+        "mg-vehicles",
+        "mg-masonry-grid",
+        "mg-cards",
+        "mg-timeline",
+        "mg-section-nav",
+        "blog-list"
       ]
     }
   ]

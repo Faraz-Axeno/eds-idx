@@ -1,0 +1,14 @@
+{
+  "variantName": "mg-cards",
+  "baseBlock": "cards",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Experience Centre: single active slide showcase per city, centered horizontally, prev/next arrows on far left and right edges of viewport, dash markers at bottom. Each card = artwork image + link (KNOW MORE). Optional first row = city map background image. Full viewport.",
+  "contentPattern": "Optional leading image-only row = map background. One row per city: artwork image (alt = city) | link to dealer page (link text e.g. 'New Delhi Experience Centre'). Link wraps the artwork; extra text stays visible.",
+  "usage": {
+    "pagesUsing": ["https://www.mgselect.co.in/"],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-05"
+  },
+  "options": [],
+  "memberVariantIds": ["mg-cards"]
+}

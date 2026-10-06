@@ -1,0 +1,14 @@
+{
+  "variantName": "mg-masonry-grid",
+  "baseBlock": "columns",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "CSS grid image collage of 10 images, alternating 16:9 and 4:3 aspect ratios, staggered columns (masonry). Aspect ratios preserved via CSS aspect-ratio. Collage bleeds past the viewport edges on desktop. Full-viewport section with intro default content above.",
+  "contentPattern": "One row per image (or one row with N image cells): image + alt. All pictures are flattened in authoring order into the collage.",
+  "usage": {
+    "pagesUsing": ["https://www.mgselect.co.in/"],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-05"
+  },
+  "options": [],
+  "memberVariantIds": ["mg-masonry-grid"]
+}

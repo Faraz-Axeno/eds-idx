@@ -1,0 +1,227 @@
+/* mg-cards: full-viewport single-slide city showcase over a shared map background */
+main > .section > .mg-cards-wrapper {
+  max-width: none;
+  padding: 0;
+}
+
+.mg-cards {
+  --mg-cards-edge: var(--mg-space-edge, 16px);
+  --mg-cards-arrow-size: var(--mg-arrow-size, 56px);
+  --mg-cards-speed: 300ms;
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* shared city map background (cover) */
+.mg-cards .mg-cards-background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.mg-cards .mg-cards-background picture,
+.mg-cards .mg-cards-background img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+/* horizontal track, one full-viewport slide visible at a time */
+.mg-cards .mg-cards-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: pan-y;
+
+  /* click-and-drag with the normal pointer (hand) cursor */
+  cursor: pointer;
+  user-select: none;
+}
+
+.mg-cards .mg-cards-slides {
+  display: flex;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform: translateX(calc(var(--mg-cards-index, 0) * -100% + var(--mg-drag-x, 0px)));
+  transition: transform var(--mg-cards-speed) ease;
+}
+
+.mg-cards .mg-cards-viewport[data-dragging='true'] .mg-cards-slides {
+  transition: none;
+}
+
+.mg-cards .mg-cards-viewport img {
+  -webkit-user-drag: none;
+}
+
+.mg-cards .mg-cards-card {
+  position: relative;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.mg-cards .mg-cards-card-link {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.mg-cards .mg-cards-card-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* artwork carries the city title, landmarks and KNOW MORE button */
+.mg-cards .mg-cards-card-image picture,
+.mg-cards .mg-cards-card-image img {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.mg-cards .mg-cards-card-image img {
+  object-fit: contain;
+  object-position: 50% 50%;
+}
+
+/* link text is the accessible name; visually hidden */
+.mg-cards .mg-cards-card-title,
+.mg-cards .mg-cards-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.mg-cards .mg-cards-card-body {
+  position: absolute;
+  inset: auto 0 calc(var(--mg-cards-markers-bottom, 32px) + 24px);
+  text-align: center;
+}
+
+/* prev/next pinned to the far left/right viewport edges; like the source, only from 1024px (swipe below) */
+.mg-cards .mg-cards-nav {
+  display: none;
+}
+
+.mg-cards .mg-cards-nav button {
+  position: absolute;
+  top: calc(50% - (var(--mg-cards-arrow-size) / 2));
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--mg-cards-arrow-size);
+  height: var(--mg-cards-arrow-size);
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0%);
+  border-radius: 100%;
+  cursor: pointer;
+  color: var(--mg-color-white, #fff);
+  background-color: var(--mg-arrow-bg, #828282);
+  /* stylelint-disable-next-line property-no-vendor-prefix -- Safari < 18 */
+  -webkit-backdrop-filter: blur(44px);
+  backdrop-filter: blur(44px);
+}
+
+.mg-cards .mg-cards-nav .mg-cards-prev {
+  left: var(--mg-cards-edge);
+}
+
+.mg-cards .mg-cards-nav .mg-cards-next {
+  right: var(--mg-cards-edge);
+}
+
+.mg-cards .mg-cards-nav svg {
+  display: block;
+  width: 22px;
+  height: 15px;
+}
+
+.mg-cards .mg-cards-nav .mg-cards-prev svg {
+  transform: rotate(180deg);
+}
+
+.mg-cards .mg-cards-nav button[aria-disabled='true'] {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* dash markers */
+.mg-cards .mg-cards-markers {
+  position: absolute;
+  left: 50%;
+  bottom: var(--mg-cards-markers-bottom, 32px);
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform: translateX(-50%);
+}
+
+.mg-cards .mg-cards-marker {
+  margin: 0;
+}
+
+.mg-cards .mg-cards-marker button {
+  display: block;
+  width: 20px;
+  height: 3px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  background-color: var(--mg-color-frost, rgb(217 217 217 / 30%));
+}
+
+.mg-cards .mg-cards-marker button[data-active='true'] {
+  background-color: var(--mg-color-grey-200, #d9d9d9);
+}
+
+.mg-cards .mg-cards-nav button:focus-visible,
+.mg-cards .mg-cards-marker button:focus-visible {
+  outline: 2px solid var(--mg-color-dark, #111);
+  outline-offset: 2px;
+}
+
+.mg-cards[data-single='true'] .mg-cards-nav,
+.mg-cards[data-single='true'] .mg-cards-markers {
+  display: none;
+}
+
+@media (width >= 900px) {
+  .mg-cards {
+    --mg-cards-edge: 36px;
+  }
+}
+
+@media (width >= 1024px) {
+  .mg-cards .mg-cards-nav {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-cards .mg-cards-slides {
+    transition: none;
+  }
+}
