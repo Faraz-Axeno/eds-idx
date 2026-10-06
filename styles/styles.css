@@ -384,6 +384,12 @@ main > .section.mg-section-nav-container {
   scroll-snap-align: none;
 }
 
+/* an empty section (e.g. the one left when page metadata moves to page properties) is no
+   panel; the Universal Editor keeps showing it so authors can still add content to it */
+main > .section:empty:not([data-aue-resource]) {
+  display: none;
+}
+
 footer {
   scroll-snap-align: end;
 }

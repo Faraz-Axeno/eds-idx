@@ -1,13 +1,14 @@
 const OPTION_CLASSES = [];
 
 /**
- * Panels that get a segment: every main > .section except one holding only this nav,
- * plus the page footer, which is the final snap panel (as on the source site).
+ * Panels that get a segment: every main > .section except an empty one or one holding
+ * only this nav, plus the page footer, which is the final snap panel (as on the source site).
  */
 function getSections(block) {
   const main = block.closest('main') || document.querySelector('main');
   if (!main) return [];
   const sections = [...main.querySelectorAll(':scope > .section')].filter((section) => {
+    if (!section.children.length) return false;
     if (!section.contains(block)) return true;
     // Keep the host section only if it has other visible content besides the nav.
     return [...section.children]
