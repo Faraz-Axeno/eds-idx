@@ -1,0 +1,55 @@
+{
+  "definitions": [
+    {
+      "title": "Jsw Hero",
+      "id": "jsw-hero",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Jsw Hero",
+              "model": "jsw-hero"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "jsw-hero",
+      "fields": [
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "image",
+          "label": "Background visual (shown blurred with an ambient glow)",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "imageAlt",
+          "label": "Background visual alt",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "nav",
+          "label": "Top navigation: logo text, a list of links, then the CTA link",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "text",
+          "label": "Headline, description and the bottom-right button link",
+          "value": ""
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

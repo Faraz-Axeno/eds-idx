@@ -1,0 +1,83 @@
+{
+  "definitions": [
+    {
+      "title": "Jsw Blogs",
+      "id": "jsw-blogs",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Jsw Blogs",
+              "model": "jsw-blogs",
+              "filter": "jsw-blogs"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Jsw Blog Post",
+      "id": "jsw-blogs-item",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Jsw Blog Post",
+              "model": "jsw-blogs-item"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "jsw-blogs",
+      "fields": [
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "background",
+          "label": "Background image (shown blurred)",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "backgroundAlt",
+          "label": "Background alt",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "heading",
+          "label": "Card heading (e.g. OUR BLOGS)",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "id": "jsw-blogs-item",
+      "fields": [
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "text",
+          "label": "Category, title, summary and the READ MORE link",
+          "value": ""
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "jsw-blogs",
+      "components": [
+        "jsw-blogs-item"
+      ]
+    }
+  ]
+}

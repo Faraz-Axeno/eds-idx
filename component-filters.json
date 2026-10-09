@@ -22,7 +22,16 @@
       "mg-cards",
       "mg-timeline",
       "mg-section-nav",
-      "blog-list"
+      "blog-list",
+      "jsw-hero",
+      "jsw-tech-showcase",
+      "jsw-collage",
+      "jsw-blogs",
+      "jsw-footer",
+      "jsw-sustainability",
+      "parallax-collage",
+      "expandable-blog-teaser",
+      "jsw-navbar"
     ]
   },
   {
@@ -47,6 +56,30 @@
     ]
   },
   {
+    "id": "jsw-blogs",
+    "components": [
+      "jsw-blogs-item"
+    ]
+  },
+  {
+    "id": "jsw-collage",
+    "components": [
+      "jsw-collage-item"
+    ]
+  },
+  {
+    "id": "jsw-sustainability",
+    "components": [
+      "jsw-sustainability-item"
+    ]
+  },
+  {
+    "id": "jsw-tech-showcase",
+    "components": [
+      "jsw-tech-showcase-item"
+    ]
+  },
+  {
     "id": "mg-cards",
     "components": [
       "mg-cards-item"
@@ -68,6 +101,12 @@
     "id": "mg-vehicles",
     "components": [
       "mg-vehicles-item"
+    ]
+  },
+  {
+    "id": "parallax-collage",
+    "components": [
+      "parallax-collage-item"
     ]
   }
 ]

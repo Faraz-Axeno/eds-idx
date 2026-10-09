@@ -214,6 +214,45 @@
     ]
   },
   {
+    "id": "expandable-blog-teaser",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tab",
+        "label": "Teaser tab text (e.g. OUR BLOGS)",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Expanded title",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "description",
+        "label": "Expanded description",
+        "value": ""
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "link",
+        "label": "Button link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "linkText",
+        "label": "Button text (e.g. READ MORE)",
+        "value": ""
+      }
+    ]
+  },
+  {
     "id": "fragment",
     "fields": [
       {
@@ -246,6 +285,271 @@
         "value": "",
         "label": "Text",
         "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "jsw-blogs",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "background",
+        "label": "Background image (shown blurred)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "backgroundAlt",
+        "label": "Background alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Card heading (e.g. OUR BLOGS)",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-blogs-item",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Category, title, summary and the READ MORE link",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-collage",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Centre headline and paragraph",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-collage-item",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Alt",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-footer",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "brand",
+        "label": "Left: brand name, copyright, location and legal link",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "cta",
+        "label": "Centre: call-to-action link",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "connect",
+        "label": "Right column 1: heading + list of links (CONNECT)",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "explore",
+        "label": "Right column 2: heading + list of links (EXPLORE)",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-hero",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "image",
+        "label": "Background visual (shown blurred with an ambient glow)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Background visual alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "nav",
+        "label": "Top navigation: logo text, a list of links, then the CTA link",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Headline, description and the bottom-right button link",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-navbar",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "brand",
+        "label": "Brand: logo text as a link (e.g. JSW MOTORS -> home page)",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "links",
+        "label": "Navigation links (a list)",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "cta",
+        "label": "Call-to-action link (e.g. REGISTER INTEREST)",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-sustainability",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "engine",
+        "label": "Centre engine image (shown first, fades out on scroll)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "engineAlt",
+        "label": "Centre engine image alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Centre headline and paragraph (revealed on scroll)",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-sustainability-item",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "image",
+        "label": "Card image (cards 1-6: top-left, top-right, middle-left, middle-right, bottom-left, bottom-right)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Alt",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-tech-showcase",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "jsw-tech-showcase-item",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "media_thumbnail",
+        "label": "Thumbnail",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_thumbnailAlt",
+        "label": "Thumbnail alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "media_image",
+        "label": "Showcase image (chassis / engine)",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_imageAlt",
+        "label": "Showcase image alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Title and description",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "hotspots",
+        "label": "Hotspots: one list item each, as 'x%, y% | TITLE | description' (position over the showcase image)",
+        "value": ""
       }
     ]
   },
@@ -447,6 +751,44 @@
         "value": "",
         "label": "Title, tagline and links",
         "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "parallax-collage",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Main heading and subtitle",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "parallax-collage-item",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Alt",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "position",
+        "label": "Position (optional): center, top-left, top-right, middle-left, middle-right, next-top-left, next-top-right, next-middle-left, next-middle-right, bottom-left, bottom-right; add 'slow' or 'fast' to change its parallax speed",
+        "value": ""
       }
     ]
   }

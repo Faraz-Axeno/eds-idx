@@ -1,0 +1,304 @@
+/*
+ * parallax-collage: the text layer is position: sticky (pinned in the centre for the whole
+ * block) and the image layer scrolls over it at the page's own speed. The image layer is
+ * pulled up by -100vh to overlap the text: screen 1 (centre engine + 4 cards), a 30vh gap,
+ * then screen 2 (4 cards). No scroll scripting.
+ * Card sizes are design pixels (--pc-u): exact at the 1280x720 frame, scaled down on
+ * smaller viewports. Frames: "NEV / Collage" (screen 1) and "NEV / Sustainable" (screen 2).
+ */
+
+@font-face {
+  font-family: Michroma;
+  font-display: swap;
+  src: url('../../fonts/michroma.woff2') format('woff2');
+}
+
+/* standalone page: no site header/footer, no CSS panel snapping (wheel scrolling is eased by
+   scripts/delayed.js between the block's stops instead) */
+body.jsw-nev-collage > header,
+body.jsw-nev-collage > footer,
+body.jsw-nev-collage main .metadata-wrapper {
+  display: none;
+}
+
+html.panels-ready:has(> body.jsw-nev-collage main > .section) {
+  scroll-snap-type: none;
+}
+
+body.jsw-nev-collage main > .section {
+  min-height: 0;
+  scroll-snap-align: none;
+}
+
+/* 1. block */
+main .parallax-collage {
+  --pc-heading-color: #111;
+  --pc-subtext-color: #666;
+  --pc-font-display: michroma, 'Space Grotesk', montserrat, 'Helvetica Neue', arial, sans-serif;
+  --pc-font-body: inter, 'Helvetica Neue', arial, sans-serif;
+  --pc-heading-size: clamp(18px, 1.75vw, 48px); /* 22px at 1280: two lines, as in the design */
+  --pc-subtitle-size: clamp(14px, 1.15vw, 18px);
+  --pc-radius: 16px;
+
+  /* one design pixel: 1px at the 1280x720 frame, scaled down on smaller viewports */
+  --pc-u: min(1px, 0.1389svh, 0.0781vw);
+
+  /* first scroll: the images hold still while the engine shrinks to the top
+     (parallax-collage.js sets --pc-m-progress 0 -> 1 over --pc-m-hold vh) */
+  --pc-m-hold: 60;
+  --pc-m-progress: 0;
+
+  position: relative;
+  width: 100%;
+  background: #fff;
+
+  /* the held image layer is offset: clip it so it adds no scroll room (clip keeps sticky) */
+  overflow: clip;
+}
+
+/* 2. sticky text layer: pinned in the centre while the block scrolls */
+main .parallax-collage .sticky-text-layer {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+}
+
+main .parallax-collage .sticky-text-layer .content {
+  box-sizing: border-box;
+  width: calc(100% - 48px);
+  max-width: 600px;
+  text-align: center;
+}
+
+main .parallax-collage .sticky-text-layer .content > div {
+  display: contents;
+}
+
+main .parallax-collage .parallax-collage-title {
+  max-width: 20em; /* "DRIVING INDIA INTO A MORE" / "SUSTAINABLE FUTURE" */
+  margin: 0 auto 20px;
+  color: var(--pc-heading-color);
+  font-family: var(--pc-font-display);
+  font-size: var(--pc-heading-size);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+main .parallax-collage .sticky-text-layer .content p {
+  max-width: 560px;
+  margin: 0 auto;
+  color: var(--pc-subtext-color);
+  font-family: var(--pc-font-body);
+  font-size: var(--pc-subtitle-size);
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+/* 3. scrolling image layer, pulled up to overlap the sticky text */
+main .parallax-collage .scrolling-images-layer {
+  position: relative;
+  z-index: 5;
+  margin-top: -100vh;
+  margin-top: -100svh;
+
+  /* extra scroll room for the hold, inside the content so the text stays sticky to the end */
+  padding-bottom: calc(var(--pc-m-hold) * 1svh);
+  pointer-events: none;
+}
+
+/* 4. screen 1 + the gap before screen 2 */
+main .parallax-collage .screen-1 {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  margin-bottom: 30vh;
+  margin-bottom: 30svh;
+}
+
+/* 5. screen 2 */
+main .parallax-collage .screen-2 {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+}
+
+/* ---------- images ---------- */
+main .parallax-collage .parallax-collage-item {
+  position: absolute;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--pc-radius);
+  background-color: #0d0d0d;
+  box-shadow: 0 20px 40px rgb(0 0 0 / 10%);
+  pointer-events: auto;
+}
+
+main .parallax-collage .parallax-collage-item picture,
+main .parallax-collage .parallax-collage-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+main .parallax-collage .parallax-collage-item img {
+  border-radius: var(--pc-radius);
+  object-fit: cover;
+}
+
+/* centre engine: covers the text at first, then scrolls away with screen 1.
+   Figma "NEV / Collage": 340 x 442 (236:306), top edge at 155px of 720, rounder corners */
+main .parallax-collage .parallax-collage-item.center-engine {
+  top: 52.2%;
+  left: 50%;
+  width: calc(340 * var(--pc-u));
+  max-width: 84vw;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgb(0 0 0 / 15%);
+
+  /* first scroll: shrinks to a 162 x 210 card at the top centre (as on mobile), its top edge
+     running behind the navbar, revealing the text */
+  transform:
+    translate(-50%, -50%)
+    translateY(calc(var(--pc-m-progress) * -45.4svh))
+    scale(calc(1 - var(--pc-m-progress) * 0.524));
+  aspect-ratio: 236 / 306;
+}
+
+/* the engine fills more of the card and sits lower, as in the frame */
+main .parallax-collage .parallax-collage-item.center-engine img {
+  border-radius: 20px;
+  transform: translate(12%, 10%) scale(1.22);
+}
+
+/* side images: all the same size, as in both Figma frames (162 x 210 at 1280x720),
+   aligned in two mirrored columns per side (outer and inner) */
+main .parallax-collage .parallax-collage-item:is(
+  .card-charger, .card-bridge, .card-room, .card-spring,
+  .card-phone, .card-jetour, .card-chassis, .card-stage
+) {
+  width: calc(162 * var(--pc-u));
+  aspect-ratio: 113 / 146;
+}
+
+/* screen 1 ("NEV / Collage"): outer pair at the top, inner pair lower */
+main .parallax-collage .parallax-collage-item.card-charger {
+  top: 18.6%;
+  left: 4.9%;
+}
+
+main .parallax-collage .parallax-collage-item.card-bridge {
+  top: 18.6%;
+  right: 5%;
+}
+
+main .parallax-collage .parallax-collage-item.card-room {
+  top: 57.6%;
+  left: 13.1%;
+}
+
+main .parallax-collage .parallax-collage-item.card-spring {
+  top: 57.6%;
+  right: 13.2%;
+}
+
+/* screen 2 ("NEV / Sustainable"): inner pair at the top, outer pair lower */
+main .parallax-collage .parallax-collage-item.card-phone {
+  top: 7.6%;
+  left: 13.1%;
+}
+
+main .parallax-collage .parallax-collage-item.card-jetour {
+  top: 7.6%;
+  right: 13.2%;
+}
+
+main .parallax-collage .parallax-collage-item.card-chassis {
+  top: 44.2%;
+  left: 4.1%;
+}
+
+main .parallax-collage .parallax-collage-item.card-stage {
+  top: 44.2%;
+  right: 4.2%;
+}
+
+/* ---------- phones (below 768px): "M / Why India needs NEV" + "M / Collage" (375x815) ----------
+ * The image group first holds still while the big engine card shrinks into a small card at
+ * the top centre, revealing the text (parallax-collage.js drives --pc-m-progress, 0 -> 1, over
+ * the first --pc-m-hold vh of scrolling); then the group scrolls on to screen 2 as on desktop.
+ * Desktop rules above are untouched. */
+@media (width < 768px) {
+  main .parallax-collage .sticky-text-layer .content {
+    width: calc(100% - 40px);
+    max-width: 340px;
+  }
+
+  /* the text fits the white band between the card rows on every phone: 24px / 14.5px on the
+     375x815 frame, scaled down with the screen height (and width) on smaller phones */
+  main .parallax-collage .parallax-collage-title {
+    max-width: none;
+    margin-bottom: min(26px, 3.2svh);
+    font-size: min(24px, 2.95svh, 6.4vw);
+    line-height: 1.15;
+  }
+
+  main .parallax-collage .sticky-text-layer .content p {
+    font-size: max(11px, min(14.5px, 1.78svh, 3.87vw));
+    line-height: 1.65;
+  }
+
+  /* engine: 350 x 479 card centred over the text, shrinking to a 119px card at the top */
+  main .parallax-collage .parallax-collage-item.center-engine {
+    top: 51%;
+    z-index: 2; /* over the side cards it overlaps at first, as in the frame */
+    width: 93.3vw;
+    max-width: none;
+    transform:
+      translate(-50%, -50%)
+      translateY(calc(var(--pc-m-progress) * -45.2svh))
+      scale(calc(1 - var(--pc-m-progress) * 0.66));
+    aspect-ratio: 350 / 479;
+  }
+
+  /* side images: all 119 x 155 on the 375x815 frame (19% of the screen height, so the rows
+     keep their vertical spacing around the text on shorter phones); the top pair runs off
+     the screen edges */
+  main .parallax-collage .parallax-collage-item:is(
+    .card-charger, .card-bridge, .card-room, .card-spring,
+    .card-phone, .card-jetour, .card-chassis, .card-stage
+  ) {
+    width: min(31.8vw, 14.6svh);
+    aspect-ratio: 119 / 155;
+  }
+
+  main .parallax-collage .parallax-collage-item:is(.card-charger, .card-phone) {
+    top: 13%;
+    left: -9.6vw;
+  }
+
+  main .parallax-collage .parallax-collage-item:is(.card-bridge, .card-jetour) {
+    top: 13%;
+    right: -9.6vw;
+  }
+
+  main .parallax-collage .parallax-collage-item:is(.card-room, .card-chassis) {
+    top: 72.8%;
+    left: 4.5vw;
+  }
+
+  main .parallax-collage .parallax-collage-item:is(.card-spring, .card-stage) {
+    top: 72.8%;
+    right: 5vw;
+  }
+}

@@ -1,0 +1,222 @@
+/*
+ * jsw-sustainability: full-viewport white collage, pinned while the scroll scrubs it.
+ * Absolutely stacked layers: centre text (z 1), six cards at their final perimeter
+ * positions (z 2), centre engine card on top (z 3). jsw-sustainability.js animates the
+ * engine out, the text in and the cards from the centre, all at once.
+ * Values from the "NEV / Collage" and "NEV / Sustainable" 1280x720 frames.
+ */
+
+@font-face {
+  font-family: Michroma;
+  font-display: swap;
+  src: url('../../fonts/michroma.woff2') format('woff2');
+}
+
+/* standalone page: no site header/footer, native scrolling (ScrollTrigger drives it) */
+body.jsw-sustainability > header,
+body.jsw-sustainability > footer,
+body.jsw-sustainability main .metadata-wrapper {
+  display: none;
+}
+
+html.panels-ready:has(> body[data-native-scroll] main > .section) {
+  scroll-snap-type: none;
+}
+
+body.jsw-sustainability main > .section.jsw-sustainability-container {
+  min-height: 0;
+  scroll-snap-align: none;
+}
+
+main .jsw-sustainability {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  color: #111;
+  background-color: #fff;
+}
+
+main .jsw-sustainability :is(p, h1, h2, h3) {
+  margin: 0;
+}
+
+/* ---------- centre text (z 1, revealed) ---------- */
+main .jsw-sustainability .center-text-container {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7vw;
+  text-align: center;
+  opacity: 0;
+}
+
+main .jsw-sustainability .center-text {
+  max-width: min(530px, 86vw);
+}
+
+main .jsw-sustainability .center-text-title {
+  max-width: 20em; /* "DRIVING INDIA INTO A MORE" / "SUSTAINABLE FUTURE" */
+  margin: 0 auto 22px;
+  font-family: michroma, sequel, 'Helvetica Neue', arial, sans-serif;
+  font-size: clamp(17px, 1.75vw, 32px);
+  font-weight: 400;
+  line-height: 1.16;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+main .jsw-sustainability .center-text p {
+  color: #888;
+  font-family: inter, 'Helvetica Neue', arial, sans-serif;
+  font-size: clamp(13px, 1.1vw, 16px);
+  line-height: 1.55;
+}
+
+/* ---------- cards (z 2) at their final perimeter positions ---------- */
+main .jsw-sustainability .collage-card {
+  position: absolute;
+  z-index: 2;
+  width: min(12.7vw, 22.4svh);
+  overflow: hidden;
+  border-radius: 16px;
+  background-color: #0d0d0d;
+  box-shadow: 0 14px 32px rgb(0 0 0 / 16%);
+  aspect-ratio: 113 / 146;
+  will-change: transform, opacity;
+}
+
+/* top / left only: GSAP animates these from 50% */
+main .jsw-sustainability .collage-card[data-slot='1'] {
+  top: 7.6%;
+  left: 13.1%;
+}
+
+main .jsw-sustainability .collage-card[data-slot='2'] {
+  top: 7.6%;
+  left: 74.2%;
+}
+
+main .jsw-sustainability .collage-card[data-slot='3'] {
+  top: 44.3%;
+  left: 4.1%;
+}
+
+main .jsw-sustainability .collage-card[data-slot='4'] {
+  top: 44.3%;
+  left: 83.2%;
+}
+
+main .jsw-sustainability .collage-card[data-slot='5'] {
+  top: 69%;
+  left: 22%;
+}
+
+main .jsw-sustainability .collage-card[data-slot='6'] {
+  top: 69%;
+  left: 65.3%;
+}
+
+/* more than six cards: not placed */
+main .jsw-sustainability .collage-card[data-slot='extra'] {
+  display: none;
+}
+
+/* ---------- centre engine (z 3, covers the text initially) ---------- */
+main .jsw-sustainability .center-engine {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  height: 61.6%;
+  max-width: 84%;
+  overflow: hidden;
+  border-radius: 16px;
+  background-color: #000;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 236 / 306;
+  pointer-events: none;
+}
+
+main .jsw-sustainability .center-engine-card,
+main .jsw-sustainability .center-engine-card > div,
+main .jsw-sustainability .center-engine-card p,
+main .jsw-sustainability .center-engine-card picture,
+main .jsw-sustainability .collage-card > div,
+main .jsw-sustainability .collage-card p,
+main .jsw-sustainability .collage-card picture {
+  display: block;
+  height: 100%;
+}
+
+main .jsw-sustainability .center-engine-card img,
+main .jsw-sustainability .collage-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* before GSAP takes over: the pre-scroll state (engine shown, text + cards hidden) */
+main .jsw-sustainability:not([data-animated]) .collage-card {
+  opacity: 0;
+}
+
+/* no animation (reduced motion, GSAP unavailable, editor): the finished collage */
+main .jsw-sustainability[data-animated='static'] .center-text-container {
+  opacity: 1;
+}
+
+main .jsw-sustainability[data-animated='static'] .center-engine {
+  opacity: 0;
+}
+
+/* Universal Editor: keep the engine faintly visible so it can be selected and edited */
+main .jsw-sustainability.jsw-sustainability-editing .center-engine {
+  opacity: 0.25;
+}
+
+@media (width < 600px) {
+  main .jsw-sustainability .center-engine {
+    height: 50%;
+  }
+
+  main .jsw-sustainability .collage-card {
+    width: 26vw;
+  }
+
+  main .jsw-sustainability .collage-card[data-slot='1'] {
+    top: 4%;
+    left: 5%;
+  }
+
+  main .jsw-sustainability .collage-card[data-slot='2'] {
+    top: 4%;
+    left: 67%;
+  }
+
+  main .jsw-sustainability .collage-card[data-slot='3'] {
+    top: 20.5%;
+    left: 5%;
+  }
+
+  main .jsw-sustainability .collage-card[data-slot='4'] {
+    top: 20.5%;
+    left: 67%;
+  }
+
+  main .jsw-sustainability .collage-card[data-slot='5'] {
+    top: 70%;
+    left: 5%;
+  }
+
+  main .jsw-sustainability .collage-card[data-slot='6'] {
+    top: 70%;
+    left: 67%;
+  }
+}

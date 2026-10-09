@@ -1,0 +1,243 @@
+/*
+ * expandable-blog-teaser: grey tab at the bottom of the viewport that expands into an overlay
+ * card. The section is transparent and pulled up over the last screen + hold of the block
+ * above (--blog-teaser-overlap = 100vh + that block's hold), so the tab rises with the page
+ * as the collage settles and the card opens over it.
+ */
+
+main > .section.expandable-blog-teaser-container {
+  position: relative;
+  z-index: 4;
+  min-height: 0;
+  margin-top: calc(-1 * var(--blog-teaser-overlap, 180svh));
+  background: transparent;
+  pointer-events: none;
+}
+
+main .expandable-blog-teaser {
+  --bt-bg: #b0b0b0;
+  --bt-text: #fff;
+  --bt-button-bg: #111;
+  --bt-button-text: #fff;
+  --bt-font-display: michroma, 'Space Grotesk', montserrat, 'Helvetica Neue', arial, sans-serif;
+  --bt-font-body: inter, 'Helvetica Neue', arial, sans-serif;
+  --bt-font-mono: 'Roboto Mono', menlo, consolas, monospace;
+  --bt-radius: 16px;
+  --bt-tab-width: min(420px, 90vw);
+  --bt-tab-height: 96px;
+  --bt-open-width: min(760px, 92vw);
+  --bt-open-height: min(80svh, 640px);
+  --bt-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* scroll distance over which the card opens (vh); matches the collage's hold */
+  --bt-scroll: 80;
+
+  height: calc((100 + var(--bt-scroll)) * 1svh);
+}
+
+main .expandable-blog-teaser .blog-teaser-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+}
+
+/* ---------- the card: tab state ---------- */
+main .expandable-blog-teaser .blog-teaser-card {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: var(--bt-tab-width);
+  height: var(--bt-tab-height);
+  overflow: hidden;
+  border-radius: var(--bt-radius) var(--bt-radius) 0 0;
+  color: var(--bt-text);
+  background-color: var(--bt-bg);
+  box-shadow: 0 -8px 30px rgb(0 0 0 / 8%);
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+  transition:
+    width 0.7s var(--bt-ease),
+    height 0.7s var(--bt-ease),
+    transform 0.7s var(--bt-ease),
+    border-radius 0.7s var(--bt-ease);
+}
+
+/* open: slides up to the middle of the screen and fills most of it */
+main .expandable-blog-teaser .blog-teaser-card[data-state='open'] {
+  width: var(--bt-open-width);
+  height: var(--bt-open-height);
+  border-radius: var(--bt-radius);
+  transform: translate(-50%, calc((100svh - var(--bt-open-height)) / -2));
+}
+
+/* "‹ OUR BLOGS ›" */
+main .expandable-blog-teaser .blog-teaser-tab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  margin: 0;
+  padding: 0 28px;
+  border: 0;
+  cursor: pointer;
+  color: inherit;
+  background: none;
+  font-family: var(--bt-font-display);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+main .expandable-blog-teaser .blog-teaser-chevron {
+  width: 8px;
+  height: 8px;
+  border-top: 1.5px solid currentcolor;
+  border-left: 1.5px solid currentcolor;
+  transform: rotate(-45deg);
+}
+
+main .expandable-blog-teaser .blog-teaser-chevron.is-next {
+  transform: rotate(135deg);
+}
+
+/* ---------- content: fades + rises in once the card has opened ---------- */
+main .expandable-blog-teaser .blog-teaser-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px 40px 40px;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+main .expandable-blog-teaser .blog-teaser-card[data-state='open'] .blog-teaser-panel {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.5s ease 0.4s, transform 0.6s var(--bt-ease) 0.4s;
+}
+
+main .expandable-blog-teaser .blog-teaser-title {
+  margin: 0 0 20px;
+  font-family: var(--bt-font-display);
+  font-size: clamp(24px, 3.1vw, 40px);
+  font-weight: 400;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+main .expandable-blog-teaser .blog-teaser-description p {
+  max-width: 560px;
+  margin: 0;
+  font-family: var(--bt-font-body);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+main .expandable-blog-teaser .blog-teaser-action {
+  margin: auto 0 0;
+}
+
+main .expandable-blog-teaser a.blog-teaser-button:any-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  height: 48px;
+  padding: 0 8px 0 20px;
+  border-radius: 8px;
+  color: var(--bt-button-text);
+  background-color: var(--bt-button-bg);
+  font-family: var(--bt-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+main .expandable-blog-teaser a.blog-teaser-button:hover {
+  background-color: #333;
+}
+
+/* ↗ */
+main .expandable-blog-teaser .blog-teaser-arrow {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background-color: rgb(255 255 255 / 12%);
+}
+
+main .expandable-blog-teaser .blog-teaser-arrow::before,
+main .expandable-blog-teaser .blog-teaser-arrow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+main .expandable-blog-teaser .blog-teaser-arrow::before {
+  width: 11px;
+  height: 1.5px;
+  background-color: currentcolor;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+main .expandable-blog-teaser .blog-teaser-arrow::after {
+  box-sizing: border-box;
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid currentcolor;
+  border-right: 1.5px solid currentcolor;
+  transform: translate(-20%, -80%);
+}
+
+main .expandable-blog-teaser :is(.blog-teaser-tab, a.blog-teaser-button):focus-visible {
+  outline: 2px solid var(--bt-button-bg);
+  outline-offset: 3px;
+}
+
+/* Universal Editor: open card in normal flow */
+main > .section.expandable-blog-teaser-container:has(.blog-teaser-editing) {
+  margin-top: 0;
+  pointer-events: auto;
+}
+
+main .expandable-blog-teaser.blog-teaser-editing {
+  height: auto;
+}
+
+main .expandable-blog-teaser.blog-teaser-editing .blog-teaser-stage {
+  position: relative;
+  height: var(--bt-open-height);
+}
+
+/* mobile: the open card takes the whole screen */
+@media (width < 768px) {
+  main .expandable-blog-teaser {
+    --bt-open-width: 100vw;
+    --bt-open-height: 100svh;
+  }
+
+  main .expandable-blog-teaser .blog-teaser-card[data-state='open'] {
+    border-radius: 0;
+  }
+
+  main .expandable-blog-teaser .blog-teaser-panel {
+    padding: 16px 24px 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main .expandable-blog-teaser .blog-teaser-card,
+  main .expandable-blog-teaser .blog-teaser-panel,
+  main .expandable-blog-teaser .blog-teaser-card[data-state='open'] .blog-teaser-panel {
+    transition: none;
+  }
+}

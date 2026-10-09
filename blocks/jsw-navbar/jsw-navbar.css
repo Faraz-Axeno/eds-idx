@@ -1,0 +1,167 @@
+/*
+ * jsw-navbar: grey pill navigation fixed at the top centre of the page.
+ * Values from the "NEV / Collage 1280x720" frame: 666 x 42px solid #a2a2a2 pill, 24px from
+ * the top, logo left, thin white links, white monospace CTA inset on the right.
+ * (The nav element is moved to <body> by jsw-navbar.js, so rules use its own classes.)
+ */
+
+@font-face {
+  font-family: Michroma;
+  font-display: swap;
+  src: url('../../fonts/michroma.woff2') format('woff2');
+}
+
+.jsw-navbar-nav {
+  --jsw-navbar-bg: #a2a2a2;
+  --jsw-navbar-text: #fff;
+  --jsw-navbar-cta-bg: #fff;
+  --jsw-navbar-cta-text: #111;
+  --jsw-navbar-width: 666px;
+  --jsw-navbar-height: 42px;
+
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  z-index: 1000;
+  width: min(var(--jsw-navbar-width), calc(100% - 24px));
+  transform: translateX(-50%);
+}
+
+.jsw-navbar-nav .jsw-navbar-pill {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 33px;
+  height: var(--jsw-navbar-height);
+  padding: 0 5px 0 13px;
+  border-radius: 10px;
+  color: var(--jsw-navbar-text);
+  background-color: var(--jsw-navbar-bg);
+}
+
+.jsw-navbar-nav a:any-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* logo: slashed ring + wide wordmark */
+.jsw-navbar-nav .jsw-navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-right: auto;
+}
+
+.jsw-navbar-nav .jsw-navbar-mark {
+  position: relative;
+  box-sizing: border-box;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentcolor;
+  border-radius: 50%;
+}
+
+.jsw-navbar-nav .jsw-navbar-mark::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -3px;
+  width: calc(100% + 6px);
+  height: 2px;
+  background-color: currentcolor;
+  transform: translateY(-50%) rotate(-35deg);
+}
+
+.jsw-navbar-nav .jsw-navbar-brand-text {
+  font-family: michroma, sequel, 'Helvetica Neue', arial, sans-serif;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+
+  /* the JSW wordmark is heavier than the single-weight display face */
+  -webkit-text-stroke: 0.35px currentcolor;
+}
+
+.jsw-navbar-nav .jsw-navbar-links {
+  display: none;
+  gap: 23px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jsw-navbar-nav .jsw-navbar-links a {
+  font-family: inter, 'Helvetica Neue', arial, sans-serif;
+  font-size: 12.5px;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.jsw-navbar-nav .jsw-navbar-links a:hover {
+  opacity: 0.75;
+}
+
+.jsw-navbar-nav a.jsw-navbar-cta:any-link {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 142px;
+  height: 31px;
+  padding: 0 12px;
+  border-radius: 6px;
+  color: var(--jsw-navbar-cta-text);
+  background-color: var(--jsw-navbar-cta-bg);
+  font-family: 'Roboto Mono', sfmono-regular, menlo, consolas, monospace;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.jsw-navbar-nav :is(a):focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+/* Universal Editor: the pill stays inside its block */
+.jsw-navbar.jsw-navbar-editing {
+  position: relative;
+  height: 90px;
+}
+
+.jsw-navbar.jsw-navbar-editing .jsw-navbar-nav {
+  position: absolute;
+}
+
+@media (width >= 600px) {
+  .jsw-navbar-nav .jsw-navbar-links {
+    display: flex;
+  }
+}
+
+/* phones: logo + CTA, tighter so both fit */
+@media (width < 600px) {
+  .jsw-navbar-nav {
+    top: 12px;
+  }
+
+  .jsw-navbar-nav .jsw-navbar-pill {
+    gap: 12px;
+    padding-left: 12px;
+  }
+
+  .jsw-navbar-nav .jsw-navbar-brand-text {
+    letter-spacing: 0.12em;
+  }
+
+  .jsw-navbar-nav a.jsw-navbar-cta:any-link {
+    min-width: 0;
+    padding: 0 10px;
+    font-size: 10px;
+  }
+}

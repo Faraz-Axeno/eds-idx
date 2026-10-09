@@ -87,7 +87,16 @@
         "mg-cards",
         "mg-timeline",
         "mg-section-nav",
-        "blog-list"
+        "blog-list",
+        "jsw-hero",
+        "jsw-tech-showcase",
+        "jsw-collage",
+        "jsw-blogs",
+        "jsw-footer",
+        "jsw-sustainability",
+        "parallax-collage",
+        "expandable-blog-teaser",
+        "jsw-navbar"
       ]
     }
   ]

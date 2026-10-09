@@ -1,0 +1,134 @@
+/*
+ * jsw-footer: full-width footer, deep black-to-teal gradient.
+ * Left brand + legal, centre CTA, right CONNECT / EXPLORE link columns.
+ * Values from the "NEV / Footer 1280x720" frame.
+ */
+
+/* the footer is not a full-viewport panel: it ends the page */
+.jsw-phase-3 main > .section.jsw-footer-container {
+  min-height: 0;
+  scroll-snap-align: end;
+}
+
+.jsw-footer {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 36px;
+  padding: 40px var(--jsw-edge, 20px) 120px;
+  border-radius: 0 0 var(--jsw-radius-card, 24px) var(--jsw-radius-card, 24px);
+  color: var(--jsw-white, #fff);
+  background: linear-gradient(180deg, var(--jsw-black, #050505) 0%, #050505 28%, #06363b 62%, #0c7d88 88%, #12a0ab 100%);
+}
+
+.jsw-footer p {
+  margin: 0;
+}
+
+.jsw-footer a:any-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.jsw-footer .jsw-footer-brand > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.jsw-footer .jsw-footer-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-family: var(--jsw-font-display);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+}
+
+.jsw-footer .jsw-footer-meta {
+  color: rgb(255 255 255 / 70%);
+  font-size: 12px;
+}
+
+.jsw-footer .jsw-footer-legal {
+  margin-top: 22px;
+  font-family: var(--jsw-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.jsw-footer .jsw-footer-legal a:hover,
+.jsw-footer .jsw-footer-list a:hover {
+  color: var(--jsw-white, #fff);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* centre CTA: white pill with a leading plus */
+.jsw-footer a.jsw-footer-cta-link:any-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 8px;
+  color: var(--jsw-text-dark, #111);
+  background-color: var(--jsw-white, #fff);
+  font-family: var(--jsw-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.jsw-footer a.jsw-footer-cta-link::before {
+  content: '+';
+  font-size: 15px;
+  line-height: 1;
+}
+
+.jsw-footer a.jsw-footer-cta-link:hover {
+  background-color: #e6e6e6;
+}
+
+.jsw-footer .jsw-footer-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  gap: 56px;
+}
+
+.jsw-footer .jsw-footer-heading {
+  margin-bottom: 10px;
+  font-family: var(--jsw-font-display);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.jsw-footer .jsw-footer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: rgb(255 255 255 / 70%);
+  font-size: 12px;
+}
+
+@media (width >= 900px) {
+  .jsw-footer {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: start;
+    padding: 28px var(--jsw-edge) 150px;
+  }
+
+  .jsw-footer .jsw-footer-cta {
+    padding-top: 6px;
+  }
+
+  .jsw-footer .jsw-footer-links {
+    justify-self: end;
+    gap: 64px;
+  }
+}

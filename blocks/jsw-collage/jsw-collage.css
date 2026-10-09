@@ -1,0 +1,149 @@
+/*
+ * jsw-collage: white rounded card; headline + paragraph in the centre, six rounded image
+ * cards floating around it on desktop, a 2-column grid below 900px.
+ * Values from the "NEV / Collage 1280x720" frames.
+ */
+
+.jsw-collage {
+  --jsw-card-w: min(12vw, 22svh);
+
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  min-height: var(--jsw-panel-height, calc(100svh - 16px));
+  padding: 96px var(--jsw-edge, 20px) 32px;
+  overflow: hidden;
+  border-radius: var(--jsw-radius-card, 24px);
+  color: var(--jsw-text-dark, #111);
+  background-color: var(--jsw-white, #fff);
+}
+
+.jsw-collage .jsw-collage-text {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.jsw-collage .jsw-collage-title {
+  margin-bottom: 18px;
+  font-family: var(--jsw-font-display);
+  font-size: clamp(19px, 2vw, 30px);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.jsw-collage .jsw-collage-text p {
+  color: #7a7a7a;
+  font-size: clamp(13px, 1.1vw, 15px);
+  line-height: 1.55;
+}
+
+.jsw-collage .jsw-collage-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.jsw-collage .jsw-collage-card {
+  overflow: hidden;
+  border-radius: 10px;
+  background-color: var(--jsw-ink, #0d0d0d);
+  aspect-ratio: 111 / 143;
+}
+
+.jsw-collage .jsw-collage-card > div,
+.jsw-collage .jsw-collage-card p,
+.jsw-collage .jsw-collage-card picture {
+  display: block;
+  height: 100%;
+}
+
+.jsw-collage .jsw-collage-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes jsw-collage-float {
+  from {
+    transform: translateY(-6px);
+  }
+
+  to {
+    transform: translateY(6px);
+  }
+}
+
+@media (width >= 900px) {
+  .jsw-collage {
+    display: block;
+    height: var(--jsw-panel-height, calc(100svh - 16px));
+    padding: 0;
+  }
+
+  /* text sits in the exact centre; the cards keep out of its column */
+  .jsw-collage .jsw-collage-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(560px, 42vw);
+    transform: translate(-50%, -50%);
+  }
+
+  .jsw-collage .jsw-collage-cards {
+    display: block;
+  }
+
+  .jsw-collage .jsw-collage-card {
+    position: absolute;
+    width: var(--jsw-card-w);
+  }
+
+  .jsw-collage .jsw-collage-card[data-slot='extra'] {
+    display: none;
+  }
+
+  /* the top pair clears the fixed pill navigation */
+  .jsw-collage .jsw-collage-card[data-slot='1'] {
+    top: 9%;
+    left: 13%;
+  }
+
+  .jsw-collage .jsw-collage-card[data-slot='2'] {
+    top: 9%;
+    right: 13%;
+  }
+
+  .jsw-collage .jsw-collage-card[data-slot='3'] {
+    top: 37%;
+    left: 4%;
+  }
+
+  .jsw-collage .jsw-collage-card[data-slot='4'] {
+    top: 37%;
+    right: 4%;
+  }
+
+  .jsw-collage .jsw-collage-card[data-slot='5'] {
+    bottom: 6%;
+    left: 15%;
+  }
+
+  .jsw-collage .jsw-collage-card[data-slot='6'] {
+    bottom: 6%;
+    right: 15%;
+  }
+}
+
+@media (width >= 900px) and (prefers-reduced-motion: no-preference) {
+  .jsw-collage .jsw-collage-card {
+    animation: jsw-collage-float 5.5s ease-in-out calc(var(--jsw-i, 0) * -1.3s) infinite alternate;
+  }
+}

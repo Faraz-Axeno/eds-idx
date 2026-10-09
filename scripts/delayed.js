@@ -19,6 +19,12 @@ function panelStops() {
       stops.add(Math.min(top + Math.round(rect.height) - window.innerHeight, maxY));
     }
   });
+  // blocks can add their own stops: data-scroll-stops="px,px" (offsets from their own top)
+  document.querySelectorAll('main [data-scroll-stops]').forEach((el) => {
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    el.dataset.scrollStops.split(',').map(Number).filter((n) => n > 0)
+      .forEach((offset) => stops.add(Math.min(Math.round(top + offset), maxY)));
+  });
   return [...stops].sort((a, b) => a - b);
 }
 
@@ -43,6 +49,8 @@ function isNativeWheel(e) {
  */
 async function initSmoothScroll() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // pages whose blocks drive scrolling themselves (e.g. a pinned ScrollTrigger) opt out
+  if (document.body.dataset.nativeScroll) return;
   await loadScript(GSAP_SRC);
   await loadScript(SCROLL_TO_SRC);
   const { gsap, ScrollToPlugin } = window;

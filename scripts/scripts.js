@@ -366,6 +366,29 @@ export function decorateMain(main) {
 }
 
 /**
+ * Standalone JSW pages bring their own chrome and skip the site header and footer.
+ * Recognised by a marker block; each gets its body class (and optional page styles):
+ *   /jsw-phase-3        jsw-hero (+ jsw-footer)      -> jsw-phase-3 + styles/jsw-phase-3.css
+ *   /jsw-sustainability jsw-sustainability (single)  -> jsw-sustainability
+ *   /jsw-nev-collage    parallax-collage (+ teaser)  -> jsw-nev-collage
+ * Every other page is unaffected.
+ */
+const STANDALONE_PAGES = [
+  { block: 'jsw-hero', bodyClass: 'jsw-phase-3', css: 'jsw-phase-3.css' },
+  { block: 'jsw-sustainability', bodyClass: 'jsw-sustainability' },
+  { block: 'parallax-collage', bodyClass: 'jsw-nev-collage' },
+];
+
+/**
+ * @param {Element} main The main element
+ * @returns {Object|undefined} the standalone page entry, if this is one
+ */
+function standalonePage(main) {
+  return STANDALONE_PAGES.find(({ block, bodyClass }) => document.body.classList.contains(bodyClass)
+    || Boolean(main && main.querySelector(`div.${block}`)));
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
@@ -374,6 +397,11 @@ async function loadEager(doc) {
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
+    const page = standalonePage(main);
+    if (page) {
+      document.body.classList.add(page.bodyClass);
+      if (page.css) await loadCSS(`${window.hlx.codeBasePath}/styles/${page.css}`);
+    }
     decorateMain(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
@@ -394,9 +422,10 @@ async function loadEager(doc) {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
-  loadHeader(doc.querySelector('header'));
-
   const main = doc.querySelector('main');
+  const siteChrome = !standalonePage(main);
+  if (siteChrome) loadHeader(doc.querySelector('header'));
+
   await loadSections(main);
 
   // enable full-viewport panel snapping only once every section has rendered,
@@ -407,7 +436,7 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadFooter(doc.querySelector('footer'));
+  if (siteChrome) loadFooter(doc.querySelector('footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();

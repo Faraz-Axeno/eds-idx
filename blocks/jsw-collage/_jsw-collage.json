@@ -1,0 +1,76 @@
+{
+  "definitions": [
+    {
+      "title": "Jsw Collage",
+      "id": "jsw-collage",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Jsw Collage",
+              "model": "jsw-collage",
+              "filter": "jsw-collage"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Jsw Collage Image",
+      "id": "jsw-collage-item",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Jsw Collage Image",
+              "model": "jsw-collage-item"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "jsw-collage",
+      "fields": [
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "text",
+          "label": "Centre headline and paragraph",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "id": "jsw-collage-item",
+      "fields": [
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "image",
+          "label": "Image",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "imageAlt",
+          "label": "Alt",
+          "value": ""
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "jsw-collage",
+      "components": [
+        "jsw-collage-item"
+      ]
+    }
+  ]
+}
