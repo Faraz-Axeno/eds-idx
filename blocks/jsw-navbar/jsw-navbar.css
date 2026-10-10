@@ -83,6 +83,15 @@
   -webkit-text-stroke: 0.35px currentcolor;
 }
 
+/* links + CTA group: no box of its own on wider screens, so the pill lays them out as before */
+.jsw-navbar-nav .jsw-navbar-menu {
+  display: contents;
+}
+
+.jsw-navbar-nav .jsw-navbar-toggle {
+  display: none;
+}
+
 .jsw-navbar-nav .jsw-navbar-links {
   display: none;
   gap: 23px;
@@ -123,7 +132,7 @@
   white-space: nowrap;
 }
 
-.jsw-navbar-nav :is(a):focus-visible {
+.jsw-navbar-nav :is(a, button):focus-visible {
   outline: 2px solid #111;
   outline-offset: 2px;
 }
@@ -144,13 +153,15 @@
   }
 }
 
-/* phones: logo + CTA, tighter so both fit */
+/* phones: logo + hamburger (in the CTA's white inset); the links and the CTA drop down in a
+   panel of the same grey, as wide as the pill */
 @media (width < 600px) {
   .jsw-navbar-nav {
     top: 12px;
   }
 
   .jsw-navbar-nav .jsw-navbar-pill {
+    position: relative;
     gap: 12px;
     padding-left: 12px;
   }
@@ -159,9 +170,93 @@
     letter-spacing: 0.12em;
   }
 
+  /* the MG Select hamburger: two thin white lines, long over short, crossing when open */
+  .jsw-navbar-nav .jsw-navbar-toggle {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 12px;
+    width: 32px;
+    height: 30px;
+    margin-right: 8px;
+    padding: 0;
+    border: 0;
+    color: var(--jsw-navbar-text);
+    background: none;
+    cursor: pointer;
+  }
+
+  .jsw-navbar-nav .jsw-navbar-stroke {
+    display: block;
+    height: 1.5px;
+    margin: 0.25px 0;
+    background-color: currentcolor;
+    transition: 0.5s cubic-bezier(0.71, 0, 0.25, 1);
+  }
+
+  .jsw-navbar-nav .jsw-navbar-stroke-top {
+    width: 32px;
+  }
+
+  .jsw-navbar-nav .jsw-navbar-stroke-bottom {
+    width: 21px;
+  }
+
+  .jsw-navbar-nav.jsw-navbar-open .jsw-navbar-stroke {
+    width: 32px;
+  }
+
+  .jsw-navbar-nav.jsw-navbar-open .jsw-navbar-stroke-top {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .jsw-navbar-nav.jsw-navbar-open .jsw-navbar-stroke-bottom {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .jsw-navbar-nav .jsw-navbar-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 6px 12px 12px;
+    border-radius: 10px;
+    background-color: var(--jsw-navbar-bg);
+    box-shadow: 0 12px 30px rgb(0 0 0 / 18%);
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+  }
+
+  .jsw-navbar-nav.jsw-navbar-open .jsw-navbar-menu {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .jsw-navbar-nav .jsw-navbar-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .jsw-navbar-nav .jsw-navbar-links a {
+    display: block;
+    padding: 14px 2px;
+    border-bottom: 1px solid rgb(255 255 255 / 35%);
+    font-size: 13px;
+  }
+
   .jsw-navbar-nav a.jsw-navbar-cta:any-link {
-    min-width: 0;
-    padding: 0 10px;
-    font-size: 10px;
+    width: 100%;
+    height: 38px;
+    margin-top: 12px;
+    font-size: 11px;
   }
 }

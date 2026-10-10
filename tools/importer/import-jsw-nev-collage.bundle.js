@@ -44,7 +44,8 @@ var CustomImportScript = (() => {
   var IMAGES = [
     ["engine-black.jpg", "Electrified engine with carbon intake pipes", "center-engine"],
     ["ev-charger.jpg", "Wall-mounted EV charger plugged into a car", "card-charger"],
-    ["bridge-road.jpg", "Aerial view of a road bridge over water", "card-bridge"],
+    // re-saved under a new name: the first upload of bridge-road.jpg to AEM failed
+    ["bridge-road-aerial.jpg", "Aerial view of a road bridge over water", "card-bridge"],
     ["test-hall.jpg", "Empty vehicle test hall with ceiling lights", "card-room"],
     ["suspension-spring.jpg", "Close-up of a black suspension coil spring", "card-spring"],
     ["phone-app.jpg", "Phone app showing the car battery at 72%", "card-phone"],

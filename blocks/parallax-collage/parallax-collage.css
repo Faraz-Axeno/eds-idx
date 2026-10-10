@@ -237,8 +237,9 @@ main .parallax-collage .parallax-collage-item.card-stage {
  * The image group first holds still while the big engine card shrinks into a small card at
  * the top centre, revealing the text (parallax-collage.js drives --pc-m-progress, 0 -> 1, over
  * the first --pc-m-hold vh of scrolling); then the group scrolls on to screen 2 as on desktop.
+ * Portrait tablets (up to 1199px wide) use the same phone layout, with the size caps below.
  * Desktop rules above are untouched. */
-@media (width < 768px) {
+@media (width < 768px), (orientation: portrait) and (width < 1200px) {
   main .parallax-collage .sticky-text-layer .content {
     width: calc(100% - 40px);
     max-width: 340px;
@@ -300,5 +301,34 @@ main .parallax-collage .parallax-collage-item.card-stage {
   main .parallax-collage .parallax-collage-item:is(.card-spring, .card-stage) {
     top: 72.8%;
     right: 5vw;
+  }
+}
+
+/* ---------- portrait tablets: the phone layout, sized by the screen height ----------
+ * the engine card keeps its 60% share of the screen height (as on the 375x815 frame), the
+ * side images their 19%, the top pair still running ~30% off the edges; larger text */
+@media (orientation: portrait) and (768px <= width < 1200px) {
+  main .parallax-collage .sticky-text-layer .content {
+    max-width: 480px;
+  }
+
+  main .parallax-collage .parallax-collage-title {
+    font-size: min(34px, 3.1svh);
+  }
+
+  main .parallax-collage .sticky-text-layer .content p {
+    font-size: min(17px, 1.6svh);
+  }
+
+  main .parallax-collage .parallax-collage-item.center-engine {
+    width: min(80vw, calc(60svh * 350 / 479));
+  }
+
+  main .parallax-collage .parallax-collage-item:is(.card-charger, .card-phone) {
+    left: -4.4svh;
+  }
+
+  main .parallax-collage .parallax-collage-item:is(.card-bridge, .card-jetour) {
+    right: -4.4svh;
   }
 }
