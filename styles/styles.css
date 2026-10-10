@@ -351,10 +351,12 @@ html.panels-ready:has(main > .section) {
   scroll-snap-type: y mandatory;
 }
 
-/* while GSAP eases between panels (scripts/delayed.js) snapping and smooth behaviour pause */
+/* while GSAP eases between panels (scripts/delayed.js) snapping and smooth behaviour pause;
+   important: ScrollTrigger (block animations) can leave an inline scroll-behavior: smooth on
+   <html>, which would animate each eased step natively and cancel the ease after a few px */
 html.panels-ready.gsap-scrolling:has(main > .section) {
   scroll-snap-type: none;
-  scroll-behavior: auto;
+  scroll-behavior: auto !important;
 }
 
 main > .section {
