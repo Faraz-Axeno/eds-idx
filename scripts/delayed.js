@@ -28,24 +28,39 @@ function panelStops() {
   return [...stops].sort((a, b) => a - b);
 }
 
-/** true when the wheel should stay native (zoom, sideways, open menu, inner scroller) */
-function isNativeWheel(e) {
-  if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY) || !e.deltaY) return true;
+/** true when an open menu or an inner scroller under `target` takes a scroll by `deltaY` */
+function scrollsInside(target, deltaY) {
   if (document.querySelector('header .header.is-open')) return true;
-  for (let el = e.target; el && el !== document.body; el = el.parentElement) {
+  for (let el = target; el && el !== document.body; el = el.parentElement) {
     const { overflowY } = getComputedStyle(el);
     if (/(auto|scroll)/.test(overflowY) && el.scrollHeight > el.clientHeight) {
       const atTop = el.scrollTop <= 0;
       const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-      if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) return true;
+      if ((deltaY < 0 && !atTop) || (deltaY > 0 && !atBottom)) return true;
     }
   }
   return false;
 }
 
+/** true when the wheel should stay native (zoom, sideways, open menu, inner scroller) */
+function isNativeWheel(e) {
+  if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY) || !e.deltaY) return true;
+  return scrollsInside(e.target, e.deltaY);
+}
+
+/** the stop one gesture leads to: the next one down (dir 1) or up (dir -1) */
+function nextStop(dir) {
+  const y = window.scrollY;
+  const stops = panelStops();
+  return dir > 0
+    ? stops.find((s) => s > y + 2) ?? stops[stops.length - 1]
+    : [...stops].reverse().find((s) => s < y - 2) ?? 0;
+}
+
 /**
  * Wheel-driven panel scrolling with GSAP: each wheel gesture eases to the
- * next / previous full-viewport panel.
+ * next / previous full-viewport panel. On the JSW NEV page, touch swipes do the same
+ * (phones and tablets have no wheel: a flick would otherwise race through the page).
  */
 async function initSmoothScroll() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -65,23 +80,11 @@ async function initSmoothScroll() {
     root.classList.remove('gsap-scrolling');
   };
 
-  window.addEventListener('wheel', (e) => {
-    // already handled, e.g. by a panel's in-place step (mg-masonry-grid)
-    if (e.defaultPrevented || isNativeWheel(e)) return;
-    e.preventDefault();
-
-    // one panel per gesture: ignore the rest of a trackpad/inertia burst
-    const now = performance.now();
-    const burst = now - lastWheel < 150;
-    lastWheel = now;
-    if (tweening || burst) return;
-
-    const y = window.scrollY;
-    const stops = panelStops();
-    const destY = e.deltaY > 0
-      ? stops.find((s) => s > y + 2) ?? stops[stops.length - 1]
-      : [...stops].reverse().find((s) => s < y - 2) ?? 0;
-    if (Math.abs(destY - y) < 2) return;
+  /** eases one stop down (dir 1) or up (dir -1) */
+  const glide = (dir) => {
+    if (tweening) return;
+    const destY = nextStop(dir);
+    if (Math.abs(destY - window.scrollY) < 2) return;
 
     tweening = true;
     // CSS snap / smooth-behaviour would fight the tween; the tween ends on a snap point
@@ -94,6 +97,51 @@ async function initSmoothScroll() {
       onComplete: done,
       onInterrupt: done,
     });
+  };
+
+  window.addEventListener('wheel', (e) => {
+    // already handled, e.g. by a panel's in-place step (mg-masonry-grid)
+    if (e.defaultPrevented || isNativeWheel(e)) return;
+    e.preventDefault();
+
+    // one panel per gesture: ignore the rest of a trackpad/inertia burst
+    const now = performance.now();
+    const burst = now - lastWheel < 150;
+    lastWheel = now;
+    if (burst) return;
+    glide(e.deltaY > 0 ? 1 : -1);
+  }, { passive: false });
+
+  if (!document.body.classList.contains('jsw-phase-3')) return;
+  // touch: a vertical swipe glides one stop, like a wheel gesture; the finger's own scroll is
+  // held back (decided on its first move, before the browser starts scrolling). Taps,
+  // sideways swipes, pinch zoom and inner scrollers stay native.
+  const SWIPE = 24; // px of finger travel that count as a swipe
+  let start = null;
+  let mode = null; // 'panel' | 'native', per gesture
+  let swiped = false;
+  window.addEventListener('touchstart', (e) => {
+    start = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+    mode = start ? null : 'native';
+    swiped = false;
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (!start || mode === 'native' || e.touches.length !== 1) {
+      mode = 'native';
+      return;
+    }
+    const dx = e.touches[0].clientX - start.x;
+    const dy = e.touches[0].clientY - start.y;
+    if (!mode) {
+      // finger up (dy < 0) scrolls the page down
+      mode = Math.abs(dy) >= Math.abs(dx) && !scrollsInside(e.target, -dy) ? 'panel' : 'native';
+    }
+    if (mode !== 'panel') return;
+    if (e.cancelable) e.preventDefault();
+    if (!swiped && Math.abs(dy) >= SWIPE) {
+      swiped = true;
+      glide(dy < 0 ? 1 : -1);
+    }
   }, { passive: false });
 }
 
