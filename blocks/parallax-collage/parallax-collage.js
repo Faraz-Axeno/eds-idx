@@ -175,6 +175,10 @@ function flyIn({
       landed.dataset.src = src;
       landed.src = src;
       flown.src = src;
+      // with the colour treatment the source section gives it (e.g. the Rotax engine's)
+      const tone = getComputedStyle(img).filter;
+      landed.style.filter = tone === 'none' ? '' : tone;
+      flown.style.filter = landed.style.filter;
     }
     if (picture) picture.style.display = 'none';
     if (!landed.isConnected) engine.append(landed);

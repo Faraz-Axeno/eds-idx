@@ -121,19 +121,18 @@
   flex: 1;
 }
 
-/* posts share one grid cell so the card keeps its height while they cross-fade */
+/* posts share one grid cell so the card keeps its height; they cross-fade in place (no
+   movement) while the background slides, over the same 1.8s glide */
 .jsw-blogs .jsw-blogs-post {
   display: flex;
   grid-area: 1 / 1;
   opacity: 0;
-  transform: translateX(16px);
-  transition: opacity 0.5s var(--jsw-ease), transform 0.5s var(--jsw-ease);
+  transition: opacity 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955);
   pointer-events: none;
 }
 
 .jsw-blogs .jsw-blogs-post.is-active {
   opacity: 1;
-  transform: none;
   pointer-events: auto;
 }
 

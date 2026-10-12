@@ -117,11 +117,40 @@ export default function decorate(block) {
   tooltip.append(tipTitle, tipText, tipClose);
 
   let openSpot = null;
+  /**
+   * the tooltip opens to the left of its hotspot and down, the hotspot in its top corner (as
+   * in the design); where that would cut it off at the card's or the screen's edge it opens
+   * to the right / up instead. Where neither side fits (narrow screens) it opens just below
+   * (or above) the hotspot, centred on it and nudged in, the hotspot keeping its own box.
+   */
+  const placeTooltip = () => {
+    const area = stage.getBoundingClientRect();
+    const gap = 8;
+    const left = Math.max(area.left, 0) + gap;
+    const right = Math.min(area.right, document.documentElement.clientWidth) - gap;
+    const bottom = Math.min(area.bottom, window.innerHeight) - gap;
+    const set = (side, align) => {
+      tooltip.dataset.side = side;
+      tooltip.dataset.align = align;
+      return tooltip.getBoundingClientRect();
+    };
+    tooltip.style.removeProperty('--jsw-sx');
+    let box = set('left', 'top');
+    if (box.left < left) box = set('right', 'top');
+    const apart = box.left < left || box.right > right;
+    if (apart) box = set('center', 'below');
+    if (box.bottom > bottom) box = set(tooltip.dataset.side, apart ? 'above' : 'bottom');
+    if (box.right > right) tooltip.style.setProperty('--jsw-sx', `${right - box.right}px`);
+    else if (box.left < left) tooltip.style.setProperty('--jsw-sx', `${left - box.left}px`);
+    openSpot?.classList.toggle('jsw-hotspot-apart', apart);
+  };
+
   const closeTooltip = (refocus = false) => {
     if (!openSpot) return;
     const spot = openSpot;
     openSpot = null;
     spot.setAttribute('aria-expanded', 'false');
+    spot.classList.remove('jsw-hotspot-apart');
     tooltip.hidden = true;
     if (refocus) spot.focus();
   };
@@ -134,9 +163,8 @@ export default function decorate(block) {
     spot.closest('.jsw-tech-figure').append(tooltip);
     tooltip.style.setProperty('--jsw-x', `${data.x}%`);
     tooltip.style.setProperty('--jsw-y', `${data.y}%`);
-    tooltip.dataset.side = data.x > 55 ? 'left' : 'right';
-    tooltip.dataset.align = data.y > 70 ? 'bottom' : 'top';
     tooltip.hidden = false;
+    placeTooltip();
   };
 
   const items = itemRows.map((row, i) => {
@@ -226,6 +254,9 @@ export default function decorate(block) {
   });
 
   tipClose.addEventListener('click', () => closeTooltip(true));
+  window.addEventListener('resize', () => {
+    if (openSpot) placeTooltip();
+  });
   document.addEventListener('click', (e) => {
     if (openSpot && !tooltip.contains(e.target)) closeTooltip();
   });

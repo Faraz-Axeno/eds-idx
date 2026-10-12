@@ -120,6 +120,13 @@
   filter: none;
 }
 
+/* "NEV / Tech 2": the Rotax engine is black and grey in the frame; the photo's blue cast is
+   taken out and it is darkened to the frame's tones (parallax-collage carries this over
+   when it flies the image on) */
+.jsw-tech-showcase .jsw-tech-panel:nth-child(2) .jsw-tech-figure img {
+  filter: grayscale(1) brightness(0.7) contrast(1.2);
+}
+
 .jsw-tech-showcase .jsw-tech-thumb[aria-selected='true'] {
   transform: translateY(-4px);
 }
@@ -197,87 +204,135 @@
   transform: translate(-50%, -50%) rotate(90deg);
 }
 
-.jsw-tech-showcase .jsw-hotspot:hover,
-.jsw-tech-showcase .jsw-hotspot[aria-expanded='true'] {
+.jsw-tech-showcase .jsw-hotspot:hover {
   background-color: rgb(80 80 80 / 70%);
 }
 
-/* open: the plus folds into a minus */
+/* open: the plus folds into a plain minus inside its tooltip's corner, over the tooltip */
+.jsw-tech-showcase .jsw-hotspot[aria-expanded='true'] {
+  z-index: 4;
+  border-color: transparent;
+  background-color: transparent;
+  backdrop-filter: none;
+}
+
+/* ...except beside a tooltip opened below / above it: then it keeps its own box */
+.jsw-tech-showcase .jsw-hotspot.jsw-hotspot-apart[aria-expanded='true'] {
+  border-color: rgb(255 255 255 / 16%);
+  background-color: rgb(80 80 80 / 70%);
+  backdrop-filter: blur(8px);
+}
+
 .jsw-tech-showcase .jsw-hotspot[aria-expanded='true']::after {
   transform: translate(-50%, -50%) rotate(0deg);
 }
 
-/* frosted tooltip next to its hotspot */
+/* frosted tooltip ("NEV / Tech 1": 270 x 119): its hotspot sits in its top corner, 25px in
+   from the side and the top. It opens to the left and down; jsw-tech-showcase.js flips it
+   right / up (data-side, data-align) and nudges it (--jsw-sx) so it always stays inside
+   the card and the screen */
 .jsw-tech-showcase .jsw-tech-tooltip {
+  --jsw-tx: calc(-100% + 25px);
+  --jsw-ty: -25px;
+
   position: absolute;
   top: var(--jsw-y);
   left: var(--jsw-x);
   z-index: 3;
   box-sizing: border-box;
-  width: min(260px, 72cqw);
-  padding: 14px 40px 16px 16px;
-  border: 1px solid rgb(255 255 255 / 18%);
-  border-radius: 8px;
+  width: min(270px, calc(100cqw - 16px));
+
+  /* the minus shares only the title's row; the text below runs the full width, so its
+     lines break as in the frame (this font is a little wider) */
+  padding: 16px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 12px;
   color: var(--jsw-white, #fff);
-  background-color: rgb(110 110 110 / 42%);
+  background-color: rgb(12 12 12 / 44%);
   backdrop-filter: blur(14px) saturate(1.2);
-  box-shadow: 0 12px 32px rgb(0 0 0 / 28%);
-  transform: translate(32px, -22px);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
+  transform: translate(calc(var(--jsw-tx) + var(--jsw-sx, 0px)), var(--jsw-ty));
 }
 
-.jsw-tech-showcase .jsw-tech-tooltip[data-side='left'] {
-  transform: translate(calc(-100% - 32px), -22px);
+.jsw-tech-showcase .jsw-tech-tooltip[data-side='right'] {
+  --jsw-tx: -25px;
 }
 
+/* opening upwards, the minus sits in the bottom corner: keep that row free of text */
 .jsw-tech-showcase .jsw-tech-tooltip[data-align='bottom'] {
-  transform: translate(32px, calc(-100% + 22px));
+  --jsw-ty: calc(-100% + 25px);
+
+  padding-bottom: 50px;
 }
 
-.jsw-tech-showcase .jsw-tech-tooltip[data-side='left'][data-align='bottom'] {
-  transform: translate(calc(-100% - 32px), calc(-100% + 22px));
+/* narrow screens: just below / above the hotspot, centred on it */
+.jsw-tech-showcase .jsw-tech-tooltip[data-side='center'] {
+  --jsw-tx: -50%;
+}
+
+.jsw-tech-showcase .jsw-tech-tooltip[data-align='below'] {
+  --jsw-ty: 28px;
+}
+
+.jsw-tech-showcase .jsw-tech-tooltip[data-align='above'] {
+  --jsw-ty: calc(-100% - 28px);
 }
 
 .jsw-tech-showcase .jsw-tech-tooltip[hidden] {
   display: none;
 }
 
+/* the title shares its row with the minus (centred 25px in from the corner) */
 .jsw-tech-showcase .jsw-tech-tooltip-title {
-  margin-bottom: 8px;
+  margin-bottom: 22px;
+  padding-right: 20px;
   font-family: var(--jsw-font-mono);
-  font-size: 12.5px;
-  letter-spacing: 0.06em;
+  font-size: 14px;
+  line-height: 18px;
   text-transform: uppercase;
 }
 
+.jsw-tech-showcase .jsw-tech-tooltip[data-side='right'] .jsw-tech-tooltip-title {
+  padding: 0 0 0 20px;
+}
+
+.jsw-tech-showcase .jsw-tech-tooltip[data-side='center'] .jsw-tech-tooltip-title {
+  padding: 0;
+}
+
+/* a touch tighter than Inter's default, so the lines break as in the frame */
 .jsw-tech-showcase .jsw-tech-tooltip-text {
   color: rgb(255 255 255 / 80%);
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
 }
 
+/* the close button lies under the hotspot's minus, in the same corner (for keyboard users;
+   the minus is the visible control) */
 .jsw-tech-showcase .jsw-tech-tooltip-close {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
+  top: 3px;
+  right: 3px;
+  width: 44px;
+  height: 44px;
   margin: 0;
   padding: 0;
   border: 0;
+  border-radius: 8px;
   cursor: pointer;
   color: inherit;
   background: none;
 }
 
-.jsw-tech-showcase .jsw-tech-tooltip-close::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 12px;
-  height: 1.5px;
-  background-color: currentcolor;
-  transform: translate(-50%, -50%);
+.jsw-tech-showcase .jsw-tech-tooltip[data-side='right'] .jsw-tech-tooltip-close {
+  right: auto;
+  left: 3px;
+}
+
+.jsw-tech-showcase .jsw-tech-tooltip[data-align='bottom'] .jsw-tech-tooltip-close {
+  top: auto;
+  bottom: 3px;
 }
 
 @media (width >= 900px) {
