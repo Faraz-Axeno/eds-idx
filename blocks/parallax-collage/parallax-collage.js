@@ -110,7 +110,8 @@ function cutout() {
  * fade in, and on arrival the card, now showing that same cut-out, takes over unnoticed.
  * It all plays within the source section's screen: that section holds still while this block,
  * already in its final place, fades in over it as a white screen, so nothing scrolls by.
- * Scrolling back flies it back. The card keeps its own photo on phones / portrait tablets.
+ * Scrolling back flies it back. Phones and portrait tablets have no flight, but their card
+ * shows the same selected cut-out.
  */
 function flyIn({
   section, engine, fadeIns, sourceSection,
@@ -165,7 +166,9 @@ function flyIn({
     frame = 0;
     const figure = sourceSection.querySelector('[data-zoom-source]');
     const img = figure?.querySelector('img');
-    if (!media.matches || !img || !section.offsetHeight) {
+    // phones and portrait tablets: no flight, the card just shows the selected image
+    const still = !media.matches;
+    if (!img || !section.offsetHeight) {
       reset();
       return;
     }
@@ -183,6 +186,21 @@ function flyIn({
     if (picture) picture.style.display = 'none';
     if (!landed.isConnected) engine.append(landed);
     engine.style.backgroundColor = '#000';
+
+    if (still) {
+      flight.style.visibility = 'hidden';
+      showSource(null);
+      release();
+      engine.style.removeProperty('opacity');
+      fadeIns.forEach((el) => el.style.removeProperty('opacity'));
+      // placed in the card as on desktop (fractions of the card, so its scaling does not matter)
+      const box = figure.getBoundingClientRect();
+      const card = engine.getBoundingClientRect();
+      if (box.width && box.height && card.width) {
+        placeCutout(landed, landing(box.width / box.height, card.width, card.height));
+      }
+      return;
+    }
 
     // 0 while this section is below the screen, 1 once its top reaches the screen top
     const h = window.innerHeight;
