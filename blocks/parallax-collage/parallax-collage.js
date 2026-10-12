@@ -108,6 +108,8 @@ function cutout() {
  * the centre card. A fixed copy travels between the two (the source image hides meanwhile),
  * the black card, corners and shadow form around it as it lands, the text and side images
  * fade in, and on arrival the card, now showing that same cut-out, takes over unnoticed.
+ * It all plays within the source section's screen: that section holds still while this block,
+ * already in its final place, fades in over it as a white screen, so nothing scrolls by.
  * Scrolling back flies it back. The card keeps its own photo on phones / portrait tablets.
  */
 function flyIn({
@@ -115,6 +117,15 @@ function flyIn({
 }) {
   const media = window.matchMedia(FOLD_MEDIA);
   const picture = engine.querySelector('picture');
+  // only the contents move (the source's card, this block's wrapper): section boxes, which the
+  // navigation theme and the wheel stops read, stay where they are
+  const held = sourceSection.firstElementChild;
+  const cover = engine.closest('.parallax-collage')?.parentElement;
+  const release = () => {
+    held?.style.removeProperty('transform');
+    ['transform', 'opacity'].forEach((p) => cover?.style.removeProperty(p));
+    section.style.removeProperty('background-color');
+  };
   const landed = cutout();
   const flight = document.createElement('div');
   flight.className = 'parallax-collage-flight';
@@ -142,6 +153,7 @@ function flyIn({
     flight.style.visibility = 'hidden';
     if (shown) shown.style.removeProperty('visibility');
     shown = null;
+    release();
     landed.remove();
     picture?.style.removeProperty('display');
     ['opacity', 'background-color'].forEach((p) => engine.style.removeProperty(p));
@@ -168,16 +180,27 @@ function flyIn({
     if (!landed.isConnected) engine.append(landed);
     engine.style.backgroundColor = '#000';
 
+    // 0 while this section is below the screen, 1 once its top reaches the screen top
+    const h = window.innerHeight;
+    const { top } = section.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, 1 - top / h));
+    const arrived = p >= 0.999;
+    // in between: the source section holds still and the white screen (this block in its final
+    // place, on a see-through section) fades in over it; set before measuring both ends
+    if (p <= 0 || arrived) release();
+    else {
+      const shift = Math.max(0, -sourceSection.getBoundingClientRect().top);
+      held.style.transform = `translate3d(0, ${shift.toFixed(1)}px, 0)`;
+      cover.style.transform = `translate3d(0, ${(-top).toFixed(1)}px, 0)`;
+      cover.style.opacity = Math.min(1, p / 0.35).toFixed(3);
+      section.style.backgroundColor = 'transparent';
+    }
+
     const from = figure.getBoundingClientRect();
     const to = engine.getBoundingClientRect();
     const spot = landing(from.width / from.height, to.width, to.height);
     placeCutout(landed, spot);
     placeCutout(flown, spot);
-
-    // 0 while this section is below the screen, 1 once its top reaches the screen top
-    const h = window.innerHeight;
-    const p = Math.min(1, Math.max(0, 1 - section.getBoundingClientRect().top / h));
-    const arrived = p >= 0.999;
     engine.style.opacity = arrived ? '' : '0';
     fadeIns.forEach((el) => {
       if (arrived) el.style.removeProperty('opacity');
@@ -346,7 +369,10 @@ export default function decorate(block) {
     else imagesLayer.style.removeProperty('padding-bottom');
     // eased-scroll stops: engine settled in the centre, engine shrunk to the top
     block.dataset.scrollStops = [fold, fold + hold].filter(Boolean).map(Math.round).join(',');
-    const held = Math.min(fold + hold, Math.max(0, -block.getBoundingClientRect().top));
+    // the block's own place, without the fly-in's temporary shift of its wrapper
+    const { transform } = getComputedStyle(block.parentElement);
+    const shift = transform === 'none' ? 0 : new DOMMatrixReadOnly(transform).m42;
+    const held = Math.min(fold + hold, Math.max(0, shift - block.getBoundingClientRect().top));
     imagesLayer.style.transform = `translate3d(0, ${held}px, 0)`;
     const progress = Math.min(1, Math.max(0, (held - fold) / hold));
     block.style.setProperty('--pc-m-progress', progress.toFixed(4));

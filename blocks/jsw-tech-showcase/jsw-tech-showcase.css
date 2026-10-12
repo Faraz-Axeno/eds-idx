@@ -369,15 +369,20 @@
 }
 
 /* "white curtain" entrance (jsw-tech-showcase.js): the card slides up empty, then its
-   content fades in once it fills the screen */
+   content slides up from 80px lower once it fills the screen; it fades in quickly so the
+   slide, longer and gentler, is seen almost all the way */
 .jsw-tech-showcase.jsw-tech-curtain :is(.jsw-tech-heading, .jsw-tech-detail, .jsw-tech-stage) {
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transform: translateY(80px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .jsw-tech-showcase.jsw-tech-curtain.jsw-tech-revealed :is(.jsw-tech-heading, .jsw-tech-detail, .jsw-tech-stage) {
   opacity: 1;
-  transition: opacity 0.9s var(--jsw-ease) 0.1s;
+  transform: none;
+  transition:
+    opacity 0.45s ease-out 0.1s,
+    transform 1.2s cubic-bezier(0.33, 1, 0.68, 1) 0.1s;
 }
 
 @media (prefers-reduced-motion: reduce) {
