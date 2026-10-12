@@ -152,22 +152,12 @@ function collage(document) {
   return WebImporter.Blocks.createBlock(document, { name: 'parallax-collage', cells });
 }
 
+// the three posts of the "NEV / Blog" prototype, in its order (same category and summary)
+const POST_TEXT = 'Forget ideal laboratory range and perfect charging scenarios. We break down actual battery performance in heavy traffic, fast-charging availability across major highways, and true power consumption so you know exactly what daily NEV ownership looks like in India.';
 const POSTS = [
-  {
-    category: 'LEARN MORE / NEV & PHEV',
-    title: 'TESTED HERE, BEFORE IT REACHES YOU.',
-    text: 'Every powertrain is proven on Indian roads first: monsoon flooding, mountain passes, city crawl and long highway runs. We share what we learn from thousands of test kilometres, so you know how a new-energy vehicle behaves where you actually drive.',
-  },
-  {
-    category: 'CHARGING IN INDIA',
-    title: 'BUILT FOR THE NATION AS IT IS TODAY.',
-    text: 'Forget ideal laboratory range and perfect charging scenarios. We break down actual battery performance in heavy traffic, fast-charging availability across major highways, and true power consumption so you know exactly what daily NEV ownership looks like in India.',
-  },
-  {
-    category: 'OWNERSHIP / RUNNING COSTS',
-    title: 'WHAT A KILOMETRE REALLY COSTS.',
-    text: 'Electricity at home, fast charging on the road, servicing and tyres: we add up the real cost of running a plug-in hybrid and a battery electric vehicle against petrol, month by month.',
-  },
+  { category: 'LEARN MORE / NEV & PHEV', title: 'TESTED HERE, BEFORE IT REACHES YOU.', text: POST_TEXT },
+  { category: 'LEARN MORE / NEV & PHEV', title: 'UNDERSTANDING WHAT\'S UNDER THE HOOD.', text: POST_TEXT },
+  { category: 'LEARN MORE / NEV & PHEV', title: 'BUILT FOR THE NATION AS IT IS TODAY.', text: POST_TEXT },
 ];
 
 function blogs(document) {

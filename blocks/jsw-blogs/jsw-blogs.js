@@ -5,13 +5,28 @@
  *   category paragraph, title (h3), summary paragraph, READ MORE link.
  * On wide screens the card rises out of the section: its top already peeks in at the bottom
  * of the previous section's last screen ("NEV / Sustainable"), then it settles as the
- * section scrolls up.
+ * section scrolls up. The section starts white and fades to its dark background as it does.
+ * Each post has its own background (the prototype's, see TONES); ‹ › slide the new one
+ * in from behind the arrow while the card's text changes, and the fixed
+ * navigation takes on the post's colour (section data-jsw-nav-tone, read by jsw-hero).
  */
 
 let instance = 0;
 // how much of the card's top peeks into the previous section: its ‹ OUR BLOGS › header row
 const PEEK = 84;
 const PEEK_MEDIA = '(width >= 768px) and (orientation: landscape), (width >= 1200px)';
+// the section arrives white ("NEV / Blog" prototype): once it fills the screen and the card
+// has settled, it stays white this long, then fades to its dark background (0.8s,
+// jsw-blogs.css); it turns white again when scrolled away
+const LIT_DELAY = 1000;
+// per post, in order (then repeating), from the "NEV / Blog" prototype: its background
+// (the authored photo for the first post; the next two are the prototype's own blurred
+// backgrounds, rebuilt from it) and the navigation pill's colour
+const TONES = [
+  { image: '', nav: '' }, // the authored photo, the default dark pill
+  { image: new URL('./blog-under-the-hood.jpg', import.meta.url).href, nav: 'rgb(112 92 82 / 78%)' },
+  { image: new URL('./blog-built-for-the-nation.jpg', import.meta.url).href, nav: 'rgb(18 24 34 / 78%)' },
+];
 
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
@@ -54,19 +69,88 @@ function decoratePost(row, index, total) {
   }
 }
 
-/** scroll-linked rise of the card from its peek position into its place */
+/** one background slide per post: its own background, else the authored photo */
+function buildSlides(backgroundRow, count) {
+  const picture = backgroundRow.querySelector('picture');
+  if (!picture || count < 2) return [];
+  const slides = Array.from({ length: count }, (_, i) => {
+    const slide = el('div', 'jsw-blogs-slide');
+    const { image } = TONES[i % TONES.length];
+    if (image) {
+      const own = el('picture');
+      const img = el('img', '', { src: image, alt: '', decoding: 'async' });
+      own.append(img);
+      slide.append(own);
+    } else {
+      slide.append(i ? picture.cloneNode(true) : picture);
+    }
+    // a slide that has left the screen is hidden until it comes back
+    slide.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'transform' && !slide.classList.contains('is-active')) {
+        slide.classList.remove('is-shown');
+      }
+    });
+    return slide;
+  });
+  backgroundRow.replaceChildren(...slides);
+  return slides;
+}
+
+/**
+ * slides background `to` in the way the arrow points, from behind it: from the left for ›
+ * (dir 1), from the right for ‹ (dir -1), pushing `from` out the other side; dir 0 just
+ * shows it
+ */
+function slideBackground(slides, from, to, dir) {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const incoming = slides[to];
+  const outgoing = slides[from];
+  slides.forEach((slide) => {
+    if (slide !== incoming && slide !== outgoing) slide.classList.remove('is-shown', 'is-active');
+  });
+  incoming.classList.add('is-shown', 'is-active');
+  if (!dir || from === to || reduced) {
+    slides.forEach((slide) => {
+      if (slide !== incoming) slide.classList.remove('is-shown', 'is-active');
+    });
+    incoming.style.transform = '';
+    return;
+  }
+  // start just off the screen on the side it comes from, then glide in (jsw-blogs.css)
+  incoming.style.transition = 'none';
+  incoming.style.transform = `translate3d(${-dir * 100}%, 0, 0)`;
+  incoming.getBoundingClientRect();
+  incoming.style.removeProperty('transition');
+  incoming.style.transform = 'translate3d(0, 0, 0)';
+  outgoing.classList.remove('is-active');
+  outgoing.style.transform = `translate3d(${dir * 100}%, 0, 0)`;
+}
+
+/**
+ * scroll-linked rise of the card from its peek position into its place, and the white to
+ * dark background reveal that goes with it
+ */
 function trackPeek(block, card) {
   const media = window.matchMedia(PEEK_MEDIA);
+  block.classList.add('jsw-blogs-reveal');
   let frame = 0;
+  let litTimer = 0;
   const update = () => {
     frame = 0;
+    const h = window.innerHeight;
+    // 0 while the section is still below the screen, 1 once its top reaches the screen top
+    const t = Math.min(1, Math.max(0, 1 - block.getBoundingClientRect().top / h));
+    if (t < 0.995) {
+      clearTimeout(litTimer);
+      litTimer = 0;
+      block.classList.remove('jsw-blogs-lit');
+    } else if (!litTimer && !block.classList.contains('jsw-blogs-lit')) {
+      litTimer = setTimeout(() => block.classList.add('jsw-blogs-lit'), LIT_DELAY);
+    }
     if (!media.matches) {
       card.style.removeProperty('transform');
       return;
     }
-    const h = window.innerHeight;
-    // 0 while the section is still below the screen, 1 once its top reaches the screen top
-    const t = Math.min(1, Math.max(0, 1 - block.getBoundingClientRect().top / h));
     const lift = (1 - t) * (card.offsetTop + PEEK);
     card.style.transform = lift ? `translate3d(0, ${-lift.toFixed(1)}px, 0)` : '';
   };
@@ -114,10 +198,12 @@ export default function decorate(block) {
   card.append(posts);
 
   const parts = [];
+  let slides = [];
   if (backgroundRow) {
     backgroundRow.className = 'jsw-blogs-background';
     backgroundRow.setAttribute('aria-hidden', 'true');
     backgroundRow.querySelector('img')?.setAttribute('alt', '');
+    slides = buildSlides(backgroundRow, postRows.length);
     parts.push(backgroundRow);
   }
   parts.push(card);
@@ -134,7 +220,9 @@ export default function decorate(block) {
   }
 
   let current = 0;
-  const show = (index) => {
+  // dir: 1 next (the new background comes in from the left), -1 previous, 0 no slide
+  const show = (index, dir = 0) => {
+    const from = current;
     current = (index + postRows.length) % postRows.length;
     postRows.forEach((row, i) => {
       const active = i === current;
@@ -143,12 +231,17 @@ export default function decorate(block) {
       row.inert = !active;
     });
     counter.textContent = `${current + 1} / ${postRows.length}`;
+    if (slides.length) slideBackground(slides, from, current, dir);
+    // the navigation pill follows the post's colour (jsw-hero.js reads it)
+    const { nav } = TONES[current % TONES.length];
+    if (section && nav) section.dataset.jswNavTone = nav;
+    else if (section) delete section.dataset.jswNavTone;
   };
-  prev.addEventListener('click', () => show(current - 1));
-  next.addEventListener('click', () => show(current + 1));
+  prev.addEventListener('click', () => show(current - 1, -1));
+  next.addEventListener('click', () => show(current + 1, 1));
   card.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') show(current - 1);
-    if (e.key === 'ArrowRight') show(current + 1);
+    if (e.key === 'ArrowLeft') show(current - 1, -1);
+    if (e.key === 'ArrowRight') show(current + 1, 1);
   });
 
   block.replaceChildren(...parts);

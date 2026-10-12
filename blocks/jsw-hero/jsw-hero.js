@@ -11,6 +11,20 @@
 
 const NAV_PROBE_Y = 40; // vertical centre of the fixed pill
 
+// "JSW MOTORS" as in the Figma navbar, letter by letter on its 9-unit cap grid: squared,
+// extended letters; each S open at the top right and bottom left
+const WORDMARK = '<svg viewBox="2 0 166 9" focusable="false" aria-hidden="true" fill="currentColor">'
+  + '<path d="M11 0H16V9H2V7.1H13.6V1.9H11Z"/>'
+  + '<path d="M20 0H35V1.9H22.4V3.55H35V9H20V7.1H32.6V5.45H20Z"/>'
+  + '<path d="M38 0H40.6V9H38ZM50.8 0H53.4V9H50.8ZM44.2 2H46.8L53.2 9H50.6ZM44.2 2H46.8L40.6 9H38Z"/>'
+  + '<path d="M64 0H66.7V9H64ZM77.3 0H80V9H77.3ZM64 0H66.7L73.2 7.2H70.6ZM77.3 0H80L73.4 7.2H70.8Z"/>'
+  + '<path d="M84 0H96.9A1 1 0 0 1 97.9 1V8A1 1 0 0 1 96.9 9H84A1 1 0 0 1 83 8V1A1 1 0 0 1 84 0ZM85.6 1.9V7.1H95.3V1.9Z"/>'
+  + '<path d="M100 0H115.9V1.9H109.1V9H106.3V1.9H100Z"/>'
+  + '<path d="M119 0H131.9A1 1 0 0 1 132.9 1V8A1 1 0 0 1 131.9 9H119A1 1 0 0 1 118 8V1A1 1 0 0 1 119 0ZM120.6 1.9V7.1H130.3V1.9Z"/>'
+  + '<path d="M135 0H137.6V9H135ZM137.6 0H148.8A1 1 0 0 1 149.8 1V5.4H147.2V1.9H137.6ZM140 3.6H149.8V5.4H140ZM140.2 5.4H143.2L149.6 9H145.7Z"/>'
+  + '<path d="M153 0H168V1.9H155.4V3.55H168V9H153V7.1H165.6V5.45H153Z"/>'
+  + '</svg>';
+
 function plainLink(a) {
   a.classList.remove('button', 'primary', 'secondary', 'accent');
   const p = a.closest('p');
@@ -100,9 +114,22 @@ function buildNav(row) {
     const mark = document.createElement('span');
     mark.className = 'jsw-logo-mark';
     mark.setAttribute('aria-hidden', 'true');
+    // the JSW mark, traced from the Figma navbar: an oval ring crossed by a leaf (running out
+    // at the top right) and, just below it, a band (running out at the bottom left)
+    mark.innerHTML = '<svg viewBox="59.4 33.4 40.2 26" focusable="false" fill="currentColor">'
+      + '<ellipse cx="79.4" cy="46.9" rx="18.7" ry="12.4" transform="rotate(-3 79.4 46.9)" fill="none" stroke="currentColor" stroke-width="2.2"/>'
+      + '<path d="M68.4 50.4C70.2 46.6 74.8 44.2 80.5 42.2C86.5 39.8 92 36.6 97.6 33.2C93.4 37.6 88.6 42 83 45.2C78 48 73 50 68.4 50.4Z"/>'
+      + '<path d="M60.3 58.4C64.5 55.4 69 53 73.5 51C81 47.6 88.5 43.4 95.6 39C96 39.8 96.5 40.8 96.9 41.8C89.5 46.6 82 50.8 74.5 54.4C69.5 56.6 64.5 58.2 60.3 58.4Z"/>'
+      + '</svg>';
     const label = document.createElement('span');
     label.className = 'jsw-nav-brand-text';
     label.textContent = brand.textContent.trim();
+    // "JSW MOTORS" is drawn as the frame's wordmark (no site font has its squared, extended
+    // letters); the link's aria-label carries the name. Any other brand text stays text.
+    if (label.textContent.toUpperCase() === 'JSW MOTORS') {
+      label.classList.add('jsw-nav-wordmark');
+      label.innerHTML = WORDMARK;
+    }
     home.append(mark, label);
     home.addEventListener('click', (e) => {
       e.preventDefault();
@@ -147,6 +174,11 @@ function trackPage(indicator) {
       return r.height > 0 && r.top <= NAV_PROBE_Y && r.bottom > NAV_PROBE_Y;
     });
     document.body.dataset.jswTheme = under?.dataset.jswTheme || 'dark';
+    // a section may tint the pill, e.g. jsw-blogs in its active post's colour
+    const tone = under?.dataset.jswNavTone;
+    if (tone) document.body.style.setProperty('--jsw-nav-tone', tone);
+    else document.body.style.removeProperty('--jsw-nav-tone');
+    document.body.toggleAttribute('data-jsw-nav-toned', Boolean(tone));
     if (indicator) {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       indicator.style.setProperty('--jsw-scroll-progress', max > 0 ? Math.min(1, window.scrollY / max) : 0);
@@ -163,7 +195,7 @@ function trackPage(indicator) {
   window.addEventListener('resize', schedule);
   // later sections set their theme once they are decorated
   new MutationObserver(schedule).observe(document.querySelector('main'), {
-    subtree: true, attributes: true, attributeFilter: ['data-jsw-theme', 'data-section-status'],
+    subtree: true, attributes: true, attributeFilter: ['data-jsw-theme', 'data-jsw-nav-tone', 'data-section-status'],
   });
   update();
 }

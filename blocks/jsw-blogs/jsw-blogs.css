@@ -47,6 +47,40 @@
   transform: scale(1.04);
 }
 
+/* one background per post (jsw-blogs.js), hidden until shown; ‹ › glide the new one in from
+   the side while the old one is pushed out the other way, with the page's own wheel-scroll
+   glide (scripts/delayed.js: 1.8s, power2.inOut) */
+.jsw-blogs .jsw-blogs-slide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  visibility: hidden;
+  isolation: isolate;
+  transition: transform 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+
+/* its own compositing layer while on screen, so the blurred photo moves without repainting */
+.jsw-blogs .jsw-blogs-slide.is-shown {
+  visibility: visible;
+  will-change: transform;
+}
+
+/* reveal (jsw-blogs.js): a white layer over the dark background, under the card; about a
+   second after the card has settled it fades out in 0.8s, and back in when scrolled away */
+.jsw-blogs.jsw-blogs-reveal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--jsw-white, #fff);
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+.jsw-blogs.jsw-blogs-reveal.jsw-blogs-lit::after {
+  opacity: 0;
+}
+
 /* frosted card */
 .jsw-blogs .jsw-blogs-card {
   box-sizing: border-box;
@@ -241,7 +275,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .jsw-blogs .jsw-blogs-post,
-  .jsw-blogs a.jsw-blogs-read:any-link {
+  .jsw-blogs a.jsw-blogs-read:any-link,
+  .jsw-blogs .jsw-blogs-slide,
+  .jsw-blogs.jsw-blogs-reveal::after {
     transition: none;
   }
 }

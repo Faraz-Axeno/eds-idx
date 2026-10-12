@@ -191,28 +191,37 @@
   top: 12px;
   left: 50%;
   z-index: 1000;
-  width: min(660px, calc(100% - 24px));
+  width: min(672px, calc(100% - 24px));
   transform: translateX(-50%);
 }
 
-/* nav > row > cell: the cell is the pill */
+/* nav > row > cell: the cell is the pill, 672 x 42 in the frames, 26px from the top */
 .jsw-phase-3 .jsw-nav .jsw-nav-inner {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 28px;
-  height: 40px;
-  padding: 0 6px 0 16px;
-  border: 1px solid rgb(255 255 255 / 8%);
-  border-radius: 8px;
+  gap: 34px;
+  height: 42px;
+  padding: 0 6px 0 12px;
+  border: 1px solid transparent; /* no outline in the frames, on dark or light panels */
+  border-radius: 11px;
   color: var(--jsw-white, #fff);
-  background-color: var(--jsw-pill-dark);
+
+  /* --jsw-nav-tone: the colour of the section underneath, when it sets one (jsw-hero.js) */
+  background-color: var(--jsw-nav-tone, var(--jsw-pill-dark));
   backdrop-filter: blur(12px);
   transition: background-color 0.4s var(--jsw-ease), border-color 0.4s var(--jsw-ease);
 }
 
+/* while tinted by the section underneath (the blog posts), the colour glides with that
+   section's background: 1.8s, the page's wheel-scroll easing (power2.inOut) */
+.jsw-phase-3[data-jsw-nav-toned] .jsw-nav .jsw-nav-inner {
+  transition:
+    background-color 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955),
+    border-color 0.4s var(--jsw-ease);
+}
+
 .jsw-phase-3[data-jsw-theme='light'] .jsw-nav .jsw-nav-inner {
-  border-color: transparent;
   background-color: var(--jsw-pill-light);
 }
 
@@ -220,7 +229,9 @@
   margin: 0;
 }
 
+/* a flex box exactly as tall as the logo, so the logo and wordmark sit on whole pixels */
 .jsw-phase-3 .jsw-nav .jsw-nav-brand-wrap {
+  display: flex;
   margin-right: auto;
 }
 
@@ -232,41 +243,42 @@
 .jsw-phase-3 .jsw-nav .jsw-nav-brand {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 11px;
 }
 
 .jsw-phase-3 .jsw-nav .jsw-nav-brand-text {
   font-family: var(--jsw-font-display);
-  font-size: 10.5px;
-  letter-spacing: 0.2em;
+  font-size: 10px;
+  letter-spacing: 0.12em;
   white-space: nowrap;
 }
 
-/* logo mark: a slashed ring */
+/* logo mark (jsw-hero.js draws it): ring, leaf and band, 28 x 18 as in the frame */
 .jsw-phase-3 .jsw-logo-mark {
-  position: relative;
-  box-sizing: border-box;
+  display: block;
   flex: none;
-  width: 18px;
+  width: 28px;
   height: 18px;
-  border: 1.6px solid currentcolor;
-  border-radius: 50%;
 }
 
-.jsw-phase-3 .jsw-logo-mark::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -3px;
-  width: calc(100% + 6px);
-  height: 1.6px;
-  background-color: currentcolor;
-  transform: translateY(-50%) rotate(-35deg);
+.jsw-phase-3 .jsw-logo-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* "JSW MOTORS" wordmark (jsw-hero.js): 6px caps, so each unit of its 9-unit grid falls on
+   whole device pixels at 1.5x and the strokes stay sharp */
+.jsw-phase-3 .jsw-nav .jsw-nav-wordmark svg {
+  display: block;
+  width: auto;
+  height: 6px;
 }
 
 .jsw-phase-3 .jsw-nav .jsw-nav-links {
   display: none;
-  gap: 18px;
+  gap: 22px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -274,7 +286,8 @@
 
 .jsw-phase-3 .jsw-nav .jsw-nav-links a {
   font-size: 12px;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
@@ -285,14 +298,18 @@
 .jsw-phase-3 .jsw-nav a.jsw-nav-cta:any-link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 142px;
   height: 28px;
-  padding: 0 16px;
-  border-radius: 4px;
+  padding: 0 14px;
+  border-radius: 6px;
   color: var(--jsw-text-dark, #111);
   background-color: var(--jsw-white, #fff);
   font-family: var(--jsw-font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
+  font-size: 9px; /* "REGISTER INTEREST": 100px wide on a 142 x 28 button */
+  font-weight: 500;
+  letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
@@ -375,6 +392,10 @@
 }
 
 @media (width >= 600px) {
+  .jsw-phase-3 .jsw-nav {
+    top: 26px;
+  }
+
   .jsw-phase-3 .jsw-nav .jsw-nav-links {
     display: flex;
   }
@@ -389,10 +410,6 @@
   .jsw-phase-3 .jsw-nav .jsw-nav-inner {
     gap: 12px;
     padding-left: 12px;
-  }
-
-  .jsw-phase-3 .jsw-nav .jsw-nav-brand-text {
-    letter-spacing: 0.12em;
   }
 
   .jsw-phase-3 .jsw-nav a.jsw-nav-cta:any-link {
