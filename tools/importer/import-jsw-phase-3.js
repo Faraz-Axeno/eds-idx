@@ -12,7 +12,7 @@
  * Sections, in order (one block each):
  *   1. jsw-hero           image | nav | text
  *   2. jsw-tech-showcase  heading, then one item per powertrain: media (thumbnail + image) | text | hotspots
- *   3. jsw-collage        text, then six image items
+ *   3. parallax-collage   text, then image | position rows (same as /jsw-nev-collage)
  *   4. jsw-blogs          background | heading, then one item per post
  *   5. jsw-footer         brand | cta | connect | explore
  */
@@ -70,38 +70,41 @@ function hero(document) {
   });
 }
 
+// showcase images: the photos cut out of their black backgrounds (transparent PNGs, cropped
+// to the artwork; the Rotax engine mirrored as in "NEV / Tech 2"); hotspot positions are
+// percentages of those images, measured on the "NEV / Tech 1-3" frames
 const POWERTRAINS = [
   {
     thumb: ['motor-red.jpg', 'Glowing red electric motor rotor'],
-    image: ['chassis.jpg', 'Plug-in hybrid chassis with motor, battery and suspension'],
+    image: ['chassis-cutout.png', 'Plug-in hybrid chassis with motor, battery and suspension'],
     title: 'Plug-in Hybrid Electric Vehicle',
     text: 'Drives on electric power for everyday journeys, with a petrol engine for added range and reassurance. On the highway engine and motor work the same axle.',
     hotspots: [
-      '42, 30 | INTELLIGENT SWITCHING | Automatically alternates between pure electric and hybrid modes based on speed and terrain to optimize fuel efficiency.',
-      '68, 55 | BATTERY PACK | A floor-mounted pack keeps the centre of gravity low and charges at home or on the go.',
-      '30, 86 | EFFICIENT DRIVE UNIT | Motor, inverter and gearbox in one compact housing on the front axle.',
+      '41, 24.5 | INTELLIGENT SWITCHING | Automatically alternates between pure electric and hybrid modes based on speed and terrain to optimize fuel efficiency.',
+      '82.5, 54.5 | BATTERY PACK | A floor-mounted pack keeps the centre of gravity low and charges at home or on the go.',
+      '29.5, 91 | EFFICIENT DRIVE UNIT | Motor, inverter and gearbox in one compact housing on the front axle.',
     ],
   },
   {
     thumb: ['motor-green.jpg', 'Electric drive unit under green light'],
-    image: ['engine-rotax.jpg', 'Compact powertrain on a display stand'],
+    image: ['engine-rotax-cutout.png', 'Compact powertrain on a display stand'],
     title: 'Battery Electric Vehicle',
     text: 'Runs on electricity alone, from a battery charged at home, at work or on the highway. Instant torque, zero tailpipe emissions and almost no running cost.',
     hotspots: [
-      '56, 26 | POWER ELECTRONICS | Converts battery power for the motor and recovers energy every time you brake.',
-      '36, 52 | THERMAL MANAGEMENT | Keeps cells at their best temperature in Indian summers for consistent range and fast charging.',
-      '62, 84 | DC FAST CHARGING | Adds range in the time of a coffee stop on highway charging networks.',
+      '40.5, 9 | POWER ELECTRONICS | Converts battery power for the motor and recovers energy every time you brake.',
+      '23, 40 | THERMAL MANAGEMENT | Keeps cells at their best temperature in Indian summers for consistent range and fast charging.',
+      '47, 74 | DC FAST CHARGING | Adds range in the time of a coffee stop on highway charging networks.',
     ],
   },
   {
     thumb: ['engine-blue.jpg', 'Hybrid engine and motor under blue light'],
-    image: ['engine-black.jpg', 'Range-extender engine with carbon intake pipes'],
+    image: ['engine-black-cutout.png', 'Range-extender engine with carbon intake pipes'],
     title: 'Extended-Range Electric Vehicle',
     text: 'The wheels are always driven electrically, while a small onboard generator tops up the battery on long journeys. Electric feel, no range anxiety.',
     hotspots: [
-      '30, 22 | ONBOARD GENERATOR | A compact engine runs only to charge the battery, at its most efficient speed.',
-      '74, 58 | ELECTRIC DRIVE | Every kilometre is driven by the electric motor for smooth, quiet acceleration.',
-      '44, 74 | ENERGY CONTROL | Decides when to generate, store or regenerate power, based on route and charge level.',
+      '35.5, 13 | ONBOARD GENERATOR | A compact engine runs only to charge the battery, at its most efficient speed.',
+      '73.5, 69 | ELECTRIC DRIVE | Every kilometre is driven by the electric motor for smooth, quiet acceleration.',
+      '20, 73 | ENERGY CONTROL | Decides when to generate, store or regenerate power, based on route and charge level.',
     ],
   },
 ];
@@ -123,13 +126,18 @@ function techShowcase(document) {
   return WebImporter.Blocks.createBlock(document, { name: 'jsw-tech-showcase', cells });
 }
 
+// section 3: the same parallax-collage as /jsw-nev-collage ("NEV / Collage" + "NEV / Sustainable"):
+// [file, alt, place] in the order of the design: first screen, then second screen
 const COLLAGE = [
-  ['engine-blue.jpg', 'Hybrid engine and motor under blue light'],
-  ['motor-green.jpg', 'Electric drive unit under green light'],
-  ['test-hall.jpg', 'Empty vehicle test hall with ceiling lights'],
-  ['motor-red.jpg', 'Glowing red electric motor rotor'],
-  ['chassis.jpg', 'Electric vehicle chassis seen from above'],
-  ['keynote-stage.jpg', 'Presenter on stage at a vehicle launch keynote'],
+  ['engine-black.jpg', 'Electrified engine with carbon intake pipes', 'center-engine'],
+  ['ev-charger.jpg', 'Wall-mounted EV charger plugged into a car', 'card-charger'],
+  ['bridge-road-aerial.jpg', 'Aerial view of a road bridge over water', 'card-bridge'],
+  ['test-hall.jpg', 'Empty vehicle test hall with ceiling lights', 'card-room'],
+  ['suspension-spring.jpg', 'Close-up of a black suspension coil spring', 'card-spring'],
+  ['phone-app.jpg', 'Phone app showing the car battery at 72%', 'card-phone'],
+  ['jetour-sign.jpg', 'Illuminated JETOUR lettering on a dark wall', 'card-jetour'],
+  ['floating-chassis.jpg', 'Car body-in-white suspended in a studio', 'card-chassis'],
+  ['keynote-stage.jpg', 'Presenter on stage at a vehicle launch keynote', 'card-stage'],
 ];
 
 function collage(document) {
@@ -137,8 +145,11 @@ function collage(document) {
     el(document, 'h2', 'DRIVING INDIA INTO A MORE SUSTAINABLE FUTURE'),
     el(document, 'p', 'India is moving faster, travelling further and demanding more from mobility. New-energy vehicles can reduce dependence on fossil fuels while making cleaner technology practical for the realities of Indian roads, distances and infrastructure.'),
   ])]];
-  COLLAGE.forEach(([file, alt]) => cells.push([hinted(document, 'image', [el(document, 'p', img(document, file, alt))])]));
-  return WebImporter.Blocks.createBlock(document, { name: 'jsw-collage', cells });
+  COLLAGE.forEach(([file, alt, place]) => cells.push([
+    hinted(document, 'image', [el(document, 'p', img(document, file, alt))]),
+    hinted(document, 'position', [place]),
+  ]));
+  return WebImporter.Blocks.createBlock(document, { name: 'parallax-collage', cells });
 }
 
 const POSTS = [
@@ -161,7 +172,8 @@ const POSTS = [
 
 function blogs(document) {
   const cells = [
-    [hinted(document, 'background', [el(document, 'p', img(document, 'engine-rotax.jpg', 'Powertrain on a display stand, out of focus'))])],
+    // the "NEV / Blog" frame's own blurred photo (taken from the design, card area filled in)
+    [hinted(document, 'background', [el(document, 'p', img(document, 'blogs-background.jpg', 'Vehicle on a lit stage, out of focus'))])],
     [hinted(document, 'heading', [el(document, 'p', 'OUR BLOGS')])],
   ];
   POSTS.forEach((post) => cells.push([hinted(document, 'text', [

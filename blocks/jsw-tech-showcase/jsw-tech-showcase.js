@@ -7,6 +7,10 @@
  *   hotspots — list items "x%, y% | TITLE | description" (position over the showcase image)
  * Thumbnails are tabs: selecting one swaps the showcase image, counter and copy.
  * A hotspot opens a frosted tooltip; clicking outside or Escape closes it.
+ * Entrance ("white curtain"): the previous section holds still while this white card slides
+ * up over it; once the card fills the screen its content fades in.
+ * The selected showcase image is marked data-zoom-source: a following parallax collage flies
+ * it from here into its centre card on scroll.
  */
 
 const HOTSPOT = /^\s*(\d+(?:\.\d+)?)\s*%?\s*,\s*(\d+(?:\.\d+)?)\s*%?\s*\|\s*([^|]+?)\s*\|\s*([\s\S]+)$/;
@@ -25,6 +29,41 @@ function parseHotspots(cell) {
     .map(([, x, y, title, text]) => ({
       x: Math.min(100, +x), y: Math.min(100, +y), title: title.trim(), text: text.trim(),
     }));
+}
+
+/**
+ * "white curtain" entrance: while this section slides up, the previous section's content is
+ * moved down by the distance scrolled, so it stays put and the white card covers it (only the
+ * content moves: section boxes, which the navigation theme and the wheel stops read, do not);
+ * the card's content is veiled until the card has filled the screen, then fades in
+ */
+function curtain(section, block) {
+  let prev = section.previousElementSibling;
+  while (prev && !prev.classList.contains('section')) prev = prev.previousElementSibling;
+  const held = prev?.firstElementChild;
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    if (held) {
+      const r = prev.getBoundingClientRect();
+      const shift = Math.min(r.height, Math.max(0, -r.top));
+      held.style.transform = shift ? `translate3d(0, ${shift.toFixed(1)}px, 0)` : '';
+    }
+    // not laid out yet (section still loading): decide once it is
+    if (!section.offsetHeight) return;
+    const { top } = section.getBoundingClientRect();
+    // revealed once the card is in place; veiled again when it slides back down
+    if (top <= 2) block.classList.add('jsw-tech-revealed');
+    else if (top > window.innerHeight * 0.5) block.classList.remove('jsw-tech-revealed');
+  };
+  const schedule = () => {
+    if (!frame) frame = requestAnimationFrame(update);
+  };
+  block.classList.add('jsw-tech-curtain');
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
+  new ResizeObserver(schedule).observe(section);
+  update();
 }
 
 /** the figure takes the image's own ratio so hotspot percentages stay on the artwork */
@@ -162,6 +201,8 @@ export default function decorate(block) {
     items.forEach(({ row, textCell, tab }, i) => {
       const active = i === current;
       row.classList.toggle('is-active', active);
+      // the selected image flies on into the next section's card (parallax-collage)
+      row.querySelector('.jsw-tech-figure')?.toggleAttribute('data-zoom-source', active);
       row.inert = !active;
       if (textCell) textCell.hidden = !active;
       tab.setAttribute('aria-selected', active ? 'true' : 'false');
@@ -194,5 +235,8 @@ export default function decorate(block) {
 
   block.replaceChildren(copy, stage);
   if (block.closest('[data-aue-resource]')) block.classList.add('jsw-tech-editing');
+  else if (section && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    curtain(section, block);
+  }
   if (items.length) select(0);
 }

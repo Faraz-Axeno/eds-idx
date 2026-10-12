@@ -1,7 +1,7 @@
 /*
  * jsw-tech-showcase: white rounded card, 2 columns.
  * Left: heading, then counter, powertrain title + copy and the thumbnail tray.
- * Right: showcase image on a dark stage with "+" hotspots and a frosted tooltip.
+ * Right: showcase image (cut out, straight on the card) with "+" hotspots and a frosted tooltip.
  * Values from the "NEV / Tech 1-3 1280x720" frames.
  */
 
@@ -124,15 +124,13 @@
   transform: translateY(-4px);
 }
 
-/* stage: dark window that holds the showcase photos (they are shot on black) */
+/* stage: holds the showcase images; they are cut out, so they sit straight on the light card */
 .jsw-tech-showcase .jsw-tech-stage {
   position: relative;
   order: 2;
   height: min(64svh, 118vw);
   margin: 0 12px;
   overflow: hidden;
-  border-radius: 18px;
-  background: radial-gradient(ellipse 70% 60% at 55% 48%, #222 0%, #080808 70%);
   container-type: size;
 }
 
@@ -284,6 +282,7 @@
 
 @media (width >= 900px) {
   .jsw-tech-showcase {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
     height: var(--jsw-panel-height, calc(100svh - 16px));
@@ -305,9 +304,57 @@
     padding: 0 24px 0 var(--jsw-edge);
   }
 
+  /* the stage covers the whole card, so each image can sit where its frame has it: partly
+     cut off by the card's right (and bottom) edge; only the hotspots take clicks */
   .jsw-tech-showcase .jsw-tech-stage {
+    position: absolute;
+    inset: 0;
     height: auto;
-    margin: 12px 12px 12px 0;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  .jsw-tech-showcase .jsw-tech-panel {
+    display: block;
+  }
+
+  /* --fx / --fy: the image's left / top edge and --fh its height, in px of the 1280x720 frame;
+     on other screens it scales with the card (height first, never wider than the frame allows),
+     keeping its distance from the card's right edge */
+  .jsw-tech-showcase .jsw-tech-figure {
+    --u: min(calc(100cqh / 720), calc(100cqw / 1280));
+
+    position: absolute;
+    top: calc((100cqh - 720 * var(--u)) / 2 + var(--fy) * var(--u));
+    left: calc(100cqw - (1280 - var(--fx)) * var(--u));
+    width: auto;
+    height: calc(var(--fh) * var(--u));
+  }
+
+  /* "NEV / Tech 1": chassis, its body running off the right edge */
+  .jsw-tech-showcase .jsw-tech-panel:nth-child(1) .jsw-tech-figure {
+    --fx: 707;
+    --fy: 107;
+    --fh: 554;
+  }
+
+  /* "NEV / Tech 2": Rotax engine, cut off by the right and bottom edges */
+  .jsw-tech-showcase .jsw-tech-panel:nth-child(2) .jsw-tech-figure {
+    --fx: 660;
+    --fy: 133;
+    --fh: 650;
+  }
+
+  /* "NEV / Tech 3": the engine section 3 starts with, cut off by the right edge */
+  .jsw-tech-showcase .jsw-tech-panel:nth-child(3) .jsw-tech-figure {
+    --fx: 670;
+    --fy: 110;
+    --fh: 592;
+  }
+
+  .jsw-tech-showcase .jsw-hotspot,
+  .jsw-tech-showcase .jsw-tech-tooltip {
+    pointer-events: auto;
   }
 }
 
@@ -319,6 +366,18 @@
   .jsw-tech-showcase .jsw-tech-thumbs {
     margin-top: 18px;
   }
+}
+
+/* "white curtain" entrance (jsw-tech-showcase.js): the card slides up empty, then its
+   content fades in once it fills the screen */
+.jsw-tech-showcase.jsw-tech-curtain :is(.jsw-tech-heading, .jsw-tech-detail, .jsw-tech-stage) {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.jsw-tech-showcase.jsw-tech-curtain.jsw-tech-revealed :is(.jsw-tech-heading, .jsw-tech-detail, .jsw-tech-stage) {
+  opacity: 1;
+  transition: opacity 0.9s var(--jsw-ease) 0.1s;
 }
 
 @media (prefers-reduced-motion: reduce) {

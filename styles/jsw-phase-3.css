@@ -57,6 +57,11 @@ body.jsw-phase-3 main > .section[data-jsw-theme='light'] {
   padding: var(--jsw-panel-inset);
 }
 
+/* except the parallax collage (section 3): full screen, exactly as on /jsw-nev-collage */
+body.jsw-phase-3 main > .section.parallax-collage-container {
+  padding: 0;
+}
+
 body.jsw-phase-3 main :is(h1, h2, h3, h4, p) {
   margin: 0;
 }

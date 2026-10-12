@@ -1,11 +1,17 @@
 /*
- * jsw-blogs: dark panel with a blurred background and ambient glow, a frosted-glass card
- * showing one post at a time, and ‹ n / total › controls below it.
+ * jsw-blogs: dark panel with a blurred background and a frosted-glass card showing one post
+ * at a time, ‹ OUR BLOGS › in its header row ("NEV / Blog").
  * Rows: background picture, card heading, then one row per post:
  *   category paragraph, title (h3), summary paragraph, READ MORE link.
+ * On wide screens the card rises out of the section: its top already peeks in at the bottom
+ * of the previous section's last screen ("NEV / Sustainable"), then it settles as the
+ * section scrolls up.
  */
 
 let instance = 0;
+// how much of the card's top peeks into the previous section: its ‹ OUR BLOGS › header row
+const PEEK = 84;
+const PEEK_MEDIA = '(width >= 768px) and (orientation: landscape), (width >= 1200px)';
 
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
@@ -48,6 +54,32 @@ function decoratePost(row, index, total) {
   }
 }
 
+/** scroll-linked rise of the card from its peek position into its place */
+function trackPeek(block, card) {
+  const media = window.matchMedia(PEEK_MEDIA);
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    if (!media.matches) {
+      card.style.removeProperty('transform');
+      return;
+    }
+    const h = window.innerHeight;
+    // 0 while the section is still below the screen, 1 once its top reaches the screen top
+    const t = Math.min(1, Math.max(0, 1 - block.getBoundingClientRect().top / h));
+    const lift = (1 - t) * (card.offsetTop + PEEK);
+    card.style.transform = lift ? `translate3d(0, ${-lift.toFixed(1)}px, 0)` : '';
+  };
+  const schedule = () => {
+    if (!frame) frame = requestAnimationFrame(update);
+  };
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
+  media.addEventListener('change', schedule);
+  new ResizeObserver(schedule).observe(block);
+  update();
+}
+
 /**
  * loads and decorates the block
  * @param {Element} block The block element
@@ -67,10 +99,13 @@ export default function decorate(block) {
   const headingRow = rows.find((r) => !postRows.includes(r) && r !== backgroundRow);
 
   const card = el('div', 'jsw-blogs-card');
+  // header row: ‹ OUR BLOGS ›
+  const header = el('div', 'jsw-blogs-header');
   if (headingRow) {
     headingRow.className = 'jsw-blogs-heading';
-    card.append(headingRow);
+    header.append(headingRow);
   }
+  card.append(header);
   const posts = el('div', 'jsw-blogs-posts', { id: `${id}-posts`, 'aria-live': 'polite' });
   postRows.forEach((row, i) => {
     decoratePost(row, i, postRows.length);
@@ -87,12 +122,16 @@ export default function decorate(block) {
   }
   parts.push(card);
 
-  const controls = el('div', 'jsw-blogs-controls', { role: 'group', 'aria-label': 'Blog posts' });
   const prev = el('button', 'jsw-blogs-prev', { type: 'button', 'aria-label': 'Previous post', 'aria-controls': posts.id });
   const next = el('button', 'jsw-blogs-next', { type: 'button', 'aria-label': 'Next post', 'aria-controls': posts.id });
+  // "n / total" for screen readers only (the design shows just the arrows)
   const counter = el('p', 'jsw-blogs-counter');
-  controls.append(prev, counter, next);
-  if (postRows.length > 1) parts.push(controls);
+  if (postRows.length > 1) {
+    header.setAttribute('role', 'group');
+    header.setAttribute('aria-label', 'Blog posts');
+    header.prepend(prev);
+    header.append(next, counter);
+  }
 
   let current = 0;
   const show = (index) => {
@@ -114,4 +153,5 @@ export default function decorate(block) {
 
   block.replaceChildren(...parts);
   if (postRows.length) show(0);
+  if (!block.closest('[data-aue-resource]')) trackPeek(block, card);
 }

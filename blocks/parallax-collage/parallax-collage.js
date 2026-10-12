@@ -65,6 +65,164 @@ function buildFoldLayer() {
   return { layer, background, card };
 }
 
+/**
+ * where a flown-in cut-out sits in the card (fractions of the card): as tall as the engine in
+ * the card's own photo (67.4%, bottom at 92.9%); 8.9% from the left when that makes it wider
+ * than the card (it then runs off the right edge, exactly like the engine in the photo),
+ * otherwise centred; very wide images are fitted to 96% of the card's width instead
+ */
+function landing(ratio, cardWidth, cardHeight) {
+  let height = 0.674;
+  let width = (height * cardHeight * ratio) / cardWidth;
+  if (width > 1.05) {
+    width = 0.96;
+    height = (width * cardWidth) / (ratio * cardHeight);
+  }
+  return {
+    left: width > 1 ? 0.089 : (1 - width) / 2, top: 0.9288 - height, width, height,
+  };
+}
+
+function placeCutout(img, spot) {
+  Object.assign(img.style, {
+    left: `${spot.left * 100}%`,
+    top: `${spot.top * 100}%`,
+    width: `${spot.width * 100}%`,
+    height: `${spot.height * 100}%`,
+  });
+}
+
+function cutout() {
+  const img = document.createElement('img');
+  img.alt = '';
+  img.decoding = 'async';
+  Object.assign(img.style, {
+    position: 'absolute', display: 'block', maxWidth: 'none', transform: 'none', borderRadius: '0',
+  });
+  return img;
+}
+
+/**
+ * Fly-in (desktop, after a section with a [data-zoom-source] image, e.g. jsw-tech-showcase):
+ * scrolling from that section to this one flies its selected image from where it sits into
+ * the centre card. A fixed copy travels between the two (the source image hides meanwhile),
+ * the black card, corners and shadow form around it as it lands, the text and side images
+ * fade in, and on arrival the card, now showing that same cut-out, takes over unnoticed.
+ * Scrolling back flies it back. The card keeps its own photo on phones / portrait tablets.
+ */
+function flyIn({
+  section, engine, fadeIns, sourceSection,
+}) {
+  const media = window.matchMedia(FOLD_MEDIA);
+  const picture = engine.querySelector('picture');
+  const landed = cutout();
+  const flight = document.createElement('div');
+  flight.className = 'parallax-collage-flight';
+  flight.setAttribute('aria-hidden', 'true');
+  Object.assign(flight.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    zIndex: '900', // over both sections, under the fixed navigation
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    transformOrigin: '0 0',
+    visibility: 'hidden',
+  });
+  const flown = cutout();
+  flight.append(flown);
+  document.body.append(flight);
+  let shown = null; // the figure currently hidden while its copy flies
+
+  const showSource = (figure) => {
+    if (shown && shown !== figure) shown.style.removeProperty('visibility');
+    shown = figure;
+  };
+  const reset = () => {
+    flight.style.visibility = 'hidden';
+    if (shown) shown.style.removeProperty('visibility');
+    shown = null;
+    landed.remove();
+    picture?.style.removeProperty('display');
+    ['opacity', 'background-color'].forEach((p) => engine.style.removeProperty(p));
+    fadeIns.forEach((el) => el.style.removeProperty('opacity'));
+  };
+
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    const figure = sourceSection.querySelector('[data-zoom-source]');
+    const img = figure?.querySelector('img');
+    if (!media.matches || !img || !section.offsetHeight) {
+      reset();
+      return;
+    }
+    // the card shows the selected image, as a cut-out on black (the visitor may switch tabs)
+    const src = img.currentSrc || img.src;
+    if (landed.dataset.src !== src) {
+      landed.dataset.src = src;
+      landed.src = src;
+      flown.src = src;
+    }
+    if (picture) picture.style.display = 'none';
+    if (!landed.isConnected) engine.append(landed);
+    engine.style.backgroundColor = '#000';
+
+    const from = figure.getBoundingClientRect();
+    const to = engine.getBoundingClientRect();
+    const spot = landing(from.width / from.height, to.width, to.height);
+    placeCutout(landed, spot);
+    placeCutout(flown, spot);
+
+    // 0 while this section is below the screen, 1 once its top reaches the screen top
+    const h = window.innerHeight;
+    const p = Math.min(1, Math.max(0, 1 - section.getBoundingClientRect().top / h));
+    const arrived = p >= 0.999;
+    engine.style.opacity = arrived ? '' : '0';
+    fadeIns.forEach((el) => {
+      if (arrived) el.style.removeProperty('opacity');
+      else el.style.opacity = Math.max(0, (p - 0.65) / 0.35).toFixed(3);
+    });
+    if (p <= 0 || arrived) {
+      flight.style.visibility = 'hidden';
+      showSource(null);
+      return;
+    }
+    // the copy: a card-sized box whose cut-out starts exactly on the source image
+    figure.style.visibility = 'hidden';
+    showSource(figure);
+    const s0 = from.width / (spot.width * to.width);
+    const e = 1 - (1 - p) ** 2; // power2.out, as Fold 1
+    const scale = s0 + (1 - s0) * e;
+    const x = (from.left - spot.left * to.width * s0) * (1 - e) + to.left * e;
+    const y = (from.top - spot.top * to.height * s0) * (1 - e) + to.top * e;
+    // the black card forms around it in the second half
+    const t = Math.min(1, Math.max(0, (p - 0.45) / 0.5));
+    const form = t * t * (3 - 2 * t);
+    Object.assign(flight.style, {
+      visibility: 'visible',
+      width: `${to.width}px`,
+      height: `${to.height}px`,
+      transform: `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`,
+      backgroundColor: `rgb(0 0 0 / ${(form * 100).toFixed(1)}%)`,
+      borderRadius: `${(20 * form).toFixed(1)}px`,
+      boxShadow: `0 20px 40px rgb(0 0 0 / ${(15 * form).toFixed(1)}%)`,
+    });
+  };
+  const schedule = () => {
+    if (!frame) frame = requestAnimationFrame(update);
+  };
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
+  media.addEventListener('change', schedule);
+  // a tab switch in the source section changes the image
+  new MutationObserver(schedule).observe(sourceSection, {
+    subtree: true, attributes: true, attributeFilter: ['data-zoom-source'],
+  });
+  new ResizeObserver(schedule).observe(section);
+  update();
+}
+
 const ENGINE = 'center-engine';
 const SCREENS = {
   [ENGINE]: 1,
@@ -114,6 +272,8 @@ function div(className) {
 export default function decorate(block) {
   // wheel scrolling glides between stops like the MG pages (scripts/delayed.js, power2.inOut):
   // the start, the end of the engine hold, and the end of the block
+  // a light panel: on /jsw-phase-3 the fixed navigation and scroll indicator follow it
+  block.closest('.section')?.setAttribute('data-jsw-theme', 'light');
   const rows = [...block.children];
   const textRow = rows.find((r) => r.querySelector('h1, h2, h3'));
   const imageRows = rows.filter((r) => r !== textRow && r.querySelector('picture'));
@@ -200,6 +360,19 @@ export default function decorate(block) {
   schedule();
 
   if (!zoom) return;
+  // after a section that marks a zoom source (jsw-tech-showcase on /jsw-phase-3), its selected
+  // image flies from there into the card instead of Fold 1
+  const section = block.closest('.section');
+  let sourceSection = section?.previousElementSibling;
+  while (sourceSection && !sourceSection.classList.contains('section')) {
+    sourceSection = sourceSection.previousElementSibling;
+  }
+  if (sourceSection?.querySelector('[data-zoom-source]')) {
+    flyIn({
+      section, engine, fadeIns, sourceSection,
+    });
+    return;
+  }
   // Fold 1 waits for GSAP: until then the engine and the fading items stay hidden on desktop
   // so the normal card never flashes before the zoomed-in start state
   const foldMedia = window.matchMedia(FOLD_MEDIA);
