@@ -37,6 +37,14 @@ body.jsw-phase-3 {
   font-family: var(--jsw-font-body);
 }
 
+/* touch screens: scripts/delayed.js moves the page one stop per vertical swipe, so the
+   browser's own vertical panning and fling are off (sideways panning and pinch zoom stay);
+   set only once that script is running (html.touch-panels) */
+html.touch-panels,
+html.touch-panels body {
+  touch-action: pan-x pinch-zoom;
+}
+
 /* the page brings its own navigation (jsw-hero) and footer (jsw-footer) */
 body.jsw-phase-3 > header,
 body.jsw-phase-3 > footer {

@@ -63,7 +63,10 @@ function nextStop(dir) {
  * (phones and tablets have no wheel: a flick would otherwise race through the page).
  */
 async function initSmoothScroll() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // the JSW NEV page always moves one stop per gesture (with reduced motion: without the glide)
+  const stepped = document.body.classList.contains('jsw-phase-3');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced && !stepped) return;
   // pages whose blocks drive scrolling themselves (e.g. a pinned ScrollTrigger) opt out
   if (document.body.dataset.nativeScroll) return;
   await loadScript(GSAP_SRC);
@@ -90,7 +93,7 @@ async function initSmoothScroll() {
     // CSS snap / smooth-behaviour would fight the tween; the tween ends on a snap point
     root.classList.add('gsap-scrolling');
     gsap.to(window, {
-      duration: 1.8,
+      duration: reduced ? 0 : 1.8,
       scrollTo: { y: destY, autoKill: true, onAutoKill: done },
       ease: 'power2.inOut',
       overwrite: 'auto',
@@ -112,14 +115,23 @@ async function initSmoothScroll() {
     glide(e.deltaY > 0 ? 1 : -1);
   }, { passive: false });
 
-  if (!document.body.classList.contains('jsw-phase-3')) return;
-  // touch: a vertical swipe glides one stop, like a wheel gesture; the finger's own scroll is
-  // held back (decided on its first move, before the browser starts scrolling). Taps,
-  // sideways swipes, pinch zoom and inner scrollers stay native.
+  if (!stepped) return;
+  // touch: a vertical swipe glides one stop, like a wheel gesture, however fast it is.
+  // The browser's own vertical panning (and its momentum fling) is switched off up front
+  // (html.touch-panels: touch-action, styles/jsw-phase-3.css): real phones start scrolling
+  // before a touchmove can be cancelled, so preventDefault alone is not enough there.
+  // Taps, sideways swipes and pinch zoom stay native.
+  root.classList.add('touch-panels');
   const SWIPE = 24; // px of finger travel that count as a swipe
   let start = null;
   let mode = null; // 'panel' | 'native', per gesture
   let swiped = false;
+  const swipe = (dy) => {
+    if (swiped || mode !== 'panel' || Math.abs(dy) < SWIPE) return;
+    swiped = true;
+    // finger up (dy < 0) moves the page down
+    glide(dy < 0 ? 1 : -1);
+  };
   window.addEventListener('touchstart', (e) => {
     start = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
     mode = start ? null : 'native';
@@ -133,16 +145,18 @@ async function initSmoothScroll() {
     const dx = e.touches[0].clientX - start.x;
     const dy = e.touches[0].clientY - start.y;
     if (!mode) {
-      // finger up (dy < 0) scrolls the page down
       mode = Math.abs(dy) >= Math.abs(dx) && !scrollsInside(e.target, -dy) ? 'panel' : 'native';
     }
     if (mode !== 'panel') return;
     if (e.cancelable) e.preventDefault();
-    if (!swiped && Math.abs(dy) >= SWIPE) {
-      swiped = true;
-      glide(dy < 0 ? 1 : -1);
-    }
+    swipe(dy);
   }, { passive: false });
+  // a short, quick flick may end before travelling far enough on a move
+  window.addEventListener('touchend', (e) => {
+    const touch = e.changedTouches[0];
+    if (start && touch) swipe(touch.clientY - start.y);
+    start = null;
+  }, { passive: true });
 }
 
 initSmoothScroll();
