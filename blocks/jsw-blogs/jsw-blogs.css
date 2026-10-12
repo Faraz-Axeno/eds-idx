@@ -272,6 +272,77 @@
   transform: translate(-70%, -50%) rotate(135deg);
 }
 
+/* phones ("M / Blogs 375x815"): a near full-width, taller card with a large
+   ‹ OUR BLOGS › header, a larger title and a large READ MORE bar (tablets keep the card above) */
+@media (width < 600px) {
+  .jsw-blogs {
+    padding: 72px 20px 56px;
+  }
+
+  .jsw-blogs .jsw-blogs-card {
+    min-height: min(590px, 72svh);
+    padding: 20px 13px 13px;
+  }
+
+  .jsw-blogs .jsw-blogs-header {
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .jsw-blogs .jsw-blogs-heading {
+    flex: none;
+    color: rgb(255 255 255 / 72%);
+    font-size: 22px;
+    letter-spacing: 0.04em;
+  }
+
+  .jsw-blogs .jsw-blogs-header button {
+    color: rgb(255 255 255 / 85%);
+  }
+
+  .jsw-blogs .jsw-blogs-header button::before {
+    width: 10px;
+    height: 10px;
+    border-width: 1.6px;
+  }
+
+  .jsw-blogs .jsw-blogs-category,
+  .jsw-blogs .jsw-blogs-title,
+  .jsw-blogs .jsw-blogs-summary {
+    margin-right: 6px;
+    margin-left: 6px;
+  }
+
+  .jsw-blogs .jsw-blogs-category {
+    margin-bottom: 18px;
+  }
+
+  .jsw-blogs .jsw-blogs-title {
+    margin-bottom: 18px;
+    font-size: min(24px, 6.4vw);
+    line-height: 1.25;
+  }
+
+  .jsw-blogs .jsw-blogs-summary {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .jsw-blogs a.jsw-blogs-read:any-link {
+    height: 64px;
+    padding: 0 12px 0 20px;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+
+  .jsw-blogs .jsw-blogs-read-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .jsw-blogs .jsw-blogs-post,
   .jsw-blogs a.jsw-blogs-read:any-link,

@@ -423,6 +423,84 @@
   }
 }
 
+/* phones ("M / What is NEV 375x815"): one screen, top to bottom: heading; "1/3" beside the
+   powertrain's name, its copy and the thumbnails; then the showcase image filling the rest
+   of the card, running off its right edge (tablets keep the layout above) */
+@media (width < 600px) {
+  /* vertical gaps follow the screen height (frame values at 815px tall) */
+  .jsw-tech-showcase .jsw-tech-heading {
+    padding: min(78px, 9.6svh) 24px 0;
+  }
+
+  .jsw-tech-showcase .jsw-tech-title {
+    max-width: none; /* the card's width breaks it "A NEW WAY TO" / "MOVE POWERED" / "BY TECH" */
+    font-size: min(24px, 6.4vw);
+    line-height: 1.3;
+  }
+
+  /* the counter and the powertrain's name share the first row */
+  .jsw-tech-showcase .jsw-tech-detail {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 10px;
+    order: 2;
+    padding: min(30px, 3.7svh) 24px 0;
+  }
+
+  .jsw-tech-showcase .jsw-tech-texts,
+  .jsw-tech-showcase .jsw-tech-text:not([hidden]) {
+    display: contents;
+  }
+
+  .jsw-tech-showcase .jsw-tech-counter {
+    grid-column: 1;
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .jsw-tech-showcase .jsw-tech-item-title {
+    grid-column: 2;
+    margin: 0 0 10px;
+    font-size: 14px;
+  }
+
+  .jsw-tech-showcase .jsw-tech-text p {
+    grid-column: 1 / -1;
+    max-width: none;
+    font-size: 12.5px;
+  }
+
+  .jsw-tech-showcase .jsw-tech-thumbs {
+    grid-column: 1 / -1;
+    gap: 6px;
+    margin-top: 18px;
+  }
+
+  .jsw-tech-showcase .jsw-tech-thumb {
+    width: 63px;
+  }
+
+  /* the image takes what is left of the screen, at full height, cut off on the right */
+  .jsw-tech-showcase .jsw-tech-stage {
+    flex: 1 0 170px;
+    order: 3;
+    height: auto;
+    margin: min(24px, 2.9svh) 0 0;
+  }
+
+  .jsw-tech-showcase .jsw-tech-panel {
+    justify-content: flex-start;
+    padding-left: 6cqw;
+  }
+
+  .jsw-tech-showcase .jsw-tech-figure {
+    flex: none;
+    width: auto;
+    height: 100cqh;
+  }
+}
+
 /* "white curtain" entrance (jsw-tech-showcase.js): the card slides up empty, then its
    content slides up from 80px lower once it fills the screen; it fades in quickly so the
    slide, longer and gentler, is seen almost all the way */

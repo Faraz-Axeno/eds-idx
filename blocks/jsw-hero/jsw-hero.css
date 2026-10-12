@@ -406,6 +406,12 @@
 }
 
 @media (width < 600px) {
+  /* phones: no fixed navigation, as in the "M / ..." frames (in Universal Editor it stays
+     in the hero, editable) */
+  body.jsw-phase-3 > .jsw-nav {
+    display: none;
+  }
+
   /* phones: logo + CTA only, tighter pill so both fit */
   .jsw-phase-3 .jsw-nav .jsw-nav-inner {
     gap: 12px;
@@ -418,20 +424,49 @@
     letter-spacing: 0.04em;
   }
 
+  /* "M / Hero 375x815": headline, description and button centred in the lower half, the
+     video's lit screen above them, the button 73px from the bottom */
   .jsw-hero .jsw-hero-content-inner {
     grid-template:
       'title' 1fr
       'desc' auto
       'action' auto / minmax(0, 1fr);
-    padding-top: 96px;
+    gap: 0;
+    padding: 96px 33px 73px;
+    text-align: center;
+  }
+
+  .jsw-hero .jsw-hero-title {
+    align-self: end;
+    max-width: none;
+    margin-bottom: 34px;
+    font-size: min(22px, 5.9vw);
+    line-height: 1.4;
   }
 
   .jsw-hero .jsw-hero-description {
-    font-size: 14px;
+    justify-self: center;
+    max-width: 320px;
+    margin-bottom: 36px;
+    color: rgb(255 255 255 / 62%);
+    font-size: 13px;
   }
 
   .jsw-hero a.jsw-hero-cta:any-link {
     width: 100%;
+    height: 56px;
+    border-radius: 8px;
+  }
+
+  /* the video's lit screen sits in the space between the navigation and the headline
+     (about 412px of text and gap below it): as wide as the screen allows, smaller on short
+     phones; its bottom 40px above the headline, as on the 375x815 frame */
+  .jsw-hero .jsw-hero-visual {
+    --jsw-hero-u: min(calc(100cqw / 640), max(calc((100cqh - 482px) / 352), 0.2px));
+  }
+
+  .jsw-hero .jsw-hero-video {
+    top: calc(100cqh - 412px - 445 * var(--jsw-hero-u));
   }
 }
 

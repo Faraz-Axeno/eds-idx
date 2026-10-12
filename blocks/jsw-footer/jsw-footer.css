@@ -116,6 +116,79 @@
   font-size: 12px;
 }
 
+/* phones ("M / Footer 375x815"): a full screen on the gradient; from the top: CONNECT and
+   EXPLORE side by side, the CTA, then the brand lines with the legal link last
+   (tablets keep the layout above) */
+@media (width < 600px) {
+  .jsw-footer {
+    align-content: end;
+    gap: 0;
+    min-height: var(--mg-panel-height, 100svh);
+
+    /* the gaps follow the screen height (frame values at 815px tall), so short phones fit */
+    padding: min(120px, 14.7svh) 24px 34px;
+  }
+
+  .jsw-footer .jsw-footer-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    order: 1;
+    gap: 24px;
+  }
+
+  .jsw-footer .jsw-footer-heading {
+    margin-bottom: 12px;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+  }
+
+  .jsw-footer .jsw-footer-list {
+    gap: 9px;
+    color: rgb(255 255 255 / 80%);
+    font-size: 13px;
+  }
+
+  .jsw-footer .jsw-footer-cta {
+    order: 2;
+    margin-top: min(72px, 8.8svh);
+  }
+
+  .jsw-footer a.jsw-footer-cta-link:any-link {
+    height: 34px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .jsw-footer .jsw-footer-brand {
+    order: 3;
+    margin-top: min(140px, 17.2svh);
+  }
+
+  .jsw-footer .jsw-footer-brand > div {
+    gap: 10px;
+  }
+
+  /* the brand line starts flush left, as in the frame */
+  .jsw-footer .jsw-footer-name .jsw-logo-mark:empty {
+    display: none;
+  }
+
+  .jsw-footer .jsw-footer-name {
+    margin-bottom: 4px;
+    font-size: 15px;
+  }
+
+  .jsw-footer .jsw-footer-meta {
+    font-size: 13px;
+  }
+
+  .jsw-footer .jsw-footer-legal {
+    margin-top: min(44px, 5.4svh);
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
 @media (width >= 900px) {
   .jsw-footer {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
