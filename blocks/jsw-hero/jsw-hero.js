@@ -1,7 +1,8 @@
 /*
  * jsw-hero: dark full-viewport intro of the JSW Motors NEV page.
  * Rows (any order, recognised by content):
- *   visual — a picture, shown blurred behind an ambient glow
+ *   visual — a picture, shown blurred behind an ambient glow; once the page has loaded, the
+ *            background video /videos/jsw-hero.mp4 (if present) plays full screen over it
  *   nav    — logo text, a list of links, then the CTA link: becomes the fixed pill navigation
  *   text   — h1 headline, description paragraph, bottom-right button link
  * Also adds the fixed right-edge scroll progress indicator. Navigation and indicator follow
@@ -36,6 +37,33 @@ function decorateVisual(row) {
     img.loading = 'eager';
     img.fetchPriority = 'high';
   }
+}
+
+/**
+ * muted looping background video, fetched after the page has loaded so the picture stays the
+ * LCP; shown only once it actually plays (no file, an error or reduced motion: the picture stays)
+ */
+function addVideo(row) {
+  if (!window.matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
+  const video = document.createElement('video');
+  video.className = 'jsw-hero-video';
+  video.setAttribute('aria-hidden', 'true');
+  video.muted = true;
+  video.defaultMuted = true;
+  video.loop = true;
+  video.playsInline = true;
+  video.preload = 'auto';
+  video.addEventListener('playing', () => row.classList.add('jsw-hero-has-video'), { once: true });
+  video.addEventListener('error', () => video.remove(), { once: true });
+  const glow = row.querySelector('.jsw-hero-glow');
+  const start = () => {
+    video.src = `${window.hlx?.codeBasePath || ''}/videos/jsw-hero.mp4`;
+    if (glow) glow.before(video);
+    else row.append(video);
+    video.play().catch(() => {});
+  };
+  if (document.readyState === 'complete') start();
+  else window.addEventListener('load', start, { once: true });
 }
 
 function decorateText(row) {
@@ -160,6 +188,7 @@ export default function decorate(block) {
     block.classList.add('jsw-hero-editing');
     return;
   }
+  if (visualRow) addVideo(visualRow);
   // fixed page chrome: outside every section so no stacking context can trap it
   if (nav) document.body.append(nav);
   const indicator = buildScrollIndicator();
