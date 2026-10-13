@@ -115,6 +115,12 @@ async function initSmoothScroll() {
     glide(e.deltaY > 0 ? 1 : -1);
   }, { passive: false });
 
+  // a page's own controls can ask for the same glide, e.g. the JSW SCROLL button (jsw-hero)
+  document.addEventListener('jsw:glide', (e) => {
+    e.preventDefault();
+    glide(e.detail < 0 ? -1 : 1);
+  });
+
   if (!stepped) return;
   // touch: a vertical swipe glides one stop, like a wheel gesture, however fast it is.
   // The browser's own vertical panning (and its momentum fling) is switched off up front

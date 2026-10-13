@@ -5,7 +5,7 @@
  *            background video /videos/jsw-hero.mp4 (if present) plays full screen over it
  *   nav    — logo text, a list of links, then the CTA link: becomes the fixed pill navigation
  *   text   — h1 headline, description paragraph, bottom-right button link
- * Also adds the fixed right-edge scroll progress indicator. Navigation and indicator follow
+ * Also adds the fixed right-edge SCROLL button (one stop down). Navigation and button follow
  * the theme of the section underneath them (sections carry data-jsw-theme).
  */
 
@@ -154,12 +154,28 @@ function buildNav(row) {
   return nav;
 }
 
+/**
+ * the SCROLL pill (mouse with an up/down arrow, as in the frames): a click glides to the next
+ * stop like a wheel gesture (scripts/delayed.js answers the jsw:glide event), or, before that
+ * script runs, scrolls smoothly to the next section
+ */
 function buildScrollIndicator() {
-  const indicator = document.createElement('div');
+  const indicator = document.createElement('button');
+  indicator.type = 'button';
   indicator.className = 'jsw-scroll';
-  indicator.setAttribute('aria-hidden', 'true');
-  indicator.innerHTML = '<span class="jsw-scroll-track"><span class="jsw-scroll-thumb"></span></span>'
-    + '<span class="jsw-scroll-label"><span class="jsw-scroll-mouse"></span>SCROLL</span>';
+  indicator.setAttribute('aria-label', 'Scroll to the next section');
+  indicator.innerHTML = '<span class="jsw-scroll-label">'
+    + '<svg class="jsw-scroll-mouse" viewBox="0 0 11 14" aria-hidden="true" focusable="false" fill="none" stroke="currentColor">'
+    + '<rect x="0.75" y="0.75" width="9.5" height="12.5" rx="4.75" stroke-width="1.5"/>'
+    + '<path d="M5.5 3.6V10.4M3.8 5.3 5.5 3.6 7.2 5.3M3.8 8.7 5.5 10.4 7.2 8.7" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '</svg>SCROLL</span>';
+  indicator.addEventListener('click', () => {
+    const glide = new CustomEvent('jsw:glide', { detail: 1, cancelable: true });
+    if (!document.dispatchEvent(glide)) return;
+    const next = [...document.querySelectorAll('main > .section')]
+      .find((s) => s.offsetHeight > 5 && s.getBoundingClientRect().top > 2);
+    next?.scrollIntoView({ behavior: 'smooth' });
+  });
   return indicator;
 }
 
@@ -184,7 +200,7 @@ function trackFit() {
   update();
 }
 
-/** keeps the fixed chrome in the theme of the section under it, and the progress current */
+/** keeps the fixed chrome in the theme of the section under it, the SCROLL button off the footer */
 function trackPage(indicator) {
   let frame = 0;
   const update = () => {
@@ -201,8 +217,6 @@ function trackPage(indicator) {
     else document.body.style.removeProperty('--jsw-nav-tone');
     document.body.toggleAttribute('data-jsw-nav-toned', Boolean(tone));
     if (indicator) {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      indicator.style.setProperty('--jsw-scroll-progress', max > 0 ? Math.min(1, window.scrollY / max) : 0);
       // step aside once the page footer comes up, so it never sits on the footer links
       const footer = document.querySelector('.jsw-footer');
       const footerTop = footer ? footer.getBoundingClientRect().top : Infinity;

@@ -140,21 +140,29 @@
   align-self: end;
 }
 
+/* desktop: the button sits nearer the edge than the copy, 47px in at 1280 (3.67vw) */
+@media (width >= 900px) {
+  .jsw-hero .jsw-hero-action {
+    margin-right: calc(3.67vw - var(--jsw-edge, 20px));
+  }
+}
+
+/* "NEV / Hero": 221 x 52, 8px corners, the label 24px in, a thin 9px plus 26px after it */
 .jsw-hero a.jsw-hero-cta:any-link {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 26px;
   min-width: 212px;
-  height: 50px;
-  padding: 0 20px;
-  border-radius: var(--jsw-radius-control, 6px);
+  height: 52px;
+  padding: 0 26px 0 24px;
+  border-radius: 8px;
   color: var(--jsw-text-dark, #111);
   background-color: var(--jsw-white, #fff);
   font-family: var(--jsw-font-mono);
   font-size: 12px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
   transition: background-color 0.3s var(--jsw-ease);
 }
@@ -165,8 +173,9 @@
 
 .jsw-hero .jsw-hero-cta-icon {
   position: relative;
-  width: 10px;
-  height: 10px;
+  flex: none;
+  width: 9px;
+  height: 9px;
 }
 
 .jsw-hero .jsw-hero-cta-icon::before,
@@ -176,7 +185,7 @@
   top: 50%;
   left: 0;
   width: 100%;
-  height: 1.5px;
+  height: 1.2px;
   background-color: currentcolor;
   transform: translateY(-50%);
 }
@@ -313,77 +322,77 @@
   white-space: nowrap;
 }
 
-/* ---------- fixed scroll progress indicator (right edge) ---------- */
+/* ---------- fixed SCROLL button (right edge): one stop down per click ----------
+   "NEV" frames: a 92 x 36 near-black pill, 10px corners, mouse icon with an up/down arrow,
+   SCROLL in the mono face; its centre 57.7% down the screen, 83px in from the right at 1280 */
 .jsw-phase-3 .jsw-scroll {
   position: fixed;
-  top: 50%;
-  right: 24px;
+  top: 57.7%;
+  right: 6.5vw;
   z-index: 999;
   display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
   color: var(--jsw-white, #fff);
+  background: none;
+  font: inherit;
   transform: translateY(-50%);
-  pointer-events: none;
   transition: color 0.4s var(--jsw-ease), opacity 0.4s var(--jsw-ease);
 }
 
 .jsw-phase-3 .jsw-scroll.is-hidden {
   opacity: 0;
+  pointer-events: none;
 }
 
-.jsw-phase-3 .jsw-scroll-track {
-  position: relative;
-  width: 2px;
-  height: 96px;
-  overflow: hidden;
-  border-radius: 2px;
-  background-color: rgb(255 255 255 / 18%);
-}
-
-.jsw-phase-3 .jsw-scroll-thumb {
-  position: absolute;
-  inset: 0;
-  background-color: currentcolor;
-  transform: scaleY(var(--jsw-scroll-progress, 0));
-  transform-origin: top;
+.jsw-phase-3 .jsw-scroll:focus-visible {
+  outline: 2px solid var(--jsw-teal);
+  outline-offset: 3px;
 }
 
 .jsw-phase-3 .jsw-scroll-label {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  height: 28px;
-  padding: 0 10px;
+  gap: 11px;
+  height: 36px;
+  padding: 0 10px 0 14px;
   border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: 6px;
-  background-color: rgb(20 20 20 / 72%);
+  border-radius: 10px;
+  background-color: rgb(12 12 12 / 88%);
   backdrop-filter: blur(10px);
   font-family: var(--jsw-font-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: 12.5px;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  transition: background-color 0.3s var(--jsw-ease);
 }
 
 .jsw-phase-3 .jsw-scroll-mouse {
-  box-sizing: border-box;
-  width: 8px;
-  height: 12px;
-  border: 1.2px solid currentcolor;
-  border-radius: 4px;
+  display: block;
+  flex: none;
+  width: 11px;
+  height: 14px;
 }
 
 .jsw-phase-3[data-jsw-theme='light'] .jsw-scroll {
   color: var(--jsw-text-dark, #111);
 }
 
-.jsw-phase-3[data-jsw-theme='light'] .jsw-scroll-track {
-  background-color: rgb(0 0 0 / 14%);
-}
-
 .jsw-phase-3[data-jsw-theme='light'] .jsw-scroll-label {
   border-color: rgb(0 0 0 / 8%);
   background-color: rgb(255 255 255 / 70%);
+}
+
+.jsw-phase-3 .jsw-scroll:hover .jsw-scroll-label {
+  background-color: rgb(36 36 36 / 92%);
+}
+
+.jsw-phase-3[data-jsw-theme='light'] .jsw-scroll:hover .jsw-scroll-label {
+  background-color: rgb(255 255 255 / 92%);
 }
 
 /* Universal Editor: navigation stays inside the hero */
