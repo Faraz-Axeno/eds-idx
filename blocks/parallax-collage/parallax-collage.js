@@ -204,10 +204,16 @@ function flyIn({
       return;
     }
 
-    // 0 while this section is below the screen, 1 once its top reaches the screen top
-    const h = window.innerHeight;
+    // 0 while the source section is at its stop, 1 once this section's top reaches the screen
+    // top. Measured against the source section's own height, and with a couple of pixels'
+    // tolerance at both ends: on real phones the screen (fractional heights, the browser's
+    // toolbars) never quite matches the sections, and at rest a flight just begun would cover
+    // the source section, its thumbnails included
+    const h = sourceSection.offsetHeight || window.innerHeight;
     const { top } = section.getBoundingClientRect();
-    const p = Math.min(1, Math.max(0, 1 - top / h));
+    let p = Math.min(1, Math.max(0, 1 - top / h));
+    if (top >= h - 2) p = 0;
+    else if (top <= 2) p = 1;
     const arrived = p >= 0.999;
     // in between: the source section holds still and the white screen (this block in its final
     // place, on a see-through section) fades in over it; set before measuring both ends
