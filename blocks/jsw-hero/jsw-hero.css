@@ -36,6 +36,7 @@
   display: block;
   width: min(62vw, 980px);
   height: 58%;
+  margin-top: 6vh;
   margin-top: 6svh;
 }
 
@@ -75,7 +76,12 @@
   transform: translateX(-50%);
   transition: opacity 0.8s ease;
 
-  /* its edges fade into the panel, so the video's rectangle never shows */
+  /* its edges fade into the panel, so the video's rectangle never shows
+     (-webkit-: Chromium before 120 and older Safari only read the prefixed mask) */
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent),
+    linear-gradient(180deg, transparent, #000 12%, #000 80%, transparent);
+  -webkit-mask-composite: source-in;
   mask-image:
     linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent),
     linear-gradient(180deg, transparent, #000 12%, #000 80%, transparent);
@@ -141,7 +147,7 @@
 }
 
 /* desktop: the button sits nearer the edge than the copy, 47px in at 1280 (3.67vw) */
-@media (width >= 900px) {
+@media (min-width: 900px) {
   .jsw-hero .jsw-hero-action {
     margin-right: calc(3.67vw - var(--jsw-edge, 20px));
   }
@@ -218,6 +224,7 @@
 
   /* --jsw-nav-tone: the colour of the section underneath, when it sets one (jsw-hero.js) */
   background-color: var(--jsw-nav-tone, var(--jsw-pill-dark));
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   transition: background-color 0.4s var(--jsw-ease), border-color 0.4s var(--jsw-ease);
 }
@@ -363,6 +370,7 @@
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 10px;
   background-color: rgb(12 12 12 / 88%);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   font-family: var(--jsw-font-mono);
   font-size: 12.5px;
@@ -400,7 +408,7 @@
   position: absolute;
 }
 
-@media (width >= 600px) {
+@media (min-width: 600px) {
   .jsw-phase-3 .jsw-nav {
     top: 26px;
   }
@@ -414,7 +422,7 @@
   }
 }
 
-@media (width < 600px) {
+@media (max-width: 599.98px) {
   /* phones: no fixed navigation, as in the "M / ..." frames (in Universal Editor it stays
      in the hero, editable) */
   body.jsw-phase-3 > .jsw-nav {
@@ -476,6 +484,34 @@
 
   .jsw-hero .jsw-hero-video {
     top: calc(100cqh - 412px - 445 * var(--jsw-hero-u));
+  }
+}
+
+/* browsers without container units: the same placement, from the visual's size as measured
+   by jsw-hero.js (--jsw-cq-w / --jsw-cq-h in place of 100cqw / 100cqh) */
+@supports not (container-type: size) {
+  .jsw-hero .jsw-hero-visual {
+    --jsw-hero-u: min(calc(var(--jsw-cq-w) / 1280), calc(var(--jsw-cq-h) / 720));
+  }
+
+  .jsw-hero .jsw-hero-video {
+    top: calc(var(--jsw-cq-h) / 2 - 250 * var(--jsw-hero-u));
+  }
+
+  @media (orientation: portrait) {
+    .jsw-hero .jsw-hero-visual {
+      --jsw-hero-u: calc(var(--jsw-cq-w) / 640);
+    }
+  }
+
+  @media (max-width: 599.98px) {
+    .jsw-hero .jsw-hero-visual {
+      --jsw-hero-u: min(calc(var(--jsw-cq-w) / 640), max(calc((var(--jsw-cq-h) - 482px) / 352), 0.2px));
+    }
+
+    .jsw-hero .jsw-hero-video {
+      top: calc(var(--jsw-cq-h) - 412px - 445 * var(--jsw-hero-u));
+    }
   }
 }
 

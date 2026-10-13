@@ -18,10 +18,12 @@ const SCROLL_TRIGGER_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/S
 // then zooms out into its centre card over the first FOLD_VH of scrolling
 // (not in the phone layout, which portrait tablets up to 1199px wide also use)
 const FOLD_MEDIA = [
-  '(width >= 768px) and (orientation: landscape) and (prefers-reduced-motion: no-preference)',
-  '(width >= 1200px) and (prefers-reduced-motion: no-preference)',
+  '(min-width: 768px) and (orientation: landscape) and (prefers-reduced-motion: no-preference)',
+  '(min-width: 1200px) and (prefers-reduced-motion: no-preference)',
 ].join(', ');
 const FOLD_VH = 100;
+// small-viewport height where the browser has it (as in the CSS), the classic vh elsewhere
+const VH_UNIT = window.CSS?.supports?.('height', '1svh') ? 'svh' : 'vh';
 const FOLD_START_SCALE = 2.5;
 // Fold 1 artwork: the engine card's own photo, cut out of its black background exactly as the
 // card shows it (same framing and crop), so the zoomed-out engine lands on the card's engine
@@ -259,7 +261,8 @@ function flyIn({
   };
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
-  media.addEventListener('change', schedule);
+  // older Safari has no change events on media queries: the resize listener covers it there
+  media.addEventListener?.('change', schedule);
   // a tab switch in the source section changes the image
   new MutationObserver(schedule).observe(sourceSection, {
     subtree: true, attributes: true, attributeFilter: ['data-zoom-source'],
@@ -387,7 +390,7 @@ export default function decorate(block) {
     if (!hold) return;
     const fold = foldActive ? (FOLD_VH / 100) * screen : 0;
     // extra scroll room for Fold 1, inside the image layer like the hold's own room
-    if (fold) imagesLayer.style.paddingBottom = `calc(${holdVh + FOLD_VH} * 1svh)`;
+    if (fold) imagesLayer.style.paddingBottom = `calc(${holdVh + FOLD_VH} * 1${VH_UNIT})`;
     else imagesLayer.style.removeProperty('padding-bottom');
     // eased-scroll stops: engine settled in the centre, engine shrunk to the top
     block.dataset.scrollStops = [fold, fold + hold].filter(Boolean).map(Math.round).join(',');

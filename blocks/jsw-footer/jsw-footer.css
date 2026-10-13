@@ -119,13 +119,14 @@
 /* phones ("M / Footer 375x815"): a full screen on the gradient; from the top: CONNECT and
    EXPLORE side by side, the CTA, then the brand lines with the legal link last
    (tablets keep the layout above) */
-@media (width < 600px) {
+@media (max-width: 599.98px) {
   .jsw-footer {
     align-content: end;
     gap: 0;
     min-height: var(--mg-panel-height, 100svh);
 
     /* the gaps follow the screen height (frame values at 815px tall), so short phones fit */
+    padding: min(120px, 14.7vh) 24px 34px;
     padding: min(120px, 14.7svh) 24px 34px;
   }
 
@@ -149,6 +150,7 @@
 
   .jsw-footer .jsw-footer-cta {
     order: 2;
+    margin-top: min(72px, 8.8vh);
     margin-top: min(72px, 8.8svh);
   }
 
@@ -160,6 +162,7 @@
 
   .jsw-footer .jsw-footer-brand {
     order: 3;
+    margin-top: min(140px, 17.2vh);
     margin-top: min(140px, 17.2svh);
   }
 
@@ -182,6 +185,7 @@
   }
 
   .jsw-footer .jsw-footer-legal {
+    margin-top: min(44px, 5.4vh);
     margin-top: min(44px, 5.4svh);
     font-size: 13px;
     text-decoration: underline;
@@ -189,7 +193,7 @@
   }
 }
 
-@media (width >= 900px) {
+@media (min-width: 900px) {
   .jsw-footer {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: start;

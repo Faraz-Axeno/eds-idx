@@ -121,6 +121,17 @@ main .parallax-collage .scrolling-images-layer {
   pointer-events: none;
 }
 
+/* browsers without small-viewport units (svh): the same values in vh */
+@supports not (height: 1svh) {
+  main .parallax-collage {
+    --pc-u: min(calc(1px * var(--jsw-fit, 1)), 0.1389vh, 0.0781vw);
+  }
+
+  main .parallax-collage .scrolling-images-layer {
+    padding-bottom: calc(var(--pc-m-hold) * 1vh);
+  }
+}
+
 /* 4. screen 1 + the gap before screen 2 */
 main .parallax-collage .screen-1 {
   position: relative;
@@ -179,6 +190,15 @@ main .parallax-collage .parallax-collage-item.center-engine {
     translateY(calc(var(--pc-m-progress) * -45.4svh))
     scale(calc(1 - var(--pc-m-progress) * 0.524));
   aspect-ratio: 236 / 306;
+}
+
+@supports not (height: 1svh) {
+  main .parallax-collage .parallax-collage-item.center-engine {
+    transform:
+      translate(-50%, -50%)
+      translateY(calc(var(--pc-m-progress) * -45.4vh))
+      scale(calc(1 - var(--pc-m-progress) * 0.524));
+  }
 }
 
 /* the engine fills more of the card and sits lower, as in the frame */
@@ -246,7 +266,7 @@ main .parallax-collage .parallax-collage-item.card-stage {
  * Portrait tablets (up to 1199px wide) use the same phone layout, with the size caps below.
  * Short landscape screens (a phone turned sideways, a desktop zoomed far in) keep the desktop
  * layout, which scales with the screen height. Desktop rules above are untouched. */
-@media (orientation: portrait) and (width < 1200px) {
+@media (orientation: portrait) and (max-width: 1199.98px) {
   main .parallax-collage .sticky-text-layer .content {
     width: calc(100% - 40px);
     max-width: 340px;
@@ -256,12 +276,15 @@ main .parallax-collage .parallax-collage-item.card-stage {
      375x815 frame, scaled down with the screen height (and width) on smaller phones */
   main .parallax-collage .parallax-collage-title {
     max-width: none;
+    margin-bottom: min(26px, 3.2vh);
     margin-bottom: min(26px, 3.2svh);
+    font-size: min(24px, 2.95vh, 6.4vw);
     font-size: min(24px, 2.95svh, 6.4vw);
     line-height: 1.15;
   }
 
   main .parallax-collage .sticky-text-layer .content p {
+    font-size: max(11px, min(14.5px, 1.78vh, 3.87vw));
     font-size: max(11px, min(14.5px, 1.78svh, 3.87vw));
     line-height: 1.65;
   }
@@ -279,6 +302,15 @@ main .parallax-collage .parallax-collage-item.card-stage {
     aspect-ratio: 350 / 479;
   }
 
+  @supports not (height: 1svh) {
+    main .parallax-collage .parallax-collage-item.center-engine {
+      transform:
+        translate(-50%, -50%)
+        translateY(calc(var(--pc-m-progress) * -45.2vh))
+        scale(calc(1 - var(--pc-m-progress) * 0.66));
+    }
+  }
+
   /* side images: all 119 x 155 on the 375x815 frame (19% of the screen height, so the rows
      keep their vertical spacing around the text on shorter phones); the top pair runs off
      the screen edges */
@@ -286,6 +318,7 @@ main .parallax-collage .parallax-collage-item.card-stage {
     .card-charger, .card-bridge, .card-room, .card-spring,
     .card-phone, .card-jetour, .card-chassis, .card-stage
   ) {
+    width: min(31.8vw, 14.6vh);
     width: min(31.8vw, 14.6svh);
     aspect-ratio: 119 / 155;
   }
@@ -320,22 +353,27 @@ main .parallax-collage .parallax-collage-item.card-stage {
   }
 
   main .parallax-collage .parallax-collage-title {
+    font-size: min(34px, 3.1vh);
     font-size: min(34px, 3.1svh);
   }
 
   main .parallax-collage .sticky-text-layer .content p {
+    font-size: min(17px, 1.6vh);
     font-size: min(17px, 1.6svh);
   }
 
   main .parallax-collage .parallax-collage-item.center-engine {
+    width: min(80vw, calc(60vh * 350 / 479));
     width: min(80vw, calc(60svh * 350 / 479));
   }
 
   main .parallax-collage .parallax-collage-item:is(.card-charger, .card-phone) {
+    left: -4.4vh;
     left: -4.4svh;
   }
 
   main .parallax-collage .parallax-collage-item:is(.card-bridge, .card-jetour) {
+    right: -4.4vh;
     right: -4.4svh;
   }
 }

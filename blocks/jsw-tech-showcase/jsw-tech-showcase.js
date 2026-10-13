@@ -78,6 +78,20 @@ function trackRatio(figure, img) {
 }
 
 /**
+ * browsers without CSS container units (cqw / cqh): the stage's own width and height as
+ * --jsw-cq-w / --jsw-cq-h, which the CSS uses in their place (@supports not container-type)
+ */
+function containerUnits(container) {
+  if (window.CSS?.supports?.('container-type', 'size')) return;
+  const measure = () => {
+    container.style.setProperty('--jsw-cq-w', `${container.clientWidth}px`);
+    container.style.setProperty('--jsw-cq-h', `${container.clientHeight}px`);
+  };
+  if (window.ResizeObserver) new ResizeObserver(measure).observe(container);
+  else window.addEventListener('resize', measure);
+}
+
+/**
  * loads and decorates the block
  * @param {Element} block The block element
  */
@@ -108,6 +122,7 @@ export default function decorate(block) {
   copy.append(detail);
 
   const stage = el('div', 'jsw-tech-stage');
+  containerUnits(stage);
   const tooltip = el('div', 'jsw-tech-tooltip', { id: `${id}-tooltip`, role: 'dialog', 'aria-modal': 'false' });
   tooltip.hidden = true;
   const tipTitle = el('p', 'jsw-tech-tooltip-title', { id: `${id}-tooltip-title` });

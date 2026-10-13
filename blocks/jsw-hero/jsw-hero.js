@@ -40,8 +40,24 @@ function inEditor(block) {
   return Boolean(block.closest('[data-aue-resource]'));
 }
 
+/**
+ * browsers without CSS container units (cqw / cqh): the container's own width and height as
+ * --jsw-cq-w / --jsw-cq-h, which the CSS uses in their place (@supports not container-type)
+ */
+function containerUnits(container) {
+  if (window.CSS?.supports?.('container-type', 'size')) return;
+  const measure = () => {
+    container.style.setProperty('--jsw-cq-w', `${container.clientWidth}px`);
+    container.style.setProperty('--jsw-cq-h', `${container.clientHeight}px`);
+  };
+  measure();
+  if (window.ResizeObserver) new ResizeObserver(measure).observe(container);
+  else window.addEventListener('resize', measure);
+}
+
 function decorateVisual(row) {
   row.className = 'jsw-hero-visual';
+  containerUnits(row);
   const glow = document.createElement('span');
   glow.className = 'jsw-hero-glow';
   glow.setAttribute('aria-hidden', 'true');
@@ -74,7 +90,8 @@ function addVideo(row) {
     video.src = `${window.hlx?.codeBasePath || ''}/videos/jsw-hero.mp4`;
     if (glow) glow.before(video);
     else row.append(video);
-    video.play().catch(() => {});
+    // older browsers return nothing from play()
+    video.play()?.catch(() => {});
   };
   if (document.readyState === 'complete') start();
   else window.addEventListener('load', start, { once: true });
@@ -217,10 +234,13 @@ function trackPage(indicator) {
     else document.body.style.removeProperty('--jsw-nav-tone');
     document.body.toggleAttribute('data-jsw-nav-toned', Boolean(tone));
     if (indicator) {
-      // step aside once the page footer comes up, so it never sits on the footer links
-      const footer = document.querySelector('.jsw-footer');
-      const footerTop = footer ? footer.getBoundingClientRect().top : Infinity;
-      indicator.classList.toggle('is-hidden', footerTop < window.innerHeight * 0.75);
+      // shown on the hero (section 1) only: it steps aside once the page moves on from it.
+      // Measured on the hero's section, which stays in its place: section 2's entrance
+      // holds the hero's content on screen while the white card slides over it
+      const block = document.querySelector('.jsw-hero');
+      const hero = block?.closest('.section') || block;
+      const heroBottom = hero ? hero.getBoundingClientRect().bottom : 0;
+      indicator.classList.toggle('is-hidden', heroBottom < window.innerHeight * 0.75);
     }
   };
   const schedule = () => {

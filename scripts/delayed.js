@@ -78,27 +78,62 @@ async function initSmoothScroll() {
   const root = document.documentElement;
   let tweening = false;
   let lastWheel = 0;
+  // the current wheel gesture: its start and direction, its last delta and how many deltas in
+  // a row have grown, its smoothed delta level, that level's highest point and lowest since
+  let lastGesture = 0;
+  let wheelDir = 0;
+  let wheelLast = 0;
+  let wheelClimb = 0;
+  let wheelLevel = 0;
+  let wheelPeak = 0;
+  let wheelLow = 0;
+  // the JSW NEV page: gestures made during a glide are counted (down +1, up -1) and played
+  // one after another, each the same glide, once the current one has ended
+  const QUEUE_PAUSE = 150; // ms between queued glides
+  let queued = 0;
+  let queueTimer = 0;
   const done = () => {
     tweening = false;
     root.classList.remove('gsap-scrolling');
   };
+  // the user took over (native scroll, zoom...): forget the queued glides
+  const stopped = () => {
+    queued = 0;
+    done();
+  };
 
   /** eases one stop down (dir 1) or up (dir -1) */
   const glide = (dir) => {
-    if (tweening) return;
+    if (tweening || queueTimer) {
+      if (stepped) queued += dir;
+      return;
+    }
     const destY = nextStop(dir);
-    if (Math.abs(destY - window.scrollY) < 2) return;
+    if (Math.abs(destY - window.scrollY) < 2) {
+      queued = 0; // top or bottom of the page reached
+      return;
+    }
 
     tweening = true;
     // CSS snap / smooth-behaviour would fight the tween; the tween ends on a snap point
     root.classList.add('gsap-scrolling');
     gsap.to(window, {
       duration: reduced ? 0 : 1.8,
-      scrollTo: { y: destY, autoKill: true, onAutoKill: done },
+      scrollTo: { y: destY, autoKill: true, onAutoKill: stopped },
       ease: 'power2.inOut',
       overwrite: 'auto',
-      onComplete: done,
-      onInterrupt: done,
+      onComplete: () => {
+        done();
+        if (!queued) return;
+        queueTimer = setTimeout(() => {
+          queueTimer = 0;
+          if (!queued) return;
+          const next = Math.sign(queued);
+          queued -= next;
+          glide(next);
+        }, QUEUE_PAUSE);
+      },
+      onInterrupt: stopped,
     });
   };
 
@@ -109,10 +144,34 @@ async function initSmoothScroll() {
 
     // one panel per gesture: ignore the rest of a trackpad/inertia burst
     const now = performance.now();
-    const burst = now - lastWheel < 150;
+    const dir = e.deltaY > 0 ? 1 : -1;
+    let burst = now - lastWheel < 150;
     lastWheel = now;
+    const size = Math.abs(e.deltaY);
+    if (burst && stepped) {
+      // quick trackpad swipes run into one unbroken stream of events: a new swipe shows as
+      // the deltas climbing steadily again after the previous swipe's inertia had died down
+      // (or as a change of direction), and counts as a gesture of its own
+      wheelClimb = size > wheelLast ? wheelClimb + 1 : 0;
+      wheelLast = size;
+      wheelLevel = (wheelLevel + size) / 2; // smoothed, so single uneven deltas do not count
+      const rising = wheelClimb >= 3 && wheelLow < wheelPeak * 0.6
+        && wheelLevel > wheelLow * 1.6 + 6;
+      if ((dir !== wheelDir || rising) && now - lastGesture > 250) burst = false;
+      else if (wheelLevel > wheelPeak) {
+        wheelPeak = wheelLevel;
+        wheelLow = wheelLevel;
+      } else wheelLow = Math.min(wheelLow, wheelLevel);
+    }
     if (burst) return;
-    glide(e.deltaY > 0 ? 1 : -1);
+    lastGesture = now;
+    wheelDir = dir;
+    wheelClimb = 0;
+    wheelLast = size;
+    wheelLevel = size;
+    wheelPeak = size;
+    wheelLow = size;
+    glide(dir);
   }, { passive: false });
 
   // a page's own controls can ask for the same glide, e.g. the JSW SCROLL button (jsw-hero)

@@ -55,7 +55,7 @@
   src: local('Arial');
 }
 
-@media (width >= 900px) {
+@media (min-width: 900px) {
   :root {
     /* body sizes */
     --body-font-size-m: 18px;

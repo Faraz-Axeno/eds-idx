@@ -42,7 +42,21 @@ body.jsw-phase-3 {
    set only once that script is running (html.touch-panels) */
 html.touch-panels,
 html.touch-panels body {
+  touch-action: pan-x;
   touch-action: pan-x pinch-zoom;
+}
+
+/* browsers without :has(): the eased steps of scripts/delayed.js are never turned into
+   native smooth scrolling (styles/styles.css does this behind :has()) */
+html.gsap-scrolling {
+  scroll-behavior: auto !important;
+}
+
+/* browsers without small-viewport units (svh): panels one classic viewport tall */
+@supports not (height: 1svh) {
+  body.jsw-phase-3 {
+    --mg-panel-height: 100vh;
+  }
 }
 
 /* very short or very large landscape screens (e.g. browser zoom far in or out): the parts
@@ -97,7 +111,7 @@ body.jsw-phase-3 main :is(a, button):focus-visible {
   outline-offset: 3px;
 }
 
-@media (width >= 900px) {
+@media (min-width: 900px) {
   body.jsw-phase-3 {
     --jsw-edge: 5.4vw;
   }

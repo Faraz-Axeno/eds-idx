@@ -74,13 +74,13 @@
   --mg-nav-height: 0px; /* header is a fixed overlay */
 }
 
-@media (width >= 600px) {
+@media (min-width: 600px) {
   :root {
     --mg-space-edge: 24px;
   }
 }
 
-@media (width >= 900px) {
+@media (min-width: 900px) {
   :root {
     --mg-font-size-display: 48px;
     --mg-font-size-title: 36px;
@@ -93,7 +93,7 @@
   }
 }
 
-@media (width >= 1200px) {
+@media (min-width: 1200px) {
   :root {
     --mg-font-size-display: 60px; /* 60px / 65px */
     --mg-font-size-title: 44.7px; /* 44.7px / 53.64px */
@@ -106,7 +106,7 @@
 }
 
 /* source slider arrows grow to 99px from 1440px wide */
-@media (width >= 1440px) {
+@media (min-width: 1440px) {
   :root {
     --mg-arrow-size: 99px;
   }

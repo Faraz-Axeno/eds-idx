@@ -14,7 +14,7 @@
 let instance = 0;
 // how much of the card's top peeks into the previous section: its ‹ OUR BLOGS › header row
 const PEEK = 84;
-const PEEK_MEDIA = '(width >= 768px) and (orientation: landscape), (width >= 1200px)';
+const PEEK_MEDIA = '(min-width: 768px) and (orientation: landscape), (min-width: 1200px)';
 // the section arrives white ("NEV / Blog" prototype): once it fills the screen and the card
 // has settled, it stays white this long, then fades to its dark background (0.8s,
 // jsw-blogs.css); it turns white again when scrolled away
@@ -51,7 +51,8 @@ function decoratePost(row, index, total) {
     const a = p.querySelector('a');
     return a && p.textContent.trim() === a.textContent.trim();
   };
-  const linkP = paragraphs.findLast(isLinkOnly);
+  // the last link-only paragraph (written out: older Safari and Samsung lack findLast)
+  const linkP = [...paragraphs].reverse().find(isLinkOnly);
   paragraphs.forEach((p) => {
     if (p === linkP) return;
     // paragraphs above the title are the category line, below it the summary
@@ -159,7 +160,8 @@ function trackPeek(block, card) {
   };
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
-  media.addEventListener('change', schedule);
+  // older Safari has no change events on media queries: the resize listener covers it there
+  media.addEventListener?.('change', schedule);
   new ResizeObserver(schedule).observe(block);
   update();
 }

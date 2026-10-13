@@ -135,6 +135,7 @@
 .jsw-tech-showcase .jsw-tech-stage {
   position: relative;
   order: 2;
+  height: min(64vh, 118vw);
   height: min(64svh, 118vw);
   margin: 0 12px;
   overflow: hidden;
@@ -144,7 +145,7 @@
 /* picking a thumbnail (jsw-tech-showcase.js): a vertical carousel inside the card. To the
    right, the current image slides up and out while the new one rises from the bottom edge;
    to the left, the current one slides down while the new one comes in from the top. The
-   outgoing image stays visible until it has left, then hides. */
+   outgoing image fades out as it slides, in step with its movement. */
 .jsw-tech-showcase .jsw-tech-panel {
   position: absolute;
   inset: 0;
@@ -153,7 +154,7 @@
   justify-content: center;
   opacity: 0;
   transform: translateY(100%);
-  transition: transform 0.9s var(--jsw-ease), opacity 0s linear 0.9s;
+  transition: transform 0.9s var(--jsw-ease), opacity 0.9s var(--jsw-ease);
 }
 
 .jsw-tech-showcase .jsw-tech-panel.is-active {
@@ -189,6 +190,7 @@
   cursor: pointer;
   color: var(--jsw-white, #fff);
   background-color: rgb(24 24 24 / 58%);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   transform: translate(-50%, -50%);
   transition: background-color 0.3s var(--jsw-ease);
@@ -220,6 +222,7 @@
   z-index: 4;
   border-color: transparent;
   background-color: transparent;
+  -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
 
@@ -227,6 +230,7 @@
 .jsw-tech-showcase .jsw-hotspot.jsw-hotspot-apart[aria-expanded='true'] {
   border-color: rgb(255 255 255 / 16%);
   background-color: rgb(80 80 80 / 70%);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 
@@ -256,6 +260,7 @@
   border-radius: 12px;
   color: var(--jsw-white, #fff);
   background-color: rgb(12 12 12 / 44%);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
   backdrop-filter: blur(14px) saturate(1.2);
   box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
   transform: translate(calc(var(--jsw-tx) + var(--jsw-sx, 0px)), var(--jsw-ty));
@@ -344,7 +349,7 @@
 
 /* side by side from 900px, and on any short landscape screen from 600px (a desktop zoomed far
    in, a phone turned sideways), where the stacked layout would push the copy off screen */
-@media (width >= 900px), (orientation: landscape) and (width >= 600px) {
+@media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
   .jsw-tech-showcase {
     position: relative;
     display: grid;
@@ -357,11 +362,14 @@
     flex-direction: column;
     justify-content: space-between;
     min-height: 0;
+    padding: 0 0 7vh;
     padding: 0 0 7svh;
   }
 
   .jsw-tech-showcase .jsw-tech-heading {
-    padding: max(108px, 17svh) 24px 0 var(--jsw-edge);
+    padding: 0 24px 0 var(--jsw-edge);
+    padding-top: max(108px, 17vh);
+    padding-top: max(108px, 17svh);
   }
 
   .jsw-tech-showcase .jsw-tech-detail {
@@ -422,8 +430,9 @@
   }
 }
 
-@media (width >= 900px) and (height < 680px), (orientation: landscape) and (width >= 600px) and (height < 680px) {
+@media (min-width: 900px) and (max-height: 679.98px), (orientation: landscape) and (min-width: 600px) and (max-height: 679.98px) {
   .jsw-tech-showcase .jsw-tech-thumb {
+    width: clamp(72px, 15vh, 120px);
     width: clamp(72px, 15svh, 120px);
   }
 
@@ -435,9 +444,10 @@
 /* phones ("M / What is NEV 375x815"): one screen, top to bottom: heading; "1/3" beside the
    powertrain's name, its copy and the thumbnails; then the showcase image filling the rest
    of the card, running off its right edge (tablets keep the layout above) */
-@media (width < 600px) {
+@media (max-width: 599.98px) {
   /* vertical gaps follow the screen height (frame values at 815px tall) */
   .jsw-tech-showcase .jsw-tech-heading {
+    padding: min(78px, 9.6vh) 24px 0;
     padding: min(78px, 9.6svh) 24px 0;
   }
 
@@ -454,6 +464,7 @@
     align-items: baseline;
     column-gap: 10px;
     order: 2;
+    padding: min(30px, 3.7vh) 24px 0;
     padding: min(30px, 3.7svh) 24px 0;
   }
 
@@ -490,23 +501,66 @@
     width: 63px;
   }
 
-  /* the image takes what is left of the screen, at full height, cut off on the right */
+  /* the image sits in what is left of the screen: as on the 375x815 frame, 87% of the card's
+     width, its right edge on the card's right edge, centred between the thumbnails and the
+     card's bottom (about 35px above and below); on shorter phones those gaps narrow first, then
+     the image shrinks */
   .jsw-tech-showcase .jsw-tech-stage {
     flex: 1 0 170px;
     order: 3;
     height: auto;
+    margin: min(24px, 2.9vh) 0 0;
     margin: min(24px, 2.9svh) 0 0;
   }
 
   .jsw-tech-showcase .jsw-tech-panel {
-    justify-content: flex-start;
-    padding-left: 6cqw;
+    justify-content: flex-end;
   }
 
   .jsw-tech-showcase .jsw-tech-figure {
     flex: none;
-    width: auto;
-    height: 100cqh;
+    width: min(87.2cqw, (100cqh - clamp(16px, 100cqh - 250px, 40px)) * var(--jsw-ratio, 0.8));
+    height: auto;
+  }
+}
+
+/* very short phones (e.g. 320x568): the image gives up a little room so the card still fits
+   the screen, and the + buttons stay inside the image, clear of the card's bottom edge */
+@media (max-width: 599.98px) and (max-height: 600px) {
+  .jsw-tech-showcase .jsw-tech-stage {
+    flex-basis: 140px;
+  }
+
+  .jsw-tech-showcase .jsw-hotspot {
+    top: min(var(--jsw-y), 100% - 44px);
+  }
+}
+
+/* browsers without container units: the same sizes, from the stage's size as measured by
+   jsw-tech-showcase.js (--jsw-cq-w / --jsw-cq-h in place of 100cqw / 100cqh) */
+@supports not (container-type: size) {
+  .jsw-tech-showcase .jsw-tech-figure {
+    width: min(var(--jsw-cq-w), var(--jsw-cq-h) * var(--jsw-ratio, 0.8));
+  }
+
+  .jsw-tech-showcase .jsw-tech-tooltip {
+    width: min(270px, calc(var(--jsw-cq-w) - 16px));
+  }
+
+  @media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
+    .jsw-tech-showcase .jsw-tech-figure {
+      --u: min(calc(var(--jsw-cq-h) / 720), calc(var(--jsw-cq-w) / 1280));
+
+      top: calc((var(--jsw-cq-h) - 720 * var(--u)) / 2 + var(--fy) * var(--u));
+      left: calc(var(--jsw-cq-w) - (1280 - var(--fx)) * var(--u));
+      width: auto;
+    }
+  }
+
+  @media (max-width: 599.98px) {
+    .jsw-tech-showcase .jsw-tech-figure {
+      width: min(var(--jsw-cq-w) * 0.872, (var(--jsw-cq-h) - clamp(16px, var(--jsw-cq-h) - 250px, 40px)) * var(--jsw-ratio, 0.8));
+    }
   }
 }
 
