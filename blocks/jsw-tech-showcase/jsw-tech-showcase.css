@@ -141,6 +141,10 @@
   container-type: size;
 }
 
+/* picking a thumbnail (jsw-tech-showcase.js): a vertical carousel inside the card. To the
+   right, the current image slides up and out while the new one rises from the bottom edge;
+   to the left, the current one slides down while the new one comes in from the top. The
+   outgoing image stays visible until it has left, then hides. */
 .jsw-tech-showcase .jsw-tech-panel {
   position: absolute;
   inset: 0;
@@ -148,12 +152,15 @@
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.6s var(--jsw-ease);
+  transform: translateY(100%);
+  transition: transform 0.9s var(--jsw-ease), opacity 0s linear 0.9s;
 }
 
 .jsw-tech-showcase .jsw-tech-panel.is-active {
   z-index: 1;
   opacity: 1;
+  transform: none;
+  transition: transform 0.9s var(--jsw-ease);
 }
 
 /* the figure has the image's own ratio, so hotspot percentages stay on the artwork */

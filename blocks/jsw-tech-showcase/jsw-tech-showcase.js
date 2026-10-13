@@ -223,9 +223,27 @@ export default function decorate(block) {
   });
 
   let current = 0;
+  /**
+   * the images move like a vertical carousel (jsw-tech-showcase.css): picking a thumbnail to
+   * the right pushes the current image up and out while the new one rises from the bottom;
+   * one to the left pushes it down while the new one comes in from the top
+   */
+  const slideImages = (from, to) => {
+    if (from === to) return;
+    const dir = to > from ? 1 : -1;
+    const incoming = items[to].row;
+    incoming.style.transition = 'none';
+    incoming.style.transform = `translateY(${dir * 100}%)`;
+    incoming.getBoundingClientRect();
+    ['transition', 'transform'].forEach((p) => incoming.style.removeProperty(p));
+    items[from].row.style.transform = `translateY(${-dir * 100}%)`;
+  };
+
   const select = (index, focus = false) => {
+    const from = current;
     current = (index + items.length) % items.length;
     closeTooltip();
+    if (items[from] && items[current]) slideImages(from, current);
     items.forEach(({ row, textCell, tab }, i) => {
       const active = i === current;
       row.classList.toggle('is-active', active);
