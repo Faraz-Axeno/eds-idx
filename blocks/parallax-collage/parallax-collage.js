@@ -105,20 +105,20 @@ function cutout() {
 }
 
 /**
- * Fly-in (desktop, after a section with a [data-zoom-source] image, e.g. jsw-tech-showcase):
+ * Fly-in (after a section with a [data-zoom-source] image, e.g. jsw-tech-showcase):
  * scrolling from that section to this one flies its selected image from where it sits into
  * the centre card. A fixed copy travels between the two (the source image hides meanwhile),
  * the black card, corners and shadow form around it as it lands, the text and side images
  * fade in, and on arrival the card, now showing that same cut-out, takes over unnoticed.
  * It all plays within the source section's screen: that section holds still while this block,
  * already in its final place, fades in over it as a white screen, so nothing scrolls by.
- * Scrolling back flies it back. Phones and portrait tablets have no flight, but their card
- * shows the same selected cut-out.
+ * Scrolling back flies it back. Every screen size has the flight (phones and tablets too); with
+ * reduced motion there is none, but the card shows the same selected cut-out.
  */
 function flyIn({
   section, engine, fadeIns, sourceSection,
 }) {
-  const media = window.matchMedia(FOLD_MEDIA);
+  const media = window.matchMedia('(prefers-reduced-motion: no-preference)');
   const picture = engine.querySelector('picture');
   // only the contents move (the source's card, this block's wrapper): section boxes, which the
   // navigation theme and the wheel stops read, stay where they are
@@ -168,7 +168,7 @@ function flyIn({
     frame = 0;
     const figure = sourceSection.querySelector('[data-zoom-source]');
     const img = figure?.querySelector('img');
-    // phones and portrait tablets: no flight, the card just shows the selected image
+    // reduced motion: no flight, the card just shows the selected image
     const still = !media.matches;
     if (!img || !section.offsetHeight) {
       reset();

@@ -3,7 +3,7 @@
  * at a time, ‹ OUR BLOGS › in its header row ("NEV / Blog").
  * Rows: background picture, card heading, then one row per post:
  *   category paragraph, title (h3), summary paragraph, READ MORE link.
- * On wide screens the card rises out of the section: its top already peeks in at the bottom
+ * On every screen size the card rises out of the section: its top already peeks in at the bottom
  * of the previous section's last screen ("NEV / Sustainable"), then it settles as the
  * section scrolls up. The section starts white and fades to its dark background as it does.
  * Each post has its own background (the prototype's, see TONES); ‹ › slide the new one
@@ -12,9 +12,11 @@
  */
 
 let instance = 0;
-// how much of the card's top peeks into the previous section: its ‹ OUR BLOGS › header row
+// how much of the card's top peeks into the previous section: its ‹ OUR BLOGS › header row;
+// less where that section's last screen leaves less room below its images (phones), so the
+// card always keeps this gap under them
 const PEEK = 84;
-const PEEK_MEDIA = '(min-width: 768px) and (orientation: landscape), (min-width: 1200px)';
+const PEEK_GAP = 20;
 // the section arrives white ("NEV / Blog" prototype): once it fills the screen and the card
 // has settled, it stays white this long, then fades to its dark background (0.8s,
 // jsw-blogs.css); it turns white again when scrolled away
@@ -132,15 +134,31 @@ function slideBackground(slides, from, to, dir) {
  * dark background reveal that goes with it
  */
 function trackPeek(block, card) {
-  const media = window.matchMedia(PEEK_MEDIA);
   block.classList.add('jsw-blogs-reveal');
+  let previous = block.closest('.section')?.previousElementSibling;
+  while (previous && !previous.classList.contains('section')) {
+    previous = previous.previousElementSibling;
+  }
+  // the peek: PEEK, or less where the previous section's images reach further down its last
+  // screen (the one this section's top comes up under)
+  const peekFor = (top, h) => {
+    let lowest = 0; // the lowest image bottom, from the top of that last screen
+    previous?.querySelectorAll('img').forEach((img) => {
+      const r = img.getBoundingClientRect();
+      if (r.width && r.bottom > top - h && r.top < top) {
+        lowest = Math.max(lowest, r.bottom - (top - h));
+      }
+    });
+    return Math.max(0, Math.min(PEEK, h - lowest - PEEK_GAP));
+  };
   let frame = 0;
   let litTimer = 0;
   const update = () => {
     frame = 0;
     const h = window.innerHeight;
+    const { top } = block.getBoundingClientRect();
     // 0 while the section is still below the screen, 1 once its top reaches the screen top
-    const t = Math.min(1, Math.max(0, 1 - block.getBoundingClientRect().top / h));
+    const t = Math.min(1, Math.max(0, 1 - top / h));
     if (t < 0.995) {
       clearTimeout(litTimer);
       litTimer = 0;
@@ -148,11 +166,7 @@ function trackPeek(block, card) {
     } else if (!litTimer && !block.classList.contains('jsw-blogs-lit')) {
       litTimer = setTimeout(() => block.classList.add('jsw-blogs-lit'), LIT_DELAY);
     }
-    if (!media.matches) {
-      card.style.removeProperty('transform');
-      return;
-    }
-    const lift = (1 - t) * (card.offsetTop + PEEK);
+    const lift = t < 1 ? (1 - t) * (card.offsetTop + peekFor(top, h)) : 0;
     card.style.transform = lift ? `translate3d(0, ${-lift.toFixed(1)}px, 0)` : '';
   };
   const schedule = () => {
@@ -160,8 +174,6 @@ function trackPeek(block, card) {
   };
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
-  // older Safari has no change events on media queries: the resize listener covers it there
-  media.addEventListener?.('change', schedule);
   new ResizeObserver(schedule).observe(block);
   update();
 }
