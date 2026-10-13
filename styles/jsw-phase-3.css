@@ -45,6 +45,19 @@ html.touch-panels body {
   touch-action: pan-x pinch-zoom;
 }
 
+/* very short or very large landscape screens (e.g. browser zoom far in or out): the parts
+   sized in fixed pixels scale by --jsw-fit (jsw-hero.js), so they keep their place beside
+   the videos, images and cards that scale with the screen; 1 (no change) on ordinary screens */
+body.jsw-phase-3 > .jsw-nav,
+body.jsw-phase-3 > .jsw-scroll,
+body.jsw-phase-3 .jsw-hero .jsw-hero-content,
+body.jsw-phase-3 .jsw-tech-showcase :is(.jsw-tech-heading, .jsw-tech-detail, .jsw-hotspot, .jsw-tech-tooltip),
+body.jsw-phase-3 .parallax-collage :is(.parallax-collage-title, .sticky-text-layer .content p),
+body.jsw-phase-3 .jsw-blogs .jsw-blogs-card,
+body.jsw-phase-3 .jsw-footer {
+  zoom: var(--jsw-fit, 1);
+}
+
 /* the page brings its own navigation (jsw-hero) and footer (jsw-footer) */
 body.jsw-phase-3 > header,
 body.jsw-phase-3 > footer {

@@ -335,7 +335,9 @@
   bottom: 3px;
 }
 
-@media (width >= 900px) {
+/* side by side from 900px, and on any short landscape screen from 600px (a desktop zoomed far
+   in, a phone turned sideways), where the stacked layout would push the copy off screen */
+@media (width >= 900px), (orientation: landscape) and (width >= 600px) {
   .jsw-tech-showcase {
     position: relative;
     display: grid;
@@ -413,7 +415,7 @@
   }
 }
 
-@media (width >= 900px) and (height < 680px) {
+@media (width >= 900px) and (height < 680px), (orientation: landscape) and (width >= 600px) and (height < 680px) {
   .jsw-tech-showcase .jsw-tech-thumb {
     width: clamp(72px, 15svh, 120px);
   }

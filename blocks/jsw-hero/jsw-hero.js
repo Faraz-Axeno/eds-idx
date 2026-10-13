@@ -163,6 +163,27 @@ function buildScrollIndicator() {
   return indicator;
 }
 
+/**
+ * --jsw-fit on <html>: how much the page's fixed-size parts (navigation, copy, hotspots,
+ * cards, footer) scale with very short or very large landscape screens, e.g. a browser zoomed
+ * far in or out, so they keep their place beside the parts that scale with the screen
+ * (videos, images). 1 on ordinary screens and on every portrait one.
+ */
+function trackFit() {
+  const update = () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    let fit = 1;
+    if (w > h) {
+      const grow = Math.min(h / 1200, w / 2133);
+      fit = grow > 1 ? grow : Math.min(1, h / 640, w / 1000);
+    }
+    document.documentElement.style.setProperty('--jsw-fit', fit.toFixed(3));
+  };
+  window.addEventListener('resize', update);
+  update();
+}
+
 /** keeps the fixed chrome in the theme of the section under it, and the progress current */
 function trackPage(indicator) {
   let frame = 0;
@@ -226,4 +247,5 @@ export default function decorate(block) {
   const indicator = buildScrollIndicator();
   document.body.append(indicator);
   trackPage(indicator);
+  trackFit();
 }

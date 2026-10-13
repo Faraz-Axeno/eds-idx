@@ -343,6 +343,28 @@
   }
 }
 
+/* very short landscape screens (e.g. a desktop zoomed in a lot): the card's spacing shrinks
+   with the screen height so the whole card stays on screen */
+@media (height < 520px) and (orientation: landscape) {
+  .jsw-blogs {
+    padding-top: min(72px, 12svh);
+    padding-bottom: min(32px, 4svh);
+  }
+
+  .jsw-blogs .jsw-blogs-header {
+    margin-bottom: min(38px, 6svh);
+  }
+
+  .jsw-blogs .jsw-blogs-category,
+  .jsw-blogs .jsw-blogs-title {
+    margin-bottom: min(20px, 3svh);
+  }
+
+  .jsw-blogs .jsw-blogs-summary {
+    margin-bottom: min(24px, 3.5svh);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .jsw-blogs .jsw-blogs-post,
   .jsw-blogs a.jsw-blogs-read:any-link,
