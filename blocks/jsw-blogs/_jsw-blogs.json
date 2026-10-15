@@ -37,7 +37,7 @@
       "id": "jsw-blogs",
       "fields": [
         {
-          "component": "richtext",
+          "component": "reference",
           "valueType": "string",
           "name": "background",
           "label": "Background image (shown blurred)",
@@ -62,6 +62,21 @@
     {
       "id": "jsw-blogs-item",
       "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Background image (optional)",
+          "multi": false,
+          "description": "Shown behind the card while this post is open. Leave empty to use the block background."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "imageAlt",
+          "label": "Background image alt",
+          "value": ""
+        },
         {
           "component": "richtext",
           "valueType": "string",

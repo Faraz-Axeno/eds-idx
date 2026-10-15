@@ -2,12 +2,13 @@
  * jsw-blogs: dark panel with a blurred background and a frosted-glass card showing one post
  * at a time, ‹ OUR BLOGS › in its header row ("NEV / Blog").
  * Rows: background picture, card heading, then one row per post:
- *   category paragraph, title (h3), summary paragraph, READ MORE link.
+ *   its own background picture (optional) | category paragraph, title (h3), summary
+ *   paragraph, READ MORE link.
  * On every screen size the card rises out of the section: its top already peeks in at the bottom
  * of the previous section's last screen ("NEV / Sustainable"), then it settles as the
  * section scrolls up. The section starts white and fades to its dark background as it does.
- * Each post has its own background (the prototype's, see TONES); ‹ › slide the new one
- * in from behind the arrow while the card's text changes, and the fixed
+ * Each post has its own background (authored, else the prototype's, see TONES); ‹ › slide
+ * the new one in from behind the arrow while the card's text changes, and the fixed
  * navigation takes on the post's colour (section data-jsw-nav-tone, read by jsw-hero).
  */
 
@@ -21,9 +22,9 @@ const PEEK_GAP = 20;
 // has settled, it stays white this long, then fades to its dark background (0.8s,
 // jsw-blogs.css); it turns white again when scrolled away
 const LIT_DELAY = 1000;
-// per post, in order (then repeating), from the "NEV / Blog" prototype: its background
-// (the authored photo for the first post; the next two are the prototype's own blurred
-// backgrounds, rebuilt from it) and the navigation pill's colour
+// per post, in order (then repeating), from the "NEV / Blog" prototype: its background where
+// the post has none authored (the block's photo for the first post; the next two are the
+// prototype's own blurred backgrounds, rebuilt from it) and the navigation pill's colour
 const TONES = [
   { image: '', nav: '' }, // the authored photo, the default dark pill
   { image: new URL('./blog-under-the-hood.jpg', import.meta.url).href, nav: 'rgb(112 92 82 / 78%)' },
@@ -35,6 +36,37 @@ function el(tag, className, attrs = {}) {
   if (className) node.className = className;
   Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
   return node;
+}
+
+// Universal Editor model of one post (block/item); published rows carry no model, so there a
+// post is a row with an image cell and a text cell, or (older content) one with a title
+const POST_MODEL = 'jsw-blogs-item';
+
+/**
+ * a part of a post moved out of its row (its background, to the slides) stays that post's in
+ * Universal Editor: its editable fields get the row's resource
+ */
+function keepResource(row, part) {
+  const resource = row.dataset.aueResource;
+  if (!resource || !part) return;
+  [part, ...part.querySelectorAll('[data-aue-prop]')].forEach((node) => {
+    if (node.hasAttribute('data-aue-prop') && !node.hasAttribute('data-aue-resource')) {
+      node.setAttribute('data-aue-resource', resource);
+    }
+  });
+}
+
+/** the post's own background picture (its first cell, then removed from the row), if any */
+function takePostPicture(row) {
+  if (row.children.length < 2) return null;
+  const imageCell = row.firstElementChild;
+  const picture = imageCell.querySelector('picture');
+  if (picture) {
+    picture.querySelector('img')?.setAttribute('alt', '');
+    keepResource(row, picture);
+  }
+  imageCell.remove();
+  return picture;
 }
 
 function decoratePost(row, index, total) {
@@ -72,20 +104,27 @@ function decoratePost(row, index, total) {
   }
 }
 
-/** one background slide per post: its own background, else the authored photo */
-function buildSlides(backgroundRow, count) {
+/**
+ * one background slide per post: the post's own authored background, else the prototype's
+ * (TONES), else the block's authored photo
+ */
+function buildSlides(backgroundRow, count, postPictures = []) {
   const picture = backgroundRow.querySelector('picture');
-  if (!picture || count < 2) return [];
+  if (count < 2 || (!picture && !postPictures.some(Boolean))) return [];
+  let pictureUsed = false;
   const slides = Array.from({ length: count }, (_, i) => {
     const slide = el('div', 'jsw-blogs-slide');
     const { image } = TONES[i % TONES.length];
-    if (image) {
+    if (postPictures[i]) {
+      slide.append(postPictures[i]);
+    } else if (image) {
       const own = el('picture');
       const img = el('img', '', { src: image, alt: '', decoding: 'async' });
       own.append(img);
       slide.append(own);
-    } else {
-      slide.append(i ? picture.cloneNode(true) : picture);
+    } else if (picture) {
+      slide.append(pictureUsed ? picture.cloneNode(true) : picture);
+      pictureUsed = true;
     }
     // a slide that has left the screen is hidden until it comes back
     slide.addEventListener('transitionend', (e) => {
@@ -192,9 +231,15 @@ export default function decorate(block) {
   }
 
   const rows = [...block.children];
-  const postRows = rows.filter((r) => r.querySelector('h2, h3, h4'));
-  const backgroundRow = rows.find((r) => !postRows.includes(r) && r.querySelector('picture'));
-  const headingRow = rows.find((r) => !postRows.includes(r) && r !== backgroundRow);
+  // a post just added in the editor has no text yet, but is shown (and editable)
+  const postRows = rows.filter((r) => r.dataset.aueModel === POST_MODEL
+    || r.children.length > 1 || r.querySelector('h2, h3, h4'));
+  // the block's own fields come first, in model order: background, heading
+  const fieldRows = rows.filter((r) => !postRows.includes(r));
+  const backgroundRow = fieldRows.length > 1 ? fieldRows[0]
+    : fieldRows.find((r) => r.querySelector('picture'));
+  const headingRow = fieldRows.find((r) => r !== backgroundRow);
+  const postPictures = postRows.map(takePostPicture);
 
   const card = el('div', 'jsw-blogs-card');
   // header row: ‹ OUR BLOGS ›
@@ -217,7 +262,7 @@ export default function decorate(block) {
     backgroundRow.className = 'jsw-blogs-background';
     backgroundRow.setAttribute('aria-hidden', 'true');
     backgroundRow.querySelector('img')?.setAttribute('alt', '');
-    slides = buildSlides(backgroundRow, postRows.length);
+    slides = buildSlides(backgroundRow, postRows.length, postPictures);
     parts.push(backgroundRow);
   }
   parts.push(card);

@@ -292,7 +292,7 @@
     "id": "jsw-blogs",
     "fields": [
       {
-        "component": "richtext",
+        "component": "reference",
         "valueType": "string",
         "name": "background",
         "label": "Background image (shown blurred)",
@@ -317,6 +317,21 @@
   {
     "id": "jsw-blogs-item",
     "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Background image (optional)",
+        "multi": false,
+        "description": "Shown behind the card while this post is open. Leave empty to use the block background."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Background image alt",
+        "value": ""
+      },
       {
         "component": "richtext",
         "valueType": "string",
@@ -394,7 +409,7 @@
     "id": "jsw-hero",
     "fields": [
       {
-        "component": "richtext",
+        "component": "reference",
         "valueType": "string",
         "name": "image",
         "label": "Background visual (shown blurred with an ambient glow)",
@@ -510,7 +525,7 @@
     "id": "jsw-tech-showcase-item",
     "fields": [
       {
-        "component": "richtext",
+        "component": "reference",
         "valueType": "string",
         "name": "media_thumbnail",
         "label": "Thumbnail",
@@ -524,7 +539,7 @@
         "value": ""
       },
       {
-        "component": "richtext",
+        "component": "reference",
         "valueType": "string",
         "name": "media_image",
         "label": "Showcase image (chassis / engine)",
@@ -548,8 +563,9 @@
         "component": "richtext",
         "valueType": "string",
         "name": "hotspots",
-        "label": "Hotspots: one list item each, as 'x%, y% | TITLE | description' (position over the showcase image)",
-        "value": ""
+        "label": "Hotspots (+ points)",
+        "value": "",
+        "description": "Up to 4 bullets, one per + point, written as: x, y | TITLE | description. x and y are percentages of the showcase image from its bottom-left corner (0, 0), x to the right and y upwards; \"40\" and \"40%\" mean the same, and a missing value counts as 0. Bullets after the 4th are not shown."
       }
     ]
   },
@@ -770,7 +786,7 @@
     "id": "parallax-collage-item",
     "fields": [
       {
-        "component": "richtext",
+        "component": "reference",
         "valueType": "string",
         "name": "image",
         "label": "Image",
@@ -784,11 +800,50 @@
         "value": ""
       },
       {
-        "component": "text",
+        "component": "select",
         "valueType": "string",
         "name": "position",
-        "label": "Position (optional): center, top-left, top-right, middle-left, middle-right, next-top-left, next-top-right, next-middle-left, next-middle-right, bottom-left, bottom-right; add 'slow' or 'fast' to change its parallax speed",
-        "value": ""
+        "label": "Place in the design",
+        "value": "",
+        "description": "Each place holds one image; an image without a place is not shown.",
+        "options": [
+          {
+            "name": "Centre engine (flies in, first screen)",
+            "value": "center-engine"
+          },
+          {
+            "name": "First screen: charger (top left)",
+            "value": "card-charger"
+          },
+          {
+            "name": "First screen: bridge (top right)",
+            "value": "card-bridge"
+          },
+          {
+            "name": "First screen: room (bottom left)",
+            "value": "card-room"
+          },
+          {
+            "name": "First screen: spring (bottom right)",
+            "value": "card-spring"
+          },
+          {
+            "name": "Second screen: phone (top left)",
+            "value": "card-phone"
+          },
+          {
+            "name": "Second screen: Jetour (top right)",
+            "value": "card-jetour"
+          },
+          {
+            "name": "Second screen: chassis (bottom left)",
+            "value": "card-chassis"
+          },
+          {
+            "name": "Second screen: stage (bottom right)",
+            "value": "card-stage"
+          }
+        ]
       }
     ]
   }

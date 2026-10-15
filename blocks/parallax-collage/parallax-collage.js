@@ -331,6 +331,14 @@ export default function decorate(block) {
   const rows = [...block.children];
   const textRow = rows.find((r) => r.querySelector('h1, h2, h3'));
   const imageRows = rows.filter((r) => r !== textRow && r.querySelector('picture'));
+  const editing = Boolean(block.closest('[data-aue-resource]'));
+  // in the editor, images without a picture or a place yet (e.g. just added) stay in the page,
+  // hidden, so they can still be picked in the content tree and completed
+  const unplaced = div('parallax-collage-unplaced');
+  unplaced.hidden = true;
+  if (editing) {
+    rows.filter((r) => r !== textRow && !imageRows.includes(r)).forEach((r) => unplaced.append(r));
+  }
 
   // sticky text layer
   const textLayer = div('sticky-text-layer');
@@ -350,7 +358,10 @@ export default function decorate(block) {
     const imageCell = cells.find((c) => c.querySelector('picture'));
     const place = placeOf(cells.find((c) => c !== imageCell));
     // images without a named place have no slot in the design and are not rendered
-    if (!place) return;
+    if (!place) {
+      if (editing) unplaced.append(row);
+      return;
+    }
 
     const item = document.createElement('figure');
     item.className = `parallax-collage-item ${place}`;
@@ -365,11 +376,11 @@ export default function decorate(block) {
   });
 
   block.replaceChildren(textLayer, imagesLayer);
+  if (unplaced.childElementCount) block.append(unplaced);
 
   // Fold 1 animates a wrapper around the engine, never the engine itself: the engine's own
   // transform belongs to the stylesheet (it drives the later shrink-to-top).
   const engine = screens[1].querySelector(`.${ENGINE}`);
-  const editing = Boolean(block.closest('[data-aue-resource]'));
   let zoom = null;
   if (engine && !editing) {
     zoom = div('parallax-collage-zoom');

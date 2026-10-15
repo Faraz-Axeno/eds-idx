@@ -49,7 +49,7 @@
       "id": "parallax-collage-item",
       "fields": [
         {
-          "component": "richtext",
+          "component": "reference",
           "valueType": "string",
           "name": "image",
           "label": "Image",
@@ -63,11 +63,50 @@
           "value": ""
         },
         {
-          "component": "text",
+          "component": "select",
           "valueType": "string",
           "name": "position",
-          "label": "Position (optional): center, top-left, top-right, middle-left, middle-right, next-top-left, next-top-right, next-middle-left, next-middle-right, bottom-left, bottom-right; add 'slow' or 'fast' to change its parallax speed",
-          "value": ""
+          "label": "Place in the design",
+          "value": "",
+          "description": "Each place holds one image; an image without a place is not shown.",
+          "options": [
+            {
+              "name": "Centre engine (flies in, first screen)",
+              "value": "center-engine"
+            },
+            {
+              "name": "First screen: charger (top left)",
+              "value": "card-charger"
+            },
+            {
+              "name": "First screen: bridge (top right)",
+              "value": "card-bridge"
+            },
+            {
+              "name": "First screen: room (bottom left)",
+              "value": "card-room"
+            },
+            {
+              "name": "First screen: spring (bottom right)",
+              "value": "card-spring"
+            },
+            {
+              "name": "Second screen: phone (top left)",
+              "value": "card-phone"
+            },
+            {
+              "name": "Second screen: Jetour (top right)",
+              "value": "card-jetour"
+            },
+            {
+              "name": "Second screen: chassis (bottom left)",
+              "value": "card-chassis"
+            },
+            {
+              "name": "Second screen: stage (bottom right)",
+              "value": "card-stage"
+            }
+          ]
         }
       ]
     }

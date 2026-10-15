@@ -13,7 +13,7 @@
  *   1. jsw-hero           image | nav | text
  *   2. jsw-tech-showcase  heading, then one item per powertrain: media (thumbnail + image) | text | hotspots
  *   3. parallax-collage   text, then image | position rows (same as /jsw-nev-collage)
- *   4. jsw-blogs          background | heading, then one item per post
+ *   4. jsw-blogs          background | heading, then one item per post: image | text
  *   5. jsw-footer         brand | cta | connect | explore
  */
 
@@ -72,7 +72,8 @@ function hero(document) {
 
 // showcase images: the photos cut out of their black backgrounds (transparent PNGs, cropped
 // to the artwork; the Rotax engine mirrored as in "NEV / Tech 2"); hotspot positions are
-// percentages of those images, measured on the "NEV / Tech 1-3" frames
+// percentages of those images from their bottom-left corner (x right, y up), measured on the
+// "NEV / Tech 1-3" frames; at most 4 per powertrain
 const POWERTRAINS = [
   {
     thumb: ['motor-red.jpg', 'Glowing red electric motor rotor'],
@@ -80,9 +81,9 @@ const POWERTRAINS = [
     title: 'Plug-in Hybrid Electric Vehicle',
     text: 'Drives on electric power for everyday journeys, with a petrol engine for added range and reassurance. On the highway engine and motor work the same axle.',
     hotspots: [
-      '41, 24.5 | INTELLIGENT SWITCHING | Automatically alternates between pure electric and hybrid modes based on speed and terrain to optimize fuel efficiency.',
-      '82.5, 54.5 | BATTERY PACK | A floor-mounted pack keeps the centre of gravity low and charges at home or on the go.',
-      '29.5, 91 | EFFICIENT DRIVE UNIT | Motor, inverter and gearbox in one compact housing on the front axle.',
+      '41, 75.5 | INTELLIGENT SWITCHING | Automatically alternates between pure electric and hybrid modes based on speed and terrain to optimize fuel efficiency.',
+      '82.5, 45.5 | BATTERY PACK | A floor-mounted pack keeps the centre of gravity low and charges at home or on the go.',
+      '29.5, 9 | EFFICIENT DRIVE UNIT | Motor, inverter and gearbox in one compact housing on the front axle.',
     ],
   },
   {
@@ -91,9 +92,9 @@ const POWERTRAINS = [
     title: 'Battery Electric Vehicle',
     text: 'Runs on electricity alone, from a battery charged at home, at work or on the highway. Instant torque, zero tailpipe emissions and almost no running cost.',
     hotspots: [
-      '40.5, 9 | POWER ELECTRONICS | Converts battery power for the motor and recovers energy every time you brake.',
-      '23, 40 | THERMAL MANAGEMENT | Keeps cells at their best temperature in Indian summers for consistent range and fast charging.',
-      '47, 74 | DC FAST CHARGING | Adds range in the time of a coffee stop on highway charging networks.',
+      '40.5, 91 | POWER ELECTRONICS | Converts battery power for the motor and recovers energy every time you brake.',
+      '23, 60 | THERMAL MANAGEMENT | Keeps cells at their best temperature in Indian summers for consistent range and fast charging.',
+      '47, 26 | DC FAST CHARGING | Adds range in the time of a coffee stop on highway charging networks.',
     ],
   },
   {
@@ -102,9 +103,9 @@ const POWERTRAINS = [
     title: 'Extended-Range Electric Vehicle',
     text: 'The wheels are always driven electrically, while a small onboard generator tops up the battery on long journeys. Electric feel, no range anxiety.',
     hotspots: [
-      '35.5, 13 | ONBOARD GENERATOR | A compact engine runs only to charge the battery, at its most efficient speed.',
-      '73.5, 69 | ELECTRIC DRIVE | Every kilometre is driven by the electric motor for smooth, quiet acceleration.',
-      '20, 73 | ENERGY CONTROL | Decides when to generate, store or regenerate power, based on route and charge level.',
+      '35.5, 87 | ONBOARD GENERATOR | A compact engine runs only to charge the battery, at its most efficient speed.',
+      '73.5, 31 | ELECTRIC DRIVE | Every kilometre is driven by the electric motor for smooth, quiet acceleration.',
+      '20, 27 | ENERGY CONTROL | Decides when to generate, store or regenerate power, based on route and charge level.',
     ],
   },
 ];
@@ -154,10 +155,18 @@ function collage(document) {
 
 // the three posts of the "NEV / Blog" prototype, in its order (same category and summary)
 const POST_TEXT = 'Forget ideal laboratory range and perfect charging scenarios. We break down actual battery performance in heavy traffic, fast-charging availability across major highways, and true power consumption so you know exactly what daily NEV ownership looks like in India.';
+// image: the post's own background (the prototype's blurred backgrounds); the first post has
+// none and shows the block's background photo
 const POSTS = [
   { category: 'LEARN MORE / NEV & PHEV', title: 'TESTED HERE, BEFORE IT REACHES YOU.', text: POST_TEXT },
-  { category: 'LEARN MORE / NEV & PHEV', title: 'UNDERSTANDING WHAT\'S UNDER THE HOOD.', text: POST_TEXT },
-  { category: 'LEARN MORE / NEV & PHEV', title: 'BUILT FOR THE NATION AS IT IS TODAY.', text: POST_TEXT },
+  {
+    category: 'LEARN MORE / NEV & PHEV', title: 'UNDERSTANDING WHAT\'S UNDER THE HOOD.', text: POST_TEXT,
+    image: ['blog-under-the-hood.jpg', 'Warm-toned stage lights, out of focus'],
+  },
+  {
+    category: 'LEARN MORE / NEV & PHEV', title: 'BUILT FOR THE NATION AS IT IS TODAY.', text: POST_TEXT,
+    image: ['blog-built-for-the-nation.jpg', 'Dark blue stage lights, out of focus'],
+  },
 ];
 
 function blogs(document) {
@@ -166,12 +175,16 @@ function blogs(document) {
     [hinted(document, 'background', [el(document, 'p', img(document, 'blogs-background.jpg', 'Vehicle on a lit stage, out of focus'))])],
     [hinted(document, 'heading', [el(document, 'p', 'OUR BLOGS')])],
   ];
-  POSTS.forEach((post) => cells.push([hinted(document, 'text', [
-    el(document, 'p', post.category),
-    el(document, 'h3', post.title),
-    el(document, 'p', post.text),
-    el(document, 'p', link(document, '#newsroom', 'READ MORE')),
-  ])]));
+  // one row per post: its own background (empty cell when it has none) | its text
+  POSTS.forEach((post) => cells.push([
+    post.image ? hinted(document, 'image', [el(document, 'p', img(document, ...post.image))]) : '',
+    hinted(document, 'text', [
+      el(document, 'p', post.category),
+      el(document, 'h3', post.title),
+      el(document, 'p', post.text),
+      el(document, 'p', link(document, '#newsroom', 'READ MORE')),
+    ]),
+  ]));
   return WebImporter.Blocks.createBlock(document, { name: 'jsw-blogs', cells });
 }
 

@@ -21,7 +21,7 @@
       "id": "jsw-hero",
       "fields": [
         {
-          "component": "richtext",
+          "component": "reference",
           "valueType": "string",
           "name": "image",
           "label": "Background visual (shown blurred with an ambient glow)",
