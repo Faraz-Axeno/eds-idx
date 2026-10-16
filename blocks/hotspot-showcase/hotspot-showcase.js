@@ -16,6 +16,8 @@
  * it from here into its centre card on scroll.
  */
 
+import { unwrapEditorRichtext } from '../../scripts/scripts.js';
+
 // at most this many + points per powertrain (the client's limit): further bullets are ignored
 const MAX_HOTSPOTS = 4;
 let instance = 0;
@@ -171,6 +173,8 @@ function textFrom(titleCell, descriptionCell, editing) {
  * @param {Element} block The block element
  */
 export default function decorate(block) {
+  // Universal Editor: rich-text fields read as when published
+  unwrapEditorRichtext(block);
   instance += 1;
   const id = `hotspot-showcase-${instance}`;
   const section = block.closest('.section');

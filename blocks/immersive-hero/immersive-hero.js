@@ -9,6 +9,8 @@
  * the theme of the section underneath them (sections carry data-jsw-theme).
  */
 
+import { unwrapEditorRichtext } from '../../scripts/scripts.js';
+
 const NAV_PROBE_Y = 40; // vertical centre of the fixed pill
 
 // "JSW MOTORS" as in the Figma navbar, letter by letter on its 9-unit cap grid: squared,
@@ -260,6 +262,8 @@ function trackPage(indicator) {
  * @param {Element} block The block element
  */
 export default function decorate(block) {
+  // Universal Editor: rich-text fields read as when published
+  unwrapEditorRichtext(block);
   block.closest('.section')?.setAttribute('data-jsw-theme', 'dark');
   const rows = [...block.children];
   const textRow = rows.find((r) => r.querySelector('h1, h2'));

@@ -288,15 +288,18 @@ main .parallax-collage .parallax-collage-item.card-stage {
  * Portrait tablets (up to 1199px wide) use the same phone layout, with the size caps below.
  * Short landscape screens (a phone turned sideways, a desktop zoomed far in) keep the desktop
  * layout, which scales with the screen height. Desktop rules above are untouched. */
+
+/* in Universal Editor the canvas grows to fit the page, so it always reads as portrait: there
+   a wide canvas (parallax-collage.js adds parallax-collage-wide-editor) keeps the layout above */
 @media (orientation: portrait) and (max-width: 1199.98px) {
-  main .parallax-collage .sticky-text-layer .content {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .sticky-text-layer .content {
     width: calc(100% - 40px);
     max-width: 340px;
   }
 
   /* the text fits the white band between the card rows on every phone: 24px / 14.5px on the
      375x815 frame, scaled down with the screen height (and width) on smaller phones */
-  main .parallax-collage .parallax-collage-title {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-title {
     max-width: none;
     margin-bottom: min(26px, 3.2vh);
     margin-bottom: min(26px, 3.2svh);
@@ -305,14 +308,14 @@ main .parallax-collage .parallax-collage-item.card-stage {
     line-height: 1.15;
   }
 
-  main .parallax-collage .sticky-text-layer .content p {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .sticky-text-layer .content p {
     font-size: max(11px, min(14.5px, 1.78vh, 3.87vw));
     font-size: max(11px, min(14.5px, 1.78svh, 3.87vw));
     line-height: 1.65;
   }
 
   /* engine: 350 x 479 card centred over the text, shrinking to a 119px card at the top */
-  main .parallax-collage .parallax-collage-item.center-engine {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-item.center-engine {
     top: 51%;
     z-index: 2; /* over the side cards it overlaps at first, as in the frame */
     width: 93.3vw;
@@ -325,7 +328,7 @@ main .parallax-collage .parallax-collage-item.card-stage {
   }
 
   @supports not (height: 1svh) {
-    main .parallax-collage .parallax-collage-item.center-engine {
+    main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-item.center-engine {
       transform:
         translate(-50%, -50%)
         translateY(calc(var(--pc-m-progress) * -45.2vh))
@@ -336,7 +339,7 @@ main .parallax-collage .parallax-collage-item.card-stage {
   /* side images: all 119 x 155 on the 375x815 frame (19% of the screen height, so the rows
      keep their vertical spacing around the text on shorter phones); the top pair runs off
      the screen edges */
-  main .parallax-collage .parallax-collage-item:is(
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-item:is(
     .card-charger, .card-bridge, .card-room, .card-spring,
     .card-phone, .card-jetour, .card-chassis, .card-stage
   ) {
@@ -345,22 +348,22 @@ main .parallax-collage .parallax-collage-item.card-stage {
     aspect-ratio: 119 / 155;
   }
 
-  main .parallax-collage .parallax-collage-item:is(.card-charger, .card-phone) {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-item:is(.card-charger, .card-phone) {
     top: 13%;
     left: -9.6vw;
   }
 
-  main .parallax-collage .parallax-collage-item:is(.card-bridge, .card-jetour) {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-item:is(.card-bridge, .card-jetour) {
     top: 13%;
     right: -9.6vw;
   }
 
-  main .parallax-collage .parallax-collage-item:is(.card-room, .card-chassis) {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-item:is(.card-room, .card-chassis) {
     top: 72.8%;
     left: 4.5vw;
   }
 
-  main .parallax-collage .parallax-collage-item:is(.card-spring, .card-stage) {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-item:is(.card-spring, .card-stage) {
     top: 72.8%;
     right: 5vw;
   }
@@ -370,31 +373,31 @@ main .parallax-collage .parallax-collage-item.card-stage {
  * the engine card keeps its 60% share of the screen height (as on the 375x815 frame), the
  * side images their 19%, the top pair still running ~30% off the edges; larger text */
 @media (orientation: portrait) and (min-width: 768px) and (max-width: 1199.98px) {
-  main .parallax-collage .sticky-text-layer .content {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .sticky-text-layer .content {
     max-width: 480px;
   }
 
-  main .parallax-collage .parallax-collage-title {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-title {
     font-size: min(34px, 3.1vh);
     font-size: min(34px, 3.1svh);
   }
 
-  main .parallax-collage .sticky-text-layer .content p {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .sticky-text-layer .content p {
     font-size: min(17px, 1.6vh);
     font-size: min(17px, 1.6svh);
   }
 
-  main .parallax-collage .parallax-collage-item.center-engine {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-item.center-engine {
     width: min(80vw, calc(60vh * 350 / 479));
     width: min(80vw, calc(60svh * 350 / 479));
   }
 
-  main .parallax-collage .parallax-collage-item:is(.card-charger, .card-phone) {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-item:is(.card-charger, .card-phone) {
     left: -4.4vh;
     left: -4.4svh;
   }
 
-  main .parallax-collage .parallax-collage-item:is(.card-bridge, .card-jetour) {
+  main .parallax-collage:not(.parallax-collage-wide-editor) .parallax-collage-item:is(.card-bridge, .card-jetour) {
     right: -4.4vh;
     right: -4.4svh;
   }

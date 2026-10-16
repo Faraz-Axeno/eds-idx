@@ -10,6 +10,7 @@
  */
 
 import { loadScript } from '../../scripts/aem.js';
+import { unwrapEditorRichtext } from '../../scripts/scripts.js';
 
 // same GSAP build as scripts/delayed.js, so the library is only downloaded once
 const GSAP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
@@ -324,6 +325,8 @@ function div(className) {
  * @param {Element} block The block element
  */
 export default function decorate(block) {
+  // Universal Editor: rich-text fields read as when published
+  unwrapEditorRichtext(block);
   // wheel scrolling glides between stops like the MG pages (scripts/delayed.js, power2.inOut):
   // the start, the end of the engine hold, and the end of the block
   // a light panel: on /jsw-phase-3 the fixed navigation and scroll indicator follow it
@@ -334,6 +337,13 @@ export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
   // in the editor, screen-height sizes are capped (parallax-collage.css)
   block.classList.toggle('parallax-collage-editing', editing);
+  // and the canvas, which grows to fit the page, always reads as portrait: a wide one keeps the
+  // desktop layout (parallax-collage.css), as the same width would on a landscape screen
+  if (editing) {
+    const wide = () => block.classList.toggle('parallax-collage-wide-editor', window.innerWidth >= 768);
+    wide();
+    window.addEventListener('resize', wide);
+  }
   // in the editor, images without a picture or a place yet (e.g. just added) stay in the page,
   // hidden, so they can still be picked in the content tree and completed
   const unplaced = div('parallax-collage-unplaced');

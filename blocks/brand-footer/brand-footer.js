@@ -4,6 +4,8 @@
  * CONNECT (heading + link list) | EXPLORE (heading + link list).
  */
 
+import { unwrapEditorRichtext } from '../../scripts/scripts.js';
+
 function plainLinks(scope) {
   scope.querySelectorAll('a').forEach((a) => {
     a.classList.remove('button', 'primary', 'secondary', 'accent');
@@ -23,6 +25,8 @@ function decorateColumn(row, className) {
  * @param {Element} block The block element
  */
 export default function decorate(block) {
+  // Universal Editor: rich-text fields read as when published
+  unwrapEditorRichtext(block);
   const section = block.closest('.section');
   if (section) {
     section.dataset.jswTheme = 'dark';

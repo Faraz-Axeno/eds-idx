@@ -289,6 +289,29 @@ export function moveInstrumentation(from, to) {
 }
 
 /**
+ * Universal Editor groups the elements of each rich-text field in a wrapper div
+ * (scripts/editor-support-rte.js runs before blocks are decorated). Where that wrapper is all a
+ * block cell holds, the cell takes its place: the wrapper's editor attributes move onto the
+ * cell and its elements up into it, so the block decorates the same markup as when published.
+ * Does nothing outside the editor.
+ * @param {Element} block the block element
+ */
+export function unwrapEditorRichtext(block) {
+  const isGroup = (el) => el?.matches('div[data-aue-type="richtext"]');
+  block.querySelectorAll(':scope > div > div').forEach((cell) => {
+    if (cell.childNodes.length !== 1) return;
+    const only = cell.firstElementChild;
+    // the group itself, or the group in the paragraph decorateBlock (aem.js) may have put it in
+    const wrapped = only?.tagName === 'P' && only.childNodes.length === 1 && isGroup(only.firstElementChild);
+    const group = isGroup(only) ? only : wrapped && only.firstElementChild;
+    if (!group) return;
+    if (wrapped) moveInstrumentation(only, cell);
+    moveInstrumentation(group, cell);
+    cell.replaceChildren(...group.childNodes);
+  });
+}
+
+/**
  * load fonts.css and set a session storage flag
  */
 async function loadFonts() {
@@ -398,11 +421,12 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     const page = standalonePage(main);
-    if (page) {
-      document.body.classList.add(page.bodyClass);
-      if (page.css) await loadCSS(`${window.hlx.codeBasePath}/styles/${page.css}`);
-    }
+    if (page) document.body.classList.add(page.bodyClass);
+    // decorated before awaiting the page styles: in Universal Editor, editor-support-rte.js
+    // groups rich-text fields as soon as this script yields, and the cells must be prepared
+    // (decorateBlock) before that happens
     decorateMain(main);
+    if (page?.css) await loadCSS(`${window.hlx.codeBasePath}/styles/${page.css}`);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }

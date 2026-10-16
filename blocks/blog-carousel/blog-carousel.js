@@ -13,6 +13,8 @@
  * navigation takes on the post's colour (section data-jsw-nav-tone, read by immersive-hero).
  */
 
+import { unwrapEditorRichtext } from '../../scripts/scripts.js';
+
 let instance = 0;
 // how much of the card's top peeks into the previous section: its ‹ OUR BLOGS › header row;
 // less where that section's last screen leaves less room below its images (phones), so the
@@ -90,7 +92,10 @@ function postTextFrom([categoryCell, titleCell, bodyCell], editing) {
   line('p', categoryCell?.textContent.trim());
   line('h3', titleCell?.textContent.trim());
   const body = bodyCell && (editing ? displayCopy(bodyCell) : bodyCell);
-  [...(body?.childNodes || [])].forEach((node) => {
+  // in Universal Editor the summary's paragraphs come grouped in a wrapper div (beside the link)
+  const nodes = [...(body?.childNodes || [])]
+    .flatMap((node) => (node.nodeName === 'DIV' ? [...node.childNodes] : [node]));
+  nodes.forEach((node) => {
     if (node.nodeType === Node.TEXT_NODE) line('p', node.textContent.trim());
     else if (node.nodeName === 'A') {
       // the link on its own, as the READ MORE paragraph
@@ -272,6 +277,8 @@ function trackPeek(block, card) {
  * @param {Element} block The block element
  */
 export default function decorate(block) {
+  // Universal Editor: rich-text fields read as when published
+  unwrapEditorRichtext(block);
   instance += 1;
   const id = `blog-carousel-${instance}`;
   const section = block.closest('.section');
