@@ -320,6 +320,16 @@ function div(className) {
   return el;
 }
 
+/** a display copy of an authored part, without the editor's instrumentation (and ids) */
+function displayCopy(part) {
+  const copy = part.cloneNode(true);
+  [copy, ...copy.querySelectorAll('*')].forEach((node) => {
+    [...node.attributes].filter(({ name }) => /^data-(aue|richtext)-/.test(name) || name === 'id')
+      .forEach(({ name }) => node.removeAttribute(name));
+  });
+  return copy;
+}
+
 /**
  * loads and decorates the block
  * @param {Element} block The block element
@@ -389,6 +399,14 @@ export default function decorate(block) {
 
   block.replaceChildren(textLayer, imagesLayer);
   if (unplaced.childElementCount) block.append(unplaced);
+  // in the editor nothing scrolls, so the text does not stay pinned into screen 2: a copy of it
+  // sits there instead, in its centre as when scrolled to (parallax-collage.css)
+  if (editing && textRow) {
+    const echo = displayCopy(textLayer);
+    echo.classList.add('parallax-collage-echo');
+    echo.setAttribute('aria-hidden', 'true');
+    screens[2].prepend(echo);
+  }
 
   // Fold 1 animates a wrapper around the engine, never the engine itself: the engine's own
   // transform belongs to the stylesheet (it drives the later shrink-to-top).

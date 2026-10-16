@@ -162,14 +162,22 @@ main .parallax-collage.parallax-collage-editing .screen-2 {
   height: var(--pc-screen);
 }
 
+/* nothing scrolls inside the editor's canvas, so the text never stays pinned and the scroll room
+   (the gap between the screens, the hold) would only be empty space: there the two screens follow
+   each other, and screen 2 shows a copy of the text in its centre (parallax-collage.js), where it
+   is when scrolled to */
 main .parallax-collage.parallax-collage-editing .scrolling-images-layer {
   margin-top: calc(-1 * var(--pc-screen));
-  padding-bottom: calc(var(--pc-m-hold) / 100 * var(--pc-screen));
+  padding-bottom: 0;
 }
 
 main .parallax-collage.parallax-collage-editing .screen-1 {
   height: var(--pc-screen);
-  margin-bottom: calc(0.3 * var(--pc-screen));
+  margin-bottom: 0;
+}
+
+main .parallax-collage.parallax-collage-editing .screen-2 > .parallax-collage-echo {
+  z-index: 0;
 }
 
 /* ---------- images ---------- */
