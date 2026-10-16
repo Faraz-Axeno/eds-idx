@@ -368,13 +368,13 @@ export function decorateMain(main) {
 /**
  * Standalone JSW pages bring their own chrome and skip the site header and footer.
  * Recognised by a marker block; each gets its body class (and optional page styles):
- *   /jsw-phase-3        jsw-hero (+ jsw-footer)      -> jsw-phase-3 + styles/jsw-phase-3.css
- *   /jsw-sustainability jsw-sustainability (single)  -> jsw-sustainability
- *   /jsw-nev-collage    parallax-collage (+ teaser)  -> jsw-nev-collage
+ *   /jsw-phase-3        immersive-hero (+ brand-footer) -> jsw-phase-3 + styles/jsw-phase-3.css
+ *   /jsw-sustainability jsw-sustainability (single)     -> jsw-sustainability
+ *   /jsw-nev-collage    parallax-collage (+ teaser)     -> jsw-nev-collage
  * Every other page is unaffected.
  */
 const STANDALONE_PAGES = [
-  { block: 'jsw-hero', bodyClass: 'jsw-phase-3', css: 'jsw-phase-3.css' },
+  { block: 'immersive-hero', bodyClass: 'jsw-phase-3', css: 'jsw-phase-3.css' },
   { block: 'jsw-sustainability', bodyClass: 'jsw-sustainability' },
   { block: 'parallax-collage', bodyClass: 'jsw-nev-collage' },
 ];

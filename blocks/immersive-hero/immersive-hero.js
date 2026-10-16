@@ -1,5 +1,5 @@
 /*
- * jsw-hero: dark full-viewport intro of the JSW Motors NEV page.
+ * immersive-hero: dark full-viewport intro of the JSW Motors NEV page.
  * Rows (any order, recognised by content):
  *   visual — a picture, shown blurred behind an ambient glow; once the page has loaded, the
  *            background video /videos/jsw-hero.mp4 (if present) plays full screen over it
@@ -42,13 +42,13 @@ function inEditor(block) {
 
 /**
  * browsers without CSS container units (cqw / cqh): the container's own width and height as
- * --jsw-cq-w / --jsw-cq-h, which the CSS uses in their place (@supports not container-type)
+ * --cq-w / --cq-h, which the CSS uses in their place (@supports not container-type)
  */
 function containerUnits(container) {
   if (window.CSS?.supports?.('container-type', 'size')) return;
   const measure = () => {
-    container.style.setProperty('--jsw-cq-w', `${container.clientWidth}px`);
-    container.style.setProperty('--jsw-cq-h', `${container.clientHeight}px`);
+    container.style.setProperty('--cq-w', `${container.clientWidth}px`);
+    container.style.setProperty('--cq-h', `${container.clientHeight}px`);
   };
   measure();
   if (window.ResizeObserver) new ResizeObserver(measure).observe(container);
@@ -56,10 +56,10 @@ function containerUnits(container) {
 }
 
 function decorateVisual(row) {
-  row.className = 'jsw-hero-visual';
+  row.className = 'immersive-hero-visual';
   containerUnits(row);
   const glow = document.createElement('span');
-  glow.className = 'jsw-hero-glow';
+  glow.className = 'immersive-hero-glow';
   glow.setAttribute('aria-hidden', 'true');
   row.append(glow);
   const img = row.querySelector('img');
@@ -76,16 +76,16 @@ function decorateVisual(row) {
 function addVideo(row) {
   if (!window.matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
   const video = document.createElement('video');
-  video.className = 'jsw-hero-video';
+  video.className = 'immersive-hero-video';
   video.setAttribute('aria-hidden', 'true');
   video.muted = true;
   video.defaultMuted = true;
   video.loop = true;
   video.playsInline = true;
   video.preload = 'auto';
-  video.addEventListener('playing', () => row.classList.add('jsw-hero-has-video'), { once: true });
+  video.addEventListener('playing', () => row.classList.add('immersive-hero-has-video'), { once: true });
   video.addEventListener('error', () => video.remove(), { once: true });
-  const glow = row.querySelector('.jsw-hero-glow');
+  const glow = row.querySelector('.immersive-hero-glow');
   const start = () => {
     video.src = `${window.hlx?.codeBasePath || ''}/videos/jsw-hero.mp4`;
     if (glow) glow.before(video);
@@ -98,22 +98,22 @@ function addVideo(row) {
 }
 
 function decorateText(row) {
-  row.className = 'jsw-hero-content';
+  row.className = 'immersive-hero-content';
   const cell = cellOf(row);
-  cell.classList.add('jsw-hero-content-inner');
-  cell.querySelector('h1, h2')?.classList.add('jsw-hero-title');
+  cell.classList.add('immersive-hero-content-inner');
+  cell.querySelector('h1, h2')?.classList.add('immersive-hero-title');
   const paragraphs = [...cell.querySelectorAll(':scope > p')];
   paragraphs.forEach((p) => {
     const a = p.querySelector('a');
     if (a && p.textContent.trim() === a.textContent.trim()) {
-      p.classList.add('jsw-hero-action');
-      plainLink(a).classList.add('jsw-hero-cta');
+      p.classList.add('immersive-hero-action');
+      plainLink(a).classList.add('immersive-hero-cta');
       const plus = document.createElement('span');
-      plus.className = 'jsw-hero-cta-icon';
+      plus.className = 'immersive-hero-cta-icon';
       plus.setAttribute('aria-hidden', 'true');
       a.append(plus);
     } else {
-      p.classList.add('jsw-hero-description');
+      p.classList.add('immersive-hero-description');
     }
   });
 }
@@ -121,15 +121,15 @@ function decorateText(row) {
 /** turns the nav row into <nav>: brand link, links list and CTA */
 function buildNav(row) {
   const cell = cellOf(row);
-  cell.classList.add('jsw-nav-inner');
+  cell.classList.add('immersive-hero-nav-inner');
   const brand = [...cell.querySelectorAll(':scope > p')].find((p) => !p.querySelector('a'));
   if (brand) {
     const home = document.createElement('a');
-    home.className = 'jsw-nav-brand';
+    home.className = 'immersive-hero-nav-brand';
     home.href = window.location.pathname;
     home.setAttribute('aria-label', `${brand.textContent.trim()} home`);
     const mark = document.createElement('span');
-    mark.className = 'jsw-logo-mark';
+    mark.className = 'logo-mark';
     mark.setAttribute('aria-hidden', 'true');
     // the JSW mark, traced from the Figma navbar: an oval ring crossed by a leaf (running out
     // at the top right) and, just below it, a band (running out at the bottom left)
@@ -139,12 +139,12 @@ function buildNav(row) {
       + '<path d="M60.3 58.4C64.5 55.4 69 53 73.5 51C81 47.6 88.5 43.4 95.6 39C96 39.8 96.5 40.8 96.9 41.8C89.5 46.6 82 50.8 74.5 54.4C69.5 56.6 64.5 58.2 60.3 58.4Z"/>'
       + '</svg>';
     const label = document.createElement('span');
-    label.className = 'jsw-nav-brand-text';
+    label.className = 'immersive-hero-nav-brand-text';
     label.textContent = brand.textContent.trim();
     // "JSW MOTORS" is drawn as the frame's wordmark (no site font has its squared, extended
     // letters); the link's aria-label carries the name. Any other brand text stays text.
     if (label.textContent.toUpperCase() === 'JSW MOTORS') {
-      label.classList.add('jsw-nav-wordmark');
+      label.classList.add('immersive-hero-nav-wordmark');
       label.innerHTML = WORDMARK;
     }
     home.append(mark, label);
@@ -153,21 +153,21 @@ function buildNav(row) {
       window.scrollTo({ top: 0 });
     });
     brand.replaceChildren(home);
-    brand.classList.add('jsw-nav-brand-wrap');
+    brand.classList.add('immersive-hero-nav-brand-wrap');
   }
-  cell.querySelector(':scope > ul')?.classList.add('jsw-nav-links');
+  cell.querySelector(':scope > ul')?.classList.add('immersive-hero-nav-links');
   cell.querySelectorAll('a').forEach(plainLink);
   const cta = [...cell.querySelectorAll(':scope > p a')].pop();
-  if (cta && !cta.classList.contains('jsw-nav-brand')) {
-    cta.classList.add('jsw-nav-cta');
-    cta.closest('p').classList.add('jsw-nav-cta-wrap');
+  if (cta && !cta.classList.contains('immersive-hero-nav-brand')) {
+    cta.classList.add('immersive-hero-nav-cta');
+    cta.closest('p').classList.add('immersive-hero-nav-cta-wrap');
   }
   const nav = document.createElement('nav');
-  nav.className = 'jsw-nav';
+  nav.className = 'immersive-hero-nav';
   nav.setAttribute('aria-label', 'Main');
   row.replaceWith(nav);
   nav.append(row);
-  row.className = 'jsw-nav-row';
+  row.className = 'immersive-hero-nav-row';
   return nav;
 }
 
@@ -179,10 +179,10 @@ function buildNav(row) {
 function buildScrollIndicator() {
   const indicator = document.createElement('button');
   indicator.type = 'button';
-  indicator.className = 'jsw-scroll';
+  indicator.className = 'immersive-hero-scroll';
   indicator.setAttribute('aria-label', 'Scroll to the next section');
-  indicator.innerHTML = '<span class="jsw-scroll-label">'
-    + '<svg class="jsw-scroll-mouse" viewBox="0 0 11 14" aria-hidden="true" focusable="false" fill="none" stroke="currentColor">'
+  indicator.innerHTML = '<span class="immersive-hero-scroll-label">'
+    + '<svg class="immersive-hero-scroll-mouse" viewBox="0 0 11 14" aria-hidden="true" focusable="false" fill="none" stroke="currentColor">'
     + '<rect x="0.75" y="0.75" width="9.5" height="12.5" rx="4.75" stroke-width="1.5"/>'
     + '<path d="M5.5 3.6V10.4M3.8 5.3 5.5 3.6 7.2 5.3M3.8 8.7 5.5 10.4 7.2 8.7" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>'
     + '</svg>SCROLL</span>';
@@ -228,7 +228,7 @@ function trackPage(indicator) {
       return r.height > 0 && r.top <= NAV_PROBE_Y && r.bottom > NAV_PROBE_Y;
     });
     document.body.dataset.jswTheme = under?.dataset.jswTheme || 'dark';
-    // a section may tint the pill, e.g. jsw-blogs in its active post's colour
+    // a section may tint the pill, e.g. blog-carousel in its active post's colour
     const tone = under?.dataset.jswNavTone;
     if (tone) document.body.style.setProperty('--jsw-nav-tone', tone);
     else document.body.style.removeProperty('--jsw-nav-tone');
@@ -237,7 +237,7 @@ function trackPage(indicator) {
       // shown on the hero (section 1) only: it steps aside once the page moves on from it.
       // Measured on the hero's section, which stays in its place: section 2's entrance
       // holds the hero's content on screen while the white card slides over it
-      const block = document.querySelector('.jsw-hero');
+      const block = document.querySelector('.immersive-hero');
       const hero = block?.closest('.section') || block;
       const heroBottom = hero ? hero.getBoundingClientRect().bottom : 0;
       indicator.classList.toggle('is-hidden', heroBottom < window.innerHeight * 0.75);
@@ -272,7 +272,7 @@ export default function decorate(block) {
 
   if (inEditor(block)) {
     // keep everything inside the block so each field stays editable in place
-    block.classList.add('jsw-hero-editing');
+    block.classList.add('immersive-hero-editing');
     return;
   }
   if (visualRow) addVideo(visualRow);

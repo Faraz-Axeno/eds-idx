@@ -1,10 +1,10 @@
 /*
- * jsw-blogs: dark panel, the frame's blurred background photo, frosted-glass card
+ * blog-carousel: dark panel, the frame's blurred background photo, frosted-glass card
  * (backdrop-filter: blur(12px)) with one post at a time and ‹ OUR BLOGS › in its header.
  * Values from the "NEV / Blog 1280x720" frame (card 400 x 508, 126px from the top).
  */
 
-.jsw-blogs {
+.blog-carousel {
   position: relative;
   box-sizing: border-box;
   display: flex;
@@ -16,14 +16,14 @@
   padding: 72px 16px 32px;
   isolation: isolate;
 
-  /* above the previous section, which the rising card overlaps at first (jsw-blogs.js) */
+  /* above the previous section, which the rising card overlaps at first (blog-carousel.js) */
   z-index: 6;
   color: var(--jsw-white, #fff);
   background-color: var(--jsw-black, #050505);
 }
 
 /* blurred background photo (already out of focus in the design) */
-.jsw-blogs .jsw-blogs-background {
+.blog-carousel .blog-carousel-background {
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -31,14 +31,14 @@
   pointer-events: none;
 }
 
-.jsw-blogs .jsw-blogs-background > div,
-.jsw-blogs .jsw-blogs-background p,
-.jsw-blogs .jsw-blogs-background picture {
+.blog-carousel .blog-carousel-background > div,
+.blog-carousel .blog-carousel-background p,
+.blog-carousel .blog-carousel-background picture {
   display: block;
   height: 100%;
 }
 
-.jsw-blogs .jsw-blogs-background img {
+.blog-carousel .blog-carousel-background img {
   display: block;
   width: 100%;
   height: 100%;
@@ -47,10 +47,10 @@
   transform: scale(1.04);
 }
 
-/* one background per post (jsw-blogs.js), hidden until shown; ‹ › glide the new one in from
+/* one background per post (blog-carousel.js), hidden until shown; ‹ › glide the new one in from
    the side while the old one is pushed out the other way, with the page's own wheel-scroll
    glide (scripts/delayed.js: 1.8s, power2.inOut) */
-.jsw-blogs .jsw-blogs-slide {
+.blog-carousel .blog-carousel-slide {
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -60,14 +60,14 @@
 }
 
 /* its own compositing layer while on screen, so the blurred photo moves without repainting */
-.jsw-blogs .jsw-blogs-slide.is-shown {
+.blog-carousel .blog-carousel-slide.is-shown {
   visibility: visible;
   will-change: transform;
 }
 
-/* reveal (jsw-blogs.js): a white layer over the dark background, under the card; about a
+/* reveal (blog-carousel.js): a white layer over the dark background, under the card; about a
    second after the card has settled it fades out in 0.8s, and back in when scrolled away */
-.jsw-blogs.jsw-blogs-reveal::after {
+.blog-carousel.blog-carousel-reveal::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -77,12 +77,12 @@
   transition: opacity 0.8s ease;
 }
 
-.jsw-blogs.jsw-blogs-reveal.jsw-blogs-lit::after {
+.blog-carousel.blog-carousel-reveal.blog-carousel-lit::after {
   opacity: 0;
 }
 
 /* frosted card */
-.jsw-blogs .jsw-blogs-card {
+.blog-carousel .blog-carousel-card {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -98,7 +98,7 @@
 }
 
 /* header row: ‹ OUR BLOGS › */
-.jsw-blogs .jsw-blogs-header {
+.blog-carousel .blog-carousel-header {
   position: relative;
   display: flex;
   align-items: center;
@@ -107,7 +107,7 @@
   margin: 0 0 38px;
 }
 
-.jsw-blogs .jsw-blogs-heading {
+.blog-carousel .blog-carousel-heading {
   flex: 1;
   color: rgb(255 255 255 / 55%);
   font-family: var(--jsw-font-display);
@@ -117,7 +117,7 @@
   text-transform: uppercase;
 }
 
-.jsw-blogs .jsw-blogs-posts {
+.blog-carousel .blog-carousel-posts {
   position: relative;
   display: grid;
   flex: 1;
@@ -125,7 +125,7 @@
 
 /* posts share one grid cell so the card keeps its height; they cross-fade in place (no
    movement) while the background slides, over the same 1.8s glide */
-.jsw-blogs .jsw-blogs-post {
+.blog-carousel .blog-carousel-post {
   display: flex;
   grid-area: 1 / 1;
   opacity: 0;
@@ -133,18 +133,18 @@
   pointer-events: none;
 }
 
-.jsw-blogs .jsw-blogs-post.is-active {
+.blog-carousel .blog-carousel-post.is-active {
   opacity: 1;
   pointer-events: auto;
 }
 
-.jsw-blogs .jsw-blogs-post-inner {
+.blog-carousel .blog-carousel-post-inner {
   display: flex;
   flex: 1;
   flex-direction: column;
 }
 
-.jsw-blogs .jsw-blogs-category {
+.blog-carousel .blog-carousel-category {
   margin: 0 12px 20px;
   color: rgb(255 255 255 / 55%);
   font-family: var(--jsw-font-mono);
@@ -153,7 +153,7 @@
   text-transform: uppercase;
 }
 
-.jsw-blogs .jsw-blogs-title {
+.blog-carousel .blog-carousel-title {
   margin: 0 12px 20px;
   font-family: var(--jsw-font-display);
   font-size: clamp(17px, 1.5vw, 20px);
@@ -162,7 +162,7 @@
   text-transform: uppercase;
 }
 
-.jsw-blogs .jsw-blogs-summary {
+.blog-carousel .blog-carousel-summary {
   margin: 0 12px 24px;
   color: var(--jsw-text-muted-light, rgb(255 255 255 / 70%));
   font-size: 12.5px;
@@ -170,11 +170,11 @@
 }
 
 /* bottom action bar */
-.jsw-blogs .jsw-blogs-action {
+.blog-carousel .blog-carousel-action {
   margin-top: auto;
 }
 
-.jsw-blogs a.jsw-blogs-read:any-link {
+.blog-carousel a.blog-carousel-read:any-link {
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -190,11 +190,11 @@
   transition: background-color 0.3s var(--jsw-ease);
 }
 
-.jsw-blogs a.jsw-blogs-read:hover {
+.blog-carousel a.blog-carousel-read:hover {
   background-color: rgb(40 40 40 / 80%);
 }
 
-.jsw-blogs .jsw-blogs-read-icon {
+.blog-carousel .blog-carousel-read-icon {
   position: relative;
   width: 30px;
   height: 30px;
@@ -203,22 +203,22 @@
 }
 
 /* arrow ↗ */
-.jsw-blogs .jsw-blogs-read-icon::before,
-.jsw-blogs .jsw-blogs-read-icon::after {
+.blog-carousel .blog-carousel-read-icon::before,
+.blog-carousel .blog-carousel-read-icon::after {
   content: '';
   position: absolute;
   top: 50%;
   left: 50%;
 }
 
-.jsw-blogs .jsw-blogs-read-icon::before {
+.blog-carousel .blog-carousel-read-icon::before {
   width: 11px;
   height: 1.5px;
   background-color: currentcolor;
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-.jsw-blogs .jsw-blogs-read-icon::after {
+.blog-carousel .blog-carousel-read-icon::after {
   box-sizing: border-box;
   width: 7px;
   height: 7px;
@@ -228,7 +228,7 @@
 }
 
 /* the counter is for screen readers only */
-.jsw-blogs .jsw-blogs-counter {
+.blog-carousel .blog-carousel-counter {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -238,7 +238,7 @@
 }
 
 /* plain chevrons at both ends of the header row */
-.jsw-blogs .jsw-blogs-header button {
+.blog-carousel .blog-carousel-header button {
   position: relative;
   flex: none;
   width: 28px;
@@ -253,11 +253,11 @@
   transition: color 0.3s var(--jsw-ease);
 }
 
-.jsw-blogs .jsw-blogs-header button:hover {
+.blog-carousel .blog-carousel-header button:hover {
   color: var(--jsw-white, #fff);
 }
 
-.jsw-blogs .jsw-blogs-header button::before {
+.blog-carousel .blog-carousel-header button::before {
   content: '';
   position: absolute;
   top: 50%;
@@ -270,76 +270,76 @@
   transform: translate(-30%, -50%) rotate(-45deg);
 }
 
-.jsw-blogs .jsw-blogs-header .jsw-blogs-next::before {
+.blog-carousel .blog-carousel-header .blog-carousel-next::before {
   transform: translate(-70%, -50%) rotate(135deg);
 }
 
 /* phones ("M / Blogs 375x815"): a near full-width, taller card with a large
    ‹ OUR BLOGS › header, a larger title and a large READ MORE bar (tablets keep the card above) */
 @media (max-width: 599.98px) {
-  .jsw-blogs {
+  .blog-carousel {
     padding: 72px 20px 56px;
   }
 
-  .jsw-blogs .jsw-blogs-card {
+  .blog-carousel .blog-carousel-card {
     min-height: min(590px, 72vh);
     min-height: min(590px, 72svh);
     padding: 20px 13px 13px;
   }
 
-  .jsw-blogs .jsw-blogs-header {
+  .blog-carousel .blog-carousel-header {
     justify-content: center;
     gap: 16px;
     margin-bottom: 40px;
   }
 
-  .jsw-blogs .jsw-blogs-heading {
+  .blog-carousel .blog-carousel-heading {
     flex: none;
     color: rgb(255 255 255 / 72%);
     font-size: 22px;
     letter-spacing: 0.04em;
   }
 
-  .jsw-blogs .jsw-blogs-header button {
+  .blog-carousel .blog-carousel-header button {
     color: rgb(255 255 255 / 85%);
   }
 
-  .jsw-blogs .jsw-blogs-header button::before {
+  .blog-carousel .blog-carousel-header button::before {
     width: 10px;
     height: 10px;
     border-width: 1.6px;
   }
 
-  .jsw-blogs .jsw-blogs-category,
-  .jsw-blogs .jsw-blogs-title,
-  .jsw-blogs .jsw-blogs-summary {
+  .blog-carousel .blog-carousel-category,
+  .blog-carousel .blog-carousel-title,
+  .blog-carousel .blog-carousel-summary {
     margin-right: 6px;
     margin-left: 6px;
   }
 
-  .jsw-blogs .jsw-blogs-category {
+  .blog-carousel .blog-carousel-category {
     margin-bottom: 18px;
   }
 
-  .jsw-blogs .jsw-blogs-title {
+  .blog-carousel .blog-carousel-title {
     margin-bottom: 18px;
     font-size: min(24px, 6.4vw);
     line-height: 1.25;
   }
 
-  .jsw-blogs .jsw-blogs-summary {
+  .blog-carousel .blog-carousel-summary {
     font-size: 13px;
     line-height: 1.4;
   }
 
-  .jsw-blogs a.jsw-blogs-read:any-link {
+  .blog-carousel a.blog-carousel-read:any-link {
     height: 64px;
     padding: 0 12px 0 20px;
     border-radius: 12px;
     font-size: 16px;
   }
 
-  .jsw-blogs .jsw-blogs-read-icon {
+  .blog-carousel .blog-carousel-read-icon {
     width: 40px;
     height: 40px;
     border-radius: 8px;
@@ -349,35 +349,35 @@
 /* very short landscape screens (e.g. a desktop zoomed in a lot): the card's spacing shrinks
    with the screen height so the whole card stays on screen */
 @media (max-height: 519.98px) and (orientation: landscape) {
-  .jsw-blogs {
+  .blog-carousel {
     padding-top: min(72px, 12vh);
     padding-top: min(72px, 12svh);
     padding-bottom: min(32px, 4vh);
     padding-bottom: min(32px, 4svh);
   }
 
-  .jsw-blogs .jsw-blogs-header {
+  .blog-carousel .blog-carousel-header {
     margin-bottom: min(38px, 6vh);
     margin-bottom: min(38px, 6svh);
   }
 
-  .jsw-blogs .jsw-blogs-category,
-  .jsw-blogs .jsw-blogs-title {
+  .blog-carousel .blog-carousel-category,
+  .blog-carousel .blog-carousel-title {
     margin-bottom: min(20px, 3vh);
     margin-bottom: min(20px, 3svh);
   }
 
-  .jsw-blogs .jsw-blogs-summary {
+  .blog-carousel .blog-carousel-summary {
     margin-bottom: min(24px, 3.5vh);
     margin-bottom: min(24px, 3.5svh);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .jsw-blogs .jsw-blogs-post,
-  .jsw-blogs a.jsw-blogs-read:any-link,
-  .jsw-blogs .jsw-blogs-slide,
-  .jsw-blogs.jsw-blogs-reveal::after {
+  .blog-carousel .blog-carousel-post,
+  .blog-carousel a.blog-carousel-read:any-link,
+  .blog-carousel .blog-carousel-slide,
+  .blog-carousel.blog-carousel-reveal::after {
     transition: none;
   }
 }

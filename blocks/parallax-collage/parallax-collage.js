@@ -105,7 +105,7 @@ function cutout() {
 }
 
 /**
- * Fly-in (after a section with a [data-zoom-source] image, e.g. jsw-tech-showcase):
+ * Fly-in (after a section with a [data-zoom-source] image, e.g. hotspot-showcase):
  * scrolling from that section to this one flies its selected image from where it sits into
  * the centre card. A fixed copy travels between the two (the source image hides meanwhile),
  * the black card, corners and shadow form around it as it lands, the text and side images
@@ -332,6 +332,8 @@ export default function decorate(block) {
   const textRow = rows.find((r) => r.querySelector('h1, h2, h3'));
   const imageRows = rows.filter((r) => r !== textRow && r.querySelector('picture'));
   const editing = Boolean(block.closest('[data-aue-resource]'));
+  // in the editor, screen-height sizes are capped (parallax-collage.css)
+  block.classList.toggle('parallax-collage-editing', editing);
   // in the editor, images without a picture or a place yet (e.g. just added) stay in the page,
   // hidden, so they can still be picked in the content tree and completed
   const unplaced = div('parallax-collage-unplaced');
@@ -428,7 +430,7 @@ export default function decorate(block) {
   schedule();
 
   if (!zoom) return;
-  // after a section that marks a zoom source (jsw-tech-showcase on /jsw-phase-3), its selected
+  // after a section that marks a zoom source (hotspot-showcase on /jsw-phase-3), its selected
   // image flies from there into the card instead of Fold 1
   const section = block.closest('.section');
   let sourceSection = section?.previousElementSibling;

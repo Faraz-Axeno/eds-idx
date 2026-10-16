@@ -1,16 +1,16 @@
 /*
- * jsw-footer: full-width footer, deep black-to-teal gradient.
+ * brand-footer: full-width footer, deep black-to-teal gradient.
  * Left brand + legal, centre CTA, right CONNECT / EXPLORE link columns.
  * Values from the "NEV / Footer 1280x720" frame.
  */
 
 /* the footer is not a full-viewport panel: it ends the page */
-.jsw-phase-3 main > .section.jsw-footer-container {
+.jsw-phase-3 main > .section.brand-footer-container {
   min-height: 0;
   scroll-snap-align: end;
 }
 
-.jsw-footer {
+.brand-footer {
   box-sizing: border-box;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -21,22 +21,22 @@
   background: linear-gradient(180deg, var(--jsw-black, #050505) 0%, #050505 28%, #06363b 62%, #0c7d88 88%, #12a0ab 100%);
 }
 
-.jsw-footer p {
+.brand-footer p {
   margin: 0;
 }
 
-.jsw-footer a:any-link {
+.brand-footer a:any-link {
   color: inherit;
   text-decoration: none;
 }
 
-.jsw-footer .jsw-footer-brand > div {
+.brand-footer .brand-footer-brand > div {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.jsw-footer .jsw-footer-name {
+.brand-footer .brand-footer-name {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -46,27 +46,27 @@
   letter-spacing: 0.2em;
 }
 
-.jsw-footer .jsw-footer-meta {
+.brand-footer .brand-footer-meta {
   color: rgb(255 255 255 / 70%);
   font-size: 12px;
 }
 
-.jsw-footer .jsw-footer-legal {
+.brand-footer .brand-footer-legal {
   margin-top: 22px;
   font-family: var(--jsw-font-mono);
   font-size: 11px;
   letter-spacing: 0.08em;
 }
 
-.jsw-footer .jsw-footer-legal a:hover,
-.jsw-footer .jsw-footer-list a:hover {
+.brand-footer .brand-footer-legal a:hover,
+.brand-footer .brand-footer-list a:hover {
   color: var(--jsw-white, #fff);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 /* centre CTA: white pill with a leading plus */
-.jsw-footer a.jsw-footer-cta-link:any-link {
+.brand-footer a.brand-footer-cta-link:any-link {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -81,23 +81,23 @@
   white-space: nowrap;
 }
 
-.jsw-footer a.jsw-footer-cta-link::before {
+.brand-footer a.brand-footer-cta-link::before {
   content: '+';
   font-size: 15px;
   line-height: 1;
 }
 
-.jsw-footer a.jsw-footer-cta-link:hover {
+.brand-footer a.brand-footer-cta-link:hover {
   background-color: #e6e6e6;
 }
 
-.jsw-footer .jsw-footer-links {
+.brand-footer .brand-footer-links {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, max-content));
   gap: 56px;
 }
 
-.jsw-footer .jsw-footer-heading {
+.brand-footer .brand-footer-heading {
   margin-bottom: 10px;
   font-family: var(--jsw-font-display);
   font-size: 12px;
@@ -105,7 +105,7 @@
   text-transform: uppercase;
 }
 
-.jsw-footer .jsw-footer-list {
+.brand-footer .brand-footer-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -120,7 +120,7 @@
    EXPLORE side by side, the CTA, then the brand lines with the legal link last
    (tablets keep the layout above) */
 @media (max-width: 599.98px) {
-  .jsw-footer {
+  .brand-footer {
     align-content: end;
     gap: 0;
     min-height: var(--mg-panel-height, 100svh);
@@ -130,61 +130,61 @@
     padding: min(120px, 14.7svh) 24px 34px;
   }
 
-  .jsw-footer .jsw-footer-links {
+  .brand-footer .brand-footer-links {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     order: 1;
     gap: 24px;
   }
 
-  .jsw-footer .jsw-footer-heading {
+  .brand-footer .brand-footer-heading {
     margin-bottom: 12px;
     font-size: 17px;
     letter-spacing: 0.02em;
   }
 
-  .jsw-footer .jsw-footer-list {
+  .brand-footer .brand-footer-list {
     gap: 9px;
     color: rgb(255 255 255 / 80%);
     font-size: 13px;
   }
 
-  .jsw-footer .jsw-footer-cta {
+  .brand-footer .brand-footer-cta {
     order: 2;
     margin-top: min(72px, 8.8vh);
     margin-top: min(72px, 8.8svh);
   }
 
-  .jsw-footer a.jsw-footer-cta-link:any-link {
+  .brand-footer a.brand-footer-cta-link:any-link {
     height: 34px;
     padding: 0 14px;
     font-size: 13px;
   }
 
-  .jsw-footer .jsw-footer-brand {
+  .brand-footer .brand-footer-brand {
     order: 3;
     margin-top: min(140px, 17.2vh);
     margin-top: min(140px, 17.2svh);
   }
 
-  .jsw-footer .jsw-footer-brand > div {
+  .brand-footer .brand-footer-brand > div {
     gap: 10px;
   }
 
   /* the brand line starts flush left, as in the frame */
-  .jsw-footer .jsw-footer-name .jsw-logo-mark:empty {
+  .brand-footer .brand-footer-name .logo-mark:empty {
     display: none;
   }
 
-  .jsw-footer .jsw-footer-name {
+  .brand-footer .brand-footer-name {
     margin-bottom: 4px;
     font-size: 15px;
   }
 
-  .jsw-footer .jsw-footer-meta {
+  .brand-footer .brand-footer-meta {
     font-size: 13px;
   }
 
-  .jsw-footer .jsw-footer-legal {
+  .brand-footer .brand-footer-legal {
     margin-top: min(44px, 5.4vh);
     margin-top: min(44px, 5.4svh);
     font-size: 13px;
@@ -194,17 +194,17 @@
 }
 
 @media (min-width: 900px) {
-  .jsw-footer {
+  .brand-footer {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: start;
     padding: 28px var(--jsw-edge) 150px;
   }
 
-  .jsw-footer .jsw-footer-cta {
+  .brand-footer .brand-footer-cta {
     padding-top: 6px;
   }
 
-  .jsw-footer .jsw-footer-links {
+  .brand-footer .brand-footer-links {
     justify-self: end;
     gap: 64px;
   }

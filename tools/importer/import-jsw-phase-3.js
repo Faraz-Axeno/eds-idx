@@ -10,11 +10,11 @@
  * as a placeholder with an alt text describing what is actually shown.
  *
  * Sections, in order (one block each):
- *   1. jsw-hero           image | nav | text
- *   2. jsw-tech-showcase  heading, then one item per powertrain: media (thumbnail + image) | text | hotspots
- *   3. parallax-collage   text, then image | position rows (same as /jsw-nev-collage)
- *   4. jsw-blogs          background | heading, then one item per post: image | text
- *   5. jsw-footer         brand | cta | connect | explore
+ *   1. immersive-hero    image | nav | text
+ *   2. hotspot-showcase  heading, then one item per powertrain: media (thumbnail + image) | title | description | hotspots
+ *   3. parallax-collage  text, then image | position rows (same as /jsw-nev-collage)
+ *   4. blog-carousel     background | heading, then one item per post: image | category | title | summary + link
+ *   5. brand-footer      brand | cta | connect | explore
  */
 
 const IMG = 'images/jsw';
@@ -53,7 +53,7 @@ function list(document, items) {
 function hero(document) {
   const p = (...c) => el(document, 'p', ...c);
   return WebImporter.Blocks.createBlock(document, {
-    name: 'jsw-hero',
+    name: 'immersive-hero',
     cells: [
       [hinted(document, 'image', [p(img(document, 'chassis.jpg', 'Electric vehicle platform lit from above'))])],
       [hinted(document, 'nav', [
@@ -120,11 +120,12 @@ function techShowcase(document) {
     );
     cells.push([
       media,
-      hinted(document, 'text', [el(document, 'h3', item.title), el(document, 'p', item.text)]),
+      hinted(document, 'title', [item.title]),
+      hinted(document, 'description', [el(document, 'p', item.text)]),
       hinted(document, 'hotspots', [el(document, 'ul', ...item.hotspots.map((h) => el(document, 'li', h)))]),
     ]);
   });
-  return WebImporter.Blocks.createBlock(document, { name: 'jsw-tech-showcase', cells });
+  return WebImporter.Blocks.createBlock(document, { name: 'hotspot-showcase', cells });
 }
 
 // section 3: the same parallax-collage as /jsw-nev-collage ("NEV / Collage" + "NEV / Sustainable"):
@@ -175,23 +176,29 @@ function blogs(document) {
     [hinted(document, 'background', [el(document, 'p', img(document, 'blogs-background.jpg', 'Vehicle on a lit stage, out of focus'))])],
     [hinted(document, 'heading', [el(document, 'p', 'OUR BLOGS')])],
   ];
-  // one row per post: its own background (empty cell when it has none) | its text
-  POSTS.forEach((post) => cells.push([
-    post.image ? hinted(document, 'image', [el(document, 'p', img(document, ...post.image))]) : '',
-    hinted(document, 'text', [
-      el(document, 'p', post.category),
-      el(document, 'h3', post.title),
-      el(document, 'p', post.text),
-      el(document, 'p', link(document, '#newsroom', 'READ MORE')),
-    ]),
-  ]));
-  return WebImporter.Blocks.createBlock(document, { name: 'jsw-blogs', cells });
+  // one row per post: its own background (empty cell when it has none) | category | title |
+  // body: the summary and the link grouped in one cell (the link's text collapses into
+  // body_linkText)
+  POSTS.forEach((post) => {
+    const body = document.createDocumentFragment();
+    body.append(
+      hinted(document, 'body_summary', [el(document, 'p', post.text)]),
+      hinted(document, 'body_link', [el(document, 'p', link(document, '#newsroom', 'READ MORE'))]),
+    );
+    cells.push([
+      post.image ? hinted(document, 'image', [el(document, 'p', img(document, ...post.image))]) : '',
+      hinted(document, 'category', [post.category]),
+      hinted(document, 'title', [post.title]),
+      body,
+    ]);
+  });
+  return WebImporter.Blocks.createBlock(document, { name: 'blog-carousel', cells });
 }
 
 function footer(document) {
   const p = (...c) => el(document, 'p', ...c);
   return WebImporter.Blocks.createBlock(document, {
-    name: 'jsw-footer',
+    name: 'brand-footer',
     cells: [
       [hinted(document, 'brand', [
         p('JSW MOTORS'),

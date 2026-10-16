@@ -1,15 +1,16 @@
 /*
- * jsw-blogs: dark panel with a blurred background and a frosted-glass card showing one post
+ * blog-carousel: dark panel with a blurred background and a frosted-glass card showing one post
  * at a time, ‹ OUR BLOGS › in its header row ("NEV / Blog").
  * Rows: background picture, card heading, then one row per post:
- *   its own background picture (optional) | category paragraph, title (h3), summary
- *   paragraph, READ MORE link.
+ *   its own background picture (optional) | category | title | summary + READ MORE link
+ *   (older content: background | one cell with the category paragraph, title (h3), summary
+ *   and link).
  * On every screen size the card rises out of the section: its top already peeks in at the bottom
  * of the previous section's last screen ("NEV / Sustainable"), then it settles as the
  * section scrolls up. The section starts white and fades to its dark background as it does.
  * Each post has its own background (authored, else the prototype's, see TONES); ‹ › slide
  * the new one in from behind the arrow while the card's text changes, and the fixed
- * navigation takes on the post's colour (section data-jsw-nav-tone, read by jsw-hero).
+ * navigation takes on the post's colour (section data-jsw-nav-tone, read by immersive-hero).
  */
 
 let instance = 0;
@@ -20,7 +21,7 @@ const PEEK = 84;
 const PEEK_GAP = 20;
 // the section arrives white ("NEV / Blog" prototype): once it fills the screen and the card
 // has settled, it stays white this long, then fades to its dark background (0.8s,
-// jsw-blogs.css); it turns white again when scrolled away
+// blog-carousel.css); it turns white again when scrolled away
 const LIT_DELAY = 1000;
 // per post, in order (then repeating), from the "NEV / Blog" prototype: its background where
 // the post has none authored (the block's photo for the first post; the next two are the
@@ -40,44 +41,92 @@ function el(tag, className, attrs = {}) {
 
 // Universal Editor model of one post (block/item); published rows carry no model, so there a
 // post is a row with an image cell and a text cell, or (older content) one with a title
-const POST_MODEL = 'jsw-blogs-item';
+const POST_MODEL = 'blog-carousel-item';
 
 /**
- * a part of a post moved out of its row (its background, to the slides) stays that post's in
- * Universal Editor: its editable fields get the row's resource
+ * a display copy of an authored part, without the editor's instrumentation (and ids): in
+ * Universal Editor a post's background stays in its own row, hidden, so the content tree lists
+ * it under that post, while the slides show a copy
  */
-function keepResource(row, part) {
-  const resource = row.dataset.aueResource;
-  if (!resource || !part) return;
-  [part, ...part.querySelectorAll('[data-aue-prop]')].forEach((node) => {
-    if (node.hasAttribute('data-aue-prop') && !node.hasAttribute('data-aue-resource')) {
-      node.setAttribute('data-aue-resource', resource);
-    }
+function displayCopy(part) {
+  const copy = part.cloneNode(true);
+  [copy, ...copy.querySelectorAll('*')].forEach((node) => {
+    [...node.attributes].filter(({ name }) => /^data-(aue|richtext)-/.test(name) || name === 'id')
+      .forEach(({ name }) => node.removeAttribute(name));
   });
+  return copy;
 }
 
-/** the post's own background picture (its first cell, then removed from the row), if any */
-function takePostPicture(row) {
+/**
+ * the post's own background picture (its first cell), if any; published, the cell leaves the
+ * row, in the editor it stays there hidden and a copy is returned
+ */
+function takePostPicture(row, editing) {
   if (row.children.length < 2) return null;
   const imageCell = row.firstElementChild;
-  const picture = imageCell.querySelector('picture');
-  if (picture) {
-    picture.querySelector('img')?.setAttribute('alt', '');
-    keepResource(row, picture);
-  }
-  imageCell.remove();
+  let picture = imageCell.querySelector('picture');
+  if (editing) {
+    imageCell.hidden = true;
+    picture = picture && displayCopy(picture);
+  } else imageCell.remove();
+  picture?.querySelector('img')?.setAttribute('alt', '');
   return picture;
 }
 
+/**
+ * a post's text from its Category, Title and body (Summary + Link, grouped in one cell)
+ * fields, in the order and markup the card styles (category line, h3, summary paragraphs,
+ * link paragraph): the body's own nodes when published, copies in the editor (where the
+ * fields stay)
+ */
+function postTextFrom([categoryCell, titleCell, bodyCell], editing) {
+  const text = el('div');
+  const line = (tag, value) => {
+    if (!value) return;
+    const node = el(tag);
+    node.textContent = value;
+    text.append(node);
+  };
+  line('p', categoryCell?.textContent.trim());
+  line('h3', titleCell?.textContent.trim());
+  const body = bodyCell && (editing ? displayCopy(bodyCell) : bodyCell);
+  [...(body?.childNodes || [])].forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) line('p', node.textContent.trim());
+    else if (node.nodeName === 'A') {
+      // the link on its own, as the READ MORE paragraph
+      const p = el('p');
+      p.append(node);
+      text.append(p);
+    } else if (node.nodeType === Node.ELEMENT_NODE) text.append(node);
+  });
+  return text;
+}
+
+/**
+ * a post with separate fields (category | title | summary + link, after its background) gets
+ * them as one text block; older content has them in a single cell already
+ */
+function joinPostText(row, editing) {
+  const cells = [...row.children].filter((c) => !c.hidden);
+  if (cells.length < 3) return;
+  const text = postTextFrom(cells, editing);
+  cells.forEach((cell) => {
+    if (editing) cell.hidden = true;
+    else cell.remove();
+  });
+  row.append(text);
+}
+
 function decoratePost(row, index, total) {
-  row.className = 'jsw-blogs-post';
+  row.className = 'blog-carousel-post';
   row.setAttribute('role', 'group');
   row.setAttribute('aria-roledescription', 'slide');
   row.setAttribute('aria-label', `${index + 1} of ${total}`);
-  const cell = row.querySelector(':scope > div') || row;
-  cell.classList.add('jsw-blogs-post-inner');
+  // its text cell (in the editor its own background cell stays before it, hidden)
+  const cell = [...row.children].find((c) => !c.hidden) || row;
+  cell.classList.add('blog-carousel-post-inner');
   const heading = cell.querySelector('h2, h3, h4');
-  heading?.classList.add('jsw-blogs-title');
+  heading?.classList.add('blog-carousel-title');
   const children = [...cell.children];
   const headingAt = heading ? children.indexOf(heading) : -1;
   const paragraphs = [...cell.querySelectorAll(':scope > p')];
@@ -90,15 +139,15 @@ function decoratePost(row, index, total) {
   paragraphs.forEach((p) => {
     if (p === linkP) return;
     // paragraphs above the title are the category line, below it the summary
-    p.classList.add(children.indexOf(p) < headingAt ? 'jsw-blogs-category' : 'jsw-blogs-summary');
+    p.classList.add(children.indexOf(p) < headingAt ? 'blog-carousel-category' : 'blog-carousel-summary');
   });
   if (linkP) {
-    linkP.className = 'jsw-blogs-action';
+    linkP.className = 'blog-carousel-action';
     const a = linkP.querySelector('a');
-    a.className = 'jsw-blogs-read';
-    const label = el('span', 'jsw-blogs-read-label');
+    a.className = 'blog-carousel-read';
+    const label = el('span', 'blog-carousel-read-label');
     label.textContent = a.textContent.trim();
-    const icon = el('span', 'jsw-blogs-read-icon', { 'aria-hidden': 'true' });
+    const icon = el('span', 'blog-carousel-read-icon', { 'aria-hidden': 'true' });
     a.replaceChildren(label, icon);
     if (heading) a.setAttribute('aria-label', `${label.textContent}: ${heading.textContent.trim()}`);
   }
@@ -113,7 +162,7 @@ function buildSlides(backgroundRow, count, postPictures = []) {
   if (count < 2 || (!picture && !postPictures.some(Boolean))) return [];
   let pictureUsed = false;
   const slides = Array.from({ length: count }, (_, i) => {
-    const slide = el('div', 'jsw-blogs-slide');
+    const slide = el('div', 'blog-carousel-slide');
     const { image } = TONES[i % TONES.length];
     if (postPictures[i]) {
       slide.append(postPictures[i]);
@@ -123,7 +172,8 @@ function buildSlides(backgroundRow, count, postPictures = []) {
       own.append(img);
       slide.append(own);
     } else if (picture) {
-      slide.append(pictureUsed ? picture.cloneNode(true) : picture);
+      // further slides show copies, so the editor lists the block's photo once
+      slide.append(pictureUsed ? displayCopy(picture) : picture);
       pictureUsed = true;
     }
     // a slide that has left the screen is hidden until it comes back
@@ -158,7 +208,7 @@ function slideBackground(slides, from, to, dir) {
     incoming.style.transform = '';
     return;
   }
-  // start just off the screen on the side it comes from, then glide in (jsw-blogs.css)
+  // start just off the screen on the side it comes from, then glide in (blog-carousel.css)
   incoming.style.transition = 'none';
   incoming.style.transform = `translate3d(${-dir * 100}%, 0, 0)`;
   incoming.getBoundingClientRect();
@@ -173,7 +223,7 @@ function slideBackground(slides, from, to, dir) {
  * dark background reveal that goes with it
  */
 function trackPeek(block, card) {
-  block.classList.add('jsw-blogs-reveal');
+  block.classList.add('blog-carousel-reveal');
   let previous = block.closest('.section')?.previousElementSibling;
   while (previous && !previous.classList.contains('section')) {
     previous = previous.previousElementSibling;
@@ -201,9 +251,9 @@ function trackPeek(block, card) {
     if (t < 0.995) {
       clearTimeout(litTimer);
       litTimer = 0;
-      block.classList.remove('jsw-blogs-lit');
-    } else if (!litTimer && !block.classList.contains('jsw-blogs-lit')) {
-      litTimer = setTimeout(() => block.classList.add('jsw-blogs-lit'), LIT_DELAY);
+      block.classList.remove('blog-carousel-lit');
+    } else if (!litTimer && !block.classList.contains('blog-carousel-lit')) {
+      litTimer = setTimeout(() => block.classList.add('blog-carousel-lit'), LIT_DELAY);
     }
     const lift = t < 1 ? (1 - t) * (card.offsetTop + peekFor(top, h)) : 0;
     card.style.transform = lift ? `translate3d(0, ${-lift.toFixed(1)}px, 0)` : '';
@@ -223,7 +273,7 @@ function trackPeek(block, card) {
  */
 export default function decorate(block) {
   instance += 1;
-  const id = `jsw-blogs-${instance}`;
+  const id = `blog-carousel-${instance}`;
   const section = block.closest('.section');
   if (section) {
     section.dataset.jswTheme = 'dark';
@@ -239,17 +289,19 @@ export default function decorate(block) {
   const backgroundRow = fieldRows.length > 1 ? fieldRows[0]
     : fieldRows.find((r) => r.querySelector('picture'));
   const headingRow = fieldRows.find((r) => r !== backgroundRow);
-  const postPictures = postRows.map(takePostPicture);
+  const editing = Boolean(block.closest('[data-aue-resource]'));
+  const postPictures = postRows.map((row) => takePostPicture(row, editing));
+  postRows.forEach((row) => joinPostText(row, editing));
 
-  const card = el('div', 'jsw-blogs-card');
+  const card = el('div', 'blog-carousel-card');
   // header row: ‹ OUR BLOGS ›
-  const header = el('div', 'jsw-blogs-header');
+  const header = el('div', 'blog-carousel-header');
   if (headingRow) {
-    headingRow.className = 'jsw-blogs-heading';
+    headingRow.className = 'blog-carousel-heading';
     header.append(headingRow);
   }
   card.append(header);
-  const posts = el('div', 'jsw-blogs-posts', { id: `${id}-posts`, 'aria-live': 'polite' });
+  const posts = el('div', 'blog-carousel-posts', { id: `${id}-posts`, 'aria-live': 'polite' });
   postRows.forEach((row, i) => {
     decoratePost(row, i, postRows.length);
     posts.append(row);
@@ -259,7 +311,7 @@ export default function decorate(block) {
   const parts = [];
   let slides = [];
   if (backgroundRow) {
-    backgroundRow.className = 'jsw-blogs-background';
+    backgroundRow.className = 'blog-carousel-background';
     backgroundRow.setAttribute('aria-hidden', 'true');
     backgroundRow.querySelector('img')?.setAttribute('alt', '');
     slides = buildSlides(backgroundRow, postRows.length, postPictures);
@@ -267,10 +319,10 @@ export default function decorate(block) {
   }
   parts.push(card);
 
-  const prev = el('button', 'jsw-blogs-prev', { type: 'button', 'aria-label': 'Previous post', 'aria-controls': posts.id });
-  const next = el('button', 'jsw-blogs-next', { type: 'button', 'aria-label': 'Next post', 'aria-controls': posts.id });
+  const prev = el('button', 'blog-carousel-prev', { type: 'button', 'aria-label': 'Previous post', 'aria-controls': posts.id });
+  const next = el('button', 'blog-carousel-next', { type: 'button', 'aria-label': 'Next post', 'aria-controls': posts.id });
   // "n / total" for screen readers only (the design shows just the arrows)
-  const counter = el('p', 'jsw-blogs-counter');
+  const counter = el('p', 'blog-carousel-counter');
   if (postRows.length > 1) {
     header.setAttribute('role', 'group');
     header.setAttribute('aria-label', 'Blog posts');
@@ -291,7 +343,7 @@ export default function decorate(block) {
     });
     counter.textContent = `${current + 1} / ${postRows.length}`;
     if (slides.length) slideBackground(slides, from, current, dir);
-    // the navigation pill follows the post's colour (jsw-hero.js reads it)
+    // the navigation pill follows the post's colour (immersive-hero.js reads it)
     const { nav } = TONES[current % TONES.length];
     if (section && nav) section.dataset.jswNavTone = nav;
     else if (section) delete section.dataset.jswNavTone;
@@ -305,5 +357,5 @@ export default function decorate(block) {
 
   block.replaceChildren(...parts);
   if (postRows.length) show(0);
-  if (!block.closest('[data-aue-resource]')) trackPeek(block, card);
+  if (!editing) trackPeek(block, card);
 }

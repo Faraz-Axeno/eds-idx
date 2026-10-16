@@ -1,5 +1,5 @@
 /*
- * jsw-footer: full-width footer on a black-to-teal gradient.
+ * brand-footer: full-width footer on a black-to-teal gradient.
  * Rows (in order): brand (name, copyright, location, legal link) | CTA link |
  * CONNECT (heading + link list) | EXPLORE (heading + link list).
  */
@@ -14,8 +14,8 @@ function plainLinks(scope) {
 function decorateColumn(row, className) {
   row.className = className;
   const heading = row.querySelector('p');
-  if (heading && !heading.querySelector('a')) heading.classList.add('jsw-footer-heading');
-  row.querySelector('ul')?.classList.add('jsw-footer-list');
+  if (heading && !heading.querySelector('a')) heading.classList.add('brand-footer-heading');
+  row.querySelector('ul')?.classList.add('brand-footer-list');
 }
 
 /**
@@ -34,26 +34,26 @@ export default function decorate(block) {
   const [brandRow, ctaRow] = [...block.children].filter((r) => !listRows.includes(r));
 
   if (brandRow) {
-    brandRow.className = 'jsw-footer-brand';
+    brandRow.className = 'brand-footer-brand';
     const [name, ...rest] = [...brandRow.querySelectorAll('p')];
     if (name && !name.querySelector('a')) {
-      name.classList.add('jsw-footer-name');
+      name.classList.add('brand-footer-name');
       const mark = document.createElement('span');
-      mark.className = 'jsw-logo-mark';
+      mark.className = 'logo-mark';
       mark.setAttribute('aria-hidden', 'true');
       name.prepend(mark);
     }
-    rest.forEach((p) => p.classList.add(p.querySelector('a') ? 'jsw-footer-legal' : 'jsw-footer-meta'));
+    rest.forEach((p) => p.classList.add(p.querySelector('a') ? 'brand-footer-legal' : 'brand-footer-meta'));
   }
   if (ctaRow) {
-    ctaRow.className = 'jsw-footer-cta';
-    ctaRow.querySelector('a')?.classList.add('jsw-footer-cta-link');
+    ctaRow.className = 'brand-footer-cta';
+    ctaRow.querySelector('a')?.classList.add('brand-footer-cta-link');
   }
 
   const links = document.createElement('div');
-  links.className = 'jsw-footer-links';
+  links.className = 'brand-footer-links';
   listRows.forEach((row) => {
-    decorateColumn(row, 'jsw-footer-column');
+    decorateColumn(row, 'brand-footer-column');
     links.append(row);
   });
 

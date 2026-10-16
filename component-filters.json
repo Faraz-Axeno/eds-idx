@@ -23,15 +23,21 @@
       "mg-timeline",
       "mg-section-nav",
       "blog-list",
-      "jsw-hero",
-      "jsw-tech-showcase",
+      "immersive-hero",
+      "hotspot-showcase",
       "jsw-collage",
-      "jsw-blogs",
-      "jsw-footer",
+      "blog-carousel",
+      "brand-footer",
       "jsw-sustainability",
       "parallax-collage",
       "expandable-blog-teaser",
       "jsw-navbar"
+    ]
+  },
+  {
+    "id": "blog-carousel",
+    "components": [
+      "blog-carousel-item"
     ]
   },
   {
@@ -56,9 +62,9 @@
     ]
   },
   {
-    "id": "jsw-blogs",
+    "id": "hotspot-showcase",
     "components": [
-      "jsw-blogs-item"
+      "hotspot-showcase-item"
     ]
   },
   {
@@ -71,12 +77,6 @@
     "id": "jsw-sustainability",
     "components": [
       "jsw-sustainability-item"
-    ]
-  },
-  {
-    "id": "jsw-tech-showcase",
-    "components": [
-      "jsw-tech-showcase-item"
     ]
   },
   {

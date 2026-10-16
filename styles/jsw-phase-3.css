@@ -1,6 +1,6 @@
 /*
  * JSW Motors NEV Experience (/jsw-phase-3): page tokens and base.
- * Loaded by scripts/scripts.js only on pages carrying a jsw-hero block; every rule is
+ * Loaded by scripts/scripts.js only on pages carrying a immersive-hero block; every rule is
  * scoped to body.jsw-phase-3 so the MG Select pages are untouched.
  */
 
@@ -52,6 +52,18 @@ html.gsap-scrolling {
   scroll-behavior: auto !important;
 }
 
+/* Universal Editor (its markup carries data-aue-resource; never on the published page): the
+   editor's canvas can grow to fit the page, and panels one screen tall would then grow it
+   without end, so there a panel is at most 1000px tall; panel snapping is off (the editor
+   scrolls to what is selected) */
+body.jsw-phase-3:has(main [data-aue-resource]) {
+  --mg-panel-height: min(100svh, 1000px);
+}
+
+html.panels-ready:has(body.jsw-phase-3 main > .section[data-aue-resource]) {
+  scroll-snap-type: none;
+}
+
 /* browsers without small-viewport units (svh): panels one classic viewport tall */
 @supports not (height: 1svh) {
   body.jsw-phase-3 {
@@ -60,19 +72,19 @@ html.gsap-scrolling {
 }
 
 /* very short or very large landscape screens (e.g. browser zoom far in or out): the parts
-   sized in fixed pixels scale by --jsw-fit (jsw-hero.js), so they keep their place beside
+   sized in fixed pixels scale by --jsw-fit (immersive-hero.js), so they keep their place beside
    the videos, images and cards that scale with the screen; 1 (no change) on ordinary screens */
-body.jsw-phase-3 > .jsw-nav,
-body.jsw-phase-3 > .jsw-scroll,
-body.jsw-phase-3 .jsw-hero .jsw-hero-content,
-body.jsw-phase-3 .jsw-tech-showcase :is(.jsw-tech-heading, .jsw-tech-detail, .jsw-hotspot, .jsw-tech-tooltip),
+body.jsw-phase-3 > .immersive-hero-nav,
+body.jsw-phase-3 > .immersive-hero-scroll,
+body.jsw-phase-3 .immersive-hero .immersive-hero-content,
+body.jsw-phase-3 .hotspot-showcase :is(.hotspot-showcase-heading, .hotspot-showcase-detail, .hotspot-showcase-spot, .hotspot-showcase-tooltip),
 body.jsw-phase-3 .parallax-collage :is(.parallax-collage-title, .sticky-text-layer .content p),
-body.jsw-phase-3 .jsw-blogs .jsw-blogs-card,
-body.jsw-phase-3 .jsw-footer {
+body.jsw-phase-3 .blog-carousel .blog-carousel-card,
+body.jsw-phase-3 .brand-footer {
   zoom: var(--jsw-fit, 1);
 }
 
-/* the page brings its own navigation (jsw-hero) and footer (jsw-footer) */
+/* the page brings its own navigation (immersive-hero) and footer (brand-footer) */
 body.jsw-phase-3 > header,
 body.jsw-phase-3 > footer {
   display: none;

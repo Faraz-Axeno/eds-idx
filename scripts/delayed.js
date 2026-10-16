@@ -69,6 +69,9 @@ async function initSmoothScroll() {
   if (reduced && !stepped) return;
   // pages whose blocks drive scrolling themselves (e.g. a pinned ScrollTrigger) opt out
   if (document.body.dataset.nativeScroll) return;
+  // Universal Editor (instrumented markup): the editor scrolls its canvas itself (and to what
+  // is selected); eased steps, or a cancelled wheel, would fight it
+  if (document.querySelector('main [data-aue-resource]')) return;
   await loadScript(GSAP_SRC);
   await loadScript(SCROLL_TO_SRC);
   const { gsap, ScrollToPlugin } = window;
@@ -174,7 +177,7 @@ async function initSmoothScroll() {
     glide(dir);
   }, { passive: false });
 
-  // a page's own controls can ask for the same glide, e.g. the JSW SCROLL button (jsw-hero)
+  // a page's own controls can ask for the same glide, e.g. the JSW SCROLL button (immersive-hero)
   document.addEventListener('jsw:glide', (e) => {
     e.preventDefault();
     glide(e.detail < 0 ? -1 : 1);

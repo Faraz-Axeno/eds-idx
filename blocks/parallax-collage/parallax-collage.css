@@ -41,7 +41,7 @@ main .parallax-collage {
   --pc-radius: 16px;
 
   /* one design pixel: 1px at the 1280x720 frame, scaled down on smaller viewports (and up
-     with the page's fixed-size parts on very large ones, --jsw-fit: jsw-hero.js) */
+     with the page's fixed-size parts on very large ones, --jsw-fit: immersive-hero.js) */
   --pc-u: min(calc(1px * var(--jsw-fit, 1)), 0.1389svh, 0.0781vw);
 
   /* first scroll: the images hold still while the engine shrinks to the top
@@ -148,6 +148,28 @@ main .parallax-collage .screen-2 {
   width: 100%;
   height: 100vh;
   height: 100svh;
+}
+
+/* Universal Editor (parallax-collage.js adds parallax-collage-editing): the editor's canvas can
+   grow to fit the page, and parts one screen tall would then grow the page without end; there
+   a screen is at most 1000px tall */
+main .parallax-collage.parallax-collage-editing {
+  --pc-screen: min(100svh, 1000px);
+}
+
+main .parallax-collage.parallax-collage-editing .sticky-text-layer,
+main .parallax-collage.parallax-collage-editing .screen-2 {
+  height: var(--pc-screen);
+}
+
+main .parallax-collage.parallax-collage-editing .scrolling-images-layer {
+  margin-top: calc(-1 * var(--pc-screen));
+  padding-bottom: calc(var(--pc-m-hold) / 100 * var(--pc-screen));
+}
+
+main .parallax-collage.parallax-collage-editing .screen-1 {
+  height: var(--pc-screen);
+  margin-bottom: calc(0.3 * var(--pc-screen));
 }
 
 /* ---------- images ---------- */
@@ -347,7 +369,7 @@ main .parallax-collage .parallax-collage-item.card-stage {
 /* ---------- portrait tablets: the phone layout, sized by the screen height ----------
  * the engine card keeps its 60% share of the screen height (as on the 375x815 frame), the
  * side images their 19%, the top pair still running ~30% off the edges; larger text */
-@media (orientation: portrait) and (768px <= width < 1200px) {
+@media (orientation: portrait) and (min-width: 768px) and (max-width: 1199.98px) {
   main .parallax-collage .sticky-text-layer .content {
     max-width: 480px;
   }

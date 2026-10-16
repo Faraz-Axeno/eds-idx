@@ -1,31 +1,31 @@
 {
   "definitions": [
     {
-      "title": "Jsw Blogs",
-      "id": "jsw-blogs",
+      "title": "Blog Carousel",
+      "id": "blog-carousel",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/franklin/components/block/v1/block",
             "template": {
-              "name": "Jsw Blogs",
-              "model": "jsw-blogs",
-              "filter": "jsw-blogs"
+              "name": "Blog Carousel",
+              "model": "blog-carousel",
+              "filter": "blog-carousel"
             }
           }
         }
       }
     },
     {
-      "title": "Jsw Blog Post",
-      "id": "jsw-blogs-item",
+      "title": "Blog Post",
+      "id": "blog-carousel-item",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/franklin/components/block/v1/block/item",
             "template": {
-              "name": "Jsw Blog Post",
-              "model": "jsw-blogs-item"
+              "name": "Blog Post",
+              "model": "blog-carousel-item"
             }
           }
         }
@@ -34,7 +34,7 @@
   ],
   "models": [
     {
-      "id": "jsw-blogs",
+      "id": "blog-carousel",
       "fields": [
         {
           "component": "reference",
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "id": "jsw-blogs-item",
+      "id": "blog-carousel-item",
       "fields": [
         {
           "component": "reference",
@@ -78,20 +78,50 @@
           "value": ""
         },
         {
+          "component": "text",
+          "valueType": "string",
+          "name": "category",
+          "label": "Category",
+          "description": "The small line above the title, e.g. LEARN MORE / NEV & PHEV.",
+          "value": ""
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "title",
+          "label": "Title",
+          "description": "The post's heading.",
+          "value": ""
+        },
+        {
           "component": "richtext",
           "valueType": "string",
-          "name": "text",
-          "label": "Category, title, summary and the READ MORE link",
+          "name": "body_summary",
+          "label": "Summary",
           "value": ""
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "body_link",
+          "label": "Link",
+          "description": "Where the READ MORE button goes."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "body_linkText",
+          "label": "Link text",
+          "value": "READ MORE"
         }
       ]
     }
   ],
   "filters": [
     {
-      "id": "jsw-blogs",
+      "id": "blog-carousel",
       "components": [
-        "jsw-blogs-item"
+        "blog-carousel-item"
       ]
     }
   ]

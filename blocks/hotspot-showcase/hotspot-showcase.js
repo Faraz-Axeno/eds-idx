@@ -1,9 +1,11 @@
 /*
- * jsw-tech-showcase: white card, copy + thumbnail tray on the left, showcase image with
+ * hotspot-showcase: white card, copy + thumbnail tray on the left, showcase image with
  * hotspots on the right.
  * Rows: a heading row, then one row per powertrain with
- *   media    — thumbnail picture, then showcase picture
- *   text     — title (h3) + description
+ *   media       — thumbnail picture, then showcase picture
+ *   title       — the powertrain's name (plain text; shown as its h3)
+ *   description — rich text below it
+ *   (older content: one text cell with the h3 and the description instead of these two)
  *   hotspots — list items "x, y | TITLE | description" (position over the showcase image,
  *              from its bottom-left corner; at most MAX_HOTSPOTS, see parseHotspots)
  * Thumbnails are tabs: selecting one swaps the showcase image, counter and copy.
@@ -80,13 +82,13 @@ function curtain(section, block) {
     if (!section.offsetHeight) return;
     const { top } = section.getBoundingClientRect();
     // revealed once the card is in place; veiled again when it slides back down
-    if (top <= 2) block.classList.add('jsw-tech-revealed');
-    else if (top > window.innerHeight * 0.5) block.classList.remove('jsw-tech-revealed');
+    if (top <= 2) block.classList.add('hotspot-showcase-revealed');
+    else if (top > window.innerHeight * 0.5) block.classList.remove('hotspot-showcase-revealed');
   };
   const schedule = () => {
     if (!frame) frame = requestAnimationFrame(update);
   };
-  block.classList.add('jsw-tech-curtain');
+  block.classList.add('hotspot-showcase-curtain');
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
   new ResizeObserver(schedule).observe(section);
@@ -97,7 +99,7 @@ function curtain(section, block) {
 function trackRatio(figure, img) {
   const apply = () => {
     if (img.naturalWidth && img.naturalHeight) {
-      figure.style.setProperty('--jsw-ratio', (img.naturalWidth / img.naturalHeight).toFixed(4));
+      figure.style.setProperty('--figure-ratio', (img.naturalWidth / img.naturalHeight).toFixed(4));
     }
   };
   if (img.complete) apply();
@@ -106,13 +108,13 @@ function trackRatio(figure, img) {
 
 /**
  * browsers without CSS container units (cqw / cqh): the stage's own width and height as
- * --jsw-cq-w / --jsw-cq-h, which the CSS uses in their place (@supports not container-type)
+ * --cq-w / --cq-h, which the CSS uses in their place (@supports not container-type)
  */
 function containerUnits(container) {
   if (window.CSS?.supports?.('container-type', 'size')) return;
   const measure = () => {
-    container.style.setProperty('--jsw-cq-w', `${container.clientWidth}px`);
-    container.style.setProperty('--jsw-cq-h', `${container.clientHeight}px`);
+    container.style.setProperty('--cq-w', `${container.clientWidth}px`);
+    container.style.setProperty('--cq-h', `${container.clientHeight}px`);
   };
   if (window.ResizeObserver) new ResizeObserver(measure).observe(container);
   else window.addEventListener('resize', measure);
@@ -121,20 +123,47 @@ function containerUnits(container) {
 // Universal Editor model of one powertrain (block/item); published rows carry no model, so
 // there a powertrain is any row with several cells (media | text | hotspots), the heading a
 // single-cell row
-const ITEM_MODEL = 'jsw-tech-showcase-item';
+const ITEM_MODEL = 'hotspot-showcase-item';
 
 /**
- * a part of a powertrain row moved elsewhere (its text to the copy column, its thumbnail to the
- * tray) stays that powertrain's in Universal Editor: its editable fields get the row's resource
+ * a display copy of an authored part, without the editor's instrumentation (and ids): in
+ * Universal Editor a powertrain's text and thumbnail stay in its own row, hidden, so the
+ * content tree lists them under that powertrain, while the copy column and the tray show copies
  */
-function keepResource(row, part) {
-  const resource = row.dataset.aueResource;
-  if (!resource || !part) return;
-  [part, ...part.querySelectorAll('[data-aue-prop]')].forEach((node) => {
-    if (node.hasAttribute('data-aue-prop') && !node.hasAttribute('data-aue-resource')) {
-      node.setAttribute('data-aue-resource', resource);
-    }
+function displayCopy(part) {
+  const copy = part.cloneNode(true);
+  [copy, ...copy.querySelectorAll('*')].forEach((node) => {
+    [...node.attributes].filter(({ name }) => /^data-(aue|richtext)-/.test(name) || name === 'id')
+      .forEach(({ name }) => node.removeAttribute(name));
   });
+  return copy;
+}
+
+/**
+ * a powertrain's text for the copy column from its Title (plain text, made its heading) and
+ * Description (rich text) fields; the description's own nodes when published, copies in the
+ * editor (where both fields stay in the row)
+ */
+function textFrom(titleCell, descriptionCell, editing) {
+  const text = document.createElement('div');
+  const name = titleCell?.textContent.trim();
+  if (name) {
+    const heading = document.createElement('h3');
+    heading.textContent = name;
+    text.append(heading);
+  }
+  const description = descriptionCell && (editing ? displayCopy(descriptionCell) : descriptionCell);
+  if (description) {
+    const nodes = [...description.childNodes].filter((n) => n.nodeType !== Node.COMMENT_NODE);
+    // a description typed without paragraphs still gets one
+    if (nodes.some((n) => n.nodeType === Node.ELEMENT_NODE)) text.append(...nodes);
+    else if (description.textContent.trim()) {
+      const p = document.createElement('p');
+      p.textContent = description.textContent.trim();
+      text.append(p);
+    }
+  }
+  return text;
 }
 
 /**
@@ -143,38 +172,40 @@ function keepResource(row, part) {
  */
 export default function decorate(block) {
   instance += 1;
-  const id = `jsw-tech-${instance}`;
+  const id = `hotspot-showcase-${instance}`;
   const section = block.closest('.section');
   if (section) {
     section.dataset.jswTheme = 'light';
     if (!section.id && !document.getElementById('nev-tech')) section.id = 'nev-tech';
   }
 
+  // Universal Editor: its markup is instrumented
+  const editing = Boolean(block.closest('[data-aue-resource]'));
   const rows = [...block.children];
   // a powertrain just added in the editor has no images or text yet, but is shown (and editable)
   const itemRows = rows.filter((r) => r.dataset.aueModel === ITEM_MODEL || r.children.length > 1);
   const headRow = rows.find((r) => !itemRows.includes(r));
 
-  const copy = el('div', 'jsw-tech-copy');
+  const copy = el('div', 'hotspot-showcase-copy');
   if (headRow) {
-    headRow.className = 'jsw-tech-heading';
-    headRow.querySelector('h1, h2, h3')?.classList.add('jsw-tech-title');
+    headRow.className = 'hotspot-showcase-heading';
+    headRow.querySelector('h1, h2, h3')?.classList.add('hotspot-showcase-title');
     copy.append(headRow);
   }
-  const detail = el('div', 'jsw-tech-detail');
-  const counter = el('p', 'jsw-tech-counter');
-  const texts = el('div', 'jsw-tech-texts', { 'aria-live': 'polite' });
-  const thumbs = el('div', 'jsw-tech-thumbs', { role: 'tablist', 'aria-label': 'Powertrains' });
+  const detail = el('div', 'hotspot-showcase-detail');
+  const counter = el('p', 'hotspot-showcase-counter');
+  const texts = el('div', 'hotspot-showcase-texts', { 'aria-live': 'polite' });
+  const thumbs = el('div', 'hotspot-showcase-thumbs', { role: 'tablist', 'aria-label': 'Powertrains' });
   detail.append(counter, texts, thumbs);
   copy.append(detail);
 
-  const stage = el('div', 'jsw-tech-stage');
+  const stage = el('div', 'hotspot-showcase-stage');
   containerUnits(stage);
-  const tooltip = el('div', 'jsw-tech-tooltip', { id: `${id}-tooltip`, role: 'dialog', 'aria-modal': 'false' });
+  const tooltip = el('div', 'hotspot-showcase-tooltip', { id: `${id}-tooltip`, role: 'dialog', 'aria-modal': 'false' });
   tooltip.hidden = true;
-  const tipTitle = el('p', 'jsw-tech-tooltip-title', { id: `${id}-tooltip-title` });
-  const tipText = el('p', 'jsw-tech-tooltip-text');
-  const tipClose = el('button', 'jsw-tech-tooltip-close', { type: 'button', 'aria-label': 'Close details' });
+  const tipTitle = el('p', 'hotspot-showcase-tooltip-title', { id: `${id}-tooltip-title` });
+  const tipText = el('p', 'hotspot-showcase-tooltip-text');
+  const tipClose = el('button', 'hotspot-showcase-tooltip-close', { type: 'button', 'aria-label': 'Close details' });
   tooltip.setAttribute('aria-labelledby', tipTitle.id);
   tooltip.append(tipTitle, tipText, tipClose);
 
@@ -196,15 +227,15 @@ export default function decorate(block) {
       tooltip.dataset.align = align;
       return tooltip.getBoundingClientRect();
     };
-    tooltip.style.removeProperty('--jsw-sx');
+    tooltip.style.removeProperty('--tooltip-sx');
     let box = set('left', 'top');
     if (box.left < left) box = set('right', 'top');
     const apart = box.left < left || box.right > right;
     if (apart) box = set('center', 'below');
     if (box.bottom > bottom) box = set(tooltip.dataset.side, apart ? 'above' : 'bottom');
-    if (box.right > right) tooltip.style.setProperty('--jsw-sx', `${right - box.right}px`);
-    else if (box.left < left) tooltip.style.setProperty('--jsw-sx', `${left - box.left}px`);
-    openSpot?.classList.toggle('jsw-hotspot-apart', apart);
+    if (box.right > right) tooltip.style.setProperty('--tooltip-sx', `${right - box.right}px`);
+    else if (box.left < left) tooltip.style.setProperty('--tooltip-sx', `${left - box.left}px`);
+    openSpot?.classList.toggle('hotspot-showcase-spot-apart', apart);
   };
 
   const closeTooltip = (refocus = false) => {
@@ -212,7 +243,7 @@ export default function decorate(block) {
     const spot = openSpot;
     openSpot = null;
     spot.setAttribute('aria-expanded', 'false');
-    spot.classList.remove('jsw-hotspot-apart');
+    spot.classList.remove('hotspot-showcase-spot-apart');
     tooltip.hidden = true;
     if (refocus) spot.focus();
   };
@@ -222,46 +253,53 @@ export default function decorate(block) {
     spot.setAttribute('aria-expanded', 'true');
     tipTitle.textContent = data.title;
     tipText.textContent = data.text;
-    spot.closest('.jsw-tech-figure').append(tooltip);
-    tooltip.style.setProperty('--jsw-x', `${data.x}%`);
-    tooltip.style.setProperty('--jsw-y', `${data.y}%`);
+    spot.closest('.hotspot-showcase-figure').append(tooltip);
+    tooltip.style.setProperty('--hotspot-x', `${data.x}%`);
+    tooltip.style.setProperty('--hotspot-y', `${data.y}%`);
     tooltip.hidden = false;
     placeTooltip();
   };
 
   const items = itemRows.map((row, i) => {
-    // cells in model order (media | text | hotspots), found by content where it is there
+    // cells in model order: media | title | description | hotspots; content written before the
+    // title and description were split has media | text (title + description) | hotspots
     const cells = [...row.children];
-    const mediaCell = cells.find((c) => c.querySelector('picture')) || cells[0];
-    const hotCell = cells.find((c) => c !== mediaCell && c.querySelector('li'))
+    const split = cells.length > 3;
+    const mediaCell = split ? cells[0] : cells.find((c) => c.querySelector('picture')) || cells[0];
+    const hotCell = split ? cells[3] : cells.find((c) => c !== mediaCell && c.querySelector('li'))
       || (cells.length > 2 ? cells[2] : null);
-    const textCell = cells.find((c) => c !== mediaCell && c !== hotCell);
+    const [titleCell, descriptionCell] = split ? [cells[1], cells[2]] : [];
+    const textCell = split ? null : cells.find((c) => c !== mediaCell && c !== hotCell);
+    // the copy column's text: the powertrain's name as its heading, then the description
+    const authored = split ? [titleCell, descriptionCell] : [textCell].filter(Boolean);
+    let text = textCell && (editing ? displayCopy(textCell) : textCell);
+    if (split) text = textFrom(titleCell, descriptionCell, editing);
     const pictures = [...(mediaCell?.querySelectorAll('picture') || [])];
     // in the editor each image names its field; published, the thumbnail comes first
     const fieldPicture = (name) => mediaCell?.querySelector(`[data-aue-prop="${name}"]`)?.closest('picture');
     const thumbPicture = fieldPicture('media_thumbnail') || pictures[0];
     const imagePicture = fieldPicture('media_image')
       || pictures.find((p) => p !== thumbPicture) || thumbPicture?.cloneNode(true);
-    const title = textCell?.querySelector('h2, h3, h4')?.textContent.trim() || `Powertrain ${i + 1}`;
+    const title = text?.querySelector('h2, h3, h4')?.textContent.trim() || `Powertrain ${i + 1}`;
 
     // the item row becomes its panel (keeps the editor's item instrumentation)
-    row.className = 'jsw-tech-panel';
+    row.className = 'hotspot-showcase-panel';
     row.id = `${id}-panel-${i}`;
     row.setAttribute('role', 'tabpanel');
     row.setAttribute('aria-labelledby', `${id}-tab-${i}`);
-    const figure = el('div', 'jsw-tech-figure');
+    const figure = el('div', 'hotspot-showcase-figure');
     if (imagePicture) figure.append(imagePicture);
     const img = imagePicture?.querySelector('img');
     if (img) trackRatio(figure, img);
     parseHotspots(hotCell).forEach((spot) => {
-      const btn = el('button', 'jsw-hotspot', {
+      const btn = el('button', 'hotspot-showcase-spot', {
         type: 'button',
         'aria-label': spot.title ? `Show details: ${spot.title}` : 'Show details',
         'aria-expanded': 'false',
         'aria-controls': tooltip.id,
       });
-      btn.style.setProperty('--jsw-x', `${spot.x}%`);
-      btn.style.setProperty('--jsw-y', `${spot.y}%`);
+      btn.style.setProperty('--hotspot-x', `${spot.x}%`);
+      btn.style.setProperty('--hotspot-y', `${spot.y}%`);
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (openSpot === btn) closeTooltip();
@@ -269,33 +307,41 @@ export default function decorate(block) {
       });
       figure.append(btn);
     });
-    if (hotCell) hotCell.classList.add('jsw-tech-hotspot-source');
-    mediaCell?.remove();
+    if (hotCell) hotCell.classList.add('hotspot-showcase-hotspot-source');
+    // published: the thumbnail and the text move to the tray and the copy column; in the
+    // editor they stay in this row, hidden (the media cell with the thumbnail, the text cell),
+    // and the tray and the column show copies
+    const thumbShown = editing && thumbPicture ? displayCopy(thumbPicture) : thumbPicture;
+    if (editing && mediaCell) mediaCell.hidden = true;
+    else mediaCell?.remove();
     row.prepend(figure);
     stage.append(row);
 
-    if (textCell) {
-      textCell.classList.add('jsw-tech-text');
-      textCell.querySelector('h2, h3, h4')?.classList.add('jsw-tech-item-title');
-      keepResource(row, textCell);
-      texts.append(textCell);
+    // published, the authored text cells leave the row; in the editor they stay there, hidden
+    authored.forEach((cell) => {
+      if (editing) cell.hidden = true;
+      else if (cell !== text) cell.remove();
+    });
+    if (text) {
+      text.classList.add('hotspot-showcase-text');
+      text.querySelector('h2, h3, h4')?.classList.add('hotspot-showcase-item-title');
+      texts.append(text);
     }
 
-    const tab = el('button', 'jsw-tech-thumb', {
+    const tab = el('button', 'hotspot-showcase-thumb', {
       type: 'button', role: 'tab', id: `${id}-tab-${i}`, 'aria-controls': row.id, 'aria-label': title,
     });
-    if (thumbPicture) {
-      thumbPicture.querySelector('img')?.setAttribute('alt', '');
-      keepResource(row, thumbPicture);
-      tab.append(thumbPicture);
+    if (thumbShown) {
+      thumbShown.querySelector('img')?.setAttribute('alt', '');
+      tab.append(thumbShown);
     }
     thumbs.append(tab);
-    return { row, textCell, tab };
+    return { row, text, tab };
   });
 
   let current = 0;
   /**
-   * the images move like a vertical carousel (jsw-tech-showcase.css): picking a thumbnail to
+   * the images move like a vertical carousel (hotspot-showcase.css): picking a thumbnail to
    * the right pushes the current image up and out while the new one rises from the bottom;
    * one to the left pushes it down while the new one comes in from the top
    */
@@ -315,13 +361,13 @@ export default function decorate(block) {
     current = (index + items.length) % items.length;
     closeTooltip();
     if (items[from] && items[current]) slideImages(from, current);
-    items.forEach(({ row, textCell, tab }, i) => {
+    items.forEach(({ row, text, tab }, i) => {
       const active = i === current;
       row.classList.toggle('is-active', active);
       // the selected image flies on into the next section's card (parallax-collage)
-      row.querySelector('.jsw-tech-figure')?.toggleAttribute('data-zoom-source', active);
+      row.querySelector('.hotspot-showcase-figure')?.toggleAttribute('data-zoom-source', active);
       row.inert = !active;
-      if (textCell) textCell.hidden = !active;
+      if (text) text.hidden = !active;
       tab.setAttribute('aria-selected', active ? 'true' : 'false');
       tab.tabIndex = active ? 0 : -1;
     });
@@ -354,7 +400,7 @@ export default function decorate(block) {
   });
 
   block.replaceChildren(copy, stage);
-  if (block.closest('[data-aue-resource]')) block.classList.add('jsw-tech-editing');
+  if (editing) block.classList.add('hotspot-showcase-editing');
   else if (section && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
     curtain(section, block);
   }
