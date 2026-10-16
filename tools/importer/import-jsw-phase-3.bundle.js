@@ -52,20 +52,25 @@ var CustomImportScript = (() => {
   }
   function hero(document) {
     const p = (...c) => el(document, "p", ...c);
+    const group = (...parts) => {
+      const cell = document.createDocumentFragment();
+      cell.append(...parts);
+      return cell;
+    };
     return WebImporter.Blocks.createBlock(document, {
       name: "immersive-hero",
       cells: [
         [hinted(document, "image", [p(img(document, "chassis.jpg", "Electric vehicle platform lit from above"))])],
-        [hinted(document, "nav", [
-          p("JSW MOTORS"),
-          list(document, [["#nev-tech", "NEV TECH"], ["#newsroom", "NEWSROOM"]]),
-          p(link(document, "#register-interest", "REGISTER INTEREST"))
-        ])],
-        [hinted(document, "text", [
-          el(document, "h1", "NEW ENERGY FOR YOU BUILT FOR BEYOND"),
-          p("The everyday drive costs you almost nothing. The long one costs you no planning. That\u2019s what new energy means, built for India."),
-          p(link(document, "#nev-tech", "DISCOVER NEW ENERGY"))
-        ])]
+        [group(
+          hinted(document, "nav_brand", ["JSW MOTORS"]),
+          hinted(document, "nav_links", [list(document, [["#nev-tech", "NEV TECH"], ["#newsroom", "NEWSROOM"]])]),
+          hinted(document, "nav_cta", [p(link(document, "#register-interest", "REGISTER INTEREST"))])
+        )],
+        [hinted(document, "title", ["NEW ENERGY FOR YOU BUILT FOR BEYOND"])],
+        [group(
+          hinted(document, "body_description", [p("The everyday drive costs you almost nothing. The long one costs you no planning. That\u2019s what new energy means, built for India.")]),
+          hinted(document, "body_cta", [p(link(document, "#nev-tech", "DISCOVER NEW ENERGY"))])
+        )]
       ]
     });
   }

@@ -297,13 +297,18 @@ export function moveInstrumentation(from, to) {
  * @param {Element} block the block element
  */
 export function unwrapEditorRichtext(block) {
-  const isGroup = (el) => el?.matches('div[data-aue-type="richtext"]');
+  const isGroup = (el) => el?.nodeType === Node.ELEMENT_NODE && el.matches('div[data-aue-type="richtext"]');
+  // an element's content, without the whitespace and comments between its elements
+  const content = (el) => [...el.childNodes].filter((n) => n.nodeType === Node.ELEMENT_NODE
+    || (n.nodeType === Node.TEXT_NODE && n.textContent.trim()));
   block.querySelectorAll(':scope > div > div').forEach((cell) => {
-    if (cell.childNodes.length !== 1) return;
-    const only = cell.firstElementChild;
+    const nodes = content(cell);
+    if (nodes.length !== 1) return;
+    const [only] = nodes;
     // the group itself, or the group in the paragraph decorateBlock (aem.js) may have put it in
-    const wrapped = only?.tagName === 'P' && only.childNodes.length === 1 && isGroup(only.firstElementChild);
-    const group = isGroup(only) ? only : wrapped && only.firstElementChild;
+    const inner = only.nodeType === Node.ELEMENT_NODE ? content(only) : [];
+    const wrapped = only.tagName === 'P' && inner.length === 1 && isGroup(inner[0]);
+    const group = isGroup(only) ? only : wrapped && inner[0];
     if (!group) return;
     if (wrapped) moveInstrumentation(only, cell);
     moveInstrumentation(group, cell);

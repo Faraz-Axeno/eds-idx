@@ -35,18 +35,61 @@
           "value": ""
         },
         {
-          "component": "richtext",
+          "component": "text",
           "valueType": "string",
-          "name": "nav",
-          "label": "Top navigation: logo text, a list of links, then the CTA link",
+          "name": "nav_brand",
+          "label": "Navigation: logo text",
+          "description": "Shown as the JSW MOTORS logo when it reads JSW MOTORS.",
           "value": ""
         },
         {
           "component": "richtext",
           "valueType": "string",
-          "name": "text",
-          "label": "Headline, description and the bottom-right button link",
+          "name": "nav_links",
+          "label": "Navigation: links",
+          "description": "A bulleted list of links (e.g. NEV TECH, NEWSROOM).",
           "value": ""
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "nav_cta",
+          "label": "Navigation: button link"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "nav_ctaText",
+          "label": "Navigation: button text",
+          "value": "REGISTER INTEREST"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "title",
+          "label": "Headline",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "body_description",
+          "label": "Description",
+          "value": ""
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "body_cta",
+          "label": "Button link",
+          "description": "The bottom-right button."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "body_ctaText",
+          "label": "Button text",
+          "value": "DISCOVER NEW ENERGY"
         }
       ]
     }

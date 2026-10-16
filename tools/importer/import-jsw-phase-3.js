@@ -10,7 +10,7 @@
  * as a placeholder with an alt text describing what is actually shown.
  *
  * Sections, in order (one block each):
- *   1. immersive-hero    image | nav | text
+ *   1. immersive-hero    image | navigation (logo text, links, button) | headline | description + button
  *   2. hotspot-showcase  heading, then one item per powertrain: media (thumbnail + image) | title | description | hotspots
  *   3. parallax-collage  text, then image | position rows (same as /jsw-nev-collage)
  *   4. blog-carousel     background | heading, then one item per post: image | category | title | summary + link
@@ -52,20 +52,27 @@ function list(document, items) {
 
 function hero(document) {
   const p = (...c) => el(document, 'p', ...c);
+  // grouped cells: the navigation (logo text, links, button) and the description + button;
+  // the links' text collapses into nav_ctaText / body_ctaText
+  const group = (...parts) => {
+    const cell = document.createDocumentFragment();
+    cell.append(...parts);
+    return cell;
+  };
   return WebImporter.Blocks.createBlock(document, {
     name: 'immersive-hero',
     cells: [
       [hinted(document, 'image', [p(img(document, 'chassis.jpg', 'Electric vehicle platform lit from above'))])],
-      [hinted(document, 'nav', [
-        p('JSW MOTORS'),
-        list(document, [['#nev-tech', 'NEV TECH'], ['#newsroom', 'NEWSROOM']]),
-        p(link(document, '#register-interest', 'REGISTER INTEREST')),
-      ])],
-      [hinted(document, 'text', [
-        el(document, 'h1', 'NEW ENERGY FOR YOU BUILT FOR BEYOND'),
-        p('The everyday drive costs you almost nothing. The long one costs you no planning. That’s what new energy means, built for India.'),
-        p(link(document, '#nev-tech', 'DISCOVER NEW ENERGY')),
-      ])],
+      [group(
+        hinted(document, 'nav_brand', ['JSW MOTORS']),
+        hinted(document, 'nav_links', [list(document, [['#nev-tech', 'NEV TECH'], ['#newsroom', 'NEWSROOM']])]),
+        hinted(document, 'nav_cta', [p(link(document, '#register-interest', 'REGISTER INTEREST'))]),
+      )],
+      [hinted(document, 'title', ['NEW ENERGY FOR YOU BUILT FOR BEYOND'])],
+      [group(
+        hinted(document, 'body_description', [p('The everyday drive costs you almost nothing. The long one costs you no planning. That’s what new energy means, built for India.')]),
+        hinted(document, 'body_cta', [p(link(document, '#nev-tech', 'DISCOVER NEW ENERGY'))]),
+      )],
     ],
   });
 }

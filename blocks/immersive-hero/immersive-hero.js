@@ -1,10 +1,15 @@
 /*
  * immersive-hero: dark full-viewport intro of the JSW Motors NEV page.
- * Rows (any order, recognised by content):
- *   visual — a picture, shown blurred behind an ambient glow; once the page has loaded, the
- *            background video /videos/jsw-hero.mp4 (if present) plays full screen over it
- *   nav    — logo text, a list of links, then the CTA link: becomes the fixed pill navigation
- *   text   — h1 headline, description paragraph, bottom-right button link
+ * Rows:
+ *   visual      — a picture, shown blurred behind an ambient glow; once the page has loaded,
+ *                 the background video /videos/jsw-hero.mp4 (if present) plays full screen
+ *                 over it
+ *   navigation  — logo text, a list of links, then the button link: becomes the fixed pill
+ *                 navigation
+ *   headline    — the h1
+ *   description — the description paragraph, then the bottom-right button link
+ * (older content: visual, then the navigation as one rich-text row and the headline,
+ * description and button as another, in any order, recognised by content; see joinFields)
  * Also adds the fixed right-edge SCROLL button (one stop down). Navigation and button follow
  * the theme of the section underneath them (sections carry data-jsw-theme).
  */
@@ -40,6 +45,74 @@ function cellOf(row) {
 
 function inEditor(block) {
   return Boolean(block.closest('[data-aue-resource]'));
+}
+
+/** a display copy of an authored part, without the editor's instrumentation (and ids) */
+function displayCopy(part) {
+  const copy = part.cloneNode(true);
+  [copy, ...copy.querySelectorAll('*')].forEach((node) => {
+    [...node.attributes].filter(({ name }) => /^data-(aue|richtext)-/.test(name) || name === 'id')
+      .forEach(({ name }) => node.removeAttribute(name));
+  });
+  return copy;
+}
+
+/**
+ * a cell's content as the elements the hero styles expect: the editor's wrappers (a rich-text
+ * field's div, and the paragraph around it) looked through, loose text as a paragraph, a bare
+ * link (a link field) in a paragraph of its own
+ */
+function contentNodes(cell) {
+  return [...cell.childNodes].flatMap((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent.trim();
+      if (!text) return [];
+      const p = document.createElement('p');
+      p.textContent = text;
+      return [p];
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return [];
+    const onlyChild = node.children.length === 1 && !node.textContent.replace(node.firstElementChild.textContent, '').trim();
+    if (node.tagName === 'DIV' || (node.tagName === 'P' && onlyChild && node.firstElementChild.tagName === 'DIV')) {
+      return contentNodes(node);
+    }
+    if (node.tagName === 'A') {
+      const p = document.createElement('p');
+      p.append(node);
+      return [p];
+    }
+    return [node];
+  });
+}
+
+/**
+ * content with separate fields — visual | navigation (logo text, links, button) | headline |
+ * description + button — becomes the two rows the hero is built from (navigation; headline,
+ * description and button), in the markup of the single rich-text fields used before. Published,
+ * the fields' own nodes move; in the editor the fields stay (hidden, so the content tree lists
+ * them under the hero) and the rows get copies.
+ */
+function joinFields(block, editing) {
+  const rows = [...block.children];
+  if (rows.length < 4 || rows.some((r) => r.querySelector('h1, h2'))) return;
+  const [, navFields, titleField, bodyFields] = rows;
+  const take = (row) => contentNodes(editing ? displayCopy(cellOf(row)) : cellOf(row));
+  const rowOf = (nodes) => {
+    const row = document.createElement('div');
+    const cell = document.createElement('div');
+    cell.append(...nodes);
+    row.append(cell);
+    return row;
+  };
+  const heading = document.createElement('h1');
+  heading.textContent = cellOf(titleField).textContent.trim();
+  const navRow = rowOf(take(navFields));
+  const textRow = rowOf([...(heading.textContent ? [heading] : []), ...take(bodyFields)]);
+  [navFields, titleField, bodyFields].forEach((row) => {
+    if (editing) row.hidden = true;
+    else row.remove();
+  });
+  block.append(navRow, textRow);
 }
 
 /**
@@ -265,7 +338,9 @@ export default function decorate(block) {
   // Universal Editor: rich-text fields read as when published
   unwrapEditorRichtext(block);
   block.closest('.section')?.setAttribute('data-jsw-theme', 'dark');
-  const rows = [...block.children];
+  const editing = inEditor(block);
+  joinFields(block, editing);
+  const rows = [...block.children].filter((r) => !r.hidden);
   const textRow = rows.find((r) => r.querySelector('h1, h2'));
   const visualRow = rows.find((r) => r !== textRow && r.querySelector('picture') && !r.querySelector('a'));
   const navRow = rows.find((r) => r !== textRow && r !== visualRow && r.querySelector('a'));
@@ -274,12 +349,13 @@ export default function decorate(block) {
   if (textRow) decorateText(textRow);
   const nav = navRow ? buildNav(navRow) : null;
 
-  if (inEditor(block)) {
+  // the background video plays in the editor too (it only decorates the picture)
+  if (visualRow) addVideo(visualRow);
+  if (editing) {
     // keep everything inside the block so each field stays editable in place
     block.classList.add('immersive-hero-editing');
     return;
   }
-  if (visualRow) addVideo(visualRow);
   // fixed page chrome: outside every section so no stacking context can trap it
   if (nav) document.body.append(nav);
   const indicator = buildScrollIndicator();
