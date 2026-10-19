@@ -128,7 +128,7 @@ function techShowcase(document) {
     cells.push([
       media,
       hinted(document, 'title', [item.title]),
-      hinted(document, 'description', [el(document, 'p', item.text)]),
+      hinted(document, 'description', [item.text]),
       hinted(document, 'hotspots', [el(document, 'ul', ...item.hotspots.map((h) => el(document, 'li', h)))]),
     ]);
   });

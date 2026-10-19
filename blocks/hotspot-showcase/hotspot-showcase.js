@@ -20,6 +20,8 @@ import { unwrapEditorRichtext } from '../../scripts/scripts.js';
 
 // at most this many + points per powertrain (the client's limit): further bullets are ignored
 const MAX_HOTSPOTS = 4;
+// at most this many powertrains (Showcase Items, the client's limit): further items are ignored
+const MAX_ITEMS = 3;
 let instance = 0;
 
 function el(tag, className, attrs = {}) {
@@ -187,8 +189,13 @@ export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const rows = [...block.children];
   // a powertrain just added in the editor has no images or text yet, but is shown (and editable)
-  const itemRows = rows.filter((r) => r.dataset.aueModel === ITEM_MODEL || r.children.length > 1);
-  const headRow = rows.find((r) => !itemRows.includes(r));
+  const allItemRows = rows.filter((r) => r.dataset.aueModel === ITEM_MODEL
+    || r.children.length > 1);
+  const headRow = rows.find((r) => !allItemRows.includes(r));
+  // at most MAX_ITEMS powertrains (the client's limit); in the editor the others stay in the
+  // block, hidden, so they can still be picked in the content tree (and removed)
+  const itemRows = allItemRows.slice(0, MAX_ITEMS);
+  const extraRows = allItemRows.slice(MAX_ITEMS);
 
   const copy = el('div', 'hotspot-showcase-copy');
   if (headRow) {
@@ -295,6 +302,8 @@ export default function decorate(block) {
     if (imagePicture) figure.append(imagePicture);
     const img = imagePicture?.querySelector('img');
     if (img) trackRatio(figure, img);
+    // in the editor every powertrain's image is ready the moment it is picked
+    if (img && editing) img.loading = 'eager';
     parseHotspots(hotCell).forEach((spot) => {
       const btn = el('button', 'hotspot-showcase-spot', {
         type: 'button',
@@ -404,8 +413,25 @@ export default function decorate(block) {
   });
 
   block.replaceChildren(copy, stage);
-  if (editing) block.classList.add('hotspot-showcase-editing');
-  else if (section && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+  if (editing) {
+    block.classList.add('hotspot-showcase-editing');
+    // items beyond the limit: not shown, but still in the content tree
+    if (extraRows.length) {
+      const extra = el('div', 'hotspot-showcase-extra');
+      extra.hidden = true;
+      extra.append(...extraRows);
+      block.append(extra);
+    }
+    // picking a powertrain, or one of its fields, in the content tree or on the canvas shows
+    // that powertrain: only the selected one is visible in the carousel, so otherwise its image
+    // would be outlined but hidden (Universal Editor's aue:ui-select event)
+    document.addEventListener('aue:ui-select', (e) => {
+      const { resource, selected } = e.detail || {};
+      if (!selected || !resource || !block.isConnected) return;
+      const index = items.findIndex(({ row }) => row.dataset.aueResource === resource);
+      if (index >= 0 && index !== current) select(index);
+    });
+  } else if (section && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
     curtain(section, block);
   }
   if (items.length) select(0);

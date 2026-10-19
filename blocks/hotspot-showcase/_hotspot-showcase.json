@@ -41,7 +41,8 @@
           "valueType": "string",
           "name": "heading",
           "label": "Heading",
-          "value": ""
+          "value": "",
+          "description": "The block shows up to 3 Showcase Items: items added after the third are not shown on the page."
         }
       ]
     },
@@ -85,11 +86,12 @@
           "value": ""
         },
         {
-          "component": "richtext",
+          "component": "text",
           "valueType": "string",
           "name": "description",
           "label": "Description",
-          "value": ""
+          "value": "",
+          "description": "Plain text, shown as the paragraph below the title."
         },
         {
           "component": "richtext",
