@@ -450,20 +450,35 @@ export default function decorate(block) {
       });
       figure.append(btn);
     });
-    if (hotCell) hotCell.classList.add('hotspot-showcase-hotspot-source');
     // published: the thumbnail and the text move to the tray and the copy column; in the
-    // editor they stay in this row, hidden (the media cell with the thumbnail, the text cell),
-    // and the tray and the column show copies
+    // editor they stay in this row (so the content tree lists them under this powertrain), and
+    // the tray and the column show copies; each authored field is then an invisible box laid
+    // over what shows it (placeFields), so picking it in the content tree outlines it there
     const thumbShown = editing && thumbPicture ? displayCopy(thumbPicture) : thumbPicture;
-    if (editing && mediaCell) mediaCell.hidden = true;
-    else mediaCell?.remove();
+    const tab = el('button', 'hotspot-showcase-thumb', {
+      type: 'button', role: 'tab', id: `${id}-tab-${i}`, 'aria-controls': row.id, 'aria-label': title,
+    });
+    const fields = []; // [authored field, () => what shows it, clickable on the canvas]
+    if (editing) {
+      if (mediaCell) fields.push([mediaCell, () => tab, true]);
+      if (split) {
+        fields.push([titleCell, () => text?.querySelector('h3'), true]);
+        fields.push([descriptionCell, () => [...(text?.querySelectorAll('p') || [])], true]);
+      } else if (textCell) fields.push([textCell, () => text, true]);
+      // the hotspots field sits over the image, letting clicks through to the image and the +
+      if (hotCell) fields.push([hotCell, () => figure, false]);
+      fields.forEach(([cell, , clickable]) => {
+        cell.classList.add('hotspot-showcase-field');
+        cell.classList.toggle('hotspot-showcase-field-passive', !clickable);
+      });
+    } else if (hotCell) hotCell.classList.add('hotspot-showcase-hotspot-source');
+    if (!editing) mediaCell?.remove();
     row.prepend(figure);
     stage.append(row);
 
-    // published, the authored text cells leave the row; in the editor they stay there, hidden
+    // published, the authored text cells leave the row; in the editor they stay there
     authored.forEach((cell) => {
-      if (editing) cell.hidden = true;
-      else if (cell !== text) cell.remove();
+      if (!editing && cell !== text) cell.remove();
     });
     if (text) {
       text.classList.add('hotspot-showcase-text');
@@ -471,16 +486,42 @@ export default function decorate(block) {
       texts.append(text);
     }
 
-    const tab = el('button', 'hotspot-showcase-thumb', {
-      type: 'button', role: 'tab', id: `${id}-tab-${i}`, 'aria-controls': row.id, 'aria-label': title,
-    });
     if (thumbShown) {
       thumbShown.querySelector('img')?.setAttribute('alt', '');
       tab.append(thumbShown);
     }
     thumbs.append(tab);
-    return { row, text, tab };
+    return {
+      row, text, tab, fields,
+    };
   });
+
+  /**
+   * Universal Editor: lays each powertrain's authored fields over what shows them (the title
+   * and description in the copy column, the thumbnail in the tray, the hotspots over the
+   * image), in the row's own coordinates; those not shown (another powertrain's text) shrink
+   */
+  const placeFields = () => {
+    items.forEach(({ row, fields }) => {
+      const base = row.getBoundingClientRect();
+      fields.forEach(([cell, shownBy]) => {
+        const boxes = [shownBy()].flat().filter(Boolean).map((node) => node.getBoundingClientRect())
+          .filter((box) => box.width && box.height);
+        const left = Math.min(...boxes.map((box) => box.left));
+        const top = Math.min(...boxes.map((box) => box.top));
+        const right = Math.max(...boxes.map((box) => box.right));
+        const bottom = Math.max(...boxes.map((box) => box.bottom));
+        Object.assign(cell.style, boxes.length ? {
+          left: `${left - base.left}px`,
+          top: `${top - base.top}px`,
+          width: `${right - left}px`,
+          height: `${bottom - top}px`,
+        } : {
+          left: '0', top: '0', width: '0', height: '0',
+        });
+      });
+    });
+  };
 
   let current = 0;
   /**
@@ -516,6 +557,7 @@ export default function decorate(block) {
     });
     counter.textContent = `${current + 1}/${items.length}`;
     if (focus) items[current].tab.focus();
+    if (editing) placeFields();
   };
 
   items.forEach(({ tab }, i) => {
@@ -556,6 +598,14 @@ export default function decorate(block) {
     // nothing (component-filters), so the editor offers no "+" (add) or duplicate for it; the
     // editor redecorates the block after every change, so removing one brings them back
     if (allItemRows.length >= MAX_ITEMS) block.dataset.aueFilter = FULL_FILTER;
+    // the authored fields follow what shows them as the layout settles or changes
+    const relayout = () => requestAnimationFrame(placeFields);
+    new ResizeObserver(relayout).observe(block);
+    [copy, thumbs, stage].forEach((part) => new ResizeObserver(relayout).observe(part));
+    block.querySelectorAll('img').forEach((img) => img.addEventListener('load', relayout));
+    // the selected thumbnail lifts a little (a short transition)
+    items.forEach(({ tab }) => tab.addEventListener('transitionend', relayout));
+    window.addEventListener('resize', relayout);
     // items beyond the limit: not shown, but still in the content tree
     if (extraRows.length) {
       const extra = el('div', 'hotspot-showcase-extra');
