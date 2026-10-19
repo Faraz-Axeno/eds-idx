@@ -253,6 +253,22 @@
   transform: translate(-50%, -50%) rotate(0deg);
 }
 
+/* Universal Editor, preview mode: a + can be dragged to its place (hotspot-showcase.js), then
+   is saved to its powertrain's Hotspots field */
+.hotspot-showcase.hotspot-showcase-previewing .hotspot-showcase-spot {
+  cursor: grab;
+  touch-action: none;
+}
+
+.hotspot-showcase.hotspot-showcase-previewing .hotspot-showcase-spot:active {
+  cursor: grabbing;
+}
+
+.hotspot-showcase .hotspot-showcase-spot.hotspot-showcase-spot-saving {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 /* frosted tooltip ("NEV / Tech 1": 270 x 119): its hotspot sits in its top corner, 25px in
    from the side and the top. It opens to the left and down; hotspot-showcase.js flips it
    right / up (data-side, data-align) and nudges it (--tooltip-sx) so it always stays inside

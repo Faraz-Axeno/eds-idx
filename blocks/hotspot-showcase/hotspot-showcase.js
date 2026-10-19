@@ -132,6 +132,116 @@ function containerUnits(container) {
 const ITEM_MODEL = 'hotspot-showcase-item';
 
 /**
+ * a hotspot bullet with new coordinates (x, y in the authoring system: % of the image from its
+ * bottom-left corner), its title and description kept as written
+ */
+function withCoordinates(line, x, y) {
+  const parts = line.split('|').map((part) => part.trim());
+  // as parseHotspots: the coordinates come first, unless the bullet is just a title
+  const rest = parts.length > 1 || /^[\d\s.,%]*$/.test(parts[0]) ? parts.slice(1) : parts;
+  return [`${x}, ${y}`, ...rest].join(' | ');
+}
+
+/**
+ * saves a powertrain's Hotspots field (its bullets, as rich text) to AEM: the item's own node,
+ * named by its editor resource, through AEM's content-saving (Sling POST) endpoint with the
+ * signed-in author's session and AEM's CSRF token
+ */
+async function saveHotspots(row, lines) {
+  const path = (row.dataset.aueResource || '').replace(/^urn:aemconnection:/, '');
+  if (!path.startsWith('/content/')) throw new Error(`no AEM path for ${row.dataset.aueResource}`);
+  const list = document.createElement('ul');
+  lines.forEach((line) => {
+    const li = document.createElement('li');
+    li.textContent = line;
+    list.append(li);
+  });
+  const tokenResponse = await fetch('/libs/granite/csrf/token.json', { credentials: 'same-origin' });
+  const { token } = await tokenResponse.json();
+  const body = new FormData();
+  body.append('hotspots', list.outerHTML);
+  body.append('_charset_', 'utf-8');
+  const response = await fetch(path, {
+    method: 'POST', body, credentials: 'same-origin', headers: { 'CSRF-Token': token },
+  });
+  if (!response.ok) throw new Error(`saving ${path} failed: ${response.status}`);
+}
+
+/**
+ * Universal Editor, preview mode: a + can be dragged over its image; on drop its new position
+ * replaces that bullet's coordinates in the powertrain's Hotspots field (saved to AEM) and the
+ * canvas reloads so the editor shows the new value. A plain click still opens the tooltip.
+ */
+function makeDraggable(btn, {
+  figure, row, hotCell, index, isPreview,
+}) {
+  let drag = null;
+  let dragged = false;
+  btn.addEventListener('pointerdown', (e) => {
+    if (!isPreview() || e.button !== 0) return;
+    const box = btn.getBoundingClientRect();
+    // where on the + it was taken: it is centred on its coordinates
+    drag = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      dx: e.clientX - (box.left + box.width / 2),
+      dy: e.clientY - (box.top + box.height / 2),
+      moved: false,
+    };
+    dragged = false;
+  });
+  btn.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 4) return;
+    if (!drag.moved) {
+      drag.moved = true;
+      btn.setPointerCapture(e.pointerId);
+    }
+    const area = figure.getBoundingClientRect();
+    const left = Math.min(100, Math.max(0, ((e.clientX - drag.dx - area.left) / area.width) * 100));
+    const top = Math.min(100, Math.max(0, ((e.clientY - drag.dy - area.top) / area.height) * 100));
+    btn.style.setProperty('--hotspot-x', `${left}%`);
+    btn.style.setProperty('--hotspot-y', `${top}%`);
+    drag.left = left;
+    drag.top = top;
+  });
+  const end = async (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const { moved, left, top } = drag;
+    drag = null;
+    if (!moved || left === undefined) return;
+    dragged = true;
+    const items = [...(hotCell?.querySelectorAll('li') || [])].map((li) => li.textContent.trim());
+    if (!items[index] && items[index] !== '') return;
+    // the authoring system: x from the left, y up from the bottom, one decimal
+    const round = (n) => Math.round(n * 10) / 10;
+    items[index] = withCoordinates(items[index], round(left), round(100 - top));
+    btn.classList.add('hotspot-showcase-spot-saving');
+    try {
+      await saveHotspots(row, items);
+      window.location.reload();
+    } catch (error) {
+      btn.classList.remove('hotspot-showcase-spot-saving');
+      // eslint-disable-next-line no-console
+      console.error(error);
+      // eslint-disable-next-line no-alert
+      window.alert('The new hotspot position could not be saved. Please enter it in the Hotspots field.');
+    }
+  };
+  btn.addEventListener('pointerup', end);
+  btn.addEventListener('pointercancel', (e) => {
+    if (drag && e.pointerId === drag.id) drag = null;
+  });
+  // the click that ends a drag does not open the tooltip
+  btn.addEventListener('click', (e) => {
+    if (!dragged) return;
+    dragged = false;
+    e.stopImmediatePropagation();
+  }, { capture: true });
+}
+
+/**
  * a display copy of an authored part, without the editor's instrumentation (and ids): in
  * Universal Editor a powertrain's text and thumbnail stay in its own row, hidden, so the
  * content tree lists them under that powertrain, while the copy column and the tray show copies
@@ -189,6 +299,18 @@ export default function decorate(block) {
 
   // Universal Editor: its markup is instrumented
   const editing = Boolean(block.closest('[data-aue-resource]'));
+  // and in its preview mode (aue:ui-preview / aue:ui-edit) the + points can be dragged
+  let previewing = false;
+  if (editing) {
+    document.addEventListener('aue:ui-preview', () => {
+      previewing = true;
+      block.classList.add('hotspot-showcase-previewing');
+    });
+    document.addEventListener('aue:ui-edit', () => {
+      previewing = false;
+      block.classList.remove('hotspot-showcase-previewing');
+    });
+  }
   const rows = [...block.children];
   // a powertrain just added in the editor has no images or text yet, but is shown (and editable)
   const allItemRows = rows.filter((r) => r.dataset.aueModel === ITEM_MODEL
@@ -306,7 +428,7 @@ export default function decorate(block) {
     if (img) trackRatio(figure, img);
     // in the editor every powertrain's image is ready the moment it is picked
     if (img && editing) img.loading = 'eager';
-    parseHotspots(hotCell).forEach((spot) => {
+    parseHotspots(hotCell).forEach((spot, index) => {
       const btn = el('button', 'hotspot-showcase-spot', {
         type: 'button',
         'aria-label': spot.title ? `Show details: ${spot.title}` : 'Show details',
@@ -315,6 +437,12 @@ export default function decorate(block) {
       });
       btn.style.setProperty('--hotspot-x', `${spot.x}%`);
       btn.style.setProperty('--hotspot-y', `${spot.y}%`);
+      // in the editor's preview mode a + can be dragged to its place (saved to its field)
+      if (editing) {
+        makeDraggable(btn, {
+          figure, row, hotCell, index, isPreview: () => previewing,
+        });
+      }
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (openSpot === btn) closeTooltip();
