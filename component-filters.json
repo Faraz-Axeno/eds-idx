@@ -68,6 +68,10 @@
     ]
   },
   {
+    "id": "hotspot-showcase-full",
+    "components": []
+  },
+  {
     "id": "jsw-collage",
     "components": [
       "jsw-collage-item"

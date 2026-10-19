@@ -22,6 +22,8 @@ import { unwrapEditorRichtext } from '../../scripts/scripts.js';
 const MAX_HOTSPOTS = 4;
 // at most this many powertrains (Showcase Items, the client's limit): further items are ignored
 const MAX_ITEMS = 3;
+// the editor filter of a block that has all of them (_hotspot-showcase.json: allows nothing)
+const FULL_FILTER = 'hotspot-showcase-full';
 let instance = 0;
 
 function el(tag, className, attrs = {}) {
@@ -415,6 +417,17 @@ export default function decorate(block) {
   block.replaceChildren(copy, stage);
   if (editing) {
     block.classList.add('hotspot-showcase-editing');
+    // a selected field is scrolled into view by the editor: the hidden powertrains wait below
+    // or above the image area, and the editor would scroll the clipped image area (or the card)
+    // to them, sliding the shown powertrain out of sight; they never scroll
+    [block, stage].forEach((box) => box.addEventListener('scroll', () => {
+      box.scrollTop = 0;
+      box.scrollLeft = 0;
+    }));
+    // with MAX_ITEMS powertrains the block takes no more: its filter becomes one that allows
+    // nothing (component-filters), so the editor offers no "+" (add) or duplicate for it; the
+    // editor redecorates the block after every change, so removing one brings them back
+    if (allItemRows.length >= MAX_ITEMS) block.dataset.aueFilter = FULL_FILTER;
     // items beyond the limit: not shown, but still in the content tree
     if (extraRows.length) {
       const extra = el('div', 'hotspot-showcase-extra');

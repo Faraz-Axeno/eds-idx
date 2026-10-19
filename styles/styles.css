@@ -1,5 +1,11 @@
 @import url('brand.css');
 
+/* New Science (Adobe Fonts / Typekit web project): replace PROJECT-ID with the web project's id
+   from fonts.adobe.com > Web Projects and delete the comment markers around the next line.
+   Commented out until then, so no browser requests a placeholder address. */
+
+/* @import url('https://use.typekit.net/PROJECT-ID.css'); */
+
 /*
  * Copyright 2020 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");

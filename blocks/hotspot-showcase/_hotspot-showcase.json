@@ -110,6 +110,10 @@
       "components": [
         "hotspot-showcase-item"
       ]
+    },
+    {
+      "id": "hotspot-showcase-full",
+      "components": []
     }
   ]
 }
