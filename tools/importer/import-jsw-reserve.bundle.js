@@ -81,6 +81,11 @@ var CustomImportScript = (() => {
           ["content_disclaimer", el(document, "p", "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice.")]
         ]),
         group(document, [
+          ["form_cities", (() => {
+            const list = el(document, "ul");
+            CITIES.forEach((city) => list.append(el(document, "li", city)));
+            return list;
+          })()],
           ["form_button", link(document, "/jsw-confirmed", "PROCEED")]
         ]),
         group(document, [
@@ -89,8 +94,7 @@ var CustomImportScript = (() => {
           ["fields_mobilePlaceholder", el(document, "p", "Mobile Number*")],
           ["fields_emailPlaceholder", el(document, "p", "Email Address")],
           ["fields_cityPlaceholder", el(document, "p", "Select City")]
-        ]),
-        ...CITIES.map((city) => [hinted(document, "city", [document.createTextNode(city)])])
+        ])
       ];
       const main = document.createElement("div");
       main.append(navbar(document), WebImporter.Blocks.createBlock(document, { name: "reservation-form", cells }));

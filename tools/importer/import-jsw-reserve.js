@@ -4,7 +4,7 @@
 /**
  * JSW reservation page (/jsw-reserve), from the "Opt 2 / Reserve 1280x720" design frame
  * (no source site: the fetched document is ignored). One block, reservation-form, its four
- * field groups as rows: media | content | form | fields, then one City Option row per city;
+ * field groups as rows: media | content | form (with the city options list) | fields;
  * the JSW Navbar block before it. Its button opens /jsw-confirmed.
  */
 
@@ -74,6 +74,11 @@ export default {
         ['content_disclaimer', el(document, 'p', 'JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice.')],
       ]),
       group(document, [
+        ['form_cities', (() => {
+          const list = el(document, 'ul');
+          CITIES.forEach((city) => list.append(el(document, 'li', city)));
+          return list;
+        })()],
         ['form_button', link(document, '/jsw-confirmed', 'PROCEED')],
       ]),
       group(document, [
@@ -83,7 +88,6 @@ export default {
         ['fields_emailPlaceholder', el(document, 'p', 'Email Address')],
         ['fields_cityPlaceholder', el(document, 'p', 'Select City')],
       ]),
-      ...CITIES.map((city) => [hinted(document, 'city', [document.createTextNode(city)])]),
     ];
 
     const main = document.createElement('div');

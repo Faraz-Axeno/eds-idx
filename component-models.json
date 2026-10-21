@@ -1069,6 +1069,24 @@
         "value": ""
       },
       {
+        "component": "text",
+        "valueType": "string",
+        "name": "form_cities",
+        "label": "City options",
+        "description": "The choices of the Select City list: click Add for each city.",
+        "multi": true,
+        "value": [
+          "Mumbai",
+          "Delhi",
+          "Bengaluru",
+          "Hyderabad",
+          "Chennai",
+          "Pune",
+          "Kolkata",
+          "Ahmedabad"
+        ]
+      },
+      {
         "component": "aem-content",
         "valueType": "string",
         "name": "form_button",
@@ -1116,20 +1134,7 @@
         "name": "fields_cityPlaceholder",
         "label": "City dropdown placeholder",
         "value": "Select City",
-        "description": "The first, empty choice of the city list. The cities themselves are the City Option items of this block (Add + in the content tree)."
-      }
-    ]
-  },
-  {
-    "id": "reservation-form-city",
-    "fields": [
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "city",
-        "label": "City",
-        "value": "",
-        "description": "One choice of the Select City list."
+        "description": "The first, empty choice of the city list (the cities are the City options field)."
       }
     ]
   }

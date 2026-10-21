@@ -114,11 +114,5 @@
     "components": [
       "parallax-collage-item"
     ]
-  },
-  {
-    "id": "reservation-form",
-    "components": [
-      "reservation-form-city"
-    ]
   }
 ]
