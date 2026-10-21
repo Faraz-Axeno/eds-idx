@@ -91,7 +91,7 @@ export default {
     ];
 
     const main = document.createElement('div');
-    main.append(navbar(document), WebImporter.Blocks.createBlock(document, { name: 'reservation-form', cells }));
+    main.append(WebImporter.Blocks.createBlock(document, { name: 'reservation-form', cells }));
 
     return [{ element: main, path: '/jsw-reserve', report: { title: 'jsw-reserve' } }];
   },
