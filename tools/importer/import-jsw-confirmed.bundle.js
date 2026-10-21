@@ -52,16 +52,18 @@ var CustomImportScript = (() => {
     return [frag];
   }
   var import_jsw_confirmed_default = {
-    transform: ({ document }) => {
+    transform: ({ document, url }) => {
+      const split = /split/.test(url || "");
       const cells = [
+        [hinted(document, "layoutVariant", [document.createTextNode(split ? "layout-split" : "layout-centered")])],
         group(document, [
           ["media_background", picture(document, "reserve-landscape.jpg", "Blue hills around a still lake")],
           ["media_foreground", picture(document, "reserve-car.jpg", "Silhouette of the JSW SUV against a dark backdrop")]
         ]),
         group(document, [
           ["content_heading", el(document, "p", "CONFIRMED")],
-          ["content_subheading", el(document, "p", "YOU\u2019RE IN, {name}.")],
-          ["content_message", el(document, "p", "We\u2019ll message you when allocation opens. Your receipt is on its way to {email}.")],
+          ["content_subheading", el(document, "p", split ? "YOU\u2019RE ALL SET, {name}." : "YOU\u2019RE IN, {name}.")],
+          ["content_message", el(document, "p", split ? "We\u2019ll message you when allocation opens in December. Your receipt is on its way to {email}." : "We\u2019ll message you when allocation opens. Your receipt is on its way to {email}.")],
           ["content_fallbackName", el(document, "p", "THERE")]
         ]),
         group(document, [
@@ -73,7 +75,7 @@ var CustomImportScript = (() => {
       ];
       const main = document.createElement("div");
       main.append(WebImporter.Blocks.createBlock(document, { name: "reservation-confirmation", cells }));
-      return [{ element: main, path: "/jsw-confirmed", report: { title: "jsw-confirmed" } }];
+      return [{ element: main, path: split ? "/jsw-confirmed-split" : "/jsw-confirmed", report: { title: "jsw-confirmed", split } }];
     }
   };
   return __toCommonJS(import_jsw_confirmed_exports);

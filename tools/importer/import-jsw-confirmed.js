@@ -4,8 +4,9 @@
 /**
  * JSW reservation confirmation page (/jsw-confirmed), from the "Confirmed 1280x720" design
  * frame (no source site: the fetched document is ignored). One block,
- * reservation-confirmation, its three field groups as rows: media | content | nav.
+ * reservation-confirmation, as rows: layoutVariant | media | content | nav.
  * {name} and {email} are filled in from the reservation form.
+ * A URL with "split" makes /jsw-confirmed-split, the split layout ("Confirmed opt3").
  */
 
 const IMG = 'images/jsw';
@@ -43,16 +44,20 @@ function group(document, fields) {
 }
 
 export default {
-  transform: ({ document }) => {
+  transform: ({ document, url }) => {
+    const split = /split/.test(url || '');
     const cells = [
+      [hinted(document, 'layoutVariant', [document.createTextNode(split ? 'layout-split' : 'layout-centered')])],
       group(document, [
         ['media_background', picture(document, 'reserve-landscape.jpg', 'Blue hills around a still lake')],
         ['media_foreground', picture(document, 'reserve-car.jpg', 'Silhouette of the JSW SUV against a dark backdrop')],
       ]),
       group(document, [
         ['content_heading', el(document, 'p', 'CONFIRMED')],
-        ['content_subheading', el(document, 'p', 'YOU’RE IN, {name}.')],
-        ['content_message', el(document, 'p', 'We’ll message you when allocation opens. Your receipt is on its way to {email}.')],
+        ['content_subheading', el(document, 'p', split ? 'YOU’RE ALL SET, {name}.' : 'YOU’RE IN, {name}.')],
+        ['content_message', el(document, 'p', split
+          ? 'We’ll message you when allocation opens in December. Your receipt is on its way to {email}.'
+          : 'We’ll message you when allocation opens. Your receipt is on its way to {email}.')],
         ['content_fallbackName', el(document, 'p', 'THERE')],
       ]),
       group(document, [
@@ -66,6 +71,6 @@ export default {
     const main = document.createElement('div');
     main.append(WebImporter.Blocks.createBlock(document, { name: 'reservation-confirmation', cells }));
 
-    return [{ element: main, path: '/jsw-confirmed', report: { title: 'jsw-confirmed' } }];
+    return [{ element: main, path: split ? '/jsw-confirmed-split' : '/jsw-confirmed', report: { title: 'jsw-confirmed', split } }];
   },
 };

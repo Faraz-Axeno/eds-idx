@@ -1,9 +1,12 @@
 @import url('../../styles/jsw-pill-nav.css');
 
 /*
- * reservation-confirmation: values from the "Confirmed 1280x720" frame. The same rounded panel
- * and landscape as reservation-form; the card is 956 x 556, 107px from the top, the car filling
- * it, CONFIRMED (84px, metallic) over its roof and the text centred near its foot.
+ * reservation-confirmation: the same rounded panel and landscape as reservation-form, and a dark
+ * 956 x 556 card 107px from the top. Two layouts (the block's layoutVariant class):
+ *   layout-centered — "Confirmed 1280x720": the car filling the card, CONFIRMED (84px,
+ *                     metallic) over its roof and the text centred near its foot
+ *   layout-split    — "Confirmed opt3": the car on the left half fading into the card, the text
+ *                     left-aligned and vertically centred on the right half
  */
 
 .reservation-confirmation {
@@ -46,20 +49,16 @@
   }
 }
 
+/* both layouts: the dark card, the car behind the text */
 .reservation-confirmation .reservation-confirmation-card {
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   width: min(956px, 100%);
   min-height: 556px;
-  padding: 72px 32px 82px;
   overflow: hidden;
   border-radius: 24px;
   background-color: #000;
-  text-align: center;
 }
 
 .reservation-confirmation .reservation-confirmation-visual,
@@ -73,41 +72,9 @@
   object-position: 50% 50%;
 }
 
-/* the car a little larger than the card and centred in it, its roof under CONFIRMED */
-.reservation-confirmation .reservation-confirmation-visual img {
-  transform: scale(1.18);
-  transform-origin: 29% 45%;
-}
-
-/* CONFIRMED: thin, wide, a silver gradient from light at the top to grey at the foot */
-.reservation-confirmation .reservation-confirmation-heading {
-  margin: 0;
-  color: #d9d9d9;
-  background-image: linear-gradient(180deg, #f4f4f4 0%, #d6d6d6 48%, #8a8a8a 100%);
-  /* stylelint-disable-next-line property-no-vendor-prefix -- Safari and older Samsung Internet */
-  -webkit-background-clip: text;
-  background-clip: text;
-  font-family: var(--jsw-pill-font-display);
-  font-size: 84px;
-  font-weight: 300;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  -webkit-text-fill-color: transparent;
-}
-
-.reservation-confirmation .reservation-confirmation-details {
-  position: relative;
-  margin-top: auto;
-}
-
 .reservation-confirmation .reservation-confirmation-subheading {
-  margin: 0 0 18px;
   font-family: var(--jsw-pill-font-display);
-  font-size: 22px;
   font-weight: 400;
-  line-height: 1.2;
   text-transform: uppercase;
 }
 
@@ -116,10 +83,6 @@
   color: #8c8c8c;
   font-size: 13px;
   line-height: 19px;
-}
-
-.reservation-confirmation .reservation-confirmation-line {
-  display: block;
 }
 
 .reservation-confirmation .reservation-confirmation-email {
@@ -141,19 +104,67 @@
   pointer-events: none;
 }
 
+/* Option 1, centered ("Confirmed 1280x720") */
+.reservation-confirmation.layout-centered .reservation-confirmation-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 72px 32px 82px;
+  text-align: center;
+}
+
+/* the car a little larger than the card and centred in it, its roof under CONFIRMED */
+.reservation-confirmation.layout-centered .reservation-confirmation-visual img {
+  transform: scale(1.18);
+  transform-origin: 29% 45%;
+}
+
+/* CONFIRMED: thin, wide, a silver gradient from light at the top to grey at the foot */
+.reservation-confirmation.layout-centered .reservation-confirmation-heading {
+  margin: 0;
+  color: #d9d9d9;
+  background-image: linear-gradient(180deg, #f4f4f4 0%, #d6d6d6 48%, #8a8a8a 100%);
+  /* stylelint-disable-next-line property-no-vendor-prefix -- Safari and older Samsung Internet */
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: var(--jsw-pill-font-display);
+  font-size: 84px;
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  -webkit-text-fill-color: transparent;
+}
+
+.reservation-confirmation.layout-centered .reservation-confirmation-details {
+  position: relative;
+  margin-top: auto;
+}
+
+.reservation-confirmation.layout-centered .reservation-confirmation-subheading {
+  margin: 0 0 18px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.reservation-confirmation.layout-centered .reservation-confirmation-line {
+  display: block;
+}
+
 /* tablets: the heading scales with the card */
 @media (max-width: 899.98px) {
-  .reservation-confirmation .reservation-confirmation-card {
+  .reservation-confirmation.layout-centered .reservation-confirmation-card {
     min-height: min(556px, 72vw);
     padding: 7.5vw 24px 7vw;
   }
 
-  .reservation-confirmation .reservation-confirmation-heading {
+  .reservation-confirmation.layout-centered .reservation-confirmation-heading {
     font-size: 8.8vw;
   }
 
   /* the whole car across the card, under the heading, rather than its roof filling it */
-  .reservation-confirmation .reservation-confirmation-visual img {
+  .reservation-confirmation.layout-centered .reservation-confirmation-visual img {
     inset: 90px auto auto 50%;
     width: 110%;
     max-width: none;
@@ -169,21 +180,123 @@
     padding: 16px 12px;
   }
 
-  .reservation-confirmation .reservation-confirmation-card {
+  .reservation-confirmation.layout-centered .reservation-confirmation-card {
     min-height: calc(var(--mg-panel-height, 100svh) - 48px);
     padding: 56px 20px 48px;
   }
 
-  .reservation-confirmation .reservation-confirmation-heading {
+  .reservation-confirmation.layout-centered .reservation-confirmation-heading {
     font-size: 9vw;
   }
 
-  .reservation-confirmation .reservation-confirmation-visual img {
+  .reservation-confirmation.layout-centered .reservation-confirmation-visual img {
     top: 120px;
     width: 125%;
   }
 
-  .reservation-confirmation .reservation-confirmation-subheading {
+  .reservation-confirmation.layout-centered .reservation-confirmation-subheading {
     font-size: 18px;
+  }
+}
+
+/* Option 2, split ("Confirmed opt3"): the same panel, landscape and dark card; the car on the
+   left half, fading into the card, the text on the right half, vertically centred */
+.reservation-confirmation.layout-split .reservation-confirmation-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.reservation-confirmation.layout-split .reservation-confirmation-visual {
+  right: auto;
+  width: 50%;
+  -webkit-mask-image: linear-gradient(90deg, #000 55%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 55%, transparent 100%);
+}
+
+/* the car large, its front running off the card's left edge, as the close-up in the frame */
+.reservation-confirmation.layout-split .reservation-confirmation-visual img {
+  object-position: 29% 50%;
+  transform: scale(1.4);
+  transform-origin: 0 55%;
+}
+
+/* no CONFIRMED in this layout: the heading stays for screen readers and the editor */
+.reservation-confirmation.layout-split .reservation-confirmation-heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.reservation-confirmation.layout-split .reservation-confirmation-details {
+  position: relative;
+  grid-column: 2;
+  padding: 0 40px 0 10px;
+  text-align: left;
+}
+
+.reservation-confirmation.layout-split .reservation-confirmation-subheading {
+  margin: 0 0 16px;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.reservation-confirmation.layout-split .reservation-confirmation-message {
+  max-width: 400px;
+}
+
+.reservation-confirmation.layout-split .reservation-confirmation-email {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* tablets and phones: the car above, the text below it */
+@media (max-width: 899.98px) {
+  .reservation-confirmation.layout-split .reservation-confirmation-card {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    align-items: end;
+    min-height: min(556px, 80vw);
+  }
+
+  .reservation-confirmation.layout-split .reservation-confirmation-visual {
+    inset: 0 0 auto;
+    width: 100%;
+    height: 62%;
+    -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+  }
+
+  .reservation-confirmation.layout-split .reservation-confirmation-visual img {
+    object-position: 50% 50%;
+    transform: none;
+  }
+
+  .reservation-confirmation.layout-split .reservation-confirmation-details {
+    grid-row: 2;
+    grid-column: 1;
+    padding: 0 32px 40px;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .reservation-confirmation.layout-split .reservation-confirmation-card {
+    min-height: calc(var(--mg-panel-height, 100svh) - 48px);
+  }
+
+  .reservation-confirmation.layout-split .reservation-confirmation-visual {
+    height: 58%;
+  }
+
+  .reservation-confirmation.layout-split .reservation-confirmation-details {
+    padding: 0 20px 40px;
+  }
+
+  .reservation-confirmation.layout-split .reservation-confirmation-subheading {
+    font-size: 20px;
   }
 }

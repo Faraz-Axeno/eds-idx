@@ -934,6 +934,23 @@
     "id": "reservation-confirmation",
     "fields": [
       {
+        "component": "select",
+        "valueType": "string",
+        "name": "layoutVariant",
+        "label": "Select Layout Style",
+        "value": "layout-centered",
+        "options": [
+          {
+            "name": "Option 1: Centered Layout",
+            "value": "layout-centered"
+          },
+          {
+            "name": "Option 2: Split Layout (Text on Right)",
+            "value": "layout-split"
+          }
+        ]
+      },
+      {
         "component": "reference",
         "valueType": "string",
         "name": "media_background",

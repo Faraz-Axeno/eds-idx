@@ -2,7 +2,9 @@
  * reservation-confirmation: the JSW confirmation page ("Confirmed"): the full-page landscape,
  * the JSW pill navigation, and a dark card filled by the car with CONFIRMED over it, then the
  * personalised subheading (YOU'RE IN, NAME.) and the confirmation message.
- * Rows (field groups of the model, _reservation-confirmation.json):
+ * Rows (fields and field groups of the model, _reservation-confirmation.json):
+ *   layout  — layoutVariant: layout-centered (default) or layout-split (car left, text right);
+ *             pages made before the option existed have no such row
  *   media   — background image, foreground image
  *   content — heading, subheading, message, the name used when none is known
  *   nav     — logo text, two links, the navigation button
@@ -15,6 +17,8 @@ import { moveInstrumentation } from '../../scripts/scripts.js';
 
 // written by reservation-form.js
 const RESERVATION_KEY = 'jsw-reservation';
+
+const LAYOUTS = ['layout-centered', 'layout-split'];
 
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
@@ -72,6 +76,8 @@ function writeMessage(node, email) {
   node.replaceChildren();
   sentences.map((s) => s.trim()).filter(Boolean).forEach((sentence) => {
     if (sentence.includes('{email}') && !email) return;
+    // a space between the sentences, for the split layout where they run on as one paragraph
+    if (node.childNodes.length) node.append(' ');
     const line = el('span', 'reservation-confirmation-line');
     sentence.split('{email}').forEach((part, i) => {
       if (i) {
@@ -91,7 +97,13 @@ function writeMessage(node, email) {
  */
 export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
-  const [mediaCell, contentCell, navCell] = [...block.children]
+  const rows = [...block.children];
+  // the layout row: the first of four rows, or one holding just a layout value
+  const layoutRow = (rows.length > 3 || /^layout-/.test(rows[0]?.textContent.trim() || ''))
+    ? rows.shift() : null;
+  const chosen = layoutRow?.textContent.trim();
+  const layout = LAYOUTS.includes(chosen) ? chosen : LAYOUTS[0];
+  const [mediaCell, contentCell, navCell] = rows
     .map((row) => row.querySelector(':scope > div') || row);
   const media = fieldsOf(mediaCell);
   const content = fieldsOf(contentCell);
@@ -148,5 +160,7 @@ export default function decorate(block) {
   card.append(heading, details);
   frame.append(nav, card);
   block.replaceChildren(frame);
+  block.classList.remove(...LAYOUTS);
+  block.classList.add(layout);
   if (editing) block.classList.add('reservation-confirmation-editing');
 }
