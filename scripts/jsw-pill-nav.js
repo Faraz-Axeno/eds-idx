@@ -1,0 +1,94 @@
+/*
+ * The JSW pill navigation (as on /jsw-phase-3, "NEV / Hero") for blocks that bring their own:
+ * logo mark + JSW MOTORS wordmark, a list of links, then the white button.
+ * Styles: styles/jsw-pill-nav.css (imported by those blocks' stylesheets).
+ */
+
+// "JSW MOTORS" as in the Figma navbar, letter by letter on its 9-unit cap grid
+const WORDMARK = '<svg viewBox="2 0 166 9" focusable="false" aria-hidden="true" fill="currentColor">'
+  + '<path d="M11 0H16V9H2V7.1H13.6V1.9H11Z"/>'
+  + '<path d="M20 0H35V1.9H22.4V3.55H35V9H20V7.1H32.6V5.45H20Z"/>'
+  + '<path d="M38 0H40.6V9H38ZM50.8 0H53.4V9H50.8ZM44.2 2H46.8L53.2 9H50.6ZM44.2 2H46.8L40.6 9H38Z"/>'
+  + '<path d="M64 0H66.7V9H64ZM77.3 0H80V9H77.3ZM64 0H66.7L73.2 7.2H70.6ZM77.3 0H80L73.4 7.2H70.8Z"/>'
+  + '<path d="M84 0H96.9A1 1 0 0 1 97.9 1V8A1 1 0 0 1 96.9 9H84A1 1 0 0 1 83 8V1A1 1 0 0 1 84 0ZM85.6 1.9V7.1H95.3V1.9Z"/>'
+  + '<path d="M100 0H115.9V1.9H109.1V9H106.3V1.9H100Z"/>'
+  + '<path d="M119 0H131.9A1 1 0 0 1 132.9 1V8A1 1 0 0 1 131.9 9H119A1 1 0 0 1 118 8V1A1 1 0 0 1 119 0ZM120.6 1.9V7.1H130.3V1.9Z"/>'
+  + '<path d="M135 0H137.6V9H135ZM137.6 0H148.8A1 1 0 0 1 149.8 1V5.4H147.2V1.9H137.6ZM140 3.6H149.8V5.4H140ZM140.2 5.4H143.2L149.6 9H145.7Z"/>'
+  + '<path d="M153 0H168V1.9H155.4V3.55H168V9H153V7.1H165.6V5.45H153Z"/>'
+  + '</svg>';
+
+// the JSW mark: an oval ring crossed by a leaf and, just below it, a band
+const LOGO_MARK = '<svg viewBox="59.4 33.4 40.2 26" focusable="false" fill="currentColor">'
+  + '<ellipse cx="79.4" cy="46.9" rx="18.7" ry="12.4" transform="rotate(-3 79.4 46.9)" fill="none" stroke="currentColor" stroke-width="2.2"/>'
+  + '<path d="M68.4 50.4C70.2 46.6 74.8 44.2 80.5 42.2C86.5 39.8 92 36.6 97.6 33.2C93.4 37.6 88.6 42 83 45.2C78 48 73 50 68.4 50.4Z"/>'
+  + '<path d="M60.3 58.4C64.5 55.4 69 53 73.5 51C81 47.6 88.5 43.4 95.6 39C96 39.8 96.5 40.8 96.9 41.8C89.5 46.6 82 50.8 74.5 54.4C69.5 56.6 64.5 58.2 60.3 58.4Z"/>'
+  + '</svg>';
+
+/** a plain link: the site's button decoration (scripts.js decorateButtons) taken off */
+function plain(a) {
+  a.classList.remove('button', 'primary', 'secondary', 'accent');
+  a.closest('p')?.classList.remove('button-container', 'button-wrapper');
+  return a;
+}
+
+/**
+ * builds the pill navigation from authored parts, moved in with their editor instrumentation:
+ * @param {Object} parts
+ * @param {Element} [parts.brand] the logo text (JSW MOTORS is drawn as the wordmark)
+ * @param {Element[]} [parts.links] the links, left to right
+ * @param {Element} [parts.cta] the button link
+ * @returns {Element} the <nav>
+ */
+export default function buildPillNav({ brand, links = [], cta } = {}) {
+  const nav = document.createElement('nav');
+  nav.className = 'jsw-pill-nav';
+  nav.setAttribute('aria-label', 'Main');
+  const inner = document.createElement('div');
+  inner.className = 'jsw-pill-nav-inner';
+  nav.append(inner);
+
+  // the logo: home is the page the links point to (e.g. /jsw-phase-3), else the site root
+  const name = brand?.textContent.trim() || 'JSW MOTORS';
+  const firstLink = links.find((a) => a?.getAttribute('href'));
+  let homePath = '/';
+  try {
+    if (firstLink) homePath = new URL(firstLink.href, window.location.href).pathname || '/';
+  } catch (e) { /* keep the root */ }
+  const home = document.createElement('a');
+  home.className = 'jsw-pill-nav-brand';
+  home.href = homePath;
+  home.setAttribute('aria-label', `${name} home`);
+  const mark = document.createElement('span');
+  mark.className = 'jsw-pill-nav-mark';
+  mark.setAttribute('aria-hidden', 'true');
+  mark.innerHTML = LOGO_MARK;
+  const label = document.createElement('span');
+  label.className = 'jsw-pill-nav-brand-text';
+  if (name.toUpperCase() === 'JSW MOTORS') {
+    label.classList.add('jsw-pill-nav-wordmark');
+    label.innerHTML = WORDMARK;
+  } else label.textContent = name;
+  home.append(mark, label);
+  const brandWrap = brand || document.createElement('p');
+  brandWrap.replaceChildren(home);
+  brandWrap.classList.add('jsw-pill-nav-brand-wrap');
+  inner.append(brandWrap);
+
+  const list = document.createElement('ul');
+  list.className = 'jsw-pill-nav-links';
+  links.filter(Boolean).forEach((a) => {
+    const li = document.createElement('li');
+    li.append(plain(a));
+    list.append(li);
+  });
+  if (list.children.length) inner.append(list);
+
+  if (cta) {
+    const wrap = document.createElement('p');
+    wrap.className = 'jsw-pill-nav-cta-wrap';
+    plain(cta).classList.add('jsw-pill-nav-cta');
+    wrap.append(cta);
+    inner.append(wrap);
+  }
+  return nav;
+}

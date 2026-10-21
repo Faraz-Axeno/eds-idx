@@ -1,0 +1,189 @@
+@import url('../../styles/jsw-pill-nav.css');
+
+/*
+ * reservation-confirmation: values from the "Confirmed 1280x720" frame. The same rounded panel
+ * and landscape as reservation-form; the card is 956 x 556, 107px from the top, the car filling
+ * it, CONFIRMED (84px, metallic) over its roof and the text centred near its foot.
+ */
+
+.reservation-confirmation {
+  box-sizing: border-box;
+  min-height: var(--mg-panel-height, 100svh);
+  padding: 8px;
+  color: #fff;
+  background-color: #050505;
+  font-family: inter, 'Helvetica Neue', arial, sans-serif;
+}
+
+.reservation-confirmation .reservation-confirmation-frame {
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--mg-panel-height, 100svh) - 16px);
+  padding: 90px 24px 40px;
+  overflow: hidden;
+  border-radius: 24px;
+  background-color: #97b5cd;
+}
+
+.reservation-confirmation .reservation-confirmation-background,
+.reservation-confirmation .reservation-confirmation-background img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* the navigation 26px from the top of the screen (18px into the inset panel) */
+@media (min-width: 600px) {
+  .reservation-confirmation .jsw-pill-nav {
+    top: 18px;
+  }
+}
+
+.reservation-confirmation .reservation-confirmation-card {
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(956px, 100%);
+  min-height: 556px;
+  padding: 72px 32px 82px;
+  overflow: hidden;
+  border-radius: 24px;
+  background-color: #000;
+  text-align: center;
+}
+
+.reservation-confirmation .reservation-confirmation-visual,
+.reservation-confirmation .reservation-confirmation-visual img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+/* the car a little larger than the card and centred in it, its roof under CONFIRMED */
+.reservation-confirmation .reservation-confirmation-visual img {
+  transform: scale(1.18);
+  transform-origin: 29% 45%;
+}
+
+/* CONFIRMED: thin, wide, a silver gradient from light at the top to grey at the foot */
+.reservation-confirmation .reservation-confirmation-heading {
+  margin: 0;
+  color: #d9d9d9;
+  background-image: linear-gradient(180deg, #f4f4f4 0%, #d6d6d6 48%, #8a8a8a 100%);
+  /* stylelint-disable-next-line property-no-vendor-prefix -- Safari and older Samsung Internet */
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: var(--jsw-pill-font-display);
+  font-size: 84px;
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  -webkit-text-fill-color: transparent;
+}
+
+.reservation-confirmation .reservation-confirmation-details {
+  position: relative;
+  margin-top: auto;
+}
+
+.reservation-confirmation .reservation-confirmation-subheading {
+  margin: 0 0 18px;
+  font-family: var(--jsw-pill-font-display);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.reservation-confirmation .reservation-confirmation-message {
+  margin: 0;
+  color: #8c8c8c;
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.reservation-confirmation .reservation-confirmation-line {
+  display: block;
+}
+
+.reservation-confirmation .reservation-confirmation-email {
+  color: #fff;
+}
+
+/* the name used when none is known: hidden published; in Universal Editor it lies invisibly
+   over the text, so picking it in the content tree outlines it */
+.reservation-confirmation .reservation-confirmation-settings {
+  display: none;
+}
+
+.reservation-confirmation.reservation-confirmation-editing .reservation-confirmation-settings {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* tablets: the heading scales with the card */
+@media (max-width: 899.98px) {
+  .reservation-confirmation .reservation-confirmation-card {
+    min-height: min(556px, 72vw);
+    padding: 7.5vw 24px 7vw;
+  }
+
+  .reservation-confirmation .reservation-confirmation-heading {
+    font-size: 8.8vw;
+  }
+
+  /* the whole car across the card, under the heading, rather than its roof filling it */
+  .reservation-confirmation .reservation-confirmation-visual img {
+    inset: 90px auto auto 50%;
+    width: 110%;
+    max-width: none;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    transform: translateX(-50%);
+  }
+}
+
+/* phones: a taller card, the car centred behind the text */
+@media (max-width: 599.98px) {
+  .reservation-confirmation .reservation-confirmation-frame {
+    padding: 16px 12px;
+  }
+
+  .reservation-confirmation .reservation-confirmation-card {
+    min-height: calc(var(--mg-panel-height, 100svh) - 48px);
+    padding: 56px 20px 48px;
+  }
+
+  .reservation-confirmation .reservation-confirmation-heading {
+    font-size: 9vw;
+  }
+
+  .reservation-confirmation .reservation-confirmation-visual img {
+    top: 120px;
+    width: 125%;
+  }
+
+  .reservation-confirmation .reservation-confirmation-subheading {
+    font-size: 18px;
+  }
+}

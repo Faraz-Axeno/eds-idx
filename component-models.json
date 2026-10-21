@@ -929,5 +929,252 @@
         ]
       }
     ]
+  },
+  {
+    "id": "reservation-confirmation",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "media_background",
+        "label": "Background image",
+        "description": "Full-page landscape behind the card.",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_backgroundAlt",
+        "label": "Background image alt",
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "media_foreground",
+        "label": "Foreground image",
+        "description": "The car filling the card, behind the text.",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_foregroundAlt",
+        "label": "Foreground image alt",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_heading",
+        "label": "Main heading",
+        "value": "CONFIRMED"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_subheading",
+        "label": "Personalized subheading",
+        "description": "{name} is replaced by the first name entered on the reservation form.",
+        "value": "YOU'RE IN, {name}."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_message",
+        "label": "Confirmation message",
+        "description": "Each sentence is shown on its own line. {email} is replaced by the email entered on the form (that sentence is left out when there is none).",
+        "value": "We’ll message you when allocation opens. Your receipt is on its way to {email}."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_fallbackName",
+        "label": "Name when none is known",
+        "description": "Used for {name} when the page is opened without the form (e.g. THERE).",
+        "value": "THERE"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_brand",
+        "label": "Navigation: logo text",
+        "description": "JSW MOTORS is shown as the JSW logo.",
+        "value": "JSW MOTORS"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_link1",
+        "label": "Navigation: first link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_link1Text",
+        "label": "Navigation: first link text",
+        "value": "NEV TECH"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_link2",
+        "label": "Navigation: second link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_link2Text",
+        "label": "Navigation: second link text",
+        "value": "NEWSROOM"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_cta",
+        "label": "Navigation: button link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_ctaText",
+        "label": "Navigation: button text",
+        "value": "REGISTER INTEREST"
+      }
+    ]
+  },
+  {
+    "id": "reservation-form",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "media_background",
+        "label": "Background image",
+        "description": "Full-page landscape behind the card.",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_backgroundAlt",
+        "label": "Background image alt",
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "media_foreground",
+        "label": "Foreground image",
+        "description": "The car shown on the left half of the card.",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_foregroundAlt",
+        "label": "Foreground image alt",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_heading",
+        "label": "Heading",
+        "value": "RESERVE NOW"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_subheading",
+        "label": "Subheading",
+        "value": "Allocation opens December 2026. Cars are assigned in the order reservations are placed."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_disclaimer",
+        "label": "Disclaimer text",
+        "description": "The small print below the button.",
+        "value": "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "form_action",
+        "label": "Form action URL",
+        "description": "Where the form data will be sent. Not used yet: the button currently goes straight to the Button link.",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "form_cities",
+        "label": "City options",
+        "description": "The cities in the Select City list, separated by commas.",
+        "value": "Mumbai, Delhi, Bengaluru, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "form_button",
+        "label": "Button link",
+        "description": "The page the button opens after the form is filled in (the confirmation page)."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "form_buttonText",
+        "label": "Button text",
+        "value": "PROCEED"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_brand",
+        "label": "Navigation: logo text",
+        "description": "JSW MOTORS is shown as the JSW logo.",
+        "value": "JSW MOTORS"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_link1",
+        "label": "Navigation: first link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_link1Text",
+        "label": "Navigation: first link text",
+        "value": "NEV TECH"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_link2",
+        "label": "Navigation: second link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_link2Text",
+        "label": "Navigation: second link text",
+        "value": "NEWSROOM"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_cta",
+        "label": "Navigation: button link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_ctaText",
+        "label": "Navigation: button text",
+        "value": "REGISTER INTEREST"
+      }
+    ]
   }
 ]

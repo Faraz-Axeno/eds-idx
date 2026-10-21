@@ -1,0 +1,143 @@
+/*
+ * The JSW pill navigation (scripts/jsw-pill-nav.js) and the JSW faces, for blocks that bring
+ * their own navigation (reservation-form, reservation-confirmation). Imported by their
+ * stylesheets. Values from the "NEV / Hero", "Opt 2 / Reserve" and "Confirmed" frames:
+ * 672 x 42, 26px from the top, 11px corners.
+ */
+
+/* the display face: New Science (Adobe Fonts, once its web project is added in
+   styles/styles.css), else Michroma, the site's wide display face */
+@font-face {
+  font-family: Michroma;
+  font-display: swap;
+  src: url('../fonts/michroma.woff2') format('woff2');
+}
+
+:root {
+  --jsw-pill-font-display: new-science, michroma, sequel, 'Helvetica Neue', arial, sans-serif;
+  --jsw-pill-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
+}
+
+.jsw-pill-nav {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 3;
+  width: min(672px, calc(100% - 24px));
+  transform: translateX(-50%);
+}
+
+/* the pill: over the blue landscape it reads slate (#54697c): black at 42% */
+.jsw-pill-nav .jsw-pill-nav-inner {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  height: 42px;
+  padding: 0 6px 0 12px;
+  border-radius: 11px;
+  color: #fff;
+  background-color: rgb(0 0 0 / 42%);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.jsw-pill-nav p {
+  margin: 0;
+}
+
+.jsw-pill-nav .jsw-pill-nav-brand-wrap {
+  display: flex;
+  margin-right: auto;
+}
+
+.jsw-pill-nav a:any-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.jsw-pill-nav .jsw-pill-nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.jsw-pill-nav .jsw-pill-nav-mark {
+  display: block;
+  flex: none;
+  width: 28px;
+  height: 18px;
+}
+
+.jsw-pill-nav .jsw-pill-nav-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.jsw-pill-nav .jsw-pill-nav-brand-text {
+  font-family: var(--jsw-pill-font-display);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.jsw-pill-nav .jsw-pill-nav-wordmark svg {
+  display: block;
+  width: auto;
+  height: 6px;
+}
+
+.jsw-pill-nav .jsw-pill-nav-links {
+  display: none;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jsw-pill-nav .jsw-pill-nav-links a {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.jsw-pill-nav .jsw-pill-nav-links a:hover {
+  opacity: 0.7;
+}
+
+.jsw-pill-nav a.jsw-pill-nav-cta:any-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 142px;
+  height: 28px;
+  padding: 0 14px;
+  border-radius: 6px;
+  color: #111;
+  background-color: #fff;
+  font-family: var(--jsw-pill-font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* phones: no navigation, as on /jsw-phase-3 */
+@media (max-width: 599.98px) {
+  .jsw-pill-nav {
+    display: none;
+  }
+}
+
+@media (min-width: 600px) {
+  .jsw-pill-nav {
+    top: 26px;
+  }
+
+  .jsw-pill-nav .jsw-pill-nav-links {
+    display: flex;
+  }
+}

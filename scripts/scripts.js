@@ -405,6 +405,8 @@ const STANDALONE_PAGES = [
   { block: 'immersive-hero', bodyClass: 'jsw-phase-3', css: 'jsw-phase-3.css' },
   { block: 'jsw-sustainability', bodyClass: 'jsw-sustainability' },
   { block: 'parallax-collage', bodyClass: 'jsw-nev-collage' },
+  { block: 'reservation-form', bodyClass: 'jsw-reservation' },
+  { block: 'reservation-confirmation', bodyClass: 'jsw-reservation' },
 ];
 
 /**

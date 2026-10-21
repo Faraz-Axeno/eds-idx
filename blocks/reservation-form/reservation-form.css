@@ -1,0 +1,288 @@
+@import url('../../styles/jsw-pill-nav.css');
+
+/*
+ * reservation-form: values from the "Opt 2 / Reserve 1280x720" frame. The page is a rounded
+ * panel inset on the dark page (as the JSW light panels) with the landscape behind; the card is
+ * 956 x 556, 107px from the top: the car on its left 435px, the form on the right (36px in).
+ */
+
+.reservation-form {
+  box-sizing: border-box;
+  min-height: var(--mg-panel-height, 100svh);
+  padding: 8px;
+  color: #111;
+  background-color: #050505;
+  font-family: inter, 'Helvetica Neue', arial, sans-serif;
+}
+
+.reservation-form .reservation-form-frame {
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--mg-panel-height, 100svh) - 16px);
+  padding: 90px 24px 40px;
+  overflow: hidden;
+  border-radius: 24px;
+  background-color: #97b5cd;
+}
+
+.reservation-form .reservation-form-background,
+.reservation-form .reservation-form-background img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* the navigation 26px from the top of the screen (18px into the inset panel) */
+@media (min-width: 600px) {
+  .reservation-form .jsw-pill-nav {
+    top: 18px;
+  }
+}
+
+.reservation-form .reservation-form-card {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 435fr 521fr;
+  width: min(956px, 100%);
+  min-height: 556px;
+  overflow: hidden;
+  border-radius: 24px;
+  background-color: #fff;
+}
+
+/* the car: its front and roof, as in the frame */
+.reservation-form .reservation-form-visual {
+  position: relative;
+  min-height: 220px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.reservation-form .reservation-form-visual picture,
+.reservation-form .reservation-form-visual img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+/* desktop: zoomed in on the windscreen and roof rail (the 2560 x 1440 car shot at 137% of the
+   card's height, its first roof light 70% across the panel) */
+@media (min-width: 900px) {
+  .reservation-form .reservation-form-visual img {
+    top: -12.4%;
+    left: -80%;
+    width: auto;
+    max-width: none;
+    height: 137%;
+  }
+}
+
+.reservation-form .reservation-form-body {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 36px 36px;
+}
+
+.reservation-form .reservation-form-heading {
+  margin: 0 0 10px;
+  font-family: var(--jsw-pill-font-display);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.reservation-form .reservation-form-subheading {
+  margin: 0 0 20px;
+  color: #666;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.reservation-form .reservation-form-fields {
+  position: relative;
+  display: grid;
+  gap: 13px;
+  margin: 0;
+}
+
+.reservation-form .reservation-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.reservation-form .reservation-form-phone {
+  grid-template-columns: 55px minmax(0, 1fr);
+}
+
+/* the fields: 46px tall, #f2f2f2, 6px corners, light grey placeholders */
+.reservation-form .reservation-form-input,
+.reservation-form .reservation-form-prefix {
+  box-sizing: border-box;
+  width: 100%;
+  height: 46px;
+  margin: 0;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #111;
+  background-color: #f2f2f2;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 44px;
+  transition: border-color 0.2s ease;
+}
+
+.reservation-form .reservation-form-input::placeholder {
+  color: #b7b7b7;
+  opacity: 1;
+}
+
+.reservation-form .reservation-form-input:focus {
+  border-color: #c9c9c9;
+  outline: none;
+}
+
+.reservation-form .reservation-form-input:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 1px;
+}
+
+/* a field left empty or wrong is outlined once the button has been tried */
+.reservation-form .reservation-form-fields.is-checked .reservation-form-input:invalid {
+  border-color: #d64545;
+}
+
+.reservation-form .reservation-form-prefix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #b7b7b7;
+}
+
+/* the city list: its own chevron, grey until a city is picked */
+.reservation-form .reservation-form-select select {
+  padding-right: 44px;
+  color: #b7b7b7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23111' stroke-width='1.4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  cursor: pointer;
+  appearance: none;
+}
+
+.reservation-form .reservation-form-select select.is-chosen {
+  color: #111;
+}
+
+.reservation-form .reservation-form-select option {
+  color: #111;
+}
+
+/* the button: 126 x 46, black, 34px below the fields */
+.reservation-form .reservation-form-submit {
+  justify-self: start;
+  min-width: 126px;
+  height: 46px;
+  margin: 21px 0 0;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  background-color: #000;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.reservation-form .reservation-form-submit:hover {
+  background-color: #2a2a2a;
+}
+
+.reservation-form .reservation-form-submit:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 3px;
+}
+
+.reservation-form .reservation-form-disclaimer {
+  max-width: 420px;
+  margin: 22px 0 0;
+  color: #707070;
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+/* settings that are not shown (action URL, cities, the button link): published they are
+   hidden; in Universal Editor they lie invisibly over the form, so picking one outlines it */
+.reservation-form .reservation-form-settings {
+  display: none;
+}
+
+.reservation-form.reservation-form-editing .reservation-form-settings {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* tablets and phones: the car above the form */
+@media (max-width: 899.98px) {
+  .reservation-form .reservation-form-card {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .reservation-form .reservation-form-visual {
+    min-height: 0;
+    aspect-ratio: 16 / 7;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .reservation-form .reservation-form-frame {
+    padding: 16px 12px;
+  }
+
+  .reservation-form .reservation-form-body {
+    padding: 28px 20px 24px;
+  }
+
+  .reservation-form .reservation-form-heading {
+    font-size: 22px;
+  }
+
+  .reservation-form .reservation-form-subheading {
+    margin-bottom: 22px;
+  }
+
+  .reservation-form .reservation-form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .reservation-form .reservation-form-phone {
+    grid-template-columns: 55px minmax(0, 1fr);
+  }
+
+  .reservation-form .reservation-form-submit {
+    width: 100%;
+  }
+}
