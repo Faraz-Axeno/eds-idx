@@ -458,15 +458,15 @@ export default function decorate(block) {
     const tab = el('button', 'hotspot-showcase-thumb', {
       type: 'button', role: 'tab', id: `${id}-tab-${i}`, 'aria-controls': row.id, 'aria-label': title,
     });
-    const fields = []; // [authored field, () => what shows it, clickable on the canvas]
+    const fields = []; // [authored field, what shows it (see placeFields), clickable on the canvas]
     if (editing) {
-      if (mediaCell) fields.push([mediaCell, () => tab, true]);
+      if (mediaCell) fields.push([mediaCell, 'thumbnail', true]);
       if (split) {
-        fields.push([titleCell, () => text?.querySelector('h3'), true]);
-        fields.push([descriptionCell, () => [...(text?.querySelectorAll('p') || [])], true]);
-      } else if (textCell) fields.push([textCell, () => text, true]);
+        fields.push([titleCell, 'title', true]);
+        fields.push([descriptionCell, 'description', true]);
+      } else if (textCell) fields.push([textCell, 'text', true]);
       // the hotspots field sits over the image, letting clicks through to the image and the +
-      if (hotCell) fields.push([hotCell, () => figure, false]);
+      if (hotCell) fields.push([hotCell, 'image', false]);
       fields.forEach(([cell, , clickable]) => {
         cell.classList.add('hotspot-showcase-field');
         cell.classList.toggle('hotspot-showcase-field-passive', !clickable);
@@ -492,21 +492,47 @@ export default function decorate(block) {
     }
     thumbs.append(tab);
     return {
-      row, text, tab, fields,
+      row, text, tab, figure, fields,
     };
   });
 
+  let current = 0;
   /**
    * Universal Editor: lays each powertrain's authored fields over what shows them (the title
    * and description in the copy column, the thumbnail in the tray, the hotspots over the
-   * image), in the row's own coordinates; those not shown (another powertrain's text) shrink
+   * image), in the row's own coordinates
    */
   const placeFields = () => {
-    items.forEach(({ row, fields }) => {
-      const base = row.getBoundingClientRect();
-      fields.forEach(([cell, shownBy]) => {
-        const boxes = [shownBy()].flat().filter(Boolean).map((node) => node.getBoundingClientRect())
-          .filter((box) => box.width && box.height);
+    // only the powertrain shown has its text and image on screen: every powertrain's text and
+    // hotspots fields sit over those (the slots the editor will show them in once picked, as
+    // it measures a field before saying which one it picked), its thumbnail over its own
+    const shown = items[current];
+    // a powertrain's image keeps its size while hidden (its row is only moved out of view):
+    // its hotspots field goes where the image sits once shown, in the place of the shown row
+    const rest = shown?.row.getBoundingClientRect();
+    const atRest = (item, box) => {
+      const base = item.row.getBoundingClientRect();
+      const dx = rest.left - base.left;
+      const dy = rest.top - base.top;
+      return {
+        left: box.left + dx, top: box.top + dy, right: box.right + dx, bottom: box.bottom + dy,
+      };
+    };
+    const target = (item, kind) => ({
+      thumbnail: [item.tab],
+      title: [shown?.text?.querySelector('h3')],
+      description: [...(shown?.text?.querySelectorAll('p') || [])],
+      text: [shown?.text],
+      image: [item.figure],
+    })[kind].filter(Boolean).map((node) => {
+      const box = node.getBoundingClientRect();
+      if (!box.width || !box.height) return null;
+      return kind === 'image' ? atRest(item, box) : box;
+    }).filter(Boolean);
+    items.forEach((item) => {
+      const base = item.row.getBoundingClientRect();
+      item.fields.forEach(([cell, kind]) => {
+        const boxes = target(item, kind);
         const left = Math.min(...boxes.map((box) => box.left));
         const top = Math.min(...boxes.map((box) => box.top));
         const right = Math.max(...boxes.map((box) => box.right));
@@ -523,7 +549,6 @@ export default function decorate(block) {
     });
   };
 
-  let current = 0;
   /**
    * the images move like a vertical carousel (hotspot-showcase.css): picking a thumbnail to
    * the right pushes the current image up and out while the new one rises from the bottom;

@@ -210,6 +210,14 @@
   pointer-events: auto;
 }
 
+/* the thumbnail field's own image covers its box, so a click on the thumbnail selects it */
+.hotspot-showcase.hotspot-showcase-editing .hotspot-showcase-panel > .hotspot-showcase-field img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .hotspot-showcase.hotspot-showcase-editing .hotspot-showcase-field-passive,
 .hotspot-showcase.hotspot-showcase-previewing .hotspot-showcase-field {
   pointer-events: none;
