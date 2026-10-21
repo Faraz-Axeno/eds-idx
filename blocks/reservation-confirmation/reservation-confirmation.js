@@ -89,6 +89,27 @@ function writeMessage(node) {
 }
 
 /**
+ * Universal Editor: while the author types in the text on the page (the editor makes it
+ * contenteditable) it shows {NAME} / {email} as authored, so they are saved, not the filled-in
+ * name and email; once the editing ends the text is filled in again
+ */
+function keepTokensWhileEditing(node, authored, fill) {
+  let raw = authored;
+  let showingRaw = false;
+  new MutationObserver(() => {
+    const typing = node.isContentEditable;
+    if (typing && !showingRaw) {
+      showingRaw = true;
+      node.textContent = raw;
+    } else if (!typing && showingRaw) {
+      showingRaw = false;
+      raw = node.textContent;
+      fill();
+    }
+  }).observe(node, { attributes: true, attributeFilter: ['contenteditable'] });
+}
+
+/**
  * loads and decorates the block
  * @param {Element} block The block element
  */
@@ -128,10 +149,15 @@ export default function decorate(block) {
   const subheading = retag(content.text('content_subheading', 1), 'p', 'reservation-confirmation-subheading');
   const message = retag(content.text('content_message', 2), 'p', 'reservation-confirmation-message');
 
-  // published: the tokens filled in; in the editor the authored text exactly as typed
-  if (!editing) {
-    subheading.replaceChildren(withTokens(subheading.textContent));
-    writeMessage(message);
+  // the tokens filled in, published and in the editor alike
+  const rawSubheading = subheading.textContent;
+  const rawMessage = message.textContent;
+  const fillSubheading = () => subheading.replaceChildren(withTokens(subheading.textContent));
+  fillSubheading();
+  writeMessage(message);
+  if (editing) {
+    keepTokensWhileEditing(subheading, rawSubheading, fillSubheading);
+    keepTokensWhileEditing(message, rawMessage, () => writeMessage(message));
   }
   details.append(subheading, message);
 
