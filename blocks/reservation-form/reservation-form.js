@@ -173,7 +173,9 @@ export default function decorate(block) {
     : (citiesField?.textContent || '').split(',');
   const cities = listed.map((c) => c.trim()).filter(Boolean);
   const rowCities = cityRows.map((row) => row.textContent.trim()).filter(Boolean);
-  (cities.length ? cities : rowCities)
+  // each word starting with a capital letter, whatever the author typed (navi mumbai: Navi Mumbai)
+  const capitalised = (name) => name.replace(/(^|\s)(\S)/g, (m, space, letter) => space + letter.toUpperCase());
+  (cities.length ? cities : rowCities).map(capitalised)
     .forEach((name) => {
       const option = el('option', '', { value: name });
       option.textContent = name;
