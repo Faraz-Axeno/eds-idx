@@ -6,9 +6,14 @@
  * Rows (field groups of the model, _reservation-form.json):
  *   media   — background image, foreground image
  *   content — heading, subheading, disclaimer
- *   form    — form action URL, button (link + text)
+ *   form    — form action URL, city options (a multi-value field: a list, or comma-separated
+ *             text where multi-field rendering is off), button (link + text)
  *   fields  — the placeholders of first name, last name, mobile, email and the city list
- *   then one row per City Option item: the cities of the list
+ *   (rows after these are City Option items of the earlier model: used when the city options
+ *   field is empty)
+ * In Universal Editor each placeholder field's instrumentation is on its input (the city list
+ * placeholder on the select, the city options on the select's box), so picking the field in
+ * the content tree outlines that input.
  * The button checks the form, keeps the visitor's first name and email in sessionStorage (for
  * a later personalised confirmation page) and opens the button link.
  */
@@ -27,7 +32,7 @@ const PLACEHOLDERS = {
   city: 'Select City',
 };
 
-// the city list of blocks without City Option items (pages made before the items existed)
+// the city list when none is authored (blocks made before the city options existed)
 const DEFAULT_CITIES = ['Mumbai', 'Delhi', 'Bengaluru', 'Hyderabad', 'Chennai', 'Pune', 'Kolkata', 'Ahmedabad'];
 
 function el(tag, className, attrs = {}) {
@@ -126,7 +131,14 @@ export default function decorate(block) {
   const disclaimer = retag(content.text('content_disclaimer', 2), 'p', 'reservation-form-disclaimer');
 
   // the form; the authored button link is where it leads, the action URL is kept for later
-  const actionField = config.text('form_action', 0);
+  // published the action URL and comma-separated city options are told apart by their text
+  const configTexts = [...(formCell?.querySelectorAll('p') || [])]
+    .filter((p) => !p.querySelector('a') && p.textContent.trim());
+  const isUrl = (p) => /^(https?:\/\/|\/)\S*$/.test(p.textContent.trim());
+  const named = (name) => formCell?.querySelector(`[data-aue-prop="${name}"]`);
+  const actionField = named('form_action') || configTexts.find(isUrl) || null;
+  const citiesField = named('form_cities') || formCell?.querySelector('ul, ol')
+    || configTexts.find((p) => p !== actionField) || null;
   const buttonLink = config.link('form_button', 0);
   const form = el('form', 'reservation-form-fields', { novalidate: '' });
   const action = actionField?.textContent.trim();
@@ -139,16 +151,16 @@ export default function decorate(block) {
     .map(([key, node]) => [key, node?.textContent.trim() || PLACEHOLDERS[key]]));
 
   const names = el('div', 'reservation-form-row');
-  names.append(
-    input('firstName', placeholderText.firstName, true, { autocomplete: 'given-name' }),
-    input('lastName', placeholderText.lastName, true, { autocomplete: 'family-name' }),
-  );
+  const firstName = input('firstName', placeholderText.firstName, true, { autocomplete: 'given-name' });
+  const lastName = input('lastName', placeholderText.lastName, true, { autocomplete: 'family-name' });
+  names.append(firstName, lastName);
   const phone = el('div', 'reservation-form-row reservation-form-phone');
   const prefix = el('span', 'reservation-form-prefix', { 'aria-hidden': 'true' });
   prefix.textContent = '+91';
-  phone.append(prefix, input('mobile', placeholderText.mobile, true, {
+  const mobile = input('mobile', placeholderText.mobile, true, {
     type: 'tel', inputmode: 'numeric', autocomplete: 'tel-national', pattern: '[6-9][0-9]{9}', maxlength: '10',
-  }));
+  });
+  phone.append(prefix, mobile);
   const email = input('email', placeholderText.email, false, { type: 'email', autocomplete: 'email' });
 
   const cityWrap = el('div', 'reservation-form-select');
@@ -157,9 +169,13 @@ export default function decorate(block) {
   placeholder.textContent = placeholderText.city;
   placeholder.selected = true;
   city.append(placeholder);
-  // one option per City Option item
-  const authoredCities = cityRows.map((row) => row.textContent.trim()).filter(Boolean);
-  (cityRows.length ? authoredCities : DEFAULT_CITIES)
+  // one option per city: the city options field, else City Option rows, else the defaults
+  const listed = citiesField?.querySelectorAll('li').length
+    ? [...citiesField.querySelectorAll('li')].map((li) => li.textContent)
+    : (citiesField?.textContent || '').split(',');
+  const cities = listed.map((c) => c.trim()).filter(Boolean);
+  const rowCities = cityRows.map((row) => row.textContent.trim()).filter(Boolean);
+  [cities, rowCities, DEFAULT_CITIES].find((list) => list.length)
     .forEach((name) => {
       const option = el('option', '', { value: name });
       option.textContent = name;
@@ -174,12 +190,25 @@ export default function decorate(block) {
   if (buttonLink) moveInstrumentation(buttonLink, submit);
   form.append(names, phone, email, cityWrap, submit);
 
-  // the authored settings that are not shown (action URL, the button link itself, the
-  // placeholders and the City Option items) stay in the block: in the editor they lie over the
-  // form, so picking one (or a City Option in the content tree) outlines the form
+  // the editor instrumentation of the placeholders and city options onto what they set; the
+  // authored elements themselves are then dropped
+  const targets = {
+    firstName, lastName, mobile, email, city,
+  };
+  placeholderNodes.forEach(([key, node]) => {
+    if (!node) return;
+    moveInstrumentation(node, targets[key]);
+    node.remove();
+  });
+  if (citiesField) {
+    moveInstrumentation(citiesField, cityWrap);
+    citiesField.remove();
+  }
+
+  // the authored settings that are not shown (action URL, the button link itself, City Option
+  // rows of the earlier model) stay in the block: in the editor they lie over the form
   const settings = el('div', 'reservation-form-settings', { 'aria-hidden': 'true' });
-  [actionField, buttonLink?.closest('p') || buttonLink, ...placeholderNodes.map(([, n]) => n),
-    ...cityRows]
+  [actionField, buttonLink?.closest('p') || buttonLink, ...cityRows]
     .filter((node) => node && node.isConnected).forEach((node) => settings.append(node));
   form.append(settings);
 
