@@ -992,71 +992,16 @@
         "valueType": "string",
         "name": "content_subheading",
         "label": "Personalized subheading",
-        "description": "{name} is replaced by the first name entered on the reservation form.",
-        "value": "YOU'RE IN, {name}."
+        "description": "Type {NAME} where the visitor's name goes, braces included; it is kept as written and filled in on the page.",
+        "value": "YOU’RE IN, {NAME}."
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "content_message",
         "label": "Confirmation message",
-        "description": "Each sentence is shown on its own line. {email} is replaced by the email entered on the form (that sentence is left out when there is none).",
+        "description": "Each sentence is shown on its own line. Type {email} where the visitor's email goes, braces included; it is kept as written and filled in on the page.",
         "value": "We’ll message you when allocation opens. Your receipt is on its way to {email}."
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "content_fallbackName",
-        "label": "Name when none is known",
-        "description": "Used for {name} when the page is opened without the form (e.g. THERE).",
-        "value": "THERE"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "nav_brand",
-        "label": "Navigation: logo text",
-        "description": "JSW MOTORS is shown as the JSW logo.",
-        "value": "JSW MOTORS"
-      },
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "nav_link1",
-        "label": "Navigation: first link"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "nav_link1Text",
-        "label": "Navigation: first link text",
-        "value": "NEV TECH"
-      },
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "nav_link2",
-        "label": "Navigation: second link"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "nav_link2Text",
-        "label": "Navigation: second link text",
-        "value": "NEWSROOM"
-      },
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "nav_cta",
-        "label": "Navigation: button link"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "nav_ctaText",
-        "label": "Navigation: button text",
-        "value": "REGISTER INTEREST"
       }
     ]
   },
@@ -1124,14 +1069,6 @@
         "value": ""
       },
       {
-        "component": "text",
-        "valueType": "string",
-        "name": "form_cities",
-        "label": "City options",
-        "description": "The cities in the Select City list, separated by commas.",
-        "value": "Mumbai, Delhi, Bengaluru, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad"
-      },
-      {
         "component": "aem-content",
         "valueType": "string",
         "name": "form_button",
@@ -1148,49 +1085,51 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_brand",
-        "label": "Navigation: logo text",
-        "description": "JSW MOTORS is shown as the JSW logo.",
-        "value": "JSW MOTORS"
-      },
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "nav_link1",
-        "label": "Navigation: first link"
+        "name": "fields_firstNamePlaceholder",
+        "label": "First name placeholder",
+        "value": "First Name*"
       },
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_link1Text",
-        "label": "Navigation: first link text",
-        "value": "NEV TECH"
-      },
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "nav_link2",
-        "label": "Navigation: second link"
+        "name": "fields_lastNamePlaceholder",
+        "label": "Last name placeholder",
+        "value": "Last Name*"
       },
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_link2Text",
-        "label": "Navigation: second link text",
-        "value": "NEWSROOM"
-      },
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "nav_cta",
-        "label": "Navigation: button link"
+        "name": "fields_mobilePlaceholder",
+        "label": "Mobile number placeholder",
+        "value": "Mobile Number*"
       },
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_ctaText",
-        "label": "Navigation: button text",
-        "value": "REGISTER INTEREST"
+        "name": "fields_emailPlaceholder",
+        "label": "Email placeholder",
+        "value": "Email Address"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "fields_cityPlaceholder",
+        "label": "City dropdown placeholder",
+        "value": "Select City",
+        "description": "The first, empty choice of the city list. The cities themselves are the City Option items of this block (Add + in the content tree)."
+      }
+    ]
+  },
+  {
+    "id": "reservation-form-city",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "city",
+        "label": "City",
+        "value": "",
+        "description": "One choice of the Select City list."
       }
     ]
   }

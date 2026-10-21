@@ -4,8 +4,9 @@
 /**
  * JSW reservation confirmation page (/jsw-confirmed), from the "Confirmed 1280x720" design
  * frame (no source site: the fetched document is ignored). One block,
- * reservation-confirmation, as rows: layoutVariant | media | content | nav.
- * {name} and {email} are filled in from the reservation form.
+ * reservation-confirmation, as rows: layoutVariant | media | content; the JSW Navbar
+ * block before it.
+ * {NAME} and {email} are filled in by the block.
  * A URL with "split" makes /jsw-confirmed-split, the split layout ("Confirmed opt3").
  */
 
@@ -43,6 +44,23 @@ function group(document, fields) {
   return [frag];
 }
 
+function navbar(document) {
+  const list = el(document, 'ul');
+  [['/jsw-phase-3#nev-tech', 'NEV TECH'], ['/jsw-phase-3#newsroom', 'NEWSROOM']].forEach(([href, text]) => {
+    const a = el(document, 'a', text);
+    a.href = href;
+    list.append(el(document, 'li', a));
+  });
+  return WebImporter.Blocks.createBlock(document, {
+    name: 'jsw-navbar',
+    cells: [
+      [hinted(document, 'brand', [link(document, '/jsw-phase-3', 'JSW MOTORS')])],
+      [hinted(document, 'links', [list])],
+      [hinted(document, 'cta', [link(document, '/jsw-reserve', 'REGISTER INTEREST')])],
+    ],
+  });
+}
+
 export default {
   transform: ({ document, url }) => {
     const split = /split/.test(url || '');
@@ -54,22 +72,15 @@ export default {
       ]),
       group(document, [
         ['content_heading', el(document, 'p', 'CONFIRMED')],
-        ['content_subheading', el(document, 'p', split ? 'YOU’RE ALL SET, {name}.' : 'YOU’RE IN, {name}.')],
+        ['content_subheading', el(document, 'p', split ? 'YOU’RE ALL SET, {NAME}.' : 'YOU’RE IN, {NAME}.')],
         ['content_message', el(document, 'p', split
           ? 'We’ll message you when allocation opens in December. Your receipt is on its way to {email}.'
           : 'We’ll message you when allocation opens. Your receipt is on its way to {email}.')],
-        ['content_fallbackName', el(document, 'p', 'THERE')],
-      ]),
-      group(document, [
-        ['nav_brand', el(document, 'p', 'JSW MOTORS')],
-        ['nav_link1', link(document, '/jsw-phase-3#nev-tech', 'NEV TECH')],
-        ['nav_link2', link(document, '/jsw-phase-3#newsroom', 'NEWSROOM')],
-        ['nav_cta', link(document, '/jsw-reserve', 'REGISTER INTEREST')],
       ]),
     ];
 
     const main = document.createElement('div');
-    main.append(WebImporter.Blocks.createBlock(document, { name: 'reservation-confirmation', cells }));
+    main.append(navbar(document), WebImporter.Blocks.createBlock(document, { name: 'reservation-confirmation', cells }));
 
     return [{ element: main, path: split ? '/jsw-confirmed-split' : '/jsw-confirmed', report: { title: 'jsw-confirmed', split } }];
   },

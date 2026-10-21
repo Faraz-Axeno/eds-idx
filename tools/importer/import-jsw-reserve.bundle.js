@@ -24,6 +24,7 @@ var CustomImportScript = (() => {
     default: () => import_jsw_reserve_default
   });
   var IMG = "images/jsw";
+  var CITIES = ["Mumbai", "Delhi", "Bengaluru", "Hyderabad", "Chennai", "Pune", "Kolkata", "Ahmedabad"];
   function hinted(document, field, nodes) {
     const frag = document.createDocumentFragment();
     frag.appendChild(document.createComment(` field:${field} `));
@@ -51,6 +52,22 @@ var CustomImportScript = (() => {
     fields.forEach(([field, node]) => frag.appendChild(hinted(document, field, [node])));
     return [frag];
   }
+  function navbar(document) {
+    const list = el(document, "ul");
+    [["/jsw-phase-3#nev-tech", "NEV TECH"], ["/jsw-phase-3#newsroom", "NEWSROOM"]].forEach(([href, text]) => {
+      const a = el(document, "a", text);
+      a.href = href;
+      list.append(el(document, "li", a));
+    });
+    return WebImporter.Blocks.createBlock(document, {
+      name: "jsw-navbar",
+      cells: [
+        [hinted(document, "brand", [link(document, "/jsw-phase-3", "JSW MOTORS")])],
+        [hinted(document, "links", [list])],
+        [hinted(document, "cta", [link(document, "/jsw-reserve", "REGISTER INTEREST")])]
+      ]
+    });
+  }
   var import_jsw_reserve_default = {
     transform: ({ document }) => {
       const cells = [
@@ -64,18 +81,19 @@ var CustomImportScript = (() => {
           ["content_disclaimer", el(document, "p", "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice.")]
         ]),
         group(document, [
-          ["form_cities", el(document, "p", "Mumbai, Delhi, Bengaluru, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad")],
           ["form_button", link(document, "/jsw-confirmed", "PROCEED")]
         ]),
         group(document, [
-          ["nav_brand", el(document, "p", "JSW MOTORS")],
-          ["nav_link1", link(document, "/jsw-phase-3#nev-tech", "NEV TECH")],
-          ["nav_link2", link(document, "/jsw-phase-3#newsroom", "NEWSROOM")],
-          ["nav_cta", link(document, "/jsw-reserve", "REGISTER INTEREST")]
-        ])
+          ["fields_firstNamePlaceholder", el(document, "p", "First Name*")],
+          ["fields_lastNamePlaceholder", el(document, "p", "Last Name*")],
+          ["fields_mobilePlaceholder", el(document, "p", "Mobile Number*")],
+          ["fields_emailPlaceholder", el(document, "p", "Email Address")],
+          ["fields_cityPlaceholder", el(document, "p", "Select City")]
+        ]),
+        ...CITIES.map((city) => [hinted(document, "city", [document.createTextNode(city)])])
       ];
       const main = document.createElement("div");
-      main.append(WebImporter.Blocks.createBlock(document, { name: "reservation-form", cells }));
+      main.append(navbar(document), WebImporter.Blocks.createBlock(document, { name: "reservation-form", cells }));
       return [{ element: main, path: "/jsw-reserve", report: { title: "jsw-reserve" } }];
     }
   };

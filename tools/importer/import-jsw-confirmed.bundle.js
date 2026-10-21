@@ -51,6 +51,22 @@ var CustomImportScript = (() => {
     fields.forEach(([field, node]) => frag.appendChild(hinted(document, field, [node])));
     return [frag];
   }
+  function navbar(document) {
+    const list = el(document, "ul");
+    [["/jsw-phase-3#nev-tech", "NEV TECH"], ["/jsw-phase-3#newsroom", "NEWSROOM"]].forEach(([href, text]) => {
+      const a = el(document, "a", text);
+      a.href = href;
+      list.append(el(document, "li", a));
+    });
+    return WebImporter.Blocks.createBlock(document, {
+      name: "jsw-navbar",
+      cells: [
+        [hinted(document, "brand", [link(document, "/jsw-phase-3", "JSW MOTORS")])],
+        [hinted(document, "links", [list])],
+        [hinted(document, "cta", [link(document, "/jsw-reserve", "REGISTER INTEREST")])]
+      ]
+    });
+  }
   var import_jsw_confirmed_default = {
     transform: ({ document, url }) => {
       const split = /split/.test(url || "");
@@ -62,19 +78,12 @@ var CustomImportScript = (() => {
         ]),
         group(document, [
           ["content_heading", el(document, "p", "CONFIRMED")],
-          ["content_subheading", el(document, "p", split ? "YOU\u2019RE ALL SET, {name}." : "YOU\u2019RE IN, {name}.")],
-          ["content_message", el(document, "p", split ? "We\u2019ll message you when allocation opens in December. Your receipt is on its way to {email}." : "We\u2019ll message you when allocation opens. Your receipt is on its way to {email}.")],
-          ["content_fallbackName", el(document, "p", "THERE")]
-        ]),
-        group(document, [
-          ["nav_brand", el(document, "p", "JSW MOTORS")],
-          ["nav_link1", link(document, "/jsw-phase-3#nev-tech", "NEV TECH")],
-          ["nav_link2", link(document, "/jsw-phase-3#newsroom", "NEWSROOM")],
-          ["nav_cta", link(document, "/jsw-reserve", "REGISTER INTEREST")]
+          ["content_subheading", el(document, "p", split ? "YOU\u2019RE ALL SET, {NAME}." : "YOU\u2019RE IN, {NAME}.")],
+          ["content_message", el(document, "p", split ? "We\u2019ll message you when allocation opens in December. Your receipt is on its way to {email}." : "We\u2019ll message you when allocation opens. Your receipt is on its way to {email}.")]
         ])
       ];
       const main = document.createElement("div");
-      main.append(WebImporter.Blocks.createBlock(document, { name: "reservation-confirmation", cells }));
+      main.append(navbar(document), WebImporter.Blocks.createBlock(document, { name: "reservation-confirmation", cells }));
       return [{ element: main, path: split ? "/jsw-confirmed-split" : "/jsw-confirmed", report: { title: "jsw-confirmed", split } }];
     }
   };

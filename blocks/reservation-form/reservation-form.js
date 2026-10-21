@@ -1,22 +1,34 @@
 /*
  * reservation-form: the JSW reservation page ("Opt 2 / Reserve 1280x720"): a full-page
- * landscape, the JSW pill navigation, and a card: the car on its left half, on its right the
- * heading, subheading, the form (first and last name, +91 mobile, email, city) with its
- * button, and the small print.
+ * landscape and a card: the car on its left half, on its right the heading, subheading, the
+ * form (first and last name, +91 mobile, email, city) with its button, and the small print.
+ * The navigation is the JSW Navbar block, added to the page next to this block.
  * Rows (field groups of the model, _reservation-form.json):
  *   media   — background image, foreground image
  *   content — heading, subheading, disclaimer
- *   form    — form action URL, city options, button (link + text)
- *   nav     — logo text, two links, the navigation button
- * The button checks the form, keeps the visitor's first name and email for the confirmation
- * page (sessionStorage, see reservation-confirmation) and opens the button link.
+ *   form    — form action URL, button (link + text)
+ *   fields  — the placeholders of first name, last name, mobile, email and the city list
+ *   then one row per City Option item: the cities of the list
+ * The button checks the form, keeps the visitor's first name and email in sessionStorage (for
+ * a later personalised confirmation page) and opens the button link.
  */
 
-import buildPillNav from '../../scripts/jsw-pill-nav.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
-// where the confirmation page finds the visitor's name and email (reservation-confirmation.js)
+// where the visitor's first name and email are kept for the confirmation page
 const RESERVATION_KEY = 'jsw-reservation';
+
+// placeholders when the author has left them empty
+const PLACEHOLDERS = {
+  firstName: 'First Name*',
+  lastName: 'Last Name*',
+  mobile: 'Mobile Number*',
+  email: 'Email Address',
+  city: 'Select City',
+};
+
+// the city list of blocks without City Option items (pages made before the items existed)
+const DEFAULT_CITIES = ['Mumbai', 'Delhi', 'Bengaluru', 'Hyderabad', 'Chennai', 'Pune', 'Kolkata', 'Ahmedabad'];
 
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
@@ -68,11 +80,12 @@ function authorUrl(href) {
   return /\.[a-z0-9]+$/i.test(full) ? `${full}${rest}` : `${full}.html${rest}`;
 }
 
-function input(name, placeholder, attrs = {}) {
+/** an input; which ones are required is fixed here, whatever the authored placeholder says */
+function input(name, placeholder, required, attrs = {}) {
   const field = el('input', 'reservation-form-input', {
-    name, placeholder, 'aria-label': placeholder.replace('*', ''), ...attrs,
+    name, placeholder, 'aria-label': placeholder.replace(/\*\s*$/, '').trim() || name, ...attrs,
   });
-  if (placeholder.endsWith('*')) field.required = true;
+  field.required = required;
   return field;
 }
 
@@ -82,12 +95,13 @@ function input(name, placeholder, attrs = {}) {
  */
 export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
-  const [mediaCell, contentCell, formCell, navCell] = [...block.children]
-    .map((row) => row.querySelector(':scope > div') || row);
+  const [mediaRow, contentRow, formRow, fieldsRow, ...cityRows] = [...block.children];
+  const [mediaCell, contentCell, formCell, fieldsCell] = [mediaRow, contentRow, formRow, fieldsRow]
+    .map((row) => row?.querySelector(':scope > div') || row);
   const media = fieldsOf(mediaCell);
   const content = fieldsOf(contentCell);
   const config = fieldsOf(formCell);
-  const navFields = fieldsOf(navCell);
+  const placeholderFields = fieldsOf(fieldsCell);
 
   // the full-page landscape behind everything
   const frame = el('div', 'reservation-form-frame');
@@ -97,12 +111,6 @@ export default function decorate(block) {
     background.querySelector('img')?.setAttribute('loading', 'eager');
     frame.append(background);
   }
-
-  const nav = buildPillNav({
-    brand: navFields.text('nav_brand', 0),
-    links: [navFields.link('nav_link1', 0), navFields.link('nav_link2', 1)],
-    cta: navFields.link('nav_cta', 2),
-  });
 
   // the card: the car on the left, the form on the right
   const card = el('div', 'reservation-form-card');
@@ -118,39 +126,40 @@ export default function decorate(block) {
   const disclaimer = retag(content.text('content_disclaimer', 2), 'p', 'reservation-form-disclaimer');
 
   // the form; the authored button link is where it leads, the action URL is kept for later
-  // the action URL may be left empty, so published the two are told apart by their text
-  const configTexts = [...(formCell?.querySelectorAll('p') || [])]
-    .filter((p) => !p.querySelector('a') && p.textContent.trim());
-  const isUrl = (p) => /^(https?:\/\/|\/)\S*$/.test(p.textContent.trim());
-  const actionField = formCell?.querySelector('[data-aue-prop="form_action"]')
-    || configTexts.find(isUrl) || null;
-  const citiesField = config.text('form_cities', -1)
-    || configTexts.find((p) => p !== actionField) || null;
+  const actionField = config.text('form_action', 0);
   const buttonLink = config.link('form_button', 0);
   const form = el('form', 'reservation-form-fields', { novalidate: '' });
   const action = actionField?.textContent.trim();
   if (action) form.setAttribute('action', action);
 
+  // the placeholders, in model order (an empty one falls back to its default)
+  const placeholderNodes = ['firstName', 'lastName', 'mobile', 'email', 'city']
+    .map((key, i) => [key, placeholderFields.text(`fields_${key}Placeholder`, i)]);
+  const placeholderText = Object.fromEntries(placeholderNodes
+    .map(([key, node]) => [key, node?.textContent.trim() || PLACEHOLDERS[key]]));
+
   const names = el('div', 'reservation-form-row');
   names.append(
-    input('firstName', 'First Name*', { autocomplete: 'given-name' }),
-    input('lastName', 'Last Name*', { autocomplete: 'family-name' }),
+    input('firstName', placeholderText.firstName, true, { autocomplete: 'given-name' }),
+    input('lastName', placeholderText.lastName, true, { autocomplete: 'family-name' }),
   );
   const phone = el('div', 'reservation-form-row reservation-form-phone');
   const prefix = el('span', 'reservation-form-prefix', { 'aria-hidden': 'true' });
   prefix.textContent = '+91';
-  phone.append(prefix, input('mobile', 'Mobile Number*', {
+  phone.append(prefix, input('mobile', placeholderText.mobile, true, {
     type: 'tel', inputmode: 'numeric', autocomplete: 'tel-national', pattern: '[6-9][0-9]{9}', maxlength: '10',
   }));
-  const email = input('email', 'Email Address', { type: 'email', autocomplete: 'email' });
+  const email = input('email', placeholderText.email, false, { type: 'email', autocomplete: 'email' });
 
   const cityWrap = el('div', 'reservation-form-select');
   const city = el('select', 'reservation-form-input', { name: 'city', 'aria-label': 'City' });
   const placeholder = el('option', '', { value: '' });
-  placeholder.textContent = 'Select City';
+  placeholder.textContent = placeholderText.city;
   placeholder.selected = true;
   city.append(placeholder);
-  (citiesField?.textContent || '').split(',').map((c) => c.trim()).filter(Boolean)
+  // one option per City Option item
+  const authoredCities = cityRows.map((row) => row.textContent.trim()).filter(Boolean);
+  (cityRows.length ? authoredCities : DEFAULT_CITIES)
     .forEach((name) => {
       const option = el('option', '', { value: name });
       option.textContent = name;
@@ -165,10 +174,12 @@ export default function decorate(block) {
   if (buttonLink) moveInstrumentation(buttonLink, submit);
   form.append(names, phone, email, cityWrap, submit);
 
-  // the authored settings that are not shown (action URL, cities, the button link itself) stay
-  // in the block: in the editor they lie over the form, so picking them outlines the form
+  // the authored settings that are not shown (action URL, the button link itself, the
+  // placeholders and the City Option items) stay in the block: in the editor they lie over the
+  // form, so picking one (or a City Option in the content tree) outlines the form
   const settings = el('div', 'reservation-form-settings', { 'aria-hidden': 'true' });
-  [actionField, citiesField, buttonLink?.closest('p') || buttonLink]
+  [actionField, buttonLink?.closest('p') || buttonLink, ...placeholderNodes.map(([, n]) => n),
+    ...cityRows]
     .filter((node) => node && node.isConnected).forEach((node) => settings.append(node));
   form.append(settings);
 
@@ -183,13 +194,13 @@ export default function decorate(block) {
       sessionStorage.setItem(RESERVATION_KEY, JSON.stringify({
         firstName: data.firstName.trim(), email: data.email.trim(),
       }));
-    } catch (error) { /* private browsing: the confirmation page uses its fallback name */ }
+    } catch (error) { /* private browsing: nothing is kept */ }
     if (destination) window.location.href = authorUrl(destination);
   });
 
   body.append(heading, subheading, form, disclaimer);
   card.append(visual, body);
-  frame.append(nav, card);
+  frame.append(card);
   block.replaceChildren(frame);
   if (editing) block.classList.add('reservation-form-editing');
 }
