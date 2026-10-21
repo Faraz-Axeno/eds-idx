@@ -33,9 +33,6 @@ const PLACEHOLDERS = {
   city: 'Select City',
 };
 
-// the city list when none is authored (blocks made before the city options existed)
-const DEFAULT_CITIES = ['Mumbai', 'Delhi', 'Bengaluru', 'Hyderabad', 'Chennai', 'Pune', 'Kolkata', 'Ahmedabad'];
-
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -170,13 +167,13 @@ export default function decorate(block) {
   placeholder.textContent = placeholderText.city;
   placeholder.selected = true;
   city.append(placeholder);
-  // one option per city: the city options field, else City Option rows, else the defaults
+  // one option per city: the city options field, else City Option rows (none built in)
   const listed = citiesField?.querySelectorAll('li').length
     ? [...citiesField.querySelectorAll('li')].map((li) => li.textContent)
     : (citiesField?.textContent || '').split(',');
   const cities = listed.map((c) => c.trim()).filter(Boolean);
   const rowCities = cityRows.map((row) => row.textContent.trim()).filter(Boolean);
-  [cities, rowCities, DEFAULT_CITIES].find((list) => list.length)
+  (cities.length ? cities : rowCities)
     .forEach((name) => {
       const option = el('option', '', { value: name });
       option.textContent = name;
