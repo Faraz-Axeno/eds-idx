@@ -508,8 +508,8 @@ export default function decorate(block) {
     // it measures a field before saying which one it picked), its thumbnail over its own
     const shown = items[current];
     // a powertrain's image keeps its size while hidden (its row is only moved out of view):
-    // its hotspots field goes where the image sits once shown, in the place of the shown row
-    const rest = shown?.row.getBoundingClientRect();
+    // its hotspots field goes where the image sits once shown: a row at rest fills the stage
+    const rest = stage.getBoundingClientRect();
     const atRest = (item, box) => {
       const base = item.row.getBoundingClientRect();
       const dx = rest.left - base.left;
@@ -565,6 +565,23 @@ export default function decorate(block) {
     items[from].row.style.transform = `translateY(${-dir * 100}%)`;
   };
 
+  /**
+   * the fields ride in the rows, which slide when the powertrain changes (0.9s,
+   * hotspot-showcase.css): they are laid over their places again on every frame of the slide,
+   * so they stay put (and the editor's outline with them) while the images move
+   */
+  let holding = 0;
+  const holdFields = () => {
+    placeFields();
+    const until = performance.now() + 1000;
+    cancelAnimationFrame(holding);
+    const step = () => {
+      placeFields();
+      holding = performance.now() < until ? requestAnimationFrame(step) : 0;
+    };
+    holding = requestAnimationFrame(step);
+  };
+
   const select = (index, focus = false) => {
     const from = current;
     current = (index + items.length) % items.length;
@@ -582,7 +599,7 @@ export default function decorate(block) {
     });
     counter.textContent = `${current + 1}/${items.length}`;
     if (focus) items[current].tab.focus();
-    if (editing) placeFields();
+    if (editing) holdFields();
   };
 
   items.forEach(({ tab }, i) => {

@@ -193,12 +193,8 @@
 /* Universal Editor: each powertrain's authored fields (title, description, thumbnail,
    hotspots) stay in its row, as invisible boxes laid over what shows them (placeFields in
    hotspot-showcase.js), so selecting one outlines it in place; clicking the title, description
-   or thumbnail on the canvas selects that field, the hotspots box lets clicks through. The
-   powertrains switch at once there, so an outline never lands mid-slide. */
-.hotspot-showcase.hotspot-showcase-editing .hotspot-showcase-panel {
-  transition: none;
-}
-
+   or thumbnail on the canvas selects that field, the hotspots box lets clicks through; while
+   the powertrains slide, the boxes are held in place (hotspot-showcase.js). */
 .hotspot-showcase.hotspot-showcase-editing .hotspot-showcase-field {
   position: absolute;
   z-index: 6;
