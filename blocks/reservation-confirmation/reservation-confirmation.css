@@ -300,3 +300,10 @@
     font-size: 20px;
   }
 }
+
+/* Universal Editor (its markup carries data-aue-resource; never on the published page): the
+   editor's canvas can grow to fit the page, and a page one screen tall would then grow it
+   without end, so there the page is at most 1000px tall (as on /jsw-phase-3) */
+body:has(.reservation-confirmation[data-aue-resource]) {
+  --mg-panel-height: min(100svh, 1000px);
+}

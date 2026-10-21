@@ -2,7 +2,7 @@
  * reservation-form: the JSW reservation page ("Opt 2 / Reserve 1280x720"): a full-page
  * landscape and a card: the car on its left half, on its right the heading, subheading, the
  * form (first and last name, +91 mobile, email, city) with its button, and the small print.
- * The navigation is the JSW Navbar block, added to the page next to this block.
+ * The navigation is the one authored on /jsw-phase-3 (loadJswNav), the same on every JSW page.
  * Rows (field groups of the model, _reservation-form.json):
  *   media   — background image, foreground image
  *   content — heading, subheading, disclaimer
@@ -18,6 +18,7 @@
  * a later personalised confirmation page) and opens the button link.
  */
 
+import { loadJswNav } from '../../scripts/jsw-pill-nav.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
 // where the visitor's first name and email are kept for the confirmation page
@@ -230,6 +231,8 @@ export default function decorate(block) {
   body.append(heading, subheading, form, disclaimer);
   card.append(visual, body);
   frame.append(card);
+  // the JSW navigation over the landscape, once read from /jsw-phase-3
+  loadJswNav().then((nav) => card.before(nav));
   block.replaceChildren(frame);
   if (editing) block.classList.add('reservation-form-editing');
 }

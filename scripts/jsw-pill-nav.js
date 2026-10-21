@@ -2,6 +2,7 @@
  * The JSW pill navigation (as on /jsw-phase-3, "NEV / Hero") for blocks that bring their own:
  * logo mark + JSW MOTORS wordmark, a list of links, then the white button.
  * Styles: styles/jsw-pill-nav.css (imported by those blocks' stylesheets).
+ * loadJswNav() builds it from the navigation authored on /jsw-phase-3, so it is edited once.
  */
 
 // "JSW MOTORS" as in the Figma navbar, letter by letter on its 9-unit cap grid
@@ -91,4 +92,50 @@ export default function buildPillNav({ brand, links = [], cta } = {}) {
     inner.append(wrap);
   }
   return nav;
+}
+
+// the page whose hero navigation is the JSW navigation of every JSW page (authored there once)
+const NAV_SOURCE_PAGE = '/jsw-phase-3';
+
+// shown when that page cannot be read
+const FALLBACK_NAV = '<p>JSW MOTORS</p><ul><li><a href="#nev-tech">NEV TECH</a></li>'
+  + '<li><a href="#newsroom">NEWSROOM</a></li></ul><p><a href="#register-interest">REGISTER INTEREST</a></p>';
+
+/** the source page's address here: on the AEM author pages live at /content/{site}/….html */
+function sourcePage() {
+  const root = window.location.pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0];
+  return root ? { page: `${root}${NAV_SOURCE_PAGE}.html`, plain: `${root}${NAV_SOURCE_PAGE}.plain.html` }
+    : { page: NAV_SOURCE_PAGE, plain: `${NAV_SOURCE_PAGE}.plain.html` };
+}
+
+/**
+ * the JSW navigation as authored on /jsw-phase-3 (the navigation fields of its immersive-hero
+ * block: logo text, links, button), for pages without that hero; links to a section of that
+ * page (#nev-tech) are made to open it there. Read once per page; the fallback if it fails.
+ * @returns {Promise<Element>} the <nav>
+ */
+export async function loadJswNav() {
+  const { page, plain: plainUrl } = sourcePage();
+  const cell = document.createElement('div');
+  try {
+    const resp = await fetch(plainUrl);
+    if (!resp.ok) throw new Error(resp.status);
+    const doc = new DOMParser().parseFromString(await resp.text(), 'text/html');
+    const navCell = [...doc.querySelectorAll('.immersive-hero > div > div')]
+      .find((c) => c.querySelector('ul a'));
+    if (!navCell) throw new Error('no navigation');
+    cell.append(...navCell.childNodes);
+  } catch (e) {
+    cell.innerHTML = FALLBACK_NAV;
+  }
+  // it belongs to the other page: no editor instrumentation of it here
+  [cell, ...cell.querySelectorAll('*')].forEach((node) => [...node.attributes]
+    .filter(({ name }) => name.startsWith('data-aue-') || name.startsWith('data-richtext-'))
+    .forEach(({ name }) => node.removeAttribute(name)));
+  cell.querySelectorAll('a[href^="#"]').forEach((a) => a.setAttribute('href', `${page}${a.getAttribute('href')}`));
+
+  const list = cell.querySelector('ul');
+  const cta = [...cell.querySelectorAll('a')].find((a) => !list?.contains(a)) || null;
+  const brand = [...cell.querySelectorAll('p')].find((p) => !p.querySelector('a') && p.textContent.trim()) || null;
+  return buildPillNav({ brand, links: [...(list?.querySelectorAll('a') || [])], cta });
 }

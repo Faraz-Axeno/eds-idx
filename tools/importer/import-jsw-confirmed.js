@@ -80,7 +80,7 @@ export default {
     ];
 
     const main = document.createElement('div');
-    main.append(navbar(document), WebImporter.Blocks.createBlock(document, { name: 'reservation-confirmation', cells }));
+    main.append(WebImporter.Blocks.createBlock(document, { name: 'reservation-confirmation', cells }));
 
     return [{ element: main, path: split ? '/jsw-confirmed-split' : '/jsw-confirmed', report: { title: 'jsw-confirmed', split } }];
   },

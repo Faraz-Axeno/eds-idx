@@ -52,22 +52,6 @@ var CustomImportScript = (() => {
     fields.forEach(([field, node]) => frag.appendChild(hinted(document, field, [node])));
     return [frag];
   }
-  function navbar(document) {
-    const list = el(document, "ul");
-    [["/jsw-phase-3#nev-tech", "NEV TECH"], ["/jsw-phase-3#newsroom", "NEWSROOM"]].forEach(([href, text]) => {
-      const a = el(document, "a", text);
-      a.href = href;
-      list.append(el(document, "li", a));
-    });
-    return WebImporter.Blocks.createBlock(document, {
-      name: "jsw-navbar",
-      cells: [
-        [hinted(document, "brand", [link(document, "/jsw-phase-3", "JSW MOTORS")])],
-        [hinted(document, "links", [list])],
-        [hinted(document, "cta", [link(document, "/jsw-reserve", "REGISTER INTEREST")])]
-      ]
-    });
-  }
   var import_jsw_reserve_default = {
     transform: ({ document }) => {
       const cells = [
@@ -97,7 +81,7 @@ var CustomImportScript = (() => {
         ])
       ];
       const main = document.createElement("div");
-      main.append(navbar(document), WebImporter.Blocks.createBlock(document, { name: "reservation-form", cells }));
+      main.append(WebImporter.Blocks.createBlock(document, { name: "reservation-form", cells }));
       return [{ element: main, path: "/jsw-reserve", report: { title: "jsw-reserve" } }];
     }
   };

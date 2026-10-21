@@ -41,31 +41,10 @@ var CustomImportScript = (() => {
     img.alt = alt;
     return el(document, "p", img);
   }
-  function link(document, href, text) {
-    const a = el(document, "a", text);
-    a.href = href;
-    return el(document, "p", a);
-  }
   function group(document, fields) {
     const frag = document.createDocumentFragment();
     fields.forEach(([field, node]) => frag.appendChild(hinted(document, field, [node])));
     return [frag];
-  }
-  function navbar(document) {
-    const list = el(document, "ul");
-    [["/jsw-phase-3#nev-tech", "NEV TECH"], ["/jsw-phase-3#newsroom", "NEWSROOM"]].forEach(([href, text]) => {
-      const a = el(document, "a", text);
-      a.href = href;
-      list.append(el(document, "li", a));
-    });
-    return WebImporter.Blocks.createBlock(document, {
-      name: "jsw-navbar",
-      cells: [
-        [hinted(document, "brand", [link(document, "/jsw-phase-3", "JSW MOTORS")])],
-        [hinted(document, "links", [list])],
-        [hinted(document, "cta", [link(document, "/jsw-reserve", "REGISTER INTEREST")])]
-      ]
-    });
   }
   var import_jsw_confirmed_default = {
     transform: ({ document, url }) => {
@@ -83,7 +62,7 @@ var CustomImportScript = (() => {
         ])
       ];
       const main = document.createElement("div");
-      main.append(navbar(document), WebImporter.Blocks.createBlock(document, { name: "reservation-confirmation", cells }));
+      main.append(WebImporter.Blocks.createBlock(document, { name: "reservation-confirmation", cells }));
       return [{ element: main, path: split ? "/jsw-confirmed-split" : "/jsw-confirmed", report: { title: "jsw-confirmed", split } }];
     }
   };
