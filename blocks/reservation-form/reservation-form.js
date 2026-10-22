@@ -137,13 +137,14 @@ function authorUrl(href) {
   return /\.[a-z0-9]+$/i.test(full) ? `${full}${rest}` : `${full}.html${rest}`;
 }
 
-/** an input; which ones are required is fixed here, whatever the authored placeholder says */
-function input(name, placeholder, required, attrs = {}) {
-  const field = el('input', 'reservation-form-input', {
-    name, placeholder, 'aria-label': placeholder.replace(/\*\s*$/, '').trim() || name, ...attrs,
+/**
+ * an input, without any of the browser's HTML validation (required, pattern, type=email…):
+ * only RULES decide. aria-required tells assistive technology which fields are needed
+ */
+function input(name, placeholder, attrs = {}) {
+  return el('input', 'reservation-form-input', {
+    name, placeholder, 'aria-label': placeholder.replace(/\*\s*$/, '').trim() || name, 'aria-required': 'true', ...attrs,
   });
-  field.required = required;
-  return field;
 }
 
 /**
@@ -192,6 +193,7 @@ export default function decorate(block) {
   const citiesField = named('form_cities') || formCell?.querySelector('ul, ol')
     || configTexts.find((p) => p !== actionField) || null;
   const buttonLink = config.link('form_button', 0);
+  // the browser's own form checks are off: the fields are checked by RULES only
   const form = el('form', 'reservation-form-fields', { novalidate: '' });
   const action = actionField?.textContent.trim();
   if (action) form.setAttribute('action', action);
@@ -215,15 +217,15 @@ export default function decorate(block) {
   };
 
   const names = el('div', 'reservation-form-row');
-  const firstName = input('firstName', placeholderText.firstName, true, { autocomplete: 'given-name' });
-  const lastName = input('lastName', placeholderText.lastName, true, { autocomplete: 'family-name' });
+  const firstName = input('firstName', placeholderText.firstName, { autocomplete: 'given-name' });
+  const lastName = input('lastName', placeholderText.lastName, { autocomplete: 'family-name' });
   names.append(withError(firstName), withError(lastName));
   const phone = el('div', 'reservation-form-row reservation-form-phone');
   const prefix = el('span', 'reservation-form-prefix', { 'aria-hidden': 'true' });
   prefix.textContent = '+91';
   // at most 10 digits, as typed; a number pasted or filled in with spaces, dashes or +91 is
   // cut down to its 10 digits (the browser's own limit would cut the pasted text instead)
-  const mobile = input('mobile', placeholderText.mobile, true, {
+  const mobile = input('mobile', placeholderText.mobile, {
     type: 'tel', inputmode: 'numeric', autocomplete: 'tel-national',
   });
   mobile.addEventListener('input', () => {
@@ -233,7 +235,10 @@ export default function decorate(block) {
     if (mobile.value !== digits) mobile.value = digits;
   });
   phone.append(prefix, withError(mobile));
-  const email = input('email', placeholderText.email, true, { type: 'email', autocomplete: 'email' });
+  // a plain text field (the email keyboard on phones), checked by RULES.email
+  const email = input('email', placeholderText.email, {
+    type: 'text', inputmode: 'email', autocomplete: 'email', autocapitalize: 'off', spellcheck: 'false',
+  });
 
   const cityWrap = el('div', 'reservation-form-select reservation-form-field');
   const city = el('select', 'reservation-form-input', { name: 'city', 'aria-label': 'City' });
@@ -297,14 +302,12 @@ export default function decorate(block) {
   const check = (key) => {
     const field = fields[key];
     const result = RULES[key](field.value, context);
-    field.setCustomValidity(result.error);
-    // the browser's own check of the field type (email) counts too
-    const error = result.error || (field.checkValidity() ? '' : field.validationMessage);
+    const { error } = result;
     field.classList.toggle('is-invalid', Boolean(error));
     if (error) field.setAttribute('aria-invalid', 'true');
     else field.removeAttribute('aria-invalid');
     errors.get(field).textContent = error;
-    return { ...result, error };
+    return result;
   };
   Object.entries(fields).forEach(([key, field]) => {
     const recheck = () => {
