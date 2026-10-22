@@ -9,13 +9,27 @@
  *                     left-aligned and vertically centred on the right half
  */
 
+/* desktop: the card and everything in it are sized in "units" (1px each in the Figma frame),
+   so on screens too short for the 556px card (most laptops: 1366 x 768 leaves about 657px) it
+   shrinks as a whole to fit below the navigation: units are 1px down to the frame's own
+   height, smaller on shorter screens (at least 0.6px). Tablets and phones keep 1px units */
 .reservation-confirmation {
+  --reservation-confirmation-unit: 1px;
+
   box-sizing: border-box;
   min-height: var(--mg-panel-height, 100svh);
   padding: 8px;
   color: #fff;
   background-color: #050505;
   font-family: inter, 'Helvetica Neue', arial, sans-serif;
+}
+
+@supports (height: 1svh) and (width: clamp(1px, 1px, 1px)) {
+  @media (min-width: 900px) {
+    .reservation-confirmation {
+      --reservation-confirmation-unit: clamp(0.6px, calc((var(--mg-panel-height, 100svh) - 146px) / 556), 1px);
+    }
+  }
 }
 
 .reservation-confirmation .reservation-confirmation-frame {
@@ -54,10 +68,10 @@
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
-  width: min(956px, 100%);
-  min-height: 556px;
+  width: min(calc(956 * var(--reservation-confirmation-unit)), 100%);
+  min-height: calc(556 * var(--reservation-confirmation-unit));
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: calc(24 * var(--reservation-confirmation-unit));
   background-color: #000;
 }
 
@@ -81,8 +95,8 @@
 .reservation-confirmation .reservation-confirmation-message {
   margin: 0;
   color: #8c8c8c;
-  font-size: 13px;
-  line-height: 19px;
+  font-size: calc(13 * var(--reservation-confirmation-unit));
+  line-height: calc(19 * var(--reservation-confirmation-unit));
 }
 
 .reservation-confirmation .reservation-confirmation-email {
@@ -109,7 +123,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 72px 32px 82px;
+  padding: calc(72 * var(--reservation-confirmation-unit)) calc(32 * var(--reservation-confirmation-unit)) calc(82 * var(--reservation-confirmation-unit));
   text-align: center;
 }
 
@@ -128,7 +142,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   font-family: var(--jsw-pill-font-display);
-  font-size: 84px;
+  font-size: calc(84 * var(--reservation-confirmation-unit));
   font-weight: 300;
   line-height: 1.1;
   letter-spacing: -0.01em;
@@ -143,8 +157,8 @@
 }
 
 .reservation-confirmation.layout-centered .reservation-confirmation-subheading {
-  margin: 0 0 18px;
-  font-size: 22px;
+  margin: 0 0 calc(18 * var(--reservation-confirmation-unit));
+  font-size: calc(22 * var(--reservation-confirmation-unit));
   line-height: 1.2;
 }
 
@@ -235,18 +249,18 @@
 .reservation-confirmation.layout-split .reservation-confirmation-details {
   position: relative;
   grid-column: 2;
-  padding: 0 40px 0 10px;
+  padding: 0 calc(40 * var(--reservation-confirmation-unit)) 0 calc(10 * var(--reservation-confirmation-unit));
   text-align: left;
 }
 
 .reservation-confirmation.layout-split .reservation-confirmation-subheading {
-  margin: 0 0 16px;
-  font-size: 22px;
+  margin: 0 0 calc(16 * var(--reservation-confirmation-unit));
+  font-size: calc(22 * var(--reservation-confirmation-unit));
   line-height: 1.25;
 }
 
 .reservation-confirmation.layout-split .reservation-confirmation-message {
-  max-width: 400px;
+  max-width: calc(400 * var(--reservation-confirmation-unit));
 }
 
 .reservation-confirmation.layout-split .reservation-confirmation-email {
