@@ -175,9 +175,33 @@
   outline-offset: 1px;
 }
 
-/* a field left empty or wrong is outlined once the button has been tried */
-.reservation-form .reservation-form-fields.is-checked .reservation-form-input:invalid {
+/* a field breaking its rule is outlined until it is corrected (reservation-form.js) */
+.reservation-form .reservation-form-input.is-invalid {
   border-color: #d64545;
+}
+
+/* a field and, under it, its error message: in the gap below the field, so nothing moves */
+.reservation-form .reservation-form-field {
+  position: relative;
+  min-width: 0;
+}
+
+.reservation-form .reservation-form-error {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: calc(1 * var(--reservation-form-unit)) 0 0;
+  overflow: hidden;
+  color: #d64545;
+  font-size: calc(10 * var(--reservation-form-unit));
+  line-height: calc(11 * var(--reservation-form-unit));
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.reservation-form .reservation-form-error:empty {
+  display: none;
 }
 
 .reservation-form .reservation-form-prefix {
