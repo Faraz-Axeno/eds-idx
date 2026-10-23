@@ -67,6 +67,10 @@ export default {
       group(document, [
         ['media_background', picture(document, 'reserve-landscape.jpg', 'Blue hills around a still lake')],
         ['media_foreground', picture(document, 'reserve-car.jpg', 'Silhouette of the JSW SUV against a dark backdrop')],
+        ['media_priceLabel', el(document, 'p', 'RESERVATION AMOUNT')],
+        ['media_priceAmount', el(document, 'p', '10000')],
+        ['media_priceBadge', el(document, 'p', 'REFUNDABLE')],
+        ['media_priceNote', el(document, 'p', 'Total payable today. Refundable until you confirm your order. You’ll complete payment securely with our payment partner.')],
       ]),
       group(document, [
         ['content_heading', el(document, 'p', 'RESERVE NOW')],
@@ -79,7 +83,12 @@ export default {
           CITIES.forEach((city) => list.append(el(document, 'li', city)));
           return list;
         })()],
+        // a made-up test Key ID: the local test page only (authors enter theirs in the editor)
+        ['form_razorpayKey', el(document, 'p', 'rzp_test_LOCALPREVIEW000')],
+        ['form_checkoutName', el(document, 'p', 'JSW Motors')],
+        ['form_checkoutDescription', el(document, 'p', 'Vehicle reservation')],
         ['form_button', link(document, '/jsw-confirmed', 'PROCEED')],
+        ['form_failure', link(document, '/jsw-payment-failed', '/jsw-payment-failed')],
       ]),
       group(document, [
         ['fields_firstNamePlaceholder', el(document, 'p', 'First Name*')],

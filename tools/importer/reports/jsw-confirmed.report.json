@@ -2,7 +2,8 @@
   "status": "success",
   "url": "https://example.com/",
   "path": "jsw-confirmed",
-  "timestamp": "2026-10-21T10:44:09.971Z",
+  "timestamp": "2026-10-23T10:13:30.287Z",
   "title": "jsw-confirmed",
-  "split": false
+  "split": false,
+  "failed": false
 }

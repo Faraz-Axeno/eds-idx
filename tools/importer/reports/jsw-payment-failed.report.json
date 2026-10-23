@@ -1,0 +1,9 @@
+{
+  "status": "success",
+  "url": "https://example.com/?page=failed",
+  "path": "jsw-payment-failed",
+  "timestamp": "2026-10-23T10:13:40.519Z",
+  "title": "jsw-confirmed",
+  "split": false,
+  "failed": true
+}

@@ -7,7 +7,8 @@
  * reservation-confirmation, as rows: layoutVariant | media | content; the JSW Navbar
  * block before it.
  * {NAME} and {email} are filled in by the block.
- * A URL with "split" makes /jsw-confirmed-split, the split layout ("Confirmed opt3").
+ * A URL with "split" makes /jsw-confirmed-split, the split layout ("Confirmed opt3"); one with
+ * "failed" makes /jsw-payment-failed, the payment failure page (the centered layout for now).
  */
 
 const IMG = 'images/jsw';
@@ -64,6 +65,7 @@ function navbar(document) {
 export default {
   transform: ({ document, url }) => {
     const split = /split/.test(url || '');
+    const failed = /failed/.test(url || '');
     const cells = [
       [hinted(document, 'layoutVariant', [document.createTextNode(split ? 'layout-split' : 'layout-centered')])],
       group(document, [
@@ -71,17 +73,20 @@ export default {
         ['media_foreground', picture(document, 'reserve-car.jpg', 'Silhouette of the JSW SUV against a dark backdrop')],
       ]),
       group(document, [
-        ['content_heading', el(document, 'p', 'CONFIRMED')],
-        ['content_subheading', el(document, 'p', split ? 'YOU’RE ALL SET, {NAME}.' : 'YOU’RE IN, {NAME}.')],
-        ['content_message', el(document, 'p', split
-          ? 'We’ll message you when allocation opens in December. Your receipt is on its way to {email}.'
-          : 'We’ll message you when allocation opens. Your receipt is on its way to {email}.')],
+        ['content_heading', el(document, 'p', failed ? 'FAILED' : 'CONFIRMED')],
+        ['content_subheading', el(document, 'p', failed ? 'SORRY, {NAME}.' : (split ? 'YOU’RE ALL SET, {NAME}.' : 'YOU’RE IN, {NAME}.'))],
+        ['content_message', el(document, 'p', (failed
+          && 'Your payment didn’t go through and no money was taken. Please try again from the reservation page.')
+          || (split
+            ? 'We’ll message you when allocation opens in December. Your receipt is on its way to {email}.'
+            : 'We’ll message you when allocation opens. Your receipt is on its way to {email}.'))],
       ]),
     ];
 
     const main = document.createElement('div');
     main.append(WebImporter.Blocks.createBlock(document, { name: 'reservation-confirmation', cells }));
 
-    return [{ element: main, path: split ? '/jsw-confirmed-split' : '/jsw-confirmed', report: { title: 'jsw-confirmed', split } }];
+    const path = (failed && '/jsw-payment-failed') || (split && '/jsw-confirmed-split') || '/jsw-confirmed';
+    return [{ element: main, path, report: { title: 'jsw-confirmed', split, failed } }];
   },
 };
