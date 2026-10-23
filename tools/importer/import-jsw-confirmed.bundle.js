@@ -49,6 +49,7 @@ var CustomImportScript = (() => {
   var import_jsw_confirmed_default = {
     transform: ({ document, url }) => {
       const split = /split/.test(url || "");
+      const failed = /failed/.test(url || "");
       const cells = [
         [hinted(document, "layoutVariant", [document.createTextNode(split ? "layout-split" : "layout-centered")])],
         group(document, [
@@ -56,14 +57,15 @@ var CustomImportScript = (() => {
           ["media_foreground", picture(document, "reserve-car.jpg", "Silhouette of the JSW SUV against a dark backdrop")]
         ]),
         group(document, [
-          ["content_heading", el(document, "p", "CONFIRMED")],
-          ["content_subheading", el(document, "p", split ? "YOU\u2019RE ALL SET, {NAME}." : "YOU\u2019RE IN, {NAME}.")],
-          ["content_message", el(document, "p", split ? "We\u2019ll message you when allocation opens in December. Your receipt is on its way to {email}." : "We\u2019ll message you when allocation opens. Your receipt is on its way to {email}.")]
+          ["content_heading", el(document, "p", failed ? "FAILED" : "CONFIRMED")],
+          ["content_subheading", el(document, "p", failed ? "SORRY, {NAME}." : split ? "YOU\u2019RE ALL SET, {NAME}." : "YOU\u2019RE IN, {NAME}.")],
+          ["content_message", el(document, "p", failed && "Your payment didn\u2019t go through and no money was taken. Please try again from the reservation page." || (split ? "We\u2019ll message you when allocation opens in December. Your receipt is on its way to {email}." : "We\u2019ll message you when allocation opens. Your receipt is on its way to {email}."))]
         ])
       ];
       const main = document.createElement("div");
       main.append(WebImporter.Blocks.createBlock(document, { name: "reservation-confirmation", cells }));
-      return [{ element: main, path: split ? "/jsw-confirmed-split" : "/jsw-confirmed", report: { title: "jsw-confirmed", split } }];
+      const path = failed && "/jsw-payment-failed" || split && "/jsw-confirmed-split" || "/jsw-confirmed";
+      return [{ element: main, path, report: { title: "jsw-confirmed", split, failed } }];
     }
   };
   return __toCommonJS(import_jsw_confirmed_exports);

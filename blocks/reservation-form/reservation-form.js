@@ -4,10 +4,13 @@
  * form (first and last name, +91 mobile, email, city) with its button, and the small print.
  * The navigation is the one authored on /jsw-phase-3 (loadJswNav), the same on every JSW page.
  * Rows (field groups of the model, _reservation-form.json):
- *   media   — background image, foreground image
+ *   media   — background image, foreground image; the pricing panel over the car: label,
+ *             amount (₹, also what Razorpay charges), badge, note
  *   content — heading, subheading, disclaimer
  *   form    — form action URL, city options (a multi-value field: a list, or comma-separated
- *             text where multi-field rendering is off), button (link + text)
+ *             text where multi-field rendering is off), Razorpay Key ID, name and description
+ *             for the Razorpay window, button (link + text: the page after a successful
+ *             payment), failure page link
  *   fields  — the placeholders of first name, last name, mobile, email and the city list
  *   (rows after these are City Option items of the earlier model: used when the city options
  *   field is empty)
@@ -17,14 +20,24 @@
  * The button checks and cleans every field (RULES below; a field that fails gets .is-invalid
  * until it is corrected), builds the payload from the cleaned values (HTML tags stripped),
  * announces it (a "jsw:reservation" event on the block, for a later backend), keeps the first
- * name and email in sessionStorage and opens the button link.
+ * name and email in sessionStorage, then takes the payment in Razorpay's window
+ * (scripts/razorpay.js), which shows its loading, verification and error steps itself:
+ *   paid      — the button link (confirmation page)
+ *   failed    — the failure page link (also when Razorpay cannot be loaded or is not set up)
+ *   closed    — back to the form
+ * The outcome is kept in sessionStorage (PAYMENT_KEY) for those pages. Test mode only needs the
+ * public Key ID: no backend creates orders or verifies payments yet.
  */
 
 import { loadJswNav } from '../../scripts/jsw-pill-nav.js';
+import { KEY_ID, loadRazorpay, payWithRazorpay } from '../../scripts/razorpay.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
 // where the visitor's first name and email are kept for the confirmation page
 const RESERVATION_KEY = 'jsw-reservation';
+
+// where the payment's outcome is kept: { status, paymentId } or { status, code, description, … }
+const PAYMENT_KEY = 'jsw-payment';
 
 // placeholders when the author has left them empty
 const PLACEHOLDERS = {
@@ -178,6 +191,37 @@ export default function decorate(block) {
     foreground.querySelector('img')?.setAttribute('loading', 'eager');
     visual.append(foreground);
   }
+
+  // the pricing panel at the foot of the car; published, the amount is the text of digits, the
+  // note the long one, then label and badge in model order
+  const mediaNamed = (name) => mediaCell?.querySelector(`[data-aue-prop="${name}"]`);
+  const mediaTexts = [...(mediaCell?.querySelectorAll('p') || [])]
+    .filter((p) => !p.querySelector('picture, a') && p.textContent.trim());
+  const isAmount = (p) => /^[₹\s\d,.]+$/.test(p.textContent.trim()) && /\d/.test(p.textContent);
+  const amountField = mediaNamed('media_priceAmount') || mediaTexts.find(isAmount) || null;
+  const pricingTexts = mediaTexts.filter((p) => p !== amountField);
+  const labelField = mediaNamed('media_priceLabel') || pricingTexts[0] || null;
+  const others = pricingTexts.filter((p) => p !== labelField);
+  const noteField = mediaNamed('media_priceNote')
+    || others.find((p) => p.textContent.trim().length > 24) || null;
+  const badgeField = mediaNamed('media_priceBadge') || others.find((p) => p !== noteField) || null;
+  // the amount in rupees (10000, 10,000 or ₹10,000), shown in the Indian style (₹10,000)
+  const rupees = Number((amountField?.textContent || '').replace(/[^\d.]/g, '')) || 0;
+  const paise = Math.round(rupees * 100);
+  if (labelField || amountField || badgeField || noteField) {
+    const pricing = el('div', 'reservation-form-pricing');
+    const top = el('div', 'reservation-form-pricing-top');
+    if (labelField) top.append(retag(labelField, 'p', 'reservation-form-pricing-label'));
+    if (badgeField) top.append(retag(badgeField, 'p', 'reservation-form-pricing-badge'));
+    if (top.children.length) pricing.append(top);
+    if (amountField) {
+      const amount = retag(amountField, 'p', 'reservation-form-pricing-amount');
+      if (rupees) amount.textContent = `₹${rupees.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+      pricing.append(amount);
+    }
+    if (noteField) pricing.append(retag(noteField, 'p', 'reservation-form-pricing-note'));
+    visual.append(pricing);
+  }
   const body = el('div', 'reservation-form-body');
   const heading = retag(content.text('content_heading', 0), 'h1', 'reservation-form-heading');
   const subheading = retag(content.text('content_subheading', 1), 'p', 'reservation-form-subheading');
@@ -190,9 +234,25 @@ export default function decorate(block) {
   const isUrl = (p) => /^(https?:\/\/|\/)\S*$/.test(p.textContent.trim());
   const named = (name) => formCell?.querySelector(`[data-aue-prop="${name}"]`);
   const actionField = named('form_action') || configTexts.find(isUrl) || null;
+  // a key: one word of letters, digits and _ (rzp_test_…; also a Key Secret pasted by mistake)
+  const isKey = (p) => /^[A-Za-z0-9_]{14,}$/.test(p.textContent.trim());
   const citiesField = named('form_cities') || formCell?.querySelector('ul, ol')
-    || configTexts.find((p) => p !== actionField) || null;
+    || configTexts.find((p) => p !== actionField && !isKey(p) && p.textContent.includes(',')) || null;
   const buttonLink = config.link('form_button', 0);
+  // Razorpay: the Key ID (rzp_…), then the name and description of its window in model order
+  const keyField = named('form_razorpayKey') || configTexts.find(isKey) || null;
+  const checkoutTexts = configTexts
+    .filter((p) => ![actionField, citiesField, keyField].includes(p));
+  const checkoutNameField = named('form_checkoutName') || checkoutTexts[0] || null;
+  const checkoutDescriptionField = named('form_checkoutDescription')
+    || checkoutTexts.find((p) => p !== checkoutNameField) || null;
+  const failureLink = config.link('form_failure', 1);
+  const keyId = keyField?.textContent.trim() || '';
+  // published, a value that is not a Key ID (a pasted Key Secret?) is not kept in the page
+  if (!editing && keyField && !KEY_ID.test(keyId)) keyField.textContent = '';
+  const checkoutName = checkoutNameField?.textContent.trim() || 'JSW Motors';
+  const checkoutDescription = checkoutDescriptionField?.textContent.trim() || '';
+  const failurePage = failureLink?.getAttribute('href') || '';
   // the browser's own form checks are off: the fields are checked by RULES only
   const form = el('form', 'reservation-form-fields', { novalidate: '' });
   const action = actionField?.textContent.trim();
@@ -289,7 +349,8 @@ export default function decorate(block) {
   // the authored settings that are not shown (action URL, the button link itself, City Option
   // rows of the earlier model) stay in the block: in the editor they lie over the form
   const settings = el('div', 'reservation-form-settings', { 'aria-hidden': 'true' });
-  [actionField, buttonLink?.closest('p') || buttonLink, ...cityRows]
+  [actionField, buttonLink?.closest('p') || buttonLink, keyField, checkoutNameField,
+    checkoutDescriptionField, failureLink?.closest('p') || failureLink, ...cityRows]
     .filter((node) => node && node.isConnected).forEach((node) => settings.append(node));
   form.append(settings);
 
@@ -317,8 +378,27 @@ export default function decorate(block) {
     field.addEventListener('change', recheck);
   });
 
-  form.addEventListener('submit', (e) => {
-    // never sent by the browser: checked here, then the button link is opened
+  const go = (href) => {
+    if (href) window.location.href = authorUrl(href);
+  };
+  const remember = (key, value) => {
+    try {
+      sessionStorage.setItem(key, JSON.stringify(value));
+    } catch (error) { /* private browsing: nothing is kept */ }
+  };
+  const busy = (on) => {
+    submit.disabled = on;
+    if (on) submit.setAttribute('aria-busy', 'true');
+    else submit.removeAttribute('aria-busy');
+  };
+  // Razorpay's script fetched as soon as the visitor starts on the form, so its window opens
+  // at once on the button (not with the page: it is not needed to show it)
+  if (!editing && KEY_ID.test(keyId)) {
+    form.addEventListener('focusin', () => loadRazorpay().catch(() => {}), { once: true });
+  }
+
+  form.addEventListener('submit', async (e) => {
+    // never sent by the browser: checked here, then paid in Razorpay's window
     e.preventDefault();
     // in Universal Editor the button only works in its Preview mode
     if (editing && !document.documentElement.classList.contains('adobe-ue-preview')) return;
@@ -333,12 +413,58 @@ export default function decorate(block) {
     const payload = Object.fromEntries(Object.entries(results)
       .map(([key, { value }]) => [key, stripTags(value)]));
     block.dispatchEvent(new CustomEvent('jsw:reservation', { detail: payload, bubbles: true }));
+    remember(RESERVATION_KEY, { firstName: payload.firstName, email: payload.email });
+
+    if (!KEY_ID.test(keyId) || !paise) {
+      // eslint-disable-next-line no-console
+      console.error('reservation-form: the block needs a Razorpay Key ID (rzp_…) and an amount');
+      remember(PAYMENT_KEY, { status: 'failed', code: 'NOT_CONFIGURED' });
+      go(failurePage);
+      return;
+    }
+
+    busy(true);
+    let outcome;
     try {
-      sessionStorage.setItem(RESERVATION_KEY, JSON.stringify({
-        firstName: payload.firstName, email: payload.email,
-      }));
-    } catch (error) { /* private browsing: nothing is kept */ }
-    if (destination) window.location.href = authorUrl(destination);
+      outcome = await payWithRazorpay({
+        key: keyId,
+        amount: paise,
+        currency: 'INR',
+        name: checkoutName,
+        description: checkoutDescription,
+        prefill: {
+          name: `${payload.firstName} ${payload.lastName}`,
+          email: payload.email,
+          contact: `+91${payload.mobile}`,
+        },
+        notes: { firstName: payload.firstName, lastName: payload.lastName, city: payload.city },
+        theme: { color: '#000000' },
+        // a failed payment goes to the failure page rather than a retry in Razorpay's window
+        retry: { enabled: false },
+      });
+    } catch (error) {
+      outcome = { status: 'failed', error: { code: 'CHECKOUT_UNAVAILABLE', description: error.message } };
+    }
+
+    if (outcome.status === 'success') {
+      remember(PAYMENT_KEY, { status: 'success', paymentId: outcome.response.razorpay_payment_id });
+      go(destination);
+      return;
+    }
+    if (outcome.status === 'failed') {
+      const {
+        code, description, reason, step, source,
+      } = outcome.error;
+      remember(PAYMENT_KEY, {
+        status: 'failed', code, description, reason, step, source,
+      });
+      if (failurePage) {
+        go(failurePage);
+        return;
+      }
+    }
+    // closed without paying (or no failure page set): back to the form
+    busy(false);
   });
 
   body.append(heading, subheading, form, disclaimer);

@@ -2,7 +2,8 @@
   "status": "success",
   "url": "https://example.com/?layout=split",
   "path": "jsw-confirmed-split",
-  "timestamp": "2026-10-21T10:44:14.786Z",
+  "timestamp": "2026-10-23T10:13:35.090Z",
   "title": "jsw-confirmed",
-  "split": true
+  "split": true,
+  "failed": false
 }

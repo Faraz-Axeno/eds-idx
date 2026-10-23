@@ -101,6 +101,68 @@
   }
 }
 
+/* the pricing panel at the foot of the car ("Opt 2 / Reserve" with pricing): label and badge,
+   the amount, then the note; 390 x 149, 22px from the left, 25px from the bottom */
+.reservation-form .reservation-form-pricing {
+  position: absolute;
+  right: calc(24 * var(--reservation-form-unit));
+  bottom: calc(25 * var(--reservation-form-unit));
+  left: calc(22 * var(--reservation-form-unit));
+  z-index: 1;
+  box-sizing: border-box;
+  padding: calc(20 * var(--reservation-form-unit)) calc(21 * var(--reservation-form-unit)) calc(19 * var(--reservation-form-unit));
+  color: #fff;
+}
+
+.reservation-form .reservation-form-pricing p {
+  margin: 0;
+}
+
+.reservation-form .reservation-form-pricing-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(12 * var(--reservation-form-unit));
+  min-height: calc(24 * var(--reservation-form-unit));
+}
+
+.reservation-form .reservation-form-pricing-label {
+  color: #a9a9a9;
+  font-size: calc(10 * var(--reservation-form-unit));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reservation-form .reservation-form-pricing-badge {
+  flex: none;
+  box-sizing: border-box;
+  height: calc(24 * var(--reservation-form-unit));
+  padding: 0 calc(10 * var(--reservation-form-unit));
+  border: 1px solid rgb(255 255 255 / 55%);
+  border-radius: calc(6 * var(--reservation-form-unit));
+  font-size: calc(9 * var(--reservation-form-unit));
+  line-height: calc(calc(24 * var(--reservation-form-unit)) - 2px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.reservation-form .reservation-form-pricing-amount {
+  margin-top: calc(2 * var(--reservation-form-unit));
+  font-family: var(--jsw-pill-font-display);
+  font-size: calc(36 * var(--reservation-form-unit));
+  font-weight: 300;
+  line-height: calc(40 * var(--reservation-form-unit));
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.reservation-form .reservation-form-pricing p.reservation-form-pricing-note {
+  margin-top: calc(10 * var(--reservation-form-unit));
+  color: #9b9b9b;
+  font-size: calc(11 * var(--reservation-form-unit));
+  line-height: calc(17 * var(--reservation-form-unit));
+}
+
 .reservation-form .reservation-form-body {
   box-sizing: border-box;
   display: flex;
@@ -294,6 +356,18 @@
     min-height: 0;
     aspect-ratio: 16 / 7;
   }
+
+  /* with the pricing panel: the car area as tall as before, the panel below it */
+  .reservation-form .reservation-form-visual:has(.reservation-form-pricing) {
+    aspect-ratio: auto;
+    padding-top: 43.75%;
+  }
+
+  .reservation-form .reservation-form-pricing {
+    position: relative;
+    inset: auto;
+    margin: 0 16px 16px;
+  }
 }
 
 @media (max-width: 599.98px) {
@@ -303,6 +377,16 @@
 
   .reservation-form .reservation-form-body {
     padding: 28px 20px 24px;
+  }
+
+  .reservation-form .reservation-form-pricing {
+    margin: 0 8px 8px;
+    padding: 16px;
+  }
+
+  .reservation-form .reservation-form-pricing-amount {
+    font-size: 32px;
+    line-height: 38px;
   }
 
   .reservation-form .reservation-form-heading {

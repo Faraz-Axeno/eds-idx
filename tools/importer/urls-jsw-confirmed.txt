@@ -1,2 +1,3 @@
 https://example.com/
 https://example.com/?layout=split
+https://example.com/?page=failed
