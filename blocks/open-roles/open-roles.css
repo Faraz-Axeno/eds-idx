@@ -1,0 +1,820 @@
+@import url('../../styles/jsw-pill-nav.css');
+
+/* the text face until New Science is loaded: Michroma drawn at 80%, about as wide as New Science
+   in the frames (at full size, as the heading's stand-in, it is some 30% wider; any smaller and
+   its letters, lower than New Science's, would look too small) */
+@font-face {
+  font-family: open-roles-text;
+  font-display: swap;
+  src: url('../../fonts/michroma.woff2') format('woff2');
+  size-adjust: 80%;
+}
+
+/*
+ * open-roles: values from the "Phase 5 / Open Roles" frame (1280 wide): a white section, the
+ * intro column (370px) and the role list (the rest, 120px apart, 1100px in all), then the
+ * gallery across the whole width: 458 x 390 images, 22px corners, 24px apart, fading out at
+ * both edges and moving left without stopping.
+ */
+
+/* desktop: the section is sized in "units", 1px each in the 1280 x 720 frames, so on screens
+   shorter or narrower than the frame (laptops: 1366 x 768 leaves about 657px, 150% scaling turns
+   1920 x 1080 into 1280 x 650) the heading, search, filters and list shrink together and fit on
+   one screen; at least 0.62px. Larger screens, tablets and phones keep 1px units */
+.open-roles {
+  --open-roles-unit: 1px;
+
+  padding: calc(100 * var(--open-roles-unit)) 0 calc(110 * var(--open-roles-unit));
+  overflow: hidden;
+  color: #111;
+  background-color: #fff;
+
+  /* all the text in the heading's face (New Science, else Michroma at New Science's width);
+     APPLY NOW stays mono */
+  font-family: new-science, open-roles-text, 'Helvetica Neue', arial, sans-serif;
+}
+
+@media (min-width: 900px) {
+  .open-roles {
+    --open-roles-unit: clamp(0.62px, min(calc(100vh / 720), calc(100vw / 1280)), 1px);
+  }
+}
+
+.open-roles .open-roles-inner {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, calc(370 * var(--open-roles-unit))) minmax(0, 1fr);
+  gap: calc(48 * var(--open-roles-unit)) calc(120 * var(--open-roles-unit));
+  max-width: calc(1148 * var(--open-roles-unit));
+  margin: 0 auto;
+  padding: 0 calc(24 * var(--open-roles-unit));
+}
+
+/* the intro column: its filters at the foot, level with the end of the list */
+.open-roles .open-roles-intro {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.open-roles .open-roles-heading {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 calc(28 * var(--open-roles-unit));
+  font-family: var(--jsw-pill-font-display);
+  font-size: calc(30 * var(--open-roles-unit));
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.open-roles .open-roles-heading-muted {
+  color: #a3a3a3;
+}
+
+.open-roles .open-roles-heading-strong {
+  color: #111;
+}
+
+.open-roles .open-roles-search {
+  position: relative;
+}
+
+.open-roles .open-roles-search-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: calc(60 * var(--open-roles-unit));
+  margin: 0;
+  padding: 0 calc(52 * var(--open-roles-unit)) 0 calc(18 * var(--open-roles-unit));
+  border: 1px solid transparent;
+  border-radius: calc(10 * var(--open-roles-unit));
+  color: #111;
+  background-color: #f2f2f2;
+  font-size: calc(14 * var(--open-roles-unit));
+  appearance: none;
+}
+
+.open-roles .open-roles-search-input::placeholder {
+  color: #9a9a9a;
+  opacity: 1;
+}
+
+.open-roles .open-roles-search-input:focus,
+.open-roles .open-roles-search.has-value .open-roles-search-input {
+  border-color: #9a9a9a;
+  background-color: #fff;
+  outline: none;
+}
+
+
+.open-roles .open-roles-search-icon {
+  position: absolute;
+  top: 50%;
+  right: calc(20 * var(--open-roles-unit));
+  width: calc(16 * var(--open-roles-unit));
+  height: calc(16 * var(--open-roles-unit));
+  color: #a3a3a3;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.open-roles .open-roles-search-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.open-roles .open-roles-search.has-value .open-roles-search-icon {
+  display: none;
+}
+
+.open-roles .open-roles-search-clear {
+  position: absolute;
+  top: 50%;
+  right: calc(12 * var(--open-roles-unit));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(32 * var(--open-roles-unit));
+  height: calc(32 * var(--open-roles-unit));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #555;
+  background: none;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.open-roles .open-roles-search-clear[hidden] {
+  display: none;
+}
+
+.open-roles .open-roles-search-clear:hover {
+  background-color: #f2f2f2;
+}
+
+.open-roles .open-roles-search-clear:focus-visible {
+  outline: 2px solid #111;
+}
+
+.open-roles .open-roles-search-clear svg {
+  width: calc(12 * var(--open-roles-unit));
+  height: calc(12 * var(--open-roles-unit));
+}
+
+/* the suggestions, under the search box and over what follows it */
+.open-roles .open-roles-suggestions {
+  position: absolute;
+  top: calc(100% + calc(6 * var(--open-roles-unit)));
+  right: 0;
+  left: 0;
+  z-index: 6;
+  box-sizing: border-box;
+  max-height: calc(330 * var(--open-roles-unit));
+  margin: 0;
+  padding: calc(6 * var(--open-roles-unit));
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c4c4c4 transparent;
+  border: 1px solid #e2e2e2;
+  border-radius: calc(10 * var(--open-roles-unit));
+  background-color: #fff;
+  box-shadow: 0 10px 28px rgb(0 0 0 / 8%);
+  list-style: none;
+}
+
+.open-roles .open-roles-suggestion {
+  display: flex;
+  flex-direction: column;
+  gap: calc(3 * var(--open-roles-unit));
+  padding: calc(10 * var(--open-roles-unit)) calc(12 * var(--open-roles-unit));
+  border-radius: calc(7 * var(--open-roles-unit));
+  cursor: pointer;
+}
+
+.open-roles .open-roles-suggestion:hover,
+.open-roles .open-roles-suggestion[aria-selected='true'] {
+  background-color: #f2f2f2;
+}
+
+/* suggestions: one line each, a long one ending in "…" */
+.open-roles .open-roles-suggestion-title,
+.open-roles .open-roles-suggestion-meta {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.open-roles .open-roles-suggestion-title {
+  color: #111;
+  font-size: calc(13.5 * var(--open-roles-unit));
+  line-height: 1.35;
+}
+
+.open-roles .open-roles-suggestion-meta {
+  color: #888;
+  font-size: calc(11.5 * var(--open-roles-unit));
+  line-height: 1.4;
+}
+
+.open-roles .open-roles-match {
+  color: inherit;
+  background: none;
+  font-weight: 600;
+}
+
+.open-roles .open-roles-suggestion-empty {
+  padding: calc(12 * var(--open-roles-unit));
+  color: #777;
+  font-size: calc(13 * var(--open-roles-unit));
+}
+
+.open-roles .open-roles-help {
+  max-width: calc(370 * var(--open-roles-unit));
+  margin: calc(14 * var(--open-roles-unit)) 0 0;
+  color: #6f6f6f;
+  font-size: calc(12.5 * var(--open-roles-unit));
+  line-height: 1.5;
+}
+
+.open-roles .open-roles-filters {
+  display: grid;
+  gap: calc(10 * var(--open-roles-unit));
+  margin-top: auto;
+  padding-top: calc(48 * var(--open-roles-unit));
+}
+
+.open-roles .open-roles-filters-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(12 * var(--open-roles-unit));
+  min-height: calc(32 * var(--open-roles-unit));
+  margin-bottom: calc(4 * var(--open-roles-unit));
+}
+
+.open-roles .open-roles-filters-label {
+  margin: 0;
+  color: #555;
+  font-size: calc(16 * var(--open-roles-unit));
+}
+
+.open-roles .open-roles-clear-all {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(8 * var(--open-roles-unit));
+  margin: 0;
+  padding: calc(6 * var(--open-roles-unit)) 0;
+  border: 0;
+  color: #111;
+  background: none;
+  font-size: calc(12.5 * var(--open-roles-unit));
+  cursor: pointer;
+}
+
+.open-roles .open-roles-clear-all[hidden] {
+  display: none;
+}
+
+.open-roles .open-roles-clear-all svg {
+  width: calc(10 * var(--open-roles-unit));
+  height: calc(10 * var(--open-roles-unit));
+}
+
+.open-roles .open-roles-clear-all:hover .open-roles-clear-all-label {
+  text-decoration: underline;
+}
+
+.open-roles .open-roles-clear-all:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+.open-roles .open-roles-filter {
+  position: relative;
+}
+
+.open-roles .open-roles-filter.is-open {
+  z-index: 6;
+}
+
+.open-roles .open-roles-filter-toggle {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--open-roles-unit));
+  width: 100%;
+  height: calc(60 * var(--open-roles-unit));
+  margin: 0;
+  padding: 0 calc(20 * var(--open-roles-unit)) 0 calc(18 * var(--open-roles-unit));
+  border: 1px solid #dcdcdc;
+  border-radius: calc(10 * var(--open-roles-unit));
+  color: #111;
+  background-color: #fff;
+  font-size: calc(15.5 * var(--open-roles-unit));
+  text-align: left;
+  cursor: pointer;
+}
+
+.open-roles .open-roles-filter-toggle.has-selection,
+.open-roles .open-roles-filter.is-open .open-roles-filter-toggle {
+  border-color: #9a9a9a;
+}
+
+.open-roles .open-roles-filter .open-roles-filter-toggle:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 1px;
+}
+
+.open-roles .open-roles-filter-summary {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* the chevron: down, up while the panel is open */
+.open-roles .open-roles-filter-chevron {
+  flex: none;
+  width: calc(14 * var(--open-roles-unit));
+  height: calc(8 * var(--open-roles-unit));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23111' stroke-width='1.4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  transition: transform 0.2s ease;
+}
+
+.open-roles .open-roles-filter.is-open .open-roles-filter-chevron {
+  transform: rotate(180deg);
+}
+
+/* the panel: a checkbox per option, its count of roles at the right */
+.open-roles .open-roles-filter-panel {
+  position: absolute;
+  top: calc(100% + calc(4 * var(--open-roles-unit)));
+  right: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: grid;
+  gap: 2px;
+  max-height: calc(440 * var(--open-roles-unit));
+  padding: calc(6 * var(--open-roles-unit));
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c4c4c4 transparent;
+  border: 1px solid #e2e2e2;
+  border-radius: calc(10 * var(--open-roles-unit));
+  background-color: #fff;
+  box-shadow: 0 10px 28px rgb(0 0 0 / 8%);
+}
+
+.open-roles .open-roles-filter-panel[hidden] {
+  display: none;
+}
+
+.open-roles .open-roles-option {
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--open-roles-unit));
+  padding: calc(10 * var(--open-roles-unit)) calc(10 * var(--open-roles-unit)) calc(10 * var(--open-roles-unit)) calc(12 * var(--open-roles-unit));
+  border-radius: calc(7 * var(--open-roles-unit));
+  color: #111;
+  font-size: calc(14 * var(--open-roles-unit));
+  cursor: pointer;
+}
+
+.open-roles .open-roles-option:hover,
+.open-roles .open-roles-option.is-checked {
+  background-color: #f2f2f2;
+}
+
+.open-roles .open-roles-option-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.open-roles .open-roles-option-count {
+  flex: none;
+  color: #8a8a8a;
+  font-size: calc(13 * var(--open-roles-unit));
+  font-variant-numeric: tabular-nums;
+}
+
+.open-roles .open-roles-option.is-empty:not(.is-checked) {
+  color: #a8a8a8;
+}
+
+.open-roles .open-roles-checkbox {
+  flex: none;
+  width: calc(16 * var(--open-roles-unit));
+  height: calc(16 * var(--open-roles-unit));
+  margin: 0;
+  border: 1px solid #bdbdbd;
+  border-radius: calc(3 * var(--open-roles-unit));
+  background-color: #fff;
+  cursor: pointer;
+  appearance: none;
+}
+
+.open-roles .open-roles-checkbox:checked {
+  border-color: #111;
+  background-color: #111;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8' fill='none'%3E%3Cpath d='M1 4l2.6 2.6L9 1.2' stroke='%23fff' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: calc(10 * var(--open-roles-unit)) calc(8 * var(--open-roles-unit));
+}
+
+.open-roles .open-roles-checkbox:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+/* the list: about four and a half roles tall, scrolling, its thin dark scrollbar 32px out */
+.open-roles .open-roles-results {
+  position: relative;
+  min-width: 0;
+}
+
+.open-roles .open-roles-list {
+  max-height: calc(515 * var(--open-roles-unit));
+  padding-right: calc(32 * var(--open-roles-unit));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #111 #e6e6e6;
+}
+
+/* the last role fades out while more are below it (frame "2. Scrolled, back to top") */
+.open-roles .open-roles-list:not(.is-end) {
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - calc(56 * var(--open-roles-unit))), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - calc(56 * var(--open-roles-unit))), transparent);
+}
+
+.open-roles .open-roles-list:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 4px;
+}
+
+.open-roles .open-roles-jobs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.open-roles .open-roles-job {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(24 * var(--open-roles-unit));
+  padding: 0 0 calc(28 * var(--open-roles-unit));
+  border-bottom: 1px solid #ececec;
+}
+
+.open-roles .open-roles-job + .open-roles-job {
+  padding-top: calc(28 * var(--open-roles-unit));
+}
+
+/* long texts never push the button out: the title at most two lines, the department and the
+   location one line each, ending in "…" (the whole text shows as a tooltip) */
+.open-roles .open-roles-job-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.open-roles .open-roles-job-title {
+  /* stylelint-disable-next-line value-no-vendor-prefix -- line clamping needs the old box */
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: #111;
+  font-family: inherit;
+  font-size: calc(17 * var(--open-roles-unit));
+  font-weight: 500;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+  -webkit-box-orient: vertical;
+  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.open-roles .open-roles-job-meta {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  min-width: 0;
+  gap: calc(4 * var(--open-roles-unit)) calc(10 * var(--open-roles-unit));
+  margin: calc(8 * var(--open-roles-unit)) 0 0;
+  color: #777;
+  font-size: calc(13.5 * var(--open-roles-unit));
+  line-height: 1.4;
+}
+
+.open-roles .open-roles-job-department,
+.open-roles .open-roles-job-location-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.open-roles .open-roles-job-department {
+  flex: 0 1 auto;
+}
+
+.open-roles .open-roles-job-dot {
+  flex: none;
+  width: calc(3 * var(--open-roles-unit));
+  height: calc(3 * var(--open-roles-unit));
+  border-radius: 50%;
+  background-color: currentcolor;
+}
+
+.open-roles .open-roles-job-location {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: calc(6 * var(--open-roles-unit));
+  min-width: 0;
+}
+
+.open-roles .open-roles-job-location svg {
+  flex: none;
+  width: calc(11 * var(--open-roles-unit));
+  height: calc(13 * var(--open-roles-unit));
+}
+
+.open-roles a.open-roles-apply:any-link {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: calc(118 * var(--open-roles-unit));
+  height: calc(36 * var(--open-roles-unit));
+  padding: 0 calc(16 * var(--open-roles-unit));
+  border-radius: calc(6 * var(--open-roles-unit));
+  color: #fff;
+  background-color: #000;
+  font-family: var(--jsw-pill-font-mono);
+  font-size: calc(11 * var(--open-roles-unit));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.open-roles a.open-roles-apply:hover {
+  background-color: #2a2a2a;
+}
+
+.open-roles a.open-roles-apply:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 3px;
+}
+
+.open-roles .open-roles-more {
+  height: 1px;
+}
+
+.open-roles .open-roles-empty {
+  margin: 0;
+  padding: calc(28 * var(--open-roles-unit)) 0;
+  color: #6f6f6f;
+  font-size: calc(14 * var(--open-roles-unit));
+}
+
+.open-roles .open-roles-list.is-empty + .open-roles-empty {
+  padding-top: 0;
+}
+
+.open-roles .open-roles-top {
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--open-roles-unit));
+  margin: calc(18 * var(--open-roles-unit)) auto 0;
+  padding: calc(6 * var(--open-roles-unit)) calc(4 * var(--open-roles-unit));
+  border: 0;
+  color: #111;
+  background: none;
+  font-size: calc(13.5 * var(--open-roles-unit));
+  cursor: pointer;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease, visibility 0.2s;
+}
+
+.open-roles .open-roles-top.is-visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+.open-roles .open-roles-top svg {
+  width: calc(11 * var(--open-roles-unit));
+  height: calc(13 * var(--open-roles-unit));
+}
+
+.open-roles .open-roles-top:hover .open-roles-top-label {
+  text-decoration: underline;
+}
+
+.open-roles .open-roles-top:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+.open-roles .open-roles-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* the gallery: across the whole width, faded at both edges, moving left without stopping */
+.open-roles .open-roles-gallery {
+  margin-top: calc(100 * var(--open-roles-unit));
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+}
+
+.open-roles .open-roles-track {
+  display: flex;
+  width: max-content;
+  animation: open-roles-marquee var(--open-roles-duration, 42s) linear infinite;
+}
+
+.open-roles .open-roles-slide {
+  flex: none;
+  width: calc(458 * var(--open-roles-unit));
+  height: calc(390 * var(--open-roles-unit));
+  margin-right: calc(24 * var(--open-roles-unit));
+  overflow: hidden;
+  border-radius: calc(22 * var(--open-roles-unit));
+  background-color: #eee;
+}
+
+.open-roles .open-roles-slide picture,
+.open-roles .open-roles-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* half the strip is the images once: moved by that half it is back where it started */
+@keyframes open-roles-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* still for visitors who ask for less motion, and while editing (so images can be picked) */
+.open-roles .open-roles-gallery.is-paused .open-roles-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .open-roles .open-roles-track {
+    animation-play-state: paused;
+  }
+}
+
+/* the Phase 5 page scrolls freely: no snapping to its sections (styles/styles.css) */
+html.panels-ready:has(body.jsw-phase-5 main > .section) {
+  scroll-snap-type: none;
+}
+
+/* texts set in Medium (500) in the frames */
+.open-roles :is(.open-roles-suggestion-title, .open-roles-filter-summary, .open-roles-option-label,
+  .open-roles-clear-all-label, .open-roles-top-label) {
+  font-weight: 500;
+}
+
+/* while Michroma stands in for New Science (class open-roles-standin, set by open-roles.js): its
+   one weight, lighter than New Science's Regular, gets a hairline outline (the text's own colour),
+   a stronger one for the Medium texts; the heading and the buttons stay as they are */
+.open-roles.open-roles-standin .open-roles-inner {
+  /* stylelint-disable-next-line property-no-vendor-prefix -- the only text-stroke there is */
+  -webkit-text-stroke: 0.3px currentcolor;
+}
+
+.open-roles.open-roles-standin :is(.open-roles-job-title, .open-roles-suggestion-title,
+  .open-roles-filter-summary, .open-roles-option-label, .open-roles-clear-all-label,
+  .open-roles-top-label) {
+  /* stylelint-disable-next-line property-no-vendor-prefix -- the only text-stroke there is */
+  -webkit-text-stroke-width: 0.045em;
+}
+
+.open-roles.open-roles-standin :is(.open-roles-heading, .open-roles-apply) {
+  /* stylelint-disable-next-line property-no-vendor-prefix -- the only text-stroke there is */
+  -webkit-text-stroke-width: 0;
+}
+
+/* tablets: the list under the intro, the filters right after the search */
+@media (max-width: 899.98px) {
+  .open-roles {
+    padding: 72px 0 80px;
+  }
+
+  .open-roles .open-roles-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .open-roles .open-roles-help {
+    max-width: none;
+  }
+
+  .open-roles .open-roles-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-top: 32px;
+  }
+
+  .open-roles .open-roles-filters-head {
+    grid-column: 1 / -1;
+  }
+
+  .open-roles .open-roles-list {
+    max-height: 480px;
+    padding-right: 16px;
+  }
+
+  .open-roles .open-roles-gallery {
+    margin-top: 72px;
+  }
+
+  .open-roles .open-roles-slide {
+    width: 340px;
+    height: 290px;
+    margin-right: 18px;
+    border-radius: 18px;
+  }
+}
+
+/* phones: one filter per line, the button under the role */
+@media (max-width: 599.98px) {
+  .open-roles {
+    padding: 56px 0 64px;
+  }
+
+  .open-roles .open-roles-inner {
+    padding: 0 20px;
+  }
+
+  .open-roles .open-roles-heading {
+    font-size: 26px;
+  }
+
+  .open-roles .open-roles-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .open-roles .open-roles-job {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .open-roles .open-roles-job-title {
+    font-size: 17px;
+  }
+
+  /* the role text the full width; department and location each on its own line, no dot */
+  .open-roles .open-roles-job-text {
+    align-self: stretch;
+  }
+
+  .open-roles .open-roles-job-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .open-roles .open-roles-job-department,
+  .open-roles .open-roles-job-location {
+    max-width: 100%;
+  }
+
+  .open-roles .open-roles-job-dot {
+    display: none;
+  }
+
+  .open-roles .open-roles-slide {
+    width: 260px;
+    height: 220px;
+    margin-right: 14px;
+    border-radius: 16px;
+  }
+}

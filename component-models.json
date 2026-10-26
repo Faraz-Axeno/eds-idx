@@ -854,6 +854,201 @@
     ]
   },
   {
+    "id": "open-roles",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_heading",
+        "label": "Heading",
+        "description": "The first, grey line of the heading.",
+        "value": "OPEN ROLES AT",
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_headingHighlight",
+        "label": "Heading: dark line",
+        "description": "The second, dark line of the heading.",
+        "value": "JSW MOTORS"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "search_placeholder",
+        "label": "Search box placeholder",
+        "value": "Search Roles"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "search_help",
+        "label": "Search box description",
+        "description": "The text under the search box.",
+        "value": "Search by role, team, or skill. New roles open up as the team grows, so check back soon for what’s new."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "search_filtersLabel",
+        "label": "Filters label",
+        "description": "The label above the filter dropdowns (the Filter items of this block).",
+        "value": "Filter Roles"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "search_emptyMessage",
+        "label": "No results message",
+        "description": "Shown when no role matches the search and filters (in the list and under the search box).",
+        "value": "No roles found matching your criteria."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "labels_clearAll",
+        "label": "Clear all button",
+        "description": "Beside the filters label, once a filter option is ticked.",
+        "value": "Clear all"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "labels_backToTop",
+        "label": "Back to top button",
+        "description": "Under the role list, once it is scrolled down.",
+        "value": "Back to top"
+      }
+    ]
+  },
+  {
+    "id": "open-roles-job",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "roleName",
+        "label": "Job title",
+        "value": "",
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "meta_department",
+        "label": "Department",
+        "value": "",
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "meta_location",
+        "label": "Location",
+        "description": "As shown, e.g. Pune, India. The Locations filter matches its options against this.",
+        "value": "",
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "meta_tags",
+        "label": "Other filter values",
+        "description": "Not shown: words for the other filters (e.g. Experience), separated by commas, e.g. 3-5 years, Full-time.",
+        "value": ""
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "button",
+        "label": "Button link",
+        "description": "The application page or form for this role.",
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "buttonText",
+        "label": "Button text",
+        "value": "APPLY NOW",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "open-roles-filter",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "filterCategoryName",
+        "label": "Filter name",
+        "description": "Shown on the dropdown until options are ticked, e.g. Locations, Departments, Experience.",
+        "value": "",
+        "required": true
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "filterField",
+        "label": "Matches the role's",
+        "description": "Which part of each Job Role the chosen option is looked for in.",
+        "value": "auto",
+        "options": [
+          {
+            "name": "Automatic (from the filter name)",
+            "value": "auto"
+          },
+          {
+            "name": "Location",
+            "value": "location"
+          },
+          {
+            "name": "Department",
+            "value": "department"
+          },
+          {
+            "name": "Other filter values",
+            "value": "tags"
+          },
+          {
+            "name": "Any of its text",
+            "value": "any"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "filterOptions",
+        "label": "Options",
+        "description": "The checkboxes of this dropdown: click Add for each one, e.g. Pune, India. The number of matching roles is shown beside each.",
+        "multi": true
+      }
+    ]
+  },
+  {
+    "id": "open-roles-image",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false,
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Alt text",
+        "value": ""
+      }
+    ]
+  },
+  {
     "id": "parallax-collage",
     "fields": [
       {
