@@ -220,16 +220,36 @@ function hasOption(job, field, value) {
   return job.text.includes(option);
 }
 
+/**
+ * a filter's options: the list of its multi-value field (each option added with Add); else one
+ * per paragraph or line; else a text with the options run together, as stored when they were
+ * not added one by one ("Bangalore, IndiaPune, India"): split where a lower-case letter meets
+ * a capital; else comma-separated
+ */
+function optionsOf(cell) {
+  const list = cell?.querySelector('ul, ol');
+  if (list) return [...list.querySelectorAll('li')].map((li) => li.textContent);
+  const paragraphs = [...(cell?.querySelectorAll('p') || [])].map((p) => p.textContent)
+    .filter((text) => text.trim());
+  if (paragraphs.length > 1) return paragraphs;
+  const lines = [''];
+  (paragraphs.length ? cell.querySelector('p') : cell)?.childNodes.forEach((node) => {
+    if (node.nodeName === 'BR') lines.push('');
+    else lines[lines.length - 1] += node.textContent;
+  });
+  if (lines.filter((line) => line.trim()).length > 1) return lines;
+  const text = lines[0];
+  if (/\p{Ll}\p{Lu}/u.test(text)) return text.replace(/(\p{Ll})(\p{Lu})/gu, '$1\n$2').split('\n');
+  return text.split(',');
+}
+
 /** a filter: a button showing its name (or the ticked options) opening a panel of checkboxes */
 function buildFilter(row, index) {
   const [nameCell, fieldCell, optionsCell] = cellsOf(row);
   const nameField = textsOf(nameCell)('filterCategoryName', 0);
   const name = nameField?.textContent.trim() || 'Filter';
   const field = fieldOf(fieldCell?.textContent.trim(), name);
-  const list = (optionsCell || row).querySelector('ul, ol');
-  const values = (list ? [...list.querySelectorAll('li')].map((li) => li.textContent)
-    : (optionsCell?.textContent || '').split(','))
-    .map((o) => o.trim()).filter(Boolean);
+  const values = optionsOf(optionsCell || row).map((o) => o.trim()).filter(Boolean);
 
   const wrapper = el('div', 'open-roles-filter');
   moveInstrumentation(row, wrapper);
