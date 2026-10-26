@@ -33,7 +33,8 @@
       "expandable-blog-teaser",
       "jsw-navbar",
       "reservation-form",
-      "reservation-confirmation"
+      "reservation-confirmation",
+      "open-roles"
     ]
   },
   {
@@ -107,6 +108,14 @@
     "id": "mg-vehicles",
     "components": [
       "mg-vehicles-item"
+    ]
+  },
+  {
+    "id": "open-roles",
+    "components": [
+      "open-roles-job",
+      "open-roles-filter",
+      "open-roles-image"
     ]
   },
   {

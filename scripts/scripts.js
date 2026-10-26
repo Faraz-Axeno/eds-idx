@@ -407,6 +407,7 @@ const STANDALONE_PAGES = [
   { block: 'parallax-collage', bodyClass: 'jsw-nev-collage' },
   { block: 'reservation-form', bodyClass: 'jsw-reservation' },
   { block: 'reservation-confirmation', bodyClass: 'jsw-reservation' },
+  { block: 'open-roles', bodyClass: 'jsw-phase-5' },
 ];
 
 /**
