@@ -45,11 +45,6 @@ var CustomImportScript = (() => {
     a.href = href;
     return el(document, "p", a);
   }
-  function list(document, items) {
-    const ul = el(document, "ul");
-    items.forEach((item) => ul.append(el(document, "li", item)));
-    return ul;
-  }
   var ROLES = [
     ["Senior Systems Engineer, Hardware Systems", "Hardware and Embedded Engineering", "Bangalore, India", "5+ years"],
     ["Battery Validation Engineer, Hybrid", "Powertrain and Battery Engineering", "Pune, India", "3-5 years"],
@@ -82,6 +77,7 @@ var CustomImportScript = (() => {
   ];
   var import_jsw_phase_5_default = {
     transform: ({ document }) => {
+      const typed = (id, cells2) => [document.createTextNode(id), ...cells2];
       const cells = [
         [group(document, [
           ["content_heading", el(document, "p", "OPEN ROLES AT")],
@@ -91,12 +87,12 @@ var CustomImportScript = (() => {
           ["search_placeholder", el(document, "p", "Search Roles")],
           ["search_help", el(document, "p", "Search by role, team, or skill. New roles open up as the team grows, so check back soon for what\u2019s new.")],
           ["search_filtersLabel", el(document, "p", "Filter Roles")],
-          ["search_emptyMessage", el(document, "p", "No roles found matching your criteria.")]
+          ["search_emptyMessage", el(document, "p", "No roles found matching your criteria.")],
+          ["search_clearAll", el(document, "p", "Clear all")],
+          ["search_backToTop", el(document, "p", "Back to top")]
         ])],
-        [group(document, [
-          ["labels_clearAll", el(document, "p", "Clear all")],
-          ["labels_backToTop", el(document, "p", "Back to top")]
-        ])],
+        // Job Roles: no type cell (md2jcr drops one only when a row has more cells than its model
+        // has fields, which is not so for a Job Role); a row without one is the first type, a Job Role
         ...ROLES.map(([title, department, location, experience]) => [
           hinted(document, "roleName", [title]),
           group(document, [
@@ -106,13 +102,21 @@ var CustomImportScript = (() => {
           ]),
           hinted(document, "button", [link(document, "/jsw-reserve", "APPLY NOW")])
         ]),
-        [hinted(document, "filterCategoryName", ["Locations"]), hinted(document, "filterField", ["location"]), hinted(document, "filterOptions", [list(document, LOCATIONS)])],
-        [hinted(document, "filterCategoryName", ["Departments"]), hinted(document, "filterField", ["department"]), hinted(document, "filterOptions", [list(document, DEPARTMENTS)])],
+        // the Filter Dropdowns: options with commas of their own are separated by semicolons
+        ...[
+          ["Locations", "location", LOCATIONS.join("; ")],
+          ["Departments", "department", DEPARTMENTS.join(", ")]
+        ].map(([name, field, options]) => typed("open-roles-filter", [
+          hinted(document, "categoryName", [name]),
+          hinted(document, "filterField", [field]),
+          hinted(document, "filterOptions", [options])
+        ])),
+        // the Gallery Images
         ...IMAGES.map(([file, alt]) => {
           const img = document.createElement("img");
           img.src = `${IMG}/${file}`;
           img.alt = alt;
-          return [hinted(document, "image", [el(document, "p", img)])];
+          return typed("open-roles-image", [hinted(document, "image", [el(document, "p", img)])]);
         })
       ];
       const main = document.createElement("div");

@@ -540,14 +540,14 @@
           }
         },
         {
-          "title": "Filter",
+          "title": "Filter Dropdown",
           "id": "open-roles-filter",
           "plugins": {
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/block/v1/block/item",
                 "template": {
-                  "name": "Filter",
+                  "name": "Filter Dropdown",
                   "model": "open-roles-filter"
                 }
               }

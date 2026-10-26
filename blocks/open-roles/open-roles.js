@@ -2,16 +2,21 @@
  * open-roles: the JSW careers section ("Phase 5 / Open Roles"): on the left the heading, the
  * search box (with suggestions under it) and its description, then the filters; on the right
  * the scrolling list of roles (title, department · location, APPLY NOW) with "Back to top"
- * under it; under both, a gallery moving continuously to the left.
+ * under it; under both, the gallery: its images side by side, the middle one centred.
  * Rows (model, _open-roles.json):
- *   content — heading (grey line), heading (dark line)
- *   search  — search placeholder, search description, filters label, no-results message
- *   labels  — Clear all, Back to top
- *   then the items, in any order:
- *     Job Role      — job title (roleName) | department, location, other filter values |
- *                     button (link + text)
- *     Filter        — filter name | the role field it matches | options (a multi-value field)
- *     Gallery Image — image (+ alt)
+ *   content  — heading (grey line), heading (dark line)
+ *   search   — search placeholder, search description, filters label, no-results message,
+ *              Clear all, Back to top
+ *   then the items, of three types (in any order):
+ *     Job Role        — job title (roleName) | department, location, other filter values |
+ *                       button (link + text): the list on the right
+ *     Filter Dropdown — its name (categoryName) | the role field it matches | its options:
+ *                       the dropdowns on the left
+ *     Gallery Image   — image (+ alt): the gallery
+ * Content written for the conversion to AEM content names each row's type in a first cell
+ * (open-roles-filter, …): that cell is read, not shown. Pages published with earlier models
+ * keep working: three field rows (content, search, labels), or four (content, search, then the
+ * filter dropdowns and gallery as composite multi-fields).
  * A role is listed when every word typed is in its text and, for every filter with options
  * ticked, it has one of them (ticked options of one filter widen, filters narrow). The counts
  * beside the options and the search suggestions come from the roles themselves. The list is
@@ -35,11 +40,10 @@ const TOP_AFTER = 120;
 // space kept under an open filter panel when the page is moved to show it
 const PANEL_MARGIN = 16;
 
-// gallery: images per half of the moving strip at least (so it fills wide screens), seconds each
-const GALLERY_MIN = 6;
-const GALLERY_SECONDS = 7;
-
 const FILTER_FIELDS = ['auto', 'location', 'department', 'tags', 'any'];
+
+// the first cell of an item row naming its type, as written for the conversion to AEM content
+const TYPE_CELL = /^open-roles-(job|filter|image)$/;
 
 const SEARCH_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="7" cy="7" r="5.25" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
 const CLOSE_ICON = '<svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
@@ -125,10 +129,13 @@ function highlighted(text, words) {
   return frag;
 }
 
-/** what an item row is: by its model in the editor, else by its content */
+/**
+ * what an item row is: a Job Role, or a row of the earlier model — a Filter or Gallery Image,
+ * told by its content (such rows were also stored as Job Roles)
+ */
 function kindOf(row) {
+  if (row.dataset.itemType) return row.dataset.itemType;
   const model = row.dataset.aueModel || '';
-  if (model.endsWith('-job')) return 'job';
   if (model.endsWith('-filter')) return 'filter';
   if (model.endsWith('-image')) return 'image';
   const cells = cellsOf(row);
@@ -221,10 +228,19 @@ function hasOption(job, field, value) {
 }
 
 /**
- * a filter's options: the list of its multi-value field (each option added with Add); else one
- * per paragraph or line; else a text with the options run together, as stored when they were
- * not added one by one ("Bangalore, IndiaPune, India"): split where a lower-case letter meets
- * a capital; else comma-separated
+ * options written in one text: separated by semicolons (or |), when the options have commas of
+ * their own; else by commas; a text with the options run together ("Pune, IndiaMumbai, India",
+ * from the earlier model) is split where a lower-case letter meets a capital
+ */
+function splitOptions(text) {
+  if (/[;|]/.test(text)) return text.split(/[;|]/);
+  if (/\p{Ll}\p{Lu}/u.test(text)) return text.replace(/(\p{Ll})(\p{Lu})/gu, '$1\n$2').split('\n');
+  return text.split(',');
+}
+
+/**
+ * a filter's options (rows of the earlier model): the list of its multi-value field (each
+ * option added with Add); else one per paragraph or line; else one text (splitOptions)
  */
 function optionsOf(cell) {
   const list = cell?.querySelector('ul, ol');
@@ -238,21 +254,65 @@ function optionsOf(cell) {
     else lines[lines.length - 1] += node.textContent;
   });
   if (lines.filter((line) => line.trim()).length > 1) return lines;
-  const text = lines[0];
-  if (/\p{Ll}\p{Lu}/u.test(text)) return text.replace(/(\p{Ll})(\p{Lu})/gu, '$1\n$2').split('\n');
-  return text.split(',');
+  return splitOptions(lines[0]);
 }
 
 /** a filter: a button showing its name (or the ticked options) opening a panel of checkboxes */
-function buildFilter(row, index) {
+/** a field's cell, or what in it carries the field's editor instrumentation */
+const instrumented = (cell) => (cell?.matches('[data-aue-prop]') ? cell
+  : cell?.querySelector(':scope > [data-aue-prop]')) || el('div');
+
+/** a Filter Dropdown item: its parts (filterCategoryName: its name in the first model) */
+function filterItem(row) {
   const [nameCell, fieldCell, optionsCell] = cellsOf(row);
-  const nameField = textsOf(nameCell)('filterCategoryName', 0);
-  const name = nameField?.textContent.trim() || 'Filter';
-  const field = fieldOf(fieldCell?.textContent.trim(), name);
-  const values = optionsOf(optionsCell || row).map((o) => o.trim()).filter(Boolean);
+  const names = textsOf(nameCell);
+  const nameField = names('categoryName', -1) || names('filterCategoryName', 0);
+  return {
+    name: nameField?.textContent.trim(),
+    fieldValue: fieldCell?.textContent.trim(),
+    values: optionsOf(optionsCell || row),
+    source: row,
+    nameField,
+  };
+}
+
+/**
+ * the dropdowns of the Filter Dropdowns field (a composite multi-field): each item between <hr>
+ * is its name, the role field it matches (one of FILTER_FIELDS) and its options
+ */
+function filterCategories(cell) {
+  if (!cell) return [];
+  // separators and texts in page order, however deep (the editor may wrap the field's content)
+  const items = [[]];
+  // (only the innermost: not a list's own parts, nor a wrapper holding the others)
+  [...cell.querySelectorAll('hr, p, ul, ol')]
+    .filter((node) => !node.parentElement.closest('li, ul, ol') && !node.querySelector('hr, p'))
+    .forEach((node) => {
+      if (node.tagName === 'HR') items.push([]);
+      else items[items.length - 1].push(node);
+    });
+  return items.map((nodes) => {
+    const texts = nodes.flatMap((n) => (n.tagName === 'UL' || n.tagName === 'OL'
+      ? [[...n.querySelectorAll('li')].map((li) => li.textContent).join(';')]
+      : [n.textContent])).map((t) => t.trim()).filter(Boolean);
+    const fieldValue = texts.find((t) => FILTER_FIELDS.includes(t));
+    const [name, ...rest] = texts.filter((t) => t !== fieldValue);
+    return {
+      name, fieldValue, values: splitOptions(rest.join(';')),
+    };
+  }).filter((f) => f.name || f.values.some((v) => v.trim()));
+}
+
+/** a filter: a button showing its name (or the ticked options) opening a panel of checkboxes */
+function buildFilter({
+  name: authoredName, fieldValue, values: rawValues, source, nameField,
+}, index) {
+  const name = authoredName || 'Filter';
+  const field = fieldOf(fieldValue, name);
+  const values = rawValues.map((o) => o.trim()).filter(Boolean);
 
   const wrapper = el('div', 'open-roles-filter');
-  moveInstrumentation(row, wrapper);
+  if (source) moveInstrumentation(source, wrapper);
   const panelId = `open-roles-${instance}-filter-${index}`;
   const toggle = el('button', 'open-roles-filter-toggle', {
     type: 'button', 'aria-expanded': 'false', 'aria-controls': panelId,
@@ -310,36 +370,33 @@ function buildFilter(row, index) {
   return filter;
 }
 
-function buildGallery(rows, editing) {
-  const slides = rows.map((row) => {
+function buildGallery(cell, rows, editing) {
+  // the Gallery Images field: its pictures, in order (the field's instrumentation on the gallery)
+  const pictures = [...(cell?.querySelectorAll('picture') || [])];
+  let slides = pictures.map((picture) => {
     const slide = el('div', 'open-roles-slide');
-    moveInstrumentation(row, slide);
-    const picture = row.querySelector('picture');
-    if (picture) slide.append(picture);
+    slide.append(picture);
     return slide;
-  }).filter((slide) => slide.querySelector('picture'));
+  });
+  // else Gallery Image rows of the earlier model; in the editor one without its image yet shows
+  // as an empty frame, so it stays in the page (and in the content tree)
+  if (!slides.length) {
+    slides = rows.map((row) => {
+      const slide = el('div', 'open-roles-slide');
+      moveInstrumentation(row, slide);
+      const picture = row.querySelector('picture');
+      if (picture) slide.append(picture);
+      else slide.classList.add('is-empty');
+      return slide;
+    }).filter((slide) => editing || !slide.classList.contains('is-empty'));
+  }
   if (!slides.length) return null;
 
   const gallery = el('div', 'open-roles-gallery');
+  if (pictures.length) moveInstrumentation(instrumented(cell), gallery);
   const track = el('div', 'open-roles-track');
-  // one half of the strip: the images, repeated until it is wide enough; then the same again,
-  // so moving it by half its width starts it over seamlessly
-  const half = [...slides];
-  while (half.length < GALLERY_MIN) {
-    half.push(...slides.map((slide) => slide.cloneNode(true)));
-  }
-  const copy = half.map((slide) => slide.cloneNode(true));
-  [...half.slice(slides.length), ...copy].forEach((clone) => {
-    clone.setAttribute('aria-hidden', 'true');
-    [clone, ...clone.querySelectorAll('*')].forEach((node) => [...node.attributes]
-      .filter(({ name }) => name.startsWith('data-aue-') || name.startsWith('data-richtext-'))
-      .forEach(({ name }) => node.removeAttribute(name)));
-    clone.querySelectorAll('img').forEach((img) => img.setAttribute('alt', ''));
-  });
-  track.append(...half, ...copy);
-  track.style.setProperty('--open-roles-duration', `${half.length * GALLERY_SECONDS}s`);
+  track.append(...slides);
   gallery.append(track);
-  if (editing) gallery.classList.add('is-paused');
   return gallery;
 }
 
@@ -351,13 +408,44 @@ export default function decorate(block) {
   instance += 1;
   const id = `open-roles-${instance}`;
   const editing = Boolean(block.closest('[data-aue-resource]'));
-  const [contentRow, searchRow, labelsRow, ...itemRows] = [...block.children];
+  const rows = [...block.children];
+  // an item row may name its type in a first cell (open-roles-filter, …): read, then dropped
+  rows.forEach((row) => {
+    const first = row.children.length > 1 ? row.firstElementChild : null;
+    const [, type] = first?.textContent.trim().match(TYPE_CELL) || [];
+    if (!type) return;
+    row.dataset.itemType = type;
+    first.remove();
+  });
+  // the block's own fields are its first rows, one cell each (an image item is not one): two
+  // (content, search); pages published with earlier models have three (content, search, labels)
+  // or four (content, search, filter dropdowns, gallery)
+  let fieldRows = 0;
+  while (fieldRows < 4 && rows[fieldRows] && !rows[fieldRows].dataset.itemType
+    && cellsOf(rows[fieldRows]).length === 1
+    && !(rows[fieldRows].querySelector('picture') && !rows[fieldRows].querySelector('ul, ol'))) {
+    fieldRows += 1;
+  }
+  const [contentRow, searchRow, thirdRow, galleryRow] = rows;
+  const itemRows = rows.slice(Math.max(fieldRows, 2));
   const content = textsOf(cellsOf(contentRow)[0]);
   const search = textsOf(cellsOf(searchRow)[0]);
-  const labels = textsOf(cellsOf(labelsRow)[0]);
+  const labels = fieldRows === 3 ? textsOf(cellsOf(thirdRow)[0]) : null;
+  const filtersCell = fieldRows === 4 ? cellsOf(thirdRow)[0] : null;
+  const galleryCell = fieldRows === 4 ? cellsOf(galleryRow)[0] : null;
 
   const groups = { job: [], filter: [], image: [] };
   itemRows.forEach((row) => groups[kindOf(row)].push(row));
+  // the Filter Dropdown and Gallery Image items; on pages of the composite model, its two fields
+  // when they are filled in (filter and image rows then left out published; in the editor they
+  // show as the Job Roles they were stored as, so authors can find and delete them)
+  const categories = filterCategories(filtersCell);
+  const useFilterItems = !categories.length;
+  const useImageItems = !galleryCell?.querySelector('picture');
+  if (editing) {
+    if (!useFilterItems) groups.job.push(...groups.filter);
+    if (!useImageItems) groups.job.push(...groups.image);
+  }
 
   // left: heading, search, description, filters
   const intro = el('div', 'open-roles-intro');
@@ -370,8 +458,8 @@ export default function decorate(block) {
   const helpField = search('search_help', 1);
   const labelField = search('search_filtersLabel', 2);
   const emptyField = search('search_emptyMessage', 3);
-  const clearAllField = labels('labels_clearAll', 0);
-  const backToTopField = labels('labels_backToTop', 1);
+  const clearAllField = labels ? labels('labels_clearAll', 0) : search('search_clearAll', 4);
+  const backToTopField = labels ? labels('labels_backToTop', 1) : search('search_backToTop', 5);
   const noResults = emptyField?.textContent.trim() || 'No roles found matching your criteria.';
 
   // the search box: a combobox with its suggestions under it, and × to clear it
@@ -409,7 +497,8 @@ export default function decorate(block) {
   if (helpField) intro.append(help);
 
   // the filters: label and Clear all, then one dropdown per Filter item
-  const filters = groups.filter.map(buildFilter);
+  const filters = (useFilterItems ? groups.filter.map(filterItem) : categories)
+    .map(buildFilter);
   const clearAll = el('button', 'open-roles-clear-all', { type: 'button' });
   const clearAllLabel = retag(clearAllField, 'span', 'open-roles-clear-all-label');
   if (!clearAllLabel.textContent.trim()) clearAllLabel.textContent = 'Clear all';
@@ -422,6 +511,8 @@ export default function decorate(block) {
     if (!label.textContent.trim()) label.textContent = 'Filter Roles';
     head.append(label, clearAll);
     filterBox.append(head, ...filters.map((f) => f.wrapper));
+    // the Filter Dropdowns field's instrumentation: picking it outlines the dropdowns
+    if (!useFilterItems) moveInstrumentation(instrumented(filtersCell), filterBox);
     intro.append(filterBox);
   }
 
@@ -642,7 +733,7 @@ export default function decorate(block) {
 
   const inner = el('div', 'open-roles-inner');
   inner.append(intro, listWrap);
-  const gallery = buildGallery(groups.image, editing);
+  const gallery = buildGallery(galleryCell, useImageItems ? groups.image : [], editing);
   block.replaceChildren(inner, ...(gallery ? [gallery] : []));
   if (editing) block.classList.add('open-roles-editing');
   // until New Science is loaded, Michroma stands in: its one weight is thickened to look like
