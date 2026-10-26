@@ -1022,8 +1022,9 @@
         "valueType": "string",
         "name": "filterOptions",
         "label": "Options",
-        "description": "The checkboxes of this dropdown, separated by commas: Pune, Mumbai, Delhi. When an option has a comma of its own, separate them with semicolons: Pune, India; Mumbai, India.",
-        "required": true
+        "description": "The checkboxes of this dropdown: click Add for each one, e.g. Pune, India.",
+        "required": true,
+        "multi": true
       }
     ]
   },
