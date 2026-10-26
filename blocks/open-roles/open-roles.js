@@ -239,8 +239,9 @@ function splitOptions(text) {
 }
 
 /**
- * a filter's options (rows of the earlier model): the list of its multi-value field (each
- * option added with Add); else one per paragraph or line; else one text (splitOptions)
+ * a filter's options: the list of its Options field (a multi-value field, each option added
+ * with Add), one checkbox per entry; pages authored before it was one, with all the options in
+ * a single text: one per paragraph or line, else that text split (splitOptions)
  */
 function optionsOf(cell) {
   const list = cell?.querySelector('ul, ol');
@@ -254,10 +255,24 @@ function optionsOf(cell) {
     else lines[lines.length - 1] += node.textContent;
   });
   if (lines.filter((line) => line.trim()).length > 1) return lines;
+  // AEM's multi-value notation, as content written for the conversion to AEM has it:
+  // [Pune\, India,Mumbai\, India]: entries split at the commas not escaped (\,)
+  const notation = lines[0].trim().match(/^\[(.*)\]$/s);
+  if (notation) {
+    const entries = [''];
+    for (let i = 0; i < notation[1].length; i += 1) {
+      const char = notation[1][i];
+      if (char === '\\' && notation[1][i + 1] === ',') {
+        entries[entries.length - 1] += ',';
+        i += 1;
+      } else if (char === ',') entries.push('');
+      else entries[entries.length - 1] += char;
+    }
+    return entries;
+  }
   return splitOptions(lines[0]);
 }
 
-/** a filter: a button showing its name (or the ticked options) opening a panel of checkboxes */
 /** a field's cell, or what in it carries the field's editor instrumentation */
 const instrumented = (cell) => (cell?.matches('[data-aue-prop]') ? cell
   : cell?.querySelector(':scope > [data-aue-prop]')) || el('div');

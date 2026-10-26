@@ -102,14 +102,16 @@ var CustomImportScript = (() => {
           ]),
           hinted(document, "button", [link(document, "/jsw-reserve", "APPLY NOW")])
         ]),
-        // the Filter Dropdowns: options with commas of their own are separated by semicolons
+        // the Filter Dropdowns: their options a multi-value field, written in AEM's multi-value
+        // notation ([a,b], a comma within an entry as \,), which md2jcr keeps as separate entries
+        // (a list it would join into one text)
         ...[
-          ["Locations", "location", LOCATIONS.join("; ")],
-          ["Departments", "department", DEPARTMENTS.join(", ")]
+          ["Locations", "location", LOCATIONS],
+          ["Departments", "department", DEPARTMENTS]
         ].map(([name, field, options]) => typed("open-roles-filter", [
           hinted(document, "categoryName", [name]),
           hinted(document, "filterField", [field]),
-          hinted(document, "filterOptions", [options])
+          hinted(document, "filterOptions", [el(document, "p", `[${options.map((o) => o.replace(/,/g, "\\,")).join(",")}]`)])
         ])),
         // the Gallery Images
         ...IMAGES.map(([file, alt]) => {
