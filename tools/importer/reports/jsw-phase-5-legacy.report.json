@@ -1,0 +1,9 @@
+{
+  "status": "success",
+  "url": "https://example.com/?v=legacy",
+  "path": "jsw-phase-5-legacy",
+  "timestamp": "2026-10-26T14:45:37.295Z",
+  "title": "jsw-phase-5",
+  "roles": 21,
+  "legacy": true
+}

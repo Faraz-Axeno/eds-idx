@@ -13,8 +13,8 @@
 /*
  * open-roles: values from the "Phase 5 / Open Roles" frame (1280 wide): a white section, the
  * intro column (370px) and the role list (the rest, 120px apart, 1100px in all), then the
- * gallery across the whole width: 458 x 390 images, 22px corners, 24px apart, fading out at
- * both edges and moving left without stopping.
+ * gallery across the whole width: 458 x 390 images, 22px corners, 24px apart, the middle one
+ * centred and the outer ones running off the edges, fading out there (as in the frame).
  */
 
 /* desktop: the section is sized in "units", 1px each in the 1280 x 720 frames, so on screens
@@ -639,7 +639,8 @@
   white-space: nowrap;
 }
 
-/* the gallery: across the whole width, faded at both edges, moving left without stopping */
+/* the gallery: still; across the whole width, the images side by side and centred (with three,
+   the middle one in the middle, the outer ones running off both edges), faded at both edges */
 .open-roles .open-roles-gallery {
   margin-top: calc(100 * var(--open-roles-unit));
   overflow: hidden;
@@ -649,15 +650,14 @@
 
 .open-roles .open-roles-track {
   display: flex;
-  width: max-content;
-  animation: open-roles-marquee var(--open-roles-duration, 42s) linear infinite;
+  justify-content: center;
+  gap: calc(24 * var(--open-roles-unit));
 }
 
 .open-roles .open-roles-slide {
   flex: none;
   width: calc(458 * var(--open-roles-unit));
   height: calc(390 * var(--open-roles-unit));
-  margin-right: calc(24 * var(--open-roles-unit));
   overflow: hidden;
   border-radius: calc(22 * var(--open-roles-unit));
   background-color: #eee;
@@ -671,26 +671,10 @@
   object-fit: cover;
 }
 
-/* half the strip is the images once: moved by that half it is back where it started */
-@keyframes open-roles-marquee {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* still for visitors who ask for less motion, and while editing (so images can be picked) */
-.open-roles .open-roles-gallery.is-paused .open-roles-track {
-  animation-play-state: paused;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .open-roles .open-roles-track {
-    animation-play-state: paused;
-  }
+/* the editor: a Gallery Image without its image yet, an empty frame to fill */
+.open-roles .open-roles-slide.is-empty {
+  outline: 2px dashed #c4c4c4;
+  outline-offset: -2px;
 }
 
 /* the Phase 5 page scrolls freely: no snapping to its sections (styles/styles.css) */
@@ -756,10 +740,13 @@ html.panels-ready:has(body.jsw-phase-5 main > .section) {
     margin-top: 72px;
   }
 
+  .open-roles .open-roles-track {
+    gap: 18px;
+  }
+
   .open-roles .open-roles-slide {
     width: 340px;
     height: 290px;
-    margin-right: 18px;
     border-radius: 18px;
   }
 }
@@ -811,10 +798,13 @@ html.panels-ready:has(body.jsw-phase-5 main > .section) {
     display: none;
   }
 
+  .open-roles .open-roles-track {
+    gap: 14px;
+  }
+
   .open-roles .open-roles-slide {
     width: 260px;
     height: 220px;
-    margin-right: 14px;
     border-radius: 16px;
   }
 }

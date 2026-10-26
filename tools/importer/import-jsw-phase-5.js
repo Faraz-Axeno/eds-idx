@@ -3,8 +3,11 @@
 
 /**
  * JSW Phase 5 page (/jsw-phase-5), from the "Phase 5 / Open Roles" design frame (no source
- * site: the fetched document is ignored). One block, open-roles: its three field groups
- * (content | search | labels), then its items: Job Roles, Filters and Gallery Images.
+ * site: the fetched document is ignored). One block, open-roles: its fields (content | search),
+ * then its items: the Job Roles, the Filter Dropdowns and the Gallery Images.
+ * The Filter Dropdown and Gallery Image rows start with their item type (open-roles-filter,
+ * open-roles-image) so md2jcr (the conversion to AEM content) creates them as those items; rows
+ * without one are Job Roles, the block's first item type.
  * The roles are the design's five plus more, so the list scrolls and loads in pages; the
  * gallery images were cut from the design.
  */
@@ -77,6 +80,9 @@ const IMAGES = [
 
 export default {
   transform: ({ document }) => {
+    // each item row starts with its type's id (no field hint): md2jcr reads it to create the
+    // right item; the block's code reads and drops it
+    const typed = (id, cells) => [document.createTextNode(id), ...cells];
     const cells = [
       [group(document, [
         ['content_heading', el(document, 'p', 'OPEN ROLES AT')],
@@ -87,11 +93,11 @@ export default {
         ['search_help', el(document, 'p', 'Search by role, team, or skill. New roles open up as the team grows, so check back soon for what’s new.')],
         ['search_filtersLabel', el(document, 'p', 'Filter Roles')],
         ['search_emptyMessage', el(document, 'p', 'No roles found matching your criteria.')],
+        ['search_clearAll', el(document, 'p', 'Clear all')],
+        ['search_backToTop', el(document, 'p', 'Back to top')],
       ])],
-      [group(document, [
-        ['labels_clearAll', el(document, 'p', 'Clear all')],
-        ['labels_backToTop', el(document, 'p', 'Back to top')],
-      ])],
+      // Job Roles: no type cell (md2jcr drops one only when a row has more cells than its model
+      // has fields, which is not so for a Job Role); a row without one is the first type, a Job Role
       ...ROLES.map(([title, department, location, experience]) => [
         hinted(document, 'roleName', [title]),
         group(document, [
@@ -101,13 +107,21 @@ export default {
         ]),
         hinted(document, 'button', [link(document, '/jsw-reserve', 'APPLY NOW')]),
       ]),
-      [hinted(document, 'filterCategoryName', ['Locations']), hinted(document, 'filterField', ['location']), hinted(document, 'filterOptions', [list(document, LOCATIONS)])],
-      [hinted(document, 'filterCategoryName', ['Departments']), hinted(document, 'filterField', ['department']), hinted(document, 'filterOptions', [list(document, DEPARTMENTS)])],
+      // the Filter Dropdowns: options with commas of their own are separated by semicolons
+      ...[
+        ['Locations', 'location', LOCATIONS.join('; ')],
+        ['Departments', 'department', DEPARTMENTS.join(', ')],
+      ].map(([name, field, options]) => typed('open-roles-filter', [
+        hinted(document, 'categoryName', [name]),
+        hinted(document, 'filterField', [field]),
+        hinted(document, 'filterOptions', [options]),
+      ])),
+      // the Gallery Images
       ...IMAGES.map(([file, alt]) => {
         const img = document.createElement('img');
         img.src = `${IMG}/${file}`;
         img.alt = alt;
-        return [hinted(document, 'image', [el(document, 'p', img)])];
+        return typed('open-roles-image', [hinted(document, 'image', [el(document, 'p', img)])]);
       }),
     ];
 

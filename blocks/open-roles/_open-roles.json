@@ -32,14 +32,14 @@
       }
     },
     {
-      "title": "Filter",
+      "title": "Filter Dropdown",
       "id": "open-roles-filter",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/franklin/components/block/v1/block/item",
             "template": {
-              "name": "Filter",
+              "name": "Filter Dropdown",
               "model": "open-roles-filter"
             }
           }
@@ -117,7 +117,7 @@
         {
           "component": "text",
           "valueType": "string",
-          "name": "labels_clearAll",
+          "name": "search_clearAll",
           "label": "Clear all button",
           "description": "Beside the filters label, once a filter option is ticked.",
           "value": "Clear all"
@@ -125,7 +125,7 @@
         {
           "component": "text",
           "valueType": "string",
-          "name": "labels_backToTop",
+          "name": "search_backToTop",
           "label": "Back to top button",
           "description": "Under the role list, once it is scrolled down.",
           "value": "Back to top"
@@ -192,10 +192,9 @@
         {
           "component": "text",
           "valueType": "string",
-          "name": "filterCategoryName",
-          "label": "Filter name",
-          "description": "Shown on the dropdown until options are ticked, e.g. Locations, Departments, Experience.",
-          "value": "",
+          "name": "categoryName",
+          "label": "Dropdown name",
+          "description": "Shown on the dropdown until options are ticked, e.g. Locations.",
           "required": true
         },
         {
@@ -233,8 +232,8 @@
           "valueType": "string",
           "name": "filterOptions",
           "label": "Options",
-          "description": "The checkboxes of this dropdown: click Add for each one, e.g. Pune, India. The number of matching roles is shown beside each.",
-          "multi": true
+          "description": "The checkboxes of this dropdown, separated by commas: Pune, Mumbai, Delhi. When an option has a comma of its own, separate them with semicolons: Pune, India; Mumbai, India.",
+          "required": true
         }
       ]
     },
