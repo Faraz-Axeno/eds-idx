@@ -36,7 +36,8 @@
       "reservation-confirmation",
       "open-roles",
       "career-hero",
-      "career-route"
+      "career-route",
+      "jsw-footer"
     ]
   },
   {
@@ -92,6 +93,14 @@
     "id": "jsw-collage",
     "components": [
       "jsw-collage-item"
+    ]
+  },
+  {
+    "id": "jsw-footer",
+    "components": [
+      "jsw-footer-column",
+      "jsw-footer-link",
+      "jsw-footer-social"
     ]
   },
   {

@@ -8,6 +8,7 @@
  *   2. open-roles: its fields (content | search), then its items: the Job Roles, the Filter
  *      Dropdowns and the Gallery Images;
  *   3. career-route: its fields, then its four Route Steps.
+ * The JSW footer (/jsw-footer) is not part of the page: scripts.js loads it as the page's footer.
  * The Filter Dropdown and Gallery Image rows start with their item type (open-roles-filter,
  * open-roles-image) so md2jcr (the conversion to AEM content) creates them as those items; rows
  * without one are Job Roles, the block's first item type.
