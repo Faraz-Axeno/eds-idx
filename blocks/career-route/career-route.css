@@ -1,9 +1,9 @@
 @import url('../../styles/jsw-pill-nav.css');
 
 /*
- * career-route: values from the "Phase 5 / Route In" frame (1280 x 720): the photo covering the
- * section, darkened; the heading 54px in, 60px from the top; at the foot, 40px above the end,
- * four frosted-glass step cards side by side, 205px tall, 8px apart. A static section.
+ * career-route: values from the "Phase 5 / Route In" frame (1280 wide), tightened: the photo
+ * covering the section, darkened; the heading 54px in, 48px from the top; at the foot, 32px above
+ * the end, four compact frosted-glass step cards side by side, 8px apart. A static section.
  */
 
 /* the text face until New Science is loaded: Michroma drawn at 80%, about as wide as New Science
@@ -60,14 +60,21 @@
   background-image: linear-gradient(180deg, rgb(0 0 0 / 55%) 0%, rgb(0 0 0 / 22%) 45%, rgb(0 0 0 / 40%) 100%);
 }
 
+/* the section as tall as the block, not a screen tall (main > .section, styles/styles.css), so no
+   empty band below the photo on taller screens or in the editor */
+main > .section.career-route-container {
+  min-height: 0;
+}
+
+/* the heading at the top, the steps anchored to the foot (margin-top: auto below); 640 tall in the
+   1280-wide frame, in units, so on narrower desktops it shrinks with the width */
 .career-route .career-route-inner {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 48px;
-  min-height: 720px;
-  padding: calc(60 * var(--career-route-unit)) calc(54 * var(--career-route-unit)) calc(40 * var(--career-route-unit));
+  gap: calc(48 * var(--career-route-unit));
+  min-height: calc(640 * var(--career-route-unit));
+  padding: calc(48 * var(--career-route-unit)) calc(54 * var(--career-route-unit)) calc(32 * var(--career-route-unit));
 }
 
 .career-route .career-route-heading {
@@ -97,20 +104,21 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: calc(8 * var(--career-route-unit));
   margin: 0;
+  margin-top: auto;
   padding: 0;
   list-style: none;
 }
 
-/* frosted glass: the photo blurred behind a gradient, darker at the foot, lighter at the top */
+/* frosted glass: the photo blurred behind a gradient, darker at the foot, lighter at the top;
+   as tall as its texts (the cards of a row match the tallest), the number, title and description
+   grouped from the top so the titles line up */
 .career-route .career-route-step {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: calc(20 * var(--career-route-unit));
+  gap: calc(24 * var(--career-route-unit));
   min-width: 0;
-  height: calc(205 * var(--career-route-unit));
-  padding: calc(26 * var(--career-route-unit)) calc(24 * var(--career-route-unit)) calc(30 * var(--career-route-unit));
+  padding: calc(18 * var(--career-route-unit)) calc(22 * var(--career-route-unit)) calc(20 * var(--career-route-unit));
   border-radius: calc(8 * var(--career-route-unit));
   background: linear-gradient(0deg, rgb(12 9 6 / 62%) 0%, rgb(12 9 6 / 34%) 55%, rgb(12 9 6 / 18%) 100%);
   -webkit-backdrop-filter: blur(10px);
@@ -128,7 +136,7 @@
   font-family: var(--jsw-pill-font-display);
   font-size: calc(18 * var(--career-route-unit));
   font-weight: 300;
-  line-height: 1.1;
+  line-height: 1;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -143,7 +151,7 @@
   font-family: inherit;
   font-size: calc(14 * var(--career-route-unit));
   font-weight: 500;
-  line-height: 1.3;
+  line-height: 1.2;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -152,11 +160,11 @@
 .career-route .career-route-step .career-route-step-description {
   /* stylelint-disable-next-line value-no-vendor-prefix -- line clamping needs the old box */
   display: -webkit-box;
-  margin-top: calc(8 * var(--career-route-unit));
+  margin-top: calc(5 * var(--career-route-unit));
   overflow: hidden;
   color: rgb(255 255 255 / 72%);
   font-size: calc(13 * var(--career-route-unit));
-  line-height: 1.55;
+  line-height: 1.4;
   letter-spacing: 0;
   overflow-wrap: anywhere;
   /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
@@ -193,9 +201,9 @@ body:has(.career-route[data-aue-resource]) {
 /* tablets: two steps a row */
 @media (max-width: 899.98px) {
   .career-route .career-route-inner {
-    gap: 160px;
+    gap: 120px;
     min-height: 0;
-    padding: 56px 24px 32px;
+    padding: 48px 24px 28px;
   }
 
   .career-route .career-route-heading {
@@ -205,17 +213,13 @@ body:has(.career-route[data-aue-resource]) {
   .career-route .career-route-steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .career-route .career-route-step {
-    height: 190px;
-  }
 }
 
 /* phones: one step a row */
 @media (max-width: 599.98px) {
   .career-route .career-route-inner {
-    gap: 120px;
-    padding: 48px 20px 24px;
+    gap: 96px;
+    padding: 40px 20px 20px;
   }
 
   .career-route .career-route-heading {
@@ -227,7 +231,7 @@ body:has(.career-route[data-aue-resource]) {
   }
 
   .career-route .career-route-step {
-    height: 170px;
-    padding: 22px 20px 24px;
+    gap: 18px;
+    padding: 16px 18px 18px;
   }
 }
