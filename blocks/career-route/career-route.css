@@ -61,7 +61,8 @@
 }
 
 /* the section as tall as the block, not a screen tall (main > .section, styles/styles.css), so no
-   empty band below the photo on taller screens or in the editor */
+   empty band below the photo on taller screens or in the editor (whose canvas can grow to fit the
+   page: a section a screen tall would grow it without end); only the section holding the block */
 main > .section.career-route-container {
   min-height: 0;
 }
@@ -189,13 +190,6 @@ html.adobe-ue-edit .career-route .career-route-step.is-over-limit {
 .career-route .career-route-step .career-route-step-limit {
   color: #ffb27a;
   font-size: 12px;
-}
-
-/* Universal Editor (its markup carries data-aue-resource): its canvas can grow to fit the page,
-   and sections a screen tall (styles/styles.css) would then grow it without end; there a screen
-   counts as at most 1000px (as on the other JSW pages) */
-body:has(.career-route[data-aue-resource]) {
-  --mg-panel-height: min(100svh, 1000px);
 }
 
 /* tablets: two steps a row */

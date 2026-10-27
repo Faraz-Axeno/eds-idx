@@ -215,12 +215,13 @@
 /* Universal Editor (its markup carries data-aue-resource; never on the published page): its
    canvas can grow to fit the page, and parts a screen tall (this top, and every section, at
    least a screen tall in styles/styles.css) would then grow it without end; there a screen
-   counts as at most 1000px (as on /jsw-phase-3 and the reservation pages) */
+   counts as at most 1000px (as on /jsw-phase-3 and the reservation pages); set on the block and
+   the section holding it only, never page-wide */
 .career-hero.career-hero-editing {
   --career-hero-screen: min(100vh, 1000px);
 }
 
-body:has(.career-hero[data-aue-resource]) {
+main > .section.career-hero-container:has(.career-hero[data-aue-resource]) {
   --mg-panel-height: min(100svh, 1000px);
 }
 
