@@ -1,0 +1,282 @@
+@import url('../../styles/jsw-pill-nav.css');
+
+/*
+ * career-hero: values from the "Phase 5 / Hero" frames (1280 wide): the photo behind the whole
+ * section; the content 1128px wide, centred; the top a screen tall less 59px, so the cards' top
+ * edge shows at the foot of the screen; the heading 56px above the cards, the SCROLL label at
+ * its right; three 360 x 325 cards, 24px apart, 33px above the section's end. Plain scrolling
+ * brings the cards into view (no scroll effects).
+ */
+
+/* the text face until New Science is loaded: Michroma drawn at 80%, about as wide as New Science
+   in the frames (as in open-roles) */
+@font-face {
+  font-family: career-hero-text;
+  font-display: swap;
+  src: url('../../fonts/michroma.woff2') format('woff2');
+  size-adjust: 80%;
+}
+
+.career-hero {
+  --career-hero-peek: 59px;
+  --career-hero-screen: 100vh;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  background-color: #0b0b0b;
+  font-family: new-science, career-hero-text, 'Helvetica Neue', arial, sans-serif;
+}
+
+@supports (height: 1svh) {
+  .career-hero {
+    --career-hero-screen: 100svh;
+  }
+}
+
+/* the photo behind everything, the cards included */
+.career-hero .career-hero-media,
+.career-hero .career-hero-media picture,
+.career-hero .career-hero-media img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+}
+
+.career-hero .career-hero-media img {
+  object-fit: cover;
+  object-position: 50% 90%;
+}
+
+.career-hero .career-hero-inner {
+  box-sizing: border-box;
+  width: min(1128px, calc(100% - 48px));
+  margin: 0 auto;
+  padding-bottom: 33px;
+}
+
+/* the top: a screen tall less the cards' top edge; the heading and scroll label at its foot */
+.career-hero .career-hero-top {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: calc(var(--career-hero-screen) - var(--career-hero-peek));
+  padding: 120px 0 56px;
+}
+
+.career-hero .career-hero-heading {
+  /* stylelint-disable-next-line value-no-vendor-prefix -- line clamping needs the old box */
+  display: -webkit-box;
+  max-width: 560px;
+  margin: 0;
+  overflow: hidden;
+  color: #fff;
+  font-family: var(--jsw-pill-font-display);
+  font-size: 43px;
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+  -webkit-box-orient: vertical;
+  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* the scroll label: a small dark pill, a mouse icon and the label */
+.career-hero .career-hero-scroll {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  max-width: 40%;
+  height: 31px;
+  margin: 0 0 7px;
+  padding: 0 12px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 8px;
+  color: #fff;
+  background-color: rgb(0 0 0 / 35%);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-family: var(--jsw-pill-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.career-hero .career-hero-scroll svg {
+  flex: none;
+  width: 9px;
+  height: 13px;
+}
+
+.career-hero .career-hero-scroll-label {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* the cards: three side by side, equal, the same height whatever their texts */
+.career-hero .career-hero-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.career-hero .career-hero-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  min-width: 0;
+  height: 325px;
+  padding: 24px 22px 28px;
+  border-radius: 16px;
+  color: #111;
+  background-color: #fff;
+}
+
+.career-hero .career-hero-card p {
+  margin: 0;
+}
+
+/* the subtitle: one line after a small blue square */
+.career-hero .career-hero-card-subtitle {
+  overflow: hidden;
+  color: #444;
+  font-size: 15px;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.career-hero .career-hero-card-subtitle::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 9px;
+  background-color: #3d9bd6;
+  vertical-align: 0.15em;
+}
+
+.career-hero .career-hero-card-value {
+  overflow: hidden;
+  color: #111;
+  font-family: var(--jsw-pill-font-display);
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.15;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* the description: two lines at most, ending in "…" */
+.career-hero .career-hero-card .career-hero-card-description {
+  /* stylelint-disable-next-line value-no-vendor-prefix -- line clamping needs the old box */
+  display: -webkit-box;
+  margin-top: 12px;
+  overflow: hidden;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+  -webkit-box-orient: vertical;
+  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* the editor: cards over the limit (MAX_CARDS, career-hero.js) dimmed, with a note */
+.career-hero .career-hero-card.is-over-limit {
+  opacity: 0.45;
+}
+
+.career-hero .career-hero-card .career-hero-card-limit {
+  color: #b04a00;
+  font-size: 12px;
+}
+
+/* Universal Editor (its markup carries data-aue-resource; never on the published page): its
+   canvas can grow to fit the page, and parts a screen tall (this top, and every section, at
+   least a screen tall in styles/styles.css) would then grow it without end; there a screen
+   counts as at most 1000px (as on /jsw-phase-3 and the reservation pages) */
+.career-hero.career-hero-editing {
+  --career-hero-screen: min(100vh, 1000px);
+}
+
+body:has(.career-hero[data-aue-resource]) {
+  --mg-panel-height: min(100svh, 1000px);
+}
+
+/* tablets and phones: the cards one above the other, the scroll label under the heading */
+@media (max-width: 899.98px) {
+  /* the stacked cards make the section tall, the whole photo shows: a dark fade behind the
+     heading and cards keeps the white text readable over its bright sky */
+  .career-hero .career-hero-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(180deg, rgb(0 0 0 / 0%) 20%, rgb(0 0 0 / 55%) 42%, rgb(0 0 0 / 85%) 100%);
+  }
+
+  .career-hero .career-hero-inner {
+    width: calc(100% - 40px);
+  }
+
+  .career-hero .career-hero-top {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 18px;
+    padding-bottom: 40px;
+  }
+
+  .career-hero .career-hero-heading {
+    font-size: 34px;
+  }
+
+  .career-hero .career-hero-scroll {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .career-hero .career-hero-cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .career-hero .career-hero-card {
+    height: 220px;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .career-hero .career-hero-heading {
+    font-size: 26px;
+  }
+
+  .career-hero .career-hero-card {
+    height: 200px;
+    padding: 20px 18px 22px;
+  }
+
+  .career-hero .career-hero-card-value {
+    font-size: 30px;
+  }
+}

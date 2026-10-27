@@ -1,0 +1,123 @@
+{
+  "definitions": [
+    {
+      "title": "Career Route",
+      "id": "career-route",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Career Route",
+              "model": "career-route",
+              "filter": "career-route"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Route Step",
+      "id": "career-route-step",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Route Step",
+              "model": "career-route-step"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "career-route",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "backgroundImage",
+          "label": "Background image",
+          "description": "The office photo behind the whole section. Route steps: you may add multiple steps, but a maximum of 4 will be displayed on the live site.",
+          "multi": false,
+          "required": true
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "backgroundImageAlt",
+          "label": "Background image alt text",
+          "description": "Describes the photo for screen readers. At most 125 characters.",
+          "value": "",
+          "validation": {
+            "maxLength": 125
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "heading",
+          "label": "Heading",
+          "description": "Two lines at most. Warning: text longer than 38 characters is cut short with “…”.",
+          "value": "THE ROAD IS NEW. HERE’S THE ROUTE IN.",
+          "required": true,
+          "validation": {
+            "maxLength": 38
+          }
+        }
+      ]
+    },
+    {
+      "id": "career-route-step",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "stepNumber",
+          "label": "Step number",
+          "description": "Warning: You may add multiple steps, but a maximum of 4 will be displayed on the live site. The number, e.g. 01: at most 3 characters.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 3
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "stepHeading",
+          "label": "Step title",
+          "description": "Warning: text longer than 30 characters is cut short with “…”.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 30
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "stepDescription",
+          "label": "Step description",
+          "description": "Three lines at most. Warning: text longer than 105 characters is cut short with “…”.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 105
+          }
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "career-route",
+      "components": [
+        "career-route-step"
+      ]
+    }
+  ]
+}

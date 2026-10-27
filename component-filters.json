@@ -34,7 +34,9 @@
       "jsw-navbar",
       "reservation-form",
       "reservation-confirmation",
-      "open-roles"
+      "open-roles",
+      "career-hero",
+      "career-route"
     ]
   },
   {
@@ -47,6 +49,18 @@
     "id": "cards",
     "components": [
       "card"
+    ]
+  },
+  {
+    "id": "career-hero",
+    "components": [
+      "career-hero-stat"
+    ]
+  },
+  {
+    "id": "career-route",
+    "components": [
+      "career-route-step"
     ]
   },
   {

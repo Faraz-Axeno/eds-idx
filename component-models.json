@@ -311,6 +311,173 @@
     ]
   },
   {
+    "id": "career-hero",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "backgroundImage",
+        "label": "Background image",
+        "description": "The photo behind the whole section, the stat cards included.",
+        "multi": false,
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "backgroundImageAlt",
+        "label": "Background image alt text",
+        "description": "Describes the photo for screen readers. At most 125 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 125
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading",
+        "description": "Two lines at most. Warning: text longer than 25 characters is cut short with “…”.",
+        "value": "THE WORLD NEEDS PIONEERS",
+        "required": true,
+        "validation": {
+          "maxLength": 25
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "scrollLabel",
+        "label": "Scroll label",
+        "description": "The label beside the mouse icon. Warning: text longer than 12 characters is cut short with “…”.",
+        "value": "SCROLL",
+        "validation": {
+          "maxLength": 12
+        }
+      }
+    ]
+  },
+  {
+    "id": "career-hero-stat",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "subtitle",
+        "label": "Subtitle",
+        "description": "The small line at the top of the card. Only the first 3 Stat Cards are shown. Warning: text longer than 32 characters is cut short with “…”.",
+        "value": "",
+        "required": true,
+        "validation": {
+          "maxLength": 32
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "statValue",
+        "label": "Stat value",
+        "description": "The big figure, e.g. 1,000+ or 44 YRS. Warning: text longer than 8 characters is cut short with “…”.",
+        "value": "",
+        "required": true,
+        "validation": {
+          "maxLength": 8
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "description",
+        "label": "Description",
+        "description": "Two lines at most under the figure. Warning: text longer than 80 characters is cut short with “…”.",
+        "value": "",
+        "required": true,
+        "validation": {
+          "maxLength": 80
+        }
+      }
+    ]
+  },
+  {
+    "id": "career-route",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "backgroundImage",
+        "label": "Background image",
+        "description": "The office photo behind the whole section. Route steps: you may add multiple steps, but a maximum of 4 will be displayed on the live site.",
+        "multi": false,
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "backgroundImageAlt",
+        "label": "Background image alt text",
+        "description": "Describes the photo for screen readers. At most 125 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 125
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading",
+        "description": "Two lines at most. Warning: text longer than 38 characters is cut short with “…”.",
+        "value": "THE ROAD IS NEW. HERE’S THE ROUTE IN.",
+        "required": true,
+        "validation": {
+          "maxLength": 38
+        }
+      }
+    ]
+  },
+  {
+    "id": "career-route-step",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "stepNumber",
+        "label": "Step number",
+        "description": "Warning: You may add multiple steps, but a maximum of 4 will be displayed on the live site. The number, e.g. 01: at most 3 characters.",
+        "value": "",
+        "required": true,
+        "validation": {
+          "maxLength": 3
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "stepHeading",
+        "label": "Step title",
+        "description": "Warning: text longer than 30 characters is cut short with “…”.",
+        "value": "",
+        "required": true,
+        "validation": {
+          "maxLength": 30
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "stepDescription",
+        "label": "Step description",
+        "description": "Three lines at most. Warning: text longer than 105 characters is cut short with “…”.",
+        "value": "",
+        "required": true,
+        "validation": {
+          "maxLength": 105
+        }
+      }
+    ]
+  },
+  {
     "id": "columns",
     "fields": [
       {

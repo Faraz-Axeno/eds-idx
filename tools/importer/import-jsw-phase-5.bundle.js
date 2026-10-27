@@ -68,6 +68,17 @@ var CustomImportScript = (() => {
     ["Product Manager, Connected Vehicle", "Design and Digital Products", "Gurugram, India", "6+ years"],
     ["Dealer Development Manager", "Sales and Network Operations", "Gurugram, India", "5+ years"]
   ];
+  var STATS = [
+    ["People who joined in year one", "1,000+", "You won\u2019t be the only new face. Everyone here is building this for the first time."],
+    ["Roles opening this year", "250+", "New roles across engineering, design, sales and service as the team grows."],
+    ["Years of JSW behind you", "44 YRS", "Backed by a group that has built steel, energy and infrastructure across India since 1982."]
+  ];
+  var STEPS = [
+    ["01", "How we hire", "A chat with the team, then a working session on a real problem. You hear back after every step."],
+    ["02", "Where we work", "Most roles are on site, close to the people you build with. If one isn\u2019t, the listing says so."],
+    ["03", "Moving for the role", "If the role means a new city, tell us early. We\u2019ll plan the move with you and work around your situation."],
+    ["04", "Your first months", "You meet the plant, the test roads and the dealer network early, so you know the car you\u2019re working on."]
+  ];
   var LOCATIONS = ["Bangalore, India", "Pune, India", "Mumbai, India", "Gurugram, India", "Chennai, India", "Delhi, India", "San Francisco, USA"];
   var DEPARTMENTS = [...new Set(ROLES.map((r) => r[1]))];
   var IMAGES = [
@@ -121,8 +132,39 @@ var CustomImportScript = (() => {
           return typed("open-roles-image", [hinted(document, "image", [el(document, "p", img)])]);
         })
       ];
+      const heroImage = document.createElement("img");
+      heroImage.src = `${IMG}/career-hero.jpg`;
+      heroImage.alt = "Silhouettes of visitors at a window looking out at the pyramids";
+      const hero = WebImporter.Blocks.createBlock(document, {
+        name: "career-hero",
+        cells: [
+          [hinted(document, "backgroundImage", [el(document, "p", heroImage)])],
+          [hinted(document, "heading", [el(document, "p", "THE WORLD NEEDS PIONEERS")])],
+          [hinted(document, "scrollLabel", [el(document, "p", "SCROLL")])],
+          ...STATS.map(([subtitle, value, description]) => [
+            hinted(document, "subtitle", [el(document, "p", subtitle)]),
+            hinted(document, "statValue", [el(document, "p", value)]),
+            hinted(document, "description", [el(document, "p", description)])
+          ])
+        ]
+      });
+      const routeImage = document.createElement("img");
+      routeImage.src = `${IMG}/career-route.jpg`;
+      routeImage.alt = "Colleagues working on laptops around a wooden table";
+      const route = WebImporter.Blocks.createBlock(document, {
+        name: "career-route",
+        cells: [
+          [hinted(document, "backgroundImage", [el(document, "p", routeImage)])],
+          [hinted(document, "heading", [el(document, "p", "THE ROAD IS NEW. HERE\u2019S THE ROUTE IN.")])],
+          ...STEPS.map(([number, title, description]) => [
+            hinted(document, "stepNumber", [el(document, "p", number)]),
+            hinted(document, "stepHeading", [el(document, "p", title)]),
+            hinted(document, "stepDescription", [el(document, "p", description)])
+          ])
+        ]
+      });
       const main = document.createElement("div");
-      main.append(WebImporter.Blocks.createBlock(document, { name: "open-roles", cells }));
+      main.append(hero, document.createElement("hr"), WebImporter.Blocks.createBlock(document, { name: "open-roles", cells }), document.createElement("hr"), route);
       return [{ element: main, path: "/jsw-phase-5", report: { title: "jsw-phase-5", roles: ROLES.length } }];
     }
   };
