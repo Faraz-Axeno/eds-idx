@@ -688,9 +688,18 @@
   outline-offset: -2px;
 }
 
-/* the Phase 5 page scrolls freely: no snapping to its sections (styles/styles.css) */
-html.panels-ready:has(body.jsw-phase-5 main > .section) {
+/* the page holding the block (Phase 5) scrolls freely: no snapping to its sections
+   (styles/styles.css); scroll snapping can only be set on the page itself, so this one rule sits
+   above the block, keyed on the block being on the page */
+html.panels-ready:has(main .open-roles) {
   scroll-snap-type: none;
+}
+
+/* Universal Editor (its markup carries data-aue-resource): its canvas can grow to fit the page,
+   and a section a screen tall (styles/styles.css) would then grow it without end; there a screen
+   counts as at most 1000px, set on the section holding the block only */
+main > .section.open-roles-container:has(.open-roles[data-aue-resource]) {
+  --mg-panel-height: min(100svh, 1000px);
 }
 
 /* every text keeps to its space, ending in "…" when it runs out of it (the whole text as a
