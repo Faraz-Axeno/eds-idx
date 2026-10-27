@@ -22,6 +22,7 @@
   --career-hero-screen: 100vh;
 
   position: relative;
+  z-index: 10;
   isolation: isolate;
   overflow: hidden;
   color: #fff;
@@ -33,6 +34,13 @@
   .career-hero {
     --career-hero-screen: 100svh;
   }
+}
+
+/* the JSW navigation stays at the top of the screen through every section of the page (here
+   only; the reservation pages keep theirs in place): fixed, and the hero raised above the
+   sections after it (z-index above) so the navigation, inside the hero, paints over them */
+.career-hero .jsw-pill-nav {
+  position: fixed;
 }
 
 /* the photo behind everything, the cards included */
