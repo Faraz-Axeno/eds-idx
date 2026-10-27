@@ -861,64 +861,89 @@
         "valueType": "string",
         "name": "content_heading",
         "label": "Heading",
-        "description": "The first, grey line of the heading.",
+        "description": "The first, grey line of the heading. Warning: text longer than 14 characters is cut short with “…”.",
         "value": "OPEN ROLES AT",
-        "required": true
+        "required": true,
+        "validation": {
+          "maxLength": 14
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "content_headingHighlight",
         "label": "Heading: dark line",
-        "description": "The second, dark line of the heading.",
-        "value": "JSW MOTORS"
+        "description": "The second, dark line of the heading. Warning: text longer than 14 characters is cut short with “…”.",
+        "value": "JSW MOTORS",
+        "validation": {
+          "maxLength": 14
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "search_placeholder",
         "label": "Search box placeholder",
-        "value": "Search Roles"
+        "value": "Search Roles",
+        "description": "Warning: text longer than 35 characters is cut short with “…”.",
+        "validation": {
+          "maxLength": 35
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "search_help",
         "label": "Search box description",
-        "description": "The text under the search box.",
-        "value": "Search by role, team, or skill. New roles open up as the team grows, so check back soon for what’s new."
+        "description": "The text under the search box (three lines at most). Warning: text longer than 130 characters is cut short with “…”.",
+        "value": "Search by role, team, or skill. New roles open up as the team grows, so check back soon for what’s new.",
+        "validation": {
+          "maxLength": 130
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "search_filtersLabel",
         "label": "Filters label",
-        "description": "The label above the filter dropdowns (the Filter items of this block).",
-        "value": "Filter Roles"
+        "description": "The label above the filter dropdowns (the Filter items of this block). Warning: text longer than 20 characters is cut short with “…”.",
+        "value": "Filter Roles",
+        "validation": {
+          "maxLength": 20
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "search_emptyMessage",
         "label": "No results message",
-        "description": "Shown when no role matches the search and filters (in the list and under the search box).",
-        "value": "No roles found matching your criteria."
+        "description": "Shown when no role matches the search and filters (two lines at most). Warning: text longer than 80 characters is cut short with “…”.",
+        "value": "No roles found matching your criteria.",
+        "validation": {
+          "maxLength": 80
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "search_clearAll",
         "label": "Clear all button",
-        "description": "Beside the filters label, once a filter option is ticked.",
-        "value": "Clear all"
+        "description": "Beside the filters label, once a filter option is ticked. Warning: text longer than 15 characters is cut short with “…”.",
+        "value": "Clear all",
+        "validation": {
+          "maxLength": 15
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "search_backToTop",
         "label": "Back to top button",
-        "description": "Under the role list, once it is scrolled down.",
-        "value": "Back to top"
+        "description": "Under the role list, once it is scrolled down. Warning: text longer than 25 characters is cut short with “…”.",
+        "value": "Back to top",
+        "validation": {
+          "maxLength": 25
+        }
       }
     ]
   },
@@ -966,8 +991,11 @@
         "valueType": "string",
         "name": "meta_tags",
         "label": "Other filter values",
-        "description": "Not shown: words for the other filters (e.g. Experience), separated by commas, e.g. 3-5 years, Full-time.",
-        "value": ""
+        "description": "Not shown: words for the other filters (e.g. Experience), separated by commas, e.g. 3-5 years, Full-time. At most 100 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 100
+        }
       },
       {
         "component": "aem-content",
@@ -1040,7 +1068,7 @@
         "valueType": "string",
         "name": "filterOptions",
         "label": "Options",
-        "description": "The checkboxes of this dropdown: click Add for each one, e.g. Pune, India.",
+        "description": "The checkboxes of this dropdown: click Add for each one, e.g. Pune, India. Warning: an option longer than 35 characters is cut short with “…”.",
         "required": true,
         "multi": true
       }
@@ -1062,7 +1090,11 @@
         "valueType": "string",
         "name": "imageAlt",
         "label": "Alt text",
-        "value": ""
+        "value": "",
+        "description": "Describes the image for screen readers. At most 125 characters.",
+        "validation": {
+          "maxLength": 125
+        }
       }
     ]
   },

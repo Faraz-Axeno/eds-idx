@@ -30,6 +30,26 @@ import { moveInstrumentation } from '../../scripts/scripts.js';
 // editor still shows them, dimmed, so they can be edited or removed
 const MAX_JOB_LIMIT = 15;
 
+// the most characters each text shows on the page, as the model's limits (_open-roles.json):
+// a longer text, if saved anyway, is cut there with "…" (its whole wording as a tooltip); the
+// editor shows every text whole, to be edited
+const TEXT_LIMITS = {
+  heading: 14,
+  headingHighlight: 14,
+  placeholder: 35,
+  help: 130,
+  filtersLabel: 20,
+  emptyMessage: 80,
+  clearAll: 15,
+  backToTop: 25,
+  title: 65,
+  department: 35,
+  location: 20,
+  button: 15,
+  categoryName: 25,
+  option: 35,
+};
+
 // roles drawn at a time; more when the list is scrolled near its end
 const PAGE_SIZE = 12;
 
@@ -56,6 +76,23 @@ const PIN_ICON = '<svg viewBox="0 0 12 14" aria-hidden="true" focusable="false">
 const ARROW_UP = '<svg viewBox="0 0 12 14" aria-hidden="true" focusable="false"><path d="M6 13V1.5M1.5 6L6 1.5 10.5 6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 let instance = 0;
+
+// texts are cut to TEXT_LIMITS on the page, not in the editor
+let capping = true;
+
+/** a text cut to its limit, with "…" */
+const capped = (text, limit) => (capping && text.length > limit
+  ? `${text.slice(0, limit).trimEnd()}…` : text);
+
+/** an element's text cut to its limit, its whole wording kept as a tooltip */
+function cap(node, limit) {
+  if (!node) return;
+  const text = node.textContent.trim();
+  const short = capped(text, limit);
+  if (short === text) return;
+  node.title = text;
+  node.textContent = short;
+}
 
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
@@ -188,6 +225,9 @@ function buildJob(row) {
   // texts cut short by the layout ("…") keep their whole wording as a tooltip
   [[title, shown.title], [department, shown.department], [locationText, shown.location]]
     .forEach(([node, full]) => { if (full) node.title = full; });
+  cap(title, TEXT_LIMITS.title);
+  cap(department, TEXT_LIMITS.department);
+  cap(locationText, TEXT_LIMITS.location);
   if (departmentField) line.append(department);
   if (departmentField && locationField) line.append(el('span', 'open-roles-job-dot', { 'aria-hidden': 'true' }));
   if (locationField) line.append(location);
@@ -207,6 +247,11 @@ function buildJob(row) {
     link.classList.remove('button', 'primary', 'secondary', 'accent');
     link.className = 'open-roles-apply';
     if (!link.textContent.trim()) link.textContent = 'APPLY NOW';
+    // its text in a span, so a long one ends in "…" while the button keeps its size
+    const label = el('span', 'open-roles-apply-label');
+    label.append(...link.childNodes);
+    link.append(label);
+    cap(label, TEXT_LIMITS.button);
     item.append(link);
   }
 
@@ -327,7 +372,7 @@ function filterCategories(cell) {
 function buildFilter({
   name: authoredName, fieldValue, values: rawValues, source, nameField,
 }, index) {
-  const name = authoredName || 'Filter';
+  const name = capped(authoredName || 'Filter', TEXT_LIMITS.categoryName);
   const field = fieldOf(fieldValue, name);
   const values = rawValues.map((o) => o.trim()).filter(Boolean);
 
@@ -347,7 +392,8 @@ function buildFilter({
     const option = el('label', 'open-roles-option');
     const input = el('input', 'open-roles-checkbox', { type: 'checkbox', value, id: `${panelId}-${i}` });
     const label = el('span', 'open-roles-option-label');
-    label.textContent = value;
+    label.textContent = capped(value, TEXT_LIMITS.option);
+    if (label.textContent !== value) label.title = value;
     const count = el('span', 'open-roles-option-count');
     option.append(input, label, count);
     panel.append(option);
@@ -477,6 +523,7 @@ export default function decorate(block) {
   instance += 1;
   const id = `open-roles-${instance}`;
   const editing = Boolean(block.closest('[data-aue-resource]'));
+  capping = !editing;
   const sorted = sortRows([...block.children]);
   const content = textsOf(sorted.contentCell);
   const search = textsOf(sorted.searchCell);
@@ -499,6 +546,8 @@ export default function decorate(block) {
   const heading = el('h2', 'open-roles-heading');
   const muted = retag(content('content_heading', 0), 'span', 'open-roles-heading-muted');
   const strong = retag(content('content_headingHighlight', 1), 'span', 'open-roles-heading-strong');
+  cap(muted, TEXT_LIMITS.heading);
+  cap(strong, TEXT_LIMITS.headingHighlight);
   heading.append(muted, strong);
 
   const placeholderField = search('search_placeholder', 0);
@@ -511,7 +560,7 @@ export default function decorate(block) {
 
   // the search box: a combobox with its suggestions under it, and × to clear it
   const searchBox = el('div', 'open-roles-search');
-  const placeholder = placeholderField?.textContent.trim() || 'Search Roles';
+  const placeholder = capped(placeholderField?.textContent.trim() || 'Search Roles', TEXT_LIMITS.placeholder);
   const suggestions = el('ul', 'open-roles-suggestions', { id: `${id}-suggestions`, role: 'listbox', 'aria-label': placeholder });
   suggestions.hidden = true;
   const input = el('input', 'open-roles-search-input', {
@@ -539,6 +588,7 @@ export default function decorate(block) {
   searchBox.insertAdjacentHTML('beforeend', `<span class="open-roles-search-icon">${SEARCH_ICON}</span>`);
   const help = retag(helpField, 'p', 'open-roles-help');
   help.id = `${id}-help`;
+  cap(help, TEXT_LIMITS.help);
   input.setAttribute('aria-describedby', help.id);
   intro.append(heading, searchBox);
   if (helpField) intro.append(help);
@@ -549,6 +599,7 @@ export default function decorate(block) {
   const clearAll = el('button', 'open-roles-clear-all', { type: 'button' });
   const clearAllLabel = retag(clearAllField, 'span', 'open-roles-clear-all-label');
   if (!clearAllLabel.textContent.trim()) clearAllLabel.textContent = 'Clear all';
+  cap(clearAllLabel, TEXT_LIMITS.clearAll);
   clearAll.append(clearAllLabel);
   clearAll.insertAdjacentHTML('beforeend', CLOSE_ICON);
   if (filters.length) {
@@ -556,6 +607,7 @@ export default function decorate(block) {
     const head = el('div', 'open-roles-filters-head');
     const label = retag(labelField, 'p', 'open-roles-filters-label');
     if (!label.textContent.trim()) label.textContent = 'Filter Roles';
+    cap(label, TEXT_LIMITS.filtersLabel);
     head.append(label, clearAll);
     filterBox.append(head, ...filters.map((f) => f.wrapper));
     // the Filter Dropdowns field's instrumentation: picking it outlines the dropdowns
@@ -582,10 +634,12 @@ export default function decorate(block) {
   list.append(jobList, more);
   const empty = retag(emptyField, 'p', 'open-roles-empty');
   empty.textContent = noResults;
+  cap(empty, TEXT_LIMITS.emptyMessage);
   const toTop = el('button', 'open-roles-top', { type: 'button' });
   toTop.insertAdjacentHTML('afterbegin', ARROW_UP);
   const toTopLabel = retag(backToTopField, 'span', 'open-roles-top-label');
   if (!toTopLabel.textContent.trim()) toTopLabel.textContent = 'Back to top';
+  cap(toTopLabel, TEXT_LIMITS.backToTop);
   toTop.append(toTopLabel);
   const status = el('p', 'open-roles-status', { 'aria-live': 'polite' });
   listWrap.append(list, empty, toTop, status);

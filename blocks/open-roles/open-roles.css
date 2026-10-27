@@ -693,6 +693,78 @@ html.panels-ready:has(body.jsw-phase-5 main > .section) {
   scroll-snap-type: none;
 }
 
+/* every text keeps to its space, ending in "…" when it runs out of it (the whole text as a
+   tooltip): one line each for the heading's lines, labels, buttons and options; three lines for
+   the search description, two for the no-results message (the role title, department and
+   location: see the job list above) */
+.open-roles :is(.open-roles-heading-muted, .open-roles-heading-strong, .open-roles-filters-label,
+  .open-roles-clear-all-label, .open-roles-top-label, .open-roles-option-label) {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.open-roles :is(.open-roles-filters-label) {
+  flex: 1 1 0;
+}
+
+/* the options panel: one column as wide as the panel, a long option ending in "…" */
+.open-roles :is(.open-roles-filter-panel) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.open-roles :is(.open-roles-option) {
+  min-width: 0;
+}
+
+.open-roles :is(.open-roles-clear-all, .open-roles-top) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.open-roles :is(.open-roles-clear-all) {
+  flex: 0 1 auto;
+  max-width: 50%;
+}
+
+.open-roles :is(.open-roles-help, .open-roles-empty:not([hidden])) {
+  /* stylelint-disable-next-line value-no-vendor-prefix -- line clamping needs the old box */
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+  -webkit-box-orient: vertical;
+}
+
+.open-roles :is(.open-roles-help) {
+  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.open-roles :is(.open-roles-empty:not([hidden])) {
+  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.open-roles :is(.open-roles-search-input) {
+  text-overflow: ellipsis;
+}
+
+/* the button: its size as it is, a longer text ending in "…" (its text in a span, open-roles.js) */
+.open-roles :is(a.open-roles-apply:any-link) {
+  max-width: calc(170 * var(--open-roles-unit));
+}
+
+.open-roles :is(.open-roles-apply-label) {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 /* the editor: Job Roles over the limit (MAX_JOB_LIMIT, open-roles.js), dimmed, with a note */
 .open-roles .open-roles-job.is-over-limit {
   opacity: 0.45;
