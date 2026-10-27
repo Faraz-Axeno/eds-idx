@@ -240,9 +240,13 @@
   line-height: 1.5;
 }
 
+/* the filters: one column exactly as wide as the intro, whatever is ticked (a long list of
+   ticked options ends in "…" on its dropdown and never widens it) */
 .open-roles .open-roles-filters {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: calc(10 * var(--open-roles-unit));
+  width: 100%;
   margin-top: auto;
   padding-top: calc(48 * var(--open-roles-unit));
 }
@@ -295,6 +299,9 @@
 
 .open-roles .open-roles-filter {
   position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .open-roles .open-roles-filter.is-open {
@@ -307,6 +314,9 @@
   align-items: center;
   gap: calc(12 * var(--open-roles-unit));
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   height: calc(60 * var(--open-roles-unit));
   margin: 0;
   padding: 0 calc(20 * var(--open-roles-unit)) 0 calc(18 * var(--open-roles-unit));
@@ -395,6 +405,7 @@
 .open-roles .open-roles-option-label {
   flex: 1;
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .open-roles .open-roles-option-count {
@@ -680,6 +691,17 @@
 /* the Phase 5 page scrolls freely: no snapping to its sections (styles/styles.css) */
 html.panels-ready:has(body.jsw-phase-5 main > .section) {
   scroll-snap-type: none;
+}
+
+/* the editor: Job Roles over the limit (MAX_JOB_LIMIT, open-roles.js), dimmed, with a note */
+.open-roles .open-roles-job.is-over-limit {
+  opacity: 0.45;
+}
+
+.open-roles .open-roles-job-limit {
+  margin: calc(6 * var(--open-roles-unit)) 0 0;
+  color: #b04a00;
+  font-size: calc(12 * var(--open-roles-unit));
 }
 
 /* texts set in Medium (500) in the frames */
