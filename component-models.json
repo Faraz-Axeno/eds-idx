@@ -931,7 +931,11 @@
         "name": "roleName",
         "label": "Job title",
         "value": "",
-        "required": true
+        "required": true,
+        "description": "Warning: a title longer than 65 characters is cut short with “…” (two lines at most). Only the first 15 Job Roles are shown on the page.",
+        "validation": {
+          "maxLength": 65
+        }
       },
       {
         "component": "text",
@@ -939,16 +943,23 @@
         "name": "meta_department",
         "label": "Department",
         "value": "",
-        "required": true
+        "required": true,
+        "description": "Warning: text longer than 35 characters is cut short with “…”.",
+        "validation": {
+          "maxLength": 35
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "meta_location",
         "label": "Location",
-        "description": "As shown, e.g. Pune, India. The Locations filter matches its options against this.",
+        "description": "As shown, e.g. Pune, India. The Locations filter matches its options against this. Warning: text longer than 20 characters is cut short with “…”.",
         "value": "",
-        "required": true
+        "required": true,
+        "validation": {
+          "maxLength": 20
+        }
       },
       {
         "component": "text",
@@ -972,7 +983,11 @@
         "name": "buttonText",
         "label": "Button text",
         "value": "APPLY NOW",
-        "required": true
+        "required": true,
+        "description": "Warning: at most 15 characters, so the button keeps its size.",
+        "validation": {
+          "maxLength": 15
+        }
       }
     ]
   },
@@ -984,8 +999,11 @@
         "valueType": "string",
         "name": "categoryName",
         "label": "Dropdown name",
-        "description": "Shown on the dropdown until options are ticked, e.g. Locations.",
-        "required": true
+        "description": "Shown on the dropdown until options are ticked, e.g. Locations. Warning: text longer than 25 characters is cut short with “…”.",
+        "required": true,
+        "validation": {
+          "maxLength": 25
+        }
       },
       {
         "component": "select",

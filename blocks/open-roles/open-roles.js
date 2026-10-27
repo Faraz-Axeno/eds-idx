@@ -14,9 +14,10 @@
  *                       the dropdowns on the left
  *     Gallery Image   — image (+ alt): the gallery
  * Content written for the conversion to AEM content names each row's type in a first cell
- * (open-roles-filter, …): that cell is read, not shown. Pages published with earlier models
- * keep working: three field rows (content, search, labels), or four (content, search, then the
- * filter dropdowns and gallery as composite multi-fields).
+ * (open-roles-filter, …): that cell is read, not shown. Rows are told apart by what they are
+ * (sortRows), not by their place, so the layout is the same whatever order they come in. Pages
+ * published with earlier models keep working: a labels field row (Clear all, Back to top), or
+ * the filter dropdowns and gallery as composite multi-fields.
  * A role is listed when every word typed is in its text and, for every filter with options
  * ticked, it has one of them (ticked options of one filter widen, filters narrow). The counts
  * beside the options and the search suggestions come from the roles themselves. The list is
@@ -24,6 +25,10 @@
  */
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
+
+// the most Job Roles shown: those after it (in authored order) are left out of the page; the
+// editor still shows them, dimmed, so they can be edited or removed
+const MAX_JOB_LIMIT = 15;
 
 // roles drawn at a time; more when the list is scrolled near its end
 const PAGE_SIZE = 12;
@@ -416,6 +421,55 @@ function buildGallery(cell, rows, editing) {
 }
 
 /**
+ * the block's rows, told apart by what they are, not by their place:
+ * - item rows: those naming their type in a first cell (dropped), those the editor marks as
+ *   items (data-aue-model), rows of several cells (Job Roles, Filter Dropdowns) and one-cell
+ *   rows holding just a picture (Gallery Images);
+ * - field rows (one cell each): the search group is the one with the search fields (in the
+ *   editor: data-aue-prop search_…) or else the most paragraphs; the content group (content_…)
+ *   or else the first of the others; a labels group of an earlier model (labels_…) or else the
+ *   one left; a cell with <hr> separators or a list of pictures: the composite multi-fields of
+ *   an earlier model. Empty rows are left out.
+ * @param {Element[]} rows the block's rows
+ */
+function sortRows(rows) {
+  const groups = { job: [], filter: [], image: [] };
+  const fields = [];
+  let filtersCell = null;
+  let galleryCell = null;
+  rows.forEach((row) => {
+    const first = row.children.length > 1 ? row.firstElementChild : null;
+    const [, type] = first?.textContent.trim().match(TYPE_CELL) || [];
+    if (type) {
+      row.dataset.itemType = type;
+      first.remove();
+    }
+    const cells = cellsOf(row);
+    const cell = cells[0];
+    const pictureOnly = cell?.querySelector('picture') && !cell.querySelector('ul, ol, hr');
+    if (type || row.dataset.aueModel || cells.length > 1 || pictureOnly) {
+      groups[kindOf(row)].push(row);
+    } else if (cell?.querySelector('hr')) {
+      filtersCell = cell;
+    } else if (cell?.querySelector('ul picture, ol picture')) {
+      galleryCell = cell;
+    } else if (cell && (cell.textContent.trim() || cell.querySelector('[data-aue-prop]'))) {
+      fields.push(cell);
+    }
+  });
+  const byProp = (prefix) => fields.find((c) => c.querySelector(`[data-aue-prop^="${prefix}"]`));
+  const paragraphs = (c) => c.querySelectorAll('p').length || 1;
+  const searchCell = byProp('search_')
+    || [...fields].sort((a, b) => paragraphs(b) - paragraphs(a))[0] || null;
+  const rest = fields.filter((c) => c !== searchCell);
+  const contentCell = byProp('content_') || rest.find((c) => !c.querySelector('[data-aue-prop^="labels_"]')) || null;
+  const labelsCell = byProp('labels_') || rest.find((c) => c !== contentCell) || null;
+  return {
+    contentCell, searchCell, labelsCell, filtersCell, galleryCell, groups,
+  };
+}
+
+/**
  * loads and decorates the block
  * @param {Element} block The block element
  */
@@ -423,34 +477,12 @@ export default function decorate(block) {
   instance += 1;
   const id = `open-roles-${instance}`;
   const editing = Boolean(block.closest('[data-aue-resource]'));
-  const rows = [...block.children];
-  // an item row may name its type in a first cell (open-roles-filter, …): read, then dropped
-  rows.forEach((row) => {
-    const first = row.children.length > 1 ? row.firstElementChild : null;
-    const [, type] = first?.textContent.trim().match(TYPE_CELL) || [];
-    if (!type) return;
-    row.dataset.itemType = type;
-    first.remove();
-  });
-  // the block's own fields are its first rows, one cell each (an image item is not one): two
-  // (content, search); pages published with earlier models have three (content, search, labels)
-  // or four (content, search, filter dropdowns, gallery)
-  let fieldRows = 0;
-  while (fieldRows < 4 && rows[fieldRows] && !rows[fieldRows].dataset.itemType
-    && cellsOf(rows[fieldRows]).length === 1
-    && !(rows[fieldRows].querySelector('picture') && !rows[fieldRows].querySelector('ul, ol'))) {
-    fieldRows += 1;
-  }
-  const [contentRow, searchRow, thirdRow, galleryRow] = rows;
-  const itemRows = rows.slice(Math.max(fieldRows, 2));
-  const content = textsOf(cellsOf(contentRow)[0]);
-  const search = textsOf(cellsOf(searchRow)[0]);
-  const labels = fieldRows === 3 ? textsOf(cellsOf(thirdRow)[0]) : null;
-  const filtersCell = fieldRows === 4 ? cellsOf(thirdRow)[0] : null;
-  const galleryCell = fieldRows === 4 ? cellsOf(galleryRow)[0] : null;
+  const sorted = sortRows([...block.children]);
+  const content = textsOf(sorted.contentCell);
+  const search = textsOf(sorted.searchCell);
+  const labels = sorted.labelsCell ? textsOf(sorted.labelsCell) : null;
+  const { filtersCell, galleryCell, groups } = sorted;
 
-  const groups = { job: [], filter: [], image: [] };
-  itemRows.forEach((row) => groups[kindOf(row)].push(row));
   // the Filter Dropdown and Gallery Image items; on pages of the composite model, its two fields
   // when they are filled in (filter and image rows then left out published; in the editor they
   // show as the Job Roles they were stored as, so authors can find and delete them)
@@ -532,7 +564,15 @@ export default function decorate(block) {
   }
 
   // right: the scrolling list, drawn a page at a time, Back to top under it
-  const jobs = groups.job.map(buildJob);
+  const jobs = groups.job.slice(0, MAX_JOB_LIMIT).map(buildJob);
+  const overLimit = editing ? groups.job.slice(MAX_JOB_LIMIT).map((row) => {
+    const { item } = buildJob(row);
+    item.classList.add('is-over-limit');
+    const note = el('p', 'open-roles-job-limit');
+    note.textContent = `Not shown on the page: only the first ${MAX_JOB_LIMIT} roles are.`;
+    item.querySelector('.open-roles-job-text').append(note);
+    return item;
+  }) : [];
   const listWrap = el('div', 'open-roles-results');
   const list = el('div', 'open-roles-list', {
     role: 'region', 'aria-label': `${muted.textContent} ${strong.textContent}`.trim() || 'Open roles', tabindex: '0',
@@ -597,6 +637,8 @@ export default function decorate(block) {
     jobList.replaceChildren();
     list.scrollTop = 0;
     drawMore();
+    // the editor: the roles over the limit, dimmed, after the others
+    jobList.append(...overLimit);
     showTop();
     countOptions();
     clearAll.hidden = !editing && !filters.some((f) => f.ticked().length);
