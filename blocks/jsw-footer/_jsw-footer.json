@@ -1,0 +1,294 @@
+{
+  "definitions": [
+    {
+      "title": "Jsw Footer",
+      "id": "jsw-footer",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Jsw Footer",
+              "model": "jsw-footer",
+              "filter": "jsw-footer"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Footer Column",
+      "id": "jsw-footer-column",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Footer Column",
+              "model": "jsw-footer-column"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Footer Link",
+      "id": "jsw-footer-link",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Footer Link",
+              "model": "jsw-footer-link"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Social Icon",
+      "id": "jsw-footer-social",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Social Icon",
+              "model": "jsw-footer-social"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "jsw-footer",
+      "fields": [
+        {
+          "component": "select",
+          "name": "media_backgroundMode",
+          "label": "Background type",
+          "description": "Image: the background image. Video: the background video, playing muted on a loop (the background image shows until it plays, and instead of it if it cannot).",
+          "valueType": "string",
+          "value": "image",
+          "required": true,
+          "options": [
+            {
+              "name": "Image",
+              "value": "image"
+            },
+            {
+              "name": "Video",
+              "value": "video"
+            }
+          ]
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "media_backgroundImage",
+          "label": "Background image",
+          "description": "Covers the whole footer (with Video: shown until the video plays).",
+          "multi": false,
+          "required": true
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "media_backgroundImageAlt",
+          "label": "Background image alt text",
+          "description": "Leave empty when the image is decoration only. At most 125 characters.",
+          "value": "",
+          "validation": {
+            "maxLength": 125
+          }
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "media_backgroundVideo",
+          "label": "Background video",
+          "description": "An MP4 video from Assets, or its full URL. Used when Background type is Video.",
+          "condition": {
+            "===": [
+              {
+                "var": "media_backgroundMode"
+              },
+              "video"
+            ]
+          }
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "brand_logo",
+          "label": "Logo",
+          "description": "The JSW MOTORS wordmark, white.",
+          "multi": false,
+          "required": true
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "brand_logoAlt",
+          "label": "Logo alt text",
+          "value": "JSW Motors",
+          "validation": {
+            "maxLength": 40
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "brand_copyright",
+          "label": "Copyright text",
+          "description": "Under the logo, e.g. © 2026 JSW Motors  Mumbai, India. At most 60 characters.",
+          "value": "© 2026 JSW Motors  Mumbai, India",
+          "required": true,
+          "validation": {
+            "maxLength": 60
+          }
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "actions_ctaButton",
+          "label": "CTA button link",
+          "description": "Where the white button leads (a page, or #section on one).",
+          "required": true
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "actions_ctaButtonText",
+          "label": "CTA button text",
+          "description": "The \"+\" after it is added on the page. At most 24 characters.",
+          "value": "REGISTER INTEREST",
+          "required": true,
+          "validation": {
+            "maxLength": 24
+          }
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "actions_privacyPolicy",
+          "label": "Privacy policy link",
+          "required": true
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "actions_privacyPolicyText",
+          "label": "Privacy policy text",
+          "description": "At the foot, on the left. At most 30 characters.",
+          "value": "PRIVACY POLICY",
+          "required": true,
+          "validation": {
+            "maxLength": 30
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "connectHeading",
+          "label": "Social heading",
+          "description": "Above the Social Icons. At most 20 characters.",
+          "value": "CONNECT",
+          "required": true,
+          "validation": {
+            "maxLength": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "jsw-footer-column",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "columnHeading",
+          "label": "Column heading",
+          "description": "Starts a navigation column, e.g. TECHNOLOGY. Its links are the Footer Links that follow it, up to the next Footer Column. At most 20 characters.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "jsw-footer-link",
+      "fields": [
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "link",
+          "label": "Link URL",
+          "description": "A link of the Footer Column above it (a page, #section, or a full URL).",
+          "required": true
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "linkText",
+          "label": "Link text",
+          "description": "At most 24 characters.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 24
+          }
+        }
+      ]
+    },
+    {
+      "id": "jsw-footer-social",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "iconImage",
+          "label": "Icon image",
+          "description": "The network's logo, white on transparent (SVG or PNG).",
+          "multi": false,
+          "required": true
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "iconImageAlt",
+          "label": "Network name",
+          "description": "e.g. Facebook: read out by screen readers for the link. At most 30 characters.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 30
+          }
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "iconLink",
+          "label": "Icon link",
+          "description": "The JSW Motors profile on that network (full URL).",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "jsw-footer",
+      "components": [
+        "jsw-footer-column",
+        "jsw-footer-link",
+        "jsw-footer-social"
+      ]
+    }
+  ]
+}

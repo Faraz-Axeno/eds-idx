@@ -1,0 +1,348 @@
+/*
+ * jsw-footer: values from the "Desktop Footer" frame (1280 x 500): the photo covering the whole
+ * footer, full-bleed, edge to edge and square-cornered (the frame's rounded top corners would show
+ * the white page behind them under the section above); the logo, copyright line and CTA button 42px in from the
+ * left; the navigation columns 197px apart, the social icons ending 54px in from the right; the
+ * privacy policy link 40px above the foot.
+ */
+
+/* the text face until New Science is loaded: Michroma drawn at 80%, about as wide as New Science
+   in the frames (as in the other Phase 5 blocks) */
+@font-face {
+  font-family: jsw-footer-text;
+  font-display: swap;
+  src: url('../../fonts/michroma.woff2') format('woff2');
+  size-adjust: 80%;
+}
+
+/* full-bleed: the section and wrapper holding the footer (on the JSW pages in their <footer>, on
+   its own page in main) edge to edge, with no space around it */
+:is(main, footer) > .section:has(> .jsw-footer-wrapper),
+.jsw-footer-wrapper {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* on its own page the section as tall as the footer, not a screen tall (styles/styles.css) */
+main > .section:has(> .jsw-footer-wrapper) {
+  min-height: 0;
+}
+
+/* its own page (/jsw-footer, body class from scripts.js): dark, the footer at the foot of the
+   window (not in the editor, whose canvas grows to fit the page: a screen-tall page would grow it
+   without end) */
+body.jsw-footer-page {
+  background-color: #030506;
+}
+
+body.jsw-footer-page main:not([data-aue-resource]) {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+.jsw-footer {
+  --jsw-footer-unit: 1px;
+  --jsw-footer-font: new-science, jsw-footer-text, 'Helvetica Neue', arial, sans-serif;
+  --jsw-footer-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
+
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 0;
+  color: #fff;
+  background-color: #030506;
+  font-family: var(--jsw-footer-font);
+  letter-spacing: 0;
+}
+
+/* desktop: sized in "units", 1px each in the 1280-wide frame, so on narrower desktops the footer
+   shrinks as a whole (at least 0.7px); tablets and phones keep 1px units */
+@media (min-width: 900px) {
+  .jsw-footer {
+    --jsw-footer-unit: clamp(0.7px, calc(100vw / 1280), 1px);
+  }
+}
+
+/* the background: the picture (or the video over it) covering the whole footer */
+.jsw-footer .jsw-footer-media,
+.jsw-footer .jsw-footer-media picture,
+.jsw-footer .jsw-footer-media img,
+.jsw-footer .jsw-footer-media video {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+}
+
+.jsw-footer .jsw-footer-media img,
+.jsw-footer .jsw-footer-media video {
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+.jsw-footer p,
+.jsw-footer h2,
+.jsw-footer ul {
+  margin: 0;
+  padding: 0;
+}
+
+.jsw-footer a:any-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.jsw-footer a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* the layout: branding at the top left, the navigation at the top right, the privacy policy at
+   the foot on the left */
+.jsw-footer .jsw-footer-inner {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr auto;
+  column-gap: calc(40 * var(--jsw-footer-unit));
+  min-height: calc(500 * var(--jsw-footer-unit));
+  padding: calc(37 * var(--jsw-footer-unit)) calc(54 * var(--jsw-footer-unit)) calc(39 * var(--jsw-footer-unit)) calc(42 * var(--jsw-footer-unit));
+}
+
+.jsw-footer .jsw-footer-brand {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.jsw-footer .jsw-footer-logo {
+  line-height: 0;
+}
+
+.jsw-footer .jsw-footer-logo img {
+  width: calc(164 * var(--jsw-footer-unit));
+  height: auto;
+  margin-top: calc(2 * var(--jsw-footer-unit));
+}
+
+.jsw-footer .jsw-footer-copyright {
+  margin-top: calc(5 * var(--jsw-footer-unit));
+  color: rgb(255 255 255 / 80%);
+  font-size: calc(11 * var(--jsw-footer-unit));
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* the CTA: a white button, its "+" after the text */
+.jsw-footer .jsw-footer-cta {
+  margin-top: calc(51 * var(--jsw-footer-unit));
+}
+
+.jsw-footer a.jsw-footer-cta-link:any-link {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(16 * var(--jsw-footer-unit));
+  max-width: 100%;
+  height: calc(39 * var(--jsw-footer-unit));
+  padding: 0 calc(24 * var(--jsw-footer-unit));
+  border-radius: calc(6 * var(--jsw-footer-unit));
+  color: #2b2b2b;
+  background-color: #fff;
+  font-size: calc(11.5 * var(--jsw-footer-unit));
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.jsw-footer a.jsw-footer-cta-link:hover {
+  background-color: #e6e6e6;
+}
+
+.jsw-footer .jsw-footer-cta-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jsw-footer .jsw-footer-cta-plus {
+  font-size: calc(15 * var(--jsw-footer-unit));
+}
+
+/* the navigation: the columns side by side, 197px apart, CONNECT last */
+.jsw-footer .jsw-footer-nav {
+  grid-area: 1 / 2;
+  display: flex;
+  align-items: flex-start;
+  gap: calc(40 * var(--jsw-footer-unit));
+}
+
+.jsw-footer .jsw-footer-column {
+  width: calc(157 * var(--jsw-footer-unit));
+  min-width: 0;
+}
+
+.jsw-footer .jsw-footer-column.jsw-footer-connect {
+  width: auto;
+}
+
+.jsw-footer .jsw-footer-heading {
+  overflow: hidden;
+  color: #fff;
+  font-family: inherit;
+  font-size: calc(12.4 * var(--jsw-footer-unit));
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.jsw-footer .jsw-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: calc(10 * var(--jsw-footer-unit));
+  margin-top: calc(10 * var(--jsw-footer-unit));
+  list-style: none;
+}
+
+.jsw-footer .jsw-footer-link {
+  overflow: hidden;
+  color: rgb(255 255 255 / 65%);
+  font-size: calc(11 * var(--jsw-footer-unit));
+  line-height: 1.5;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.jsw-footer .jsw-footer-link a:hover,
+.jsw-footer .jsw-footer-legal a:hover {
+  color: #fff;
+}
+
+/* the social icons: 36px dark tiles, 4px apart */
+.jsw-footer .jsw-footer-social {
+  display: flex;
+  gap: calc(4 * var(--jsw-footer-unit));
+  margin-top: calc(17 * var(--jsw-footer-unit));
+  list-style: none;
+}
+
+.jsw-footer a.jsw-footer-social-link:any-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(36 * var(--jsw-footer-unit));
+  height: calc(36 * var(--jsw-footer-unit));
+  border-radius: calc(6 * var(--jsw-footer-unit));
+  background-color: rgb(255 255 255 / 9%);
+  transition: background-color 0.2s ease;
+}
+
+.jsw-footer a.jsw-footer-social-link:hover {
+  background-color: rgb(255 255 255 / 18%);
+}
+
+.jsw-footer .jsw-footer-social-link picture {
+  display: contents;
+}
+
+.jsw-footer .jsw-footer-social-link img {
+  width: calc(15 * var(--jsw-footer-unit));
+  height: calc(15 * var(--jsw-footer-unit));
+  object-fit: contain;
+}
+
+/* the privacy policy: small mono capitals, underlined */
+.jsw-footer .jsw-footer-legal {
+  grid-area: 3 / 1 / 4 / 3;
+  align-self: end;
+  color: rgb(255 255 255 / 70%);
+  font-family: var(--jsw-footer-font-mono);
+  font-size: calc(10 * var(--jsw-footer-unit));
+  line-height: 1.2;
+}
+
+.jsw-footer .jsw-footer-legal a:any-link {
+  text-decoration: underline;
+  text-underline-offset: calc(2 * var(--jsw-footer-unit));
+}
+
+/* tablets: the branding, then the navigation, then the privacy policy, one under the other */
+@media (max-width: 899.98px) {
+  .jsw-footer .jsw-footer-inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr auto;
+    row-gap: 48px;
+    min-height: 520px;
+    padding: 40px 32px 32px;
+  }
+
+  .jsw-footer .jsw-footer-nav {
+    grid-area: 2 / 1;
+    flex-wrap: wrap;
+    row-gap: 32px;
+  }
+
+  .jsw-footer .jsw-footer-legal {
+    grid-area: 4 / 1;
+  }
+
+  .jsw-footer .jsw-footer-cta {
+    margin-top: 32px;
+  }
+}
+
+/* phones: the columns two a row, CONNECT across */
+@media (max-width: 599.98px) {
+  .jsw-footer .jsw-footer-inner {
+    row-gap: 40px;
+    min-height: 0;
+    padding: 36px 20px 28px;
+  }
+
+  .jsw-footer .jsw-footer-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 20px;
+  }
+
+  .jsw-footer .jsw-footer-column {
+    width: auto;
+  }
+
+  .jsw-footer .jsw-footer-column.jsw-footer-connect {
+    grid-column: 1 / -1;
+  }
+
+  .jsw-footer .jsw-footer-legal {
+    margin-top: 24px;
+    font-size: 11px;
+  }
+
+  /* the small texts a little larger, to read on a phone */
+  .jsw-footer .jsw-footer-heading {
+    font-size: 14px;
+  }
+
+  .jsw-footer .jsw-footer-link {
+    font-size: 13px;
+  }
+
+  .jsw-footer .jsw-footer-copyright,
+  .jsw-footer a.jsw-footer-cta-link:any-link {
+    font-size: 12px;
+  }
+}

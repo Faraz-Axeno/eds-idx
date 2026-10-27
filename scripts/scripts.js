@@ -399,6 +399,9 @@ export function decorateMain(main) {
  *   /jsw-phase-3        immersive-hero (+ brand-footer) -> jsw-phase-3 + styles/jsw-phase-3.css
  *   /jsw-sustainability jsw-sustainability (single)     -> jsw-sustainability
  *   /jsw-nev-collage    parallax-collage (+ teaser)     -> jsw-nev-collage
+ *   /jsw-phase-5        open-roles                      -> jsw-phase-5, the JSW footer
+ *   /jsw-footer         jsw-footer (the JSW footer)     -> jsw-footer-page
+ * An entry with a footer gets that page as its footer (loadJswFooter) instead of the site's.
  * Every other page is unaffected.
  */
 const STANDALONE_PAGES = [
@@ -407,8 +410,36 @@ const STANDALONE_PAGES = [
   { block: 'parallax-collage', bodyClass: 'jsw-nev-collage' },
   { block: 'reservation-form', bodyClass: 'jsw-reservation' },
   { block: 'reservation-confirmation', bodyClass: 'jsw-reservation' },
-  { block: 'open-roles', bodyClass: 'jsw-phase-5' },
+  { block: 'open-roles', bodyClass: 'jsw-phase-5', footer: '/jsw-footer' },
+  { block: 'jsw-footer', bodyClass: 'jsw-footer-page' },
 ];
+
+/**
+ * Loads a JSW footer page (e.g. /jsw-footer) into the page's <footer>, as a fragment: its
+ * address here first (on the AEM author pages live at /content/{site}/…, in the local preview at
+ * /content/…, on aem.page / aem.live at the root), the others if it is not found there.
+ * @param {Element} footer the <footer> element
+ * @param {string} path the footer page, from the site root
+ */
+async function loadJswFooter(footer, path) {
+  if (!footer) return;
+  const { pathname } = window.location;
+  const siteRoot = pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0];
+  const candidates = pathname.startsWith('/content/')
+    ? [siteRoot && `${siteRoot}${path}`, `/content${path}`, path]
+    : [path, `/content${path}`];
+  // eslint-disable-next-line import/no-cycle
+  const { loadFragment } = await import('../blocks/fragment/fragment.js');
+  // eslint-disable-next-line no-restricted-syntax
+  for (const candidate of [...new Set(candidates.filter(Boolean))]) {
+    // eslint-disable-next-line no-await-in-loop
+    const fragment = await loadFragment(candidate);
+    if (fragment) {
+      footer.replaceChildren(...fragment.childNodes);
+      return;
+    }
+  }
+}
 
 /**
  * @param {Element} main The main element
@@ -455,7 +486,8 @@ async function loadEager(doc) {
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
-  const siteChrome = !standalonePage(main);
+  const page = standalonePage(main);
+  const siteChrome = !page;
   if (siteChrome) loadHeader(doc.querySelector('header'));
 
   await loadSections(main);
@@ -468,7 +500,9 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
+  // the site's footer, or (a JSW page with its own) that footer page only
   if (siteChrome) loadFooter(doc.querySelector('footer'));
+  else if (page.footer) loadJswFooter(doc.querySelector('footer'), page.footer);
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
