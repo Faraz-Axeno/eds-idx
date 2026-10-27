@@ -11,8 +11,9 @@
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
-// the route steps on the page: only the first MAX_STEPS are put into it (the editor also shows
-// the others, dimmed, so authors can find and remove them)
+// the route steps on the page: only the first MAX_STEPS are put into it; the editor keeps the
+// others in its page too, but shows them only while editing (dimmed, so authors can find and
+// remove them), never in its Preview mode (career-route.css)
 const MAX_STEPS = 4;
 
 // the most characters each text shows on the page, as the model's limits (_career-route.json):

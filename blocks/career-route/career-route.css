@@ -166,8 +166,15 @@
   line-clamp: 3;
 }
 
-/* the editor: steps over the limit (MAX_STEPS, career-route.js) dimmed, with a note */
+/* steps over the limit (MAX_STEPS, career-route.js): never on the live page (not put into it);
+   in Universal Editor hidden too, also in its Preview mode, and only while editing (the editor
+   marks it with adobe-ue-edit) shown dimmed with a note, so they can be found and removed */
 .career-route .career-route-step.is-over-limit {
+  display: none;
+}
+
+html.adobe-ue-edit .career-route .career-route-step.is-over-limit {
+  display: flex;
   opacity: 0.45;
 }
 
