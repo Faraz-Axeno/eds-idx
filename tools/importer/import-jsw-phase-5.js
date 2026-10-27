@@ -2,9 +2,12 @@
 /* global WebImporter */
 
 /**
- * JSW Phase 5 page (/jsw-phase-5), from the "Phase 5 / Open Roles" design frame (no source
- * site: the fetched document is ignored). One block, open-roles: its fields (content | search),
- * then its items: the Job Roles, the Filter Dropdowns and the Gallery Images.
+ * JSW Phase 5 page (/jsw-phase-5), from the "Phase 5 / Hero" and "Phase 5 / Open Roles" design
+ * frames (no source site: the fetched document is ignored). Top to bottom:
+ *   1. career-hero: its fields, then its three Stat Cards;
+ *   2. open-roles: its fields (content | search), then its items: the Job Roles, the Filter
+ *      Dropdowns and the Gallery Images;
+ *   3. career-route: its fields, then its four Route Steps.
  * The Filter Dropdown and Gallery Image rows start with their item type (open-roles-filter,
  * open-roles-image) so md2jcr (the conversion to AEM content) creates them as those items; rows
  * without one are Job Roles, the block's first item type.
@@ -69,6 +72,21 @@ const ROLES = [
   ['Dealer Development Manager', 'Sales and Network Operations', 'Gurugram, India', '5+ years'],
 ];
 
+// the hero's Stat Cards (the design's three)
+const STATS = [
+  ['People who joined in year one', '1,000+', 'You won’t be the only new face. Everyone here is building this for the first time.'],
+  ['Roles opening this year', '250+', 'New roles across engineering, design, sales and service as the team grows.'],
+  ['Years of JSW behind you', '44 YRS', 'Backed by a group that has built steel, energy and infrastructure across India since 1982.'],
+];
+
+// the route in's Route Steps (the design's four)
+const STEPS = [
+  ['01', 'How we hire', 'A chat with the team, then a working session on a real problem. You hear back after every step.'],
+  ['02', 'Where we work', 'Most roles are on site, close to the people you build with. If one isn’t, the listing says so.'],
+  ['03', 'Moving for the role', 'If the role means a new city, tell us early. We’ll plan the move with you and work around your situation.'],
+  ['04', 'Your first months', 'You meet the plant, the test roads and the dealer network early, so you know the car you’re working on.'],
+];
+
 const LOCATIONS = ['Bangalore, India', 'Pune, India', 'Mumbai, India', 'Gurugram, India', 'Chennai, India', 'Delhi, India', 'San Francisco, USA'];
 const DEPARTMENTS = [...new Set(ROLES.map((r) => r[1]))];
 
@@ -127,8 +145,44 @@ export default {
       }),
     ];
 
+    // section 1: the hero (photo, heading, scroll label, then its Stat Cards)
+    const heroImage = document.createElement('img');
+    heroImage.src = `${IMG}/career-hero.jpg`;
+    heroImage.alt = 'Silhouettes of visitors at a window looking out at the pyramids';
+    const hero = WebImporter.Blocks.createBlock(document, {
+      name: 'career-hero',
+      cells: [
+        [hinted(document, 'backgroundImage', [el(document, 'p', heroImage)])],
+        [hinted(document, 'heading', [el(document, 'p', 'THE WORLD NEEDS PIONEERS')])],
+        [hinted(document, 'scrollLabel', [el(document, 'p', 'SCROLL')])],
+        ...STATS.map(([subtitle, value, description]) => [
+          hinted(document, 'subtitle', [el(document, 'p', subtitle)]),
+          hinted(document, 'statValue', [el(document, 'p', value)]),
+          hinted(document, 'description', [el(document, 'p', description)]),
+        ]),
+      ],
+    });
+
+    // the route in: photo, heading, then its Route Steps
+    const routeImage = document.createElement('img');
+    routeImage.src = `${IMG}/career-route.jpg`;
+    routeImage.alt = 'Colleagues working on laptops around a wooden table';
+    const route = WebImporter.Blocks.createBlock(document, {
+      name: 'career-route',
+      cells: [
+        [hinted(document, 'backgroundImage', [el(document, 'p', routeImage)])],
+        [hinted(document, 'heading', [el(document, 'p', 'THE ROAD IS NEW. HERE’S THE ROUTE IN.')])],
+        ...STEPS.map(([number, title, description]) => [
+          hinted(document, 'stepNumber', [el(document, 'p', number)]),
+          hinted(document, 'stepHeading', [el(document, 'p', title)]),
+          hinted(document, 'stepDescription', [el(document, 'p', description)]),
+        ]),
+      ],
+    });
+
     const main = document.createElement('div');
-    main.append(WebImporter.Blocks.createBlock(document, { name: 'open-roles', cells }));
+    // top to bottom: the hero, the open roles, then the route in
+    main.append(hero, document.createElement('hr'), WebImporter.Blocks.createBlock(document, { name: 'open-roles', cells }), document.createElement('hr'), route);
     return [{ element: main, path: '/jsw-phase-5', report: { title: 'jsw-phase-5', roles: ROLES.length } }];
   },
 };

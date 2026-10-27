@@ -1,0 +1,134 @@
+{
+  "definitions": [
+    {
+      "title": "Career Hero",
+      "id": "career-hero",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Career Hero",
+              "model": "career-hero",
+              "filter": "career-hero"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Stat Card",
+      "id": "career-hero-stat",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Stat Card",
+              "model": "career-hero-stat"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "career-hero",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "backgroundImage",
+          "label": "Background image",
+          "description": "The photo behind the whole section, the stat cards included.",
+          "multi": false,
+          "required": true
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "backgroundImageAlt",
+          "label": "Background image alt text",
+          "description": "Describes the photo for screen readers. At most 125 characters.",
+          "value": "",
+          "validation": {
+            "maxLength": 125
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "heading",
+          "label": "Heading",
+          "description": "Two lines at most. Warning: text longer than 25 characters is cut short with “…”.",
+          "value": "THE WORLD NEEDS PIONEERS",
+          "required": true,
+          "validation": {
+            "maxLength": 25
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "scrollLabel",
+          "label": "Scroll label",
+          "description": "The label beside the mouse icon. Warning: text longer than 12 characters is cut short with “…”.",
+          "value": "SCROLL",
+          "validation": {
+            "maxLength": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": "career-hero-stat",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "subtitle",
+          "label": "Subtitle",
+          "description": "The small line at the top of the card. Only the first 3 Stat Cards are shown. Warning: text longer than 32 characters is cut short with “…”.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 32
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "statValue",
+          "label": "Stat value",
+          "description": "The big figure, e.g. 1,000+ or 44 YRS. Warning: text longer than 8 characters is cut short with “…”.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 8
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "description",
+          "label": "Description",
+          "description": "Two lines at most under the figure. Warning: text longer than 80 characters is cut short with “…”.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 80
+          }
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "career-hero",
+      "components": [
+        "career-hero-stat"
+      ]
+    }
+  ]
+}
