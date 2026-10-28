@@ -235,14 +235,38 @@ function buildLegal(link, editing) {
   return legal;
 }
 
+/*
+ * Universal Editor builds its content tree from where the instrumented elements sit in the page:
+ * an item inside another item's element is shown as that item's child (and, its parent not being
+ * a container, cannot be deleted or moved). The Footer Columns, Footer Links and Social Icons are
+ * all the block's own items, side by side (_jsw-footer.json): so a column's instrumentation goes
+ * on its heading only (.jsw-footer-column-head), never on an element around its links, and every
+ * item's element sits directly under the block's, as in the content.
+ */
+
+/** an item the author has not filled in yet (just added in the editor) */
+const isEmptyLink = (row) => !row.querySelector('a[href]')?.getAttribute('href')?.trim();
+const isEmptySocial = (row) => !row.querySelector('picture, a[href]');
+
+/** in the editor, an empty item's place: something to select (never on the page) */
+function placeholder(text) {
+  const span = el('span', 'jsw-footer-placeholder');
+  span.textContent = text;
+  return span;
+}
+
+/** a navigation column: its heading (the Footer Column item), then its links' list */
 function buildColumn(row, editing) {
   const column = el('div', 'jsw-footer-column');
-  moveInstrumentation(row, column);
-  const [node] = textsOf(cellsOf(row)[0]);
+  const head = el('div', 'jsw-footer-column-head');
+  if (row) moveInstrumentation(row, head);
+  const [node] = row ? textsOf(cellsOf(row)[0]) : [];
   const heading = retag(node, 'h2', 'jsw-footer-heading');
   cap(heading, TEXT_LIMITS.columnHeading, editing);
-  const list = el('ul', 'jsw-footer-links');
-  column.append(heading, list);
+  if (!heading.textContent.trim() && editing && row) heading.append(placeholder('Column heading'));
+  if (heading.textContent.trim()) head.append(heading);
+  if (head.children.length || head.hasAttribute('data-aue-resource')) column.append(head);
+  column.append(el('ul', 'jsw-footer-links'));
   return column;
 }
 
@@ -250,11 +274,14 @@ function buildLink(row, editing) {
   const item = el('li', 'jsw-footer-link');
   moveInstrumentation(row, item);
   const a = row.querySelector('a');
-  if (a) {
+  if (a && !isEmptyLink(row)) {
     external(plain(a));
     a.removeAttribute('class');
     cap(a, TEXT_LIMITS.linkText, editing);
     item.append(a);
+  } else if (editing) {
+    item.classList.add('is-empty');
+    item.append(placeholder('New link'));
   }
   return item;
 }
@@ -268,6 +295,13 @@ function buildSocial(row, asText) {
   const name = img?.getAttribute('alt')?.trim() || '';
   const authored = row.querySelector('a');
   const a = authored ? external(plain(authored)) : el('a');
+  if (isEmptySocial(row)) {
+    item.classList.add('is-empty');
+    a.className = asText ? '' : 'jsw-footer-social-link';
+    a.replaceChildren(placeholder(asText ? 'New icon' : '+'));
+    item.append(a);
+    return item;
+  }
   if (asText) {
     a.removeAttribute('class');
     a.textContent = name || a.textContent;
@@ -292,9 +326,23 @@ function linkLimit(headingText, index) {
 }
 
 /**
- * the items shown: on the page the first `limit` (already sliced); in the editor all of them,
- * those over the limit marked
- * @param {Element[]} built the items, built
+ * the item rows to build: on the page the first `limit` filled-in ones (.slice: the others are
+ * never put into it); in the editor every one, empty ones too, so each can be selected, moved
+ * and deleted
+ * @param {Element[]} rows the items' rows
+ * @param {number} limit the most shown on the page
+ * @param {boolean} editing in the editor
+ * @param {function(Element): boolean} isEmpty an item not filled in yet
+ * @returns {Element[]}
+ */
+function rowsToBuild(rows, limit, editing, isEmpty) {
+  return editing ? rows : rows.filter((r) => !isEmpty(r)).slice(0, limit);
+}
+
+/**
+ * in the editor, the filled-in items after the first `limit` marked (shown dimmed only while
+ * editing, never in Preview mode: jsw-footer.css); empty ones are not counted
+ * @param {Element[]} built the items, built (in the rows' order)
  * @param {number} limit the most shown on the page
  * @param {boolean} editing in the editor
  * @param {string} what what they are, for the editor's note
@@ -302,7 +350,7 @@ function linkLimit(headingText, index) {
  */
 function limited(built, limit, editing, what) {
   if (!editing) return built;
-  built.slice(limit).forEach((item) => {
+  built.filter((item) => !item.classList.contains('is-empty')).slice(limit).forEach((item) => {
     item.classList.add('is-over-limit');
     item.title = `Not shown on the page: only the first ${limit} ${what} are.`;
   });
@@ -339,18 +387,16 @@ export default function decorate(block) {
     }
   });
   columns.forEach(({ row, links }, i) => {
-    let column;
-    if (row) column = buildColumn(row, editing);
-    else {
-      column = el('div', 'jsw-footer-column');
-      column.append(el('ul', 'jsw-footer-links'));
-    }
-    const limit = linkLimit(column.querySelector('.jsw-footer-heading')?.textContent || '', i);
-    const built = (editing ? links : links.slice(0, limit)).map((r) => buildLink(r, editing));
+    const column = buildColumn(row, editing);
+    const heading = column.querySelector('.jsw-footer-heading');
+    const named = heading && !heading.querySelector('.jsw-footer-placeholder');
+    const limit = linkLimit(named ? heading.textContent : '', i);
+    const built = rowsToBuild(links, limit, editing, isEmptyLink).map((r) => buildLink(r, editing));
     column.querySelector('.jsw-footer-links').append(...limited(built, limit, editing, 'links'));
-    nav.append(column);
+    // on the page, a column with neither a heading nor links is left out
+    if (editing || column.querySelector('.jsw-footer-heading, li')) nav.append(column);
   });
-  const builtSocials = (editing ? socialRows : socialRows.slice(0, MAX_SOCIAL_ICONS))
+  const builtSocials = rowsToBuild(socialRows, MAX_SOCIAL_ICONS, editing, isEmptySocial)
     .map((r) => buildSocial(r, phase3));
   socials.append(...limited(builtSocials, MAX_SOCIAL_ICONS, editing, 'social icons'));
 
