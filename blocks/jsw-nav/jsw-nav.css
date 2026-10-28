@@ -1,0 +1,56 @@
+@import url('../../styles/jsw-pill-nav.css');
+
+/*
+ * jsw-nav: on its own page (/jsw-nav) the JSW pill navigation as the JSW pages show it (styles:
+ * styles/jsw-pill-nav.css), centred on a band of the slate blue it sits on in the frames.
+ */
+
+/* the section holding it as tall as the band, not a screen tall (styles/styles.css) */
+main > .section:has(> .jsw-nav-wrapper) {
+  min-height: 0;
+}
+
+.jsw-nav {
+  box-sizing: border-box;
+  padding: 26px 12px;
+  background: linear-gradient(180deg, #4d6478 0%, #7d93a4 100%);
+}
+
+/* its own page (/jsw-nav, body class from scripts.js) holds only the navigation: the whole
+   window in the band's slate blue, not white below it (a background only, no height: the
+   editor's canvas, which grows to fit the page, is not stretched) */
+body.jsw-nav-page {
+  background: linear-gradient(180deg, #4d6478 0%, #7d93a4 100%) fixed;
+}
+
+body.jsw-nav-page .jsw-nav {
+  background: none;
+}
+
+/* in the band, not over a hero: in the flow, centred */
+.jsw-nav .jsw-pill-nav {
+  position: relative;
+  top: auto;
+  left: auto;
+  margin: 0 auto;
+  transform: none;
+}
+
+/* Nav Links over the limit (MAX_NAV_LINKS, scripts/jsw-pill-nav.js): never on the pages; here
+   hidden, also in the editor's Preview mode, and shown dimmed only while editing */
+.jsw-nav .jsw-pill-nav-links > li.is-over-limit {
+  display: none;
+}
+
+html.adobe-ue-edit .jsw-nav .jsw-pill-nav-links > li.is-over-limit {
+  display: list-item;
+  opacity: 0.45;
+}
+
+/* phones: the pill navigation is not shown on the JSW pages (styles/jsw-pill-nav.css); here it
+   is, so it can still be edited */
+@media (max-width: 599.98px) {
+  .jsw-nav .jsw-pill-nav {
+    display: block;
+  }
+}

@@ -966,6 +966,75 @@
     ]
   },
   {
+    "id": "jsw-nav",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "brand",
+        "label": "Logo text",
+        "description": "JSW MOTORS shows as the JSW MOTORS wordmark, beside the JSW mark. At most 20 characters.",
+        "value": "JSW MOTORS",
+        "required": true,
+        "validation": {
+          "maxLength": 20
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "homeLink",
+        "label": "Logo link",
+        "description": "Where the logo leads, e.g. the JSW home page."
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "cta",
+        "label": "Button link",
+        "description": "Where the white button leads.",
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "ctaText",
+        "label": "Button text",
+        "description": "At most 17 characters. Nav Links: you may add more, but at most 2 are shown on the pages (more do not fit in the bar).",
+        "value": "REGISTER INTEREST",
+        "required": true,
+        "validation": {
+          "maxLength": 17
+        }
+      }
+    ]
+  },
+  {
+    "id": "jsw-nav-link",
+    "fields": [
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "link",
+        "label": "Link URL",
+        "description": "A page, a section of one (/jsw-phase-3#nev-tech), or a full URL. At most 2 Nav Links are shown on the pages.",
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "linkText",
+        "label": "Link text",
+        "description": "At most 11 characters (on narrow tablets, under 700px wide, keep the texts short: about 8 characters per link).",
+        "value": "",
+        "required": true,
+        "validation": {
+          "maxLength": 11
+        }
+      }
+    ]
+  },
+  {
     "id": "jsw-navbar",
     "fields": [
       {

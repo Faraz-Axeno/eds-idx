@@ -2,7 +2,8 @@
  * The JSW pill navigation (as on /jsw-phase-3, "NEV / Hero") for blocks that bring their own:
  * logo mark + JSW MOTORS wordmark, a list of links, then the white button.
  * Styles: styles/jsw-pill-nav.css (imported by those blocks' stylesheets).
- * loadJswNav() builds it from the navigation authored on /jsw-phase-3, so it is edited once.
+ * loadJswNav() builds it from the navigation authored once on /jsw-nav (its jsw-nav block), else
+ * from the one on /jsw-phase-3.
  */
 
 // "JSW MOTORS" as in the Figma navbar, letter by letter on its 9-unit cap grid
@@ -108,13 +109,128 @@ function sourcePage() {
     : { page: NAV_SOURCE_PAGE, plain: `${NAV_SOURCE_PAGE}.plain.html` };
 }
 
+// the JSW navigation page: its jsw-nav block is the navigation of every JSW page that brings the
+// pill navigation (authored there once); while it is not there, the Phase 3 hero's (above)
+const NAV_PAGE = '/jsw-nav';
+
+// the links shown in the pill (the jsw-nav block's Nav Links): more do not fit beside the logo
+// and the button; the editor shows the others dimmed (blocks/jsw-nav)
+export const MAX_NAV_LINKS = 2;
+
+// the most characters the pill has room for (the model's limits, _jsw-nav.json): a longer text,
+// if saved anyway, is cut there with "…" (its whole wording as a tooltip)
+export const NAV_TEXT_LIMITS = { linkText: 11, ctaText: 17 };
+
+/** an element's text cut to its limit with "…", its whole text a tooltip */
+export function capNavText(node, limit) {
+  const text = node?.textContent.trim();
+  if (!text || text.length <= limit) return;
+  node.title = text;
+  node.textContent = `${text.slice(0, limit).trimEnd()}…`;
+}
+
+/** a page's addresses, this one's first: AEM author /content/{site}/…, preview /content/…, root */
+function pageCandidates(path) {
+  const { pathname } = window.location;
+  const siteRoot = pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0];
+  const candidates = pathname.startsWith('/content/')
+    ? [siteRoot && `${siteRoot}${path}`, `/content${path}`, path]
+    : [path, `/content${path}`];
+  return [...new Set(candidates.filter(Boolean))];
+}
+
+/** an authored link holding only its address (a link field without a text) */
+const isBareLink = (a) => {
+  const text = a.textContent.trim();
+  return !text || text === a.getAttribute('href') || /^(\/|#|https?:|mailto:|tel:)/.test(text);
+};
+
 /**
- * the JSW navigation as authored on /jsw-phase-3 (the navigation fields of its immersive-hero
- * block: logo text, links, button), for pages without that hero; links to a section of that
- * page (#nev-tech) are made to open it there. Read once per page; the fallback if it fails.
+ * the parts of a jsw-nav block, from its rows as authored (_jsw-nav.json): its fields, the logo
+ * text (brand), the logo link (homeLink) and the button (cta + text), then its Nav Links (link +
+ * text). The Nav Links are told by their type (the editor's model, or the type cell of imported
+ * content, dropped here); published pages mark none: there the fields are the first three rows.
+ * @param {Element} block the jsw-nav block
+ * @returns {{brand: Element, home: Element, cta: Element, links: {row: Element, link: Element}[]}}
+ */
+export function readNavBlock(block) {
+  const rows = [...block.children].map((row) => {
+    const first = row.firstElementChild;
+    const typed = Boolean(first && !first.querySelector('a, picture')
+      && first.textContent.trim() === 'jsw-nav-link' && row.children.length > 1);
+    if (typed) first.remove();
+    return { row, link: typed || row.dataset.aueModel === 'jsw-nav-link' };
+  });
+  const marked = rows.some(({ link }) => link);
+  const fieldRows = marked ? rows.filter(({ link }) => !link) : rows.slice(0, 3);
+  const linkRows = marked ? rows.filter(({ link }) => link) : rows.slice(3);
+
+  let brand = null;
+  let home = null;
+  let cta = null;
+  fieldRows.forEach(({ row }) => {
+    const a = row.querySelector('a');
+    if (!a) {
+      if (!brand && row.textContent.trim()) brand = row.querySelector('[data-aue-prop], p') || row.firstElementChild;
+    } else if (isBareLink(a) && !home) home = a;
+    else if (!cta) cta = a;
+    else if (!home) home = a;
+  });
+  const links = linkRows.map(({ row }) => ({ row, link: row.querySelector('a') }))
+    .filter(({ link }) => link);
+  return {
+    brand, home, cta, links,
+  };
+}
+
+/** the navigation page's jsw-nav block, as authored (null when it is not there) */
+async function fetchNavBlock() {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const url of pageCandidates(NAV_PAGE)) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const resp = await fetch(`${url}.plain.html`);
+      if (resp.ok) {
+        // eslint-disable-next-line no-await-in-loop
+        const doc = new DOMParser().parseFromString(await resp.text(), 'text/html');
+        const block = doc.querySelector('.jsw-nav');
+        if (block) return block;
+      }
+    } catch (e) { /* the next address */ }
+  }
+  return null;
+}
+
+/** no editor instrumentation on what belongs to another page */
+function stripInstrumentation(root) {
+  [root, ...root.querySelectorAll('*')].forEach((node) => [...node.attributes]
+    .filter(({ name }) => name.startsWith('data-aue-') || name.startsWith('data-richtext-'))
+    .forEach(({ name }) => node.removeAttribute(name)));
+}
+
+/**
+ * the JSW navigation: as authored on /jsw-nav (its jsw-nav block); while that page is not there,
+ * as on /jsw-phase-3 (the navigation fields of its immersive-hero block: logo text, links,
+ * button), links to a section of that page (#nev-tech) made to open it there; the fallback if
+ * neither can be read.
  * @returns {Promise<Element>} the <nav>
  */
 export async function loadJswNav() {
+  const navBlock = await fetchNavBlock();
+  if (navBlock) {
+    stripInstrumentation(navBlock);
+    const {
+      brand, home, cta, links,
+    } = readNavBlock(navBlock);
+    const shown = links.slice(0, MAX_NAV_LINKS).map(({ link }) => link);
+    shown.forEach((a) => capNavText(a, NAV_TEXT_LIMITS.linkText));
+    capNavText(cta, NAV_TEXT_LIMITS.ctaText);
+    const nav = buildPillNav({ brand, links: shown, cta });
+    const logo = nav.querySelector('.jsw-pill-nav-brand');
+    if (home && logo) logo.setAttribute('href', home.getAttribute('href'));
+    return nav;
+  }
+
   const { page, plain: plainUrl } = sourcePage();
   const cell = document.createElement('div');
   try {
@@ -129,9 +245,7 @@ export async function loadJswNav() {
     cell.innerHTML = FALLBACK_NAV;
   }
   // it belongs to the other page: no editor instrumentation of it here
-  [cell, ...cell.querySelectorAll('*')].forEach((node) => [...node.attributes]
-    .filter(({ name }) => name.startsWith('data-aue-') || name.startsWith('data-richtext-'))
-    .forEach(({ name }) => node.removeAttribute(name)));
+  stripInstrumentation(cell);
   cell.querySelectorAll('a[href^="#"]').forEach((a) => a.setAttribute('href', `${page}${a.getAttribute('href')}`));
 
   const list = cell.querySelector('ul');

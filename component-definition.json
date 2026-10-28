@@ -434,6 +434,37 @@
           }
         },
         {
+          "title": "Jsw Nav",
+          "id": "jsw-nav",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Jsw Nav",
+                  "model": "jsw-nav",
+                  "filter": "jsw-nav"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Nav Link",
+          "id": "jsw-nav-link",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Nav Link",
+                  "model": "jsw-nav-link"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Jsw Navbar",
           "id": "jsw-navbar",
           "plugins": {
