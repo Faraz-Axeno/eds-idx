@@ -85,27 +85,23 @@ var CustomImportScript = (() => {
         [group(document, [
           ["actions_ctaButton", link(document, "/jsw-phase-3#register-interest", "REGISTER INTEREST")],
           ["actions_privacyPolicy", link(document, "#privacy-policy", "PRIVACY POLICY")]
+        ])],
+        // the columns (each its heading, then its links) and the social links (their heading, then
+        // the icons: each its image, named, then its link)
+        [group(document, [
+          ...COLUMNS.flatMap(([heading, links], c) => [
+            [`nav_column${c + 1}Heading`, el(document, "p", heading)],
+            ...links.map(([text, href], i) => [`nav_column${c + 1}Link${i + 1}`, link(document, href, text)])
+          ]),
+          ["nav_socialHeading", el(document, "p", "CONNECT")],
+          ...SOCIALS.flatMap(([file, name, href], i) => [
+            [`nav_social${i + 1}Icon`, image(document, file, name)],
+            [`nav_social${i + 1}Link`, link(document, href, href)]
+          ])
         ])]
       ];
-      const columns = COLUMNS.map(([heading, links]) => WebImporter.Blocks.createBlock(document, {
-        name: "jsw-footer-column",
-        cells: [
-          [hinted(document, "columnHeading", [el(document, "p", heading)])],
-          ...links.map(([text, href]) => [hinted(document, "link", [link(document, href, text)])])
-        ]
-      }));
-      const social = WebImporter.Blocks.createBlock(document, {
-        name: "jsw-footer-social",
-        cells: [
-          [hinted(document, "connectHeading", [el(document, "p", "CONNECT")])],
-          ...SOCIALS.map(([file, name, href]) => [
-            hinted(document, "iconImage", [image(document, file, name)]),
-            hinted(document, "iconLink", [link(document, href, href)])
-          ])
-        ]
-      });
       const main = document.createElement("div");
-      main.append(WebImporter.Blocks.createBlock(document, { name: "jsw-footer", cells }), ...columns, social);
+      main.append(WebImporter.Blocks.createBlock(document, { name: "jsw-footer", cells }));
       return [{ element: main, path: "/jsw-footer", report: { title: "jsw-footer" } }];
     }
   };

@@ -749,106 +749,18 @@
     ]
   },
   {
-    "id": "jsw-footer-column",
-    "fields": [
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "columnHeading",
-        "label": "Column heading",
-        "description": "e.g. TECHNOLOGY. Add this column's links inside it (Footer Links). Warning: You can add multiple links, but a maximum of 4 will be displayed on the live site. At most 20 characters.",
-        "value": "",
-        "required": true,
-        "validation": {
-          "maxLength": 20
-        }
-      }
-    ]
-  },
-  {
-    "id": "jsw-footer-link",
-    "fields": [
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "link",
-        "label": "Link URL",
-        "description": "A page, #section, or a full URL. Warning: You can add multiple links, but a maximum of 4 will be displayed on the live site.",
-        "required": true
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "linkText",
-        "label": "Link text",
-        "description": "At most 24 characters.",
-        "value": "",
-        "required": true,
-        "validation": {
-          "maxLength": 24
-        }
-      }
-    ]
-  },
-  {
-    "id": "jsw-footer-social",
-    "fields": [
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "connectHeading",
-        "label": "Social heading",
-        "description": "Above the Social Icons, e.g. CONNECT. Add the icons inside this block (Social Icons). Warning: You can add multiple social icons, but a maximum of 4 will be displayed on the live site. At most 20 characters.",
-        "value": "CONNECT",
-        "required": true,
-        "validation": {
-          "maxLength": 20
-        }
-      }
-    ]
-  },
-  {
-    "id": "jsw-footer-social-icon",
-    "fields": [
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "iconImage",
-        "label": "Icon image",
-        "description": "The network's logo, white on transparent (SVG or PNG). Warning: You can add multiple social icons, but a maximum of 4 will be displayed on the live site.",
-        "multi": false,
-        "required": true
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "iconImageAlt",
-        "label": "Network name",
-        "description": "e.g. Facebook: read out by screen readers for the link, and shown as the link in the Variant B layout. At most 30 characters.",
-        "value": "",
-        "required": true,
-        "validation": {
-          "maxLength": 30
-        }
-      },
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "iconLink",
-        "label": "Icon link",
-        "description": "The JSW Motors profile on that network (full URL).",
-        "required": true
-      }
-    ]
-  },
-  {
     "id": "jsw-footer",
     "fields": [
+      {
+        "component": "tab",
+        "name": "tab_footer",
+        "label": "Footer"
+      },
       {
         "component": "select",
         "name": "media_footerVariant",
         "label": "Footer layout",
-        "description": "Variant A: the photo (or video) behind; the logo, copyright and button at the left, the columns and social icons at the right. Variant B: the black-to-teal gradient (no photo); the logo, copyright and privacy policy at the left, the button in the centre, CONNECT (the social links as text) and the columns at the right. The columns and social links are the Jsw Footer Column and Jsw Footer Social blocks in this section.",
+        "description": "Variant A: the photo (or video) behind; the logo, copyright and button at the left, the columns and social icons at the right. Variant B: the black-to-teal gradient (no photo); the logo, copyright and privacy policy at the left, the button in the centre, CONNECT (the social links as text) and the columns at the right. The columns and social icons: the Column 1, Column 2 and Social icons tabs.",
         "valueType": "string",
         "value": "variant-phase-5",
         "required": true,
@@ -986,6 +898,305 @@
         "validation": {
           "maxLength": 30
         }
+      },
+      {
+        "component": "tab",
+        "name": "tab_column1",
+        "label": "Column 1"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_column1Heading",
+        "label": "Column 1 heading",
+        "description": "e.g. TECHNOLOGY. Its links below: up to 4 (a link without a URL is not shown). At most 20 characters.",
+        "value": "TECHNOLOGY",
+        "validation": {
+          "maxLength": 20
+        },
+        "required": true
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_column1Link1",
+        "label": "Link 1 URL",
+        "description": "A page, #section, or a full URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_column1Link1Text",
+        "label": "Link 1 text",
+        "description": "At most 24 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 24
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_column1Link2",
+        "label": "Link 2 URL",
+        "description": "A page, #section, or a full URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_column1Link2Text",
+        "label": "Link 2 text",
+        "description": "At most 24 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 24
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_column1Link3",
+        "label": "Link 3 URL",
+        "description": "A page, #section, or a full URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_column1Link3Text",
+        "label": "Link 3 text",
+        "description": "At most 24 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 24
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_column1Link4",
+        "label": "Link 4 URL",
+        "description": "A page, #section, or a full URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_column1Link4Text",
+        "label": "Link 4 text",
+        "description": "At most 24 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 24
+        }
+      },
+      {
+        "component": "tab",
+        "name": "tab_column2",
+        "label": "Column 2"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_column2Heading",
+        "label": "Column 2 heading",
+        "description": "e.g. EXPLORE. Its links below: up to 4 (a link without a URL is not shown). At most 20 characters.",
+        "value": "EXPLORE",
+        "validation": {
+          "maxLength": 20
+        },
+        "required": true
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_column2Link1",
+        "label": "Link 1 URL",
+        "description": "A page, #section, or a full URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_column2Link1Text",
+        "label": "Link 1 text",
+        "description": "At most 24 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 24
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_column2Link2",
+        "label": "Link 2 URL",
+        "description": "A page, #section, or a full URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_column2Link2Text",
+        "label": "Link 2 text",
+        "description": "At most 24 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 24
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_column2Link3",
+        "label": "Link 3 URL",
+        "description": "A page, #section, or a full URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_column2Link3Text",
+        "label": "Link 3 text",
+        "description": "At most 24 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 24
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_column2Link4",
+        "label": "Link 4 URL",
+        "description": "A page, #section, or a full URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_column2Link4Text",
+        "label": "Link 4 text",
+        "description": "At most 24 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 24
+        }
+      },
+      {
+        "component": "tab",
+        "name": "tab_social",
+        "label": "Social icons"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_socialHeading",
+        "label": "Social heading",
+        "description": "Above the social icons, e.g. CONNECT. The icons below: up to 4. At most 20 characters.",
+        "value": "CONNECT",
+        "validation": {
+          "maxLength": 20
+        },
+        "required": true
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "nav_social1Icon",
+        "label": "Icon 1 image",
+        "description": "The network's logo, white on transparent (SVG or PNG).",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_social1IconAlt",
+        "label": "Icon 1 network name",
+        "description": "e.g. Facebook: read out by screen readers, and shown as the link in the Variant B layout. At most 30 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 30
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_social1Link",
+        "label": "Icon 1 link",
+        "description": "The JSW Motors profile on that network (full URL)."
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "nav_social2Icon",
+        "label": "Icon 2 image",
+        "description": "The network's logo, white on transparent (SVG or PNG).",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_social2IconAlt",
+        "label": "Icon 2 network name",
+        "description": "e.g. Facebook: read out by screen readers, and shown as the link in the Variant B layout. At most 30 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 30
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_social2Link",
+        "label": "Icon 2 link",
+        "description": "The JSW Motors profile on that network (full URL)."
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "nav_social3Icon",
+        "label": "Icon 3 image",
+        "description": "The network's logo, white on transparent (SVG or PNG).",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_social3IconAlt",
+        "label": "Icon 3 network name",
+        "description": "e.g. Facebook: read out by screen readers, and shown as the link in the Variant B layout. At most 30 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 30
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_social3Link",
+        "label": "Icon 3 link",
+        "description": "The JSW Motors profile on that network (full URL)."
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "nav_social4Icon",
+        "label": "Icon 4 image",
+        "description": "The network's logo, white on transparent (SVG or PNG).",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "nav_social4IconAlt",
+        "label": "Icon 4 network name",
+        "description": "e.g. Facebook: read out by screen readers, and shown as the link in the Variant B layout. At most 30 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 30
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "nav_social4Link",
+        "label": "Icon 4 link",
+        "description": "The JSW Motors profile on that network (full URL)."
       }
     ]
   },
