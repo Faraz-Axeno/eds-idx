@@ -401,6 +401,7 @@ export function decorateMain(main) {
  *   /jsw-nev-collage    parallax-collage (+ teaser)     -> jsw-nev-collage
  *   /jsw-phase-5        open-roles                      -> jsw-phase-5, the JSW footer
  *   /jsw-footer         jsw-footer (the JSW footer)     -> jsw-footer-page
+ *   /jsw-nav            jsw-nav (the JSW navigation)    -> jsw-nav-page
  * An entry with a footer gets that page as its footer (loadJswFooter) instead of the site's.
  * Every other page is unaffected.
  */
@@ -412,6 +413,7 @@ const STANDALONE_PAGES = [
   { block: 'reservation-confirmation', bodyClass: 'jsw-reservation' },
   { block: 'open-roles', bodyClass: 'jsw-phase-5', footer: '/jsw-footer' },
   { block: 'jsw-footer', bodyClass: 'jsw-footer-page' },
+  { block: 'jsw-nav', bodyClass: 'jsw-nav-page' },
 ];
 
 /**

@@ -37,7 +37,8 @@
       "open-roles",
       "career-hero",
       "career-route",
-      "jsw-footer"
+      "jsw-footer",
+      "jsw-nav"
     ]
   },
   {
@@ -101,6 +102,12 @@
       "jsw-footer-column",
       "jsw-footer-link",
       "jsw-footer-social"
+    ]
+  },
+  {
+    "id": "jsw-nav",
+    "components": [
+      "jsw-nav-link"
     ]
   },
   {
