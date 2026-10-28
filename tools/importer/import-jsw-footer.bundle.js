@@ -73,36 +73,33 @@ var CustomImportScript = (() => {
   var import_jsw_footer_default = {
     transform: ({ document }) => {
       const cells = [
+        // media: the layout and background, then the starting content (fields hidden in the
+        // editor's panel): the design's columns and icons, shown until the lists hold items
         [group(document, [
           ["media_footerVariant", el(document, "p", "variant-phase-5")],
           ["media_backgroundMode", el(document, "p", "image")],
-          ["media_backgroundImage", image(document, "jsw-footer-bg.jpg", "")]
-        ])],
-        [group(document, [
-          ["brand_logo", image(document, "jsw-motors-wordmark.svg", "JSW Motors")],
-          ["brand_copyright", el(document, "p", "\xA9 2026 JSW Motors  Mumbai, India")]
-        ])],
-        [group(document, [
-          ["actions_ctaButton", link(document, "/jsw-phase-3#register-interest", "REGISTER INTEREST")],
-          ["actions_privacyPolicy", link(document, "#privacy-policy", "PRIVACY POLICY")]
-        ])],
-        // the footer columns and social icons: multi-fields, added in Universal Editor (md2jcr
-        // does not carry them); the social heading
-        [hinted(document, "footerColumns", [])],
-        [hinted(document, "socialHeading", [el(document, "p", "CONNECT")])],
-        [hinted(document, "socialIcons", [])],
-        // the starting content (fields hidden in the editor's panel): the design's columns and icons,
-        // shown until the lists above hold items
-        [group(document, [
+          ["media_backgroundImage", image(document, "jsw-footer-bg.jpg", "")],
           ...COLUMNS.flatMap(([heading, links], c) => [
-            [`nav_column${c + 1}Heading`, el(document, "p", heading)],
-            ...links.map(([text, href], i) => [`nav_column${c + 1}Link${i + 1}`, link(document, href, text)])
+            [`media_startColumn${c + 1}Heading`, el(document, "p", heading)],
+            ...links.map(([text, href], i) => [`media_startColumn${c + 1}Link${i + 1}`, link(document, href, text)])
           ]),
           ...SOCIALS.flatMap(([file, name, href], i) => [
-            [`nav_social${i + 1}Icon`, image(document, file, name)],
-            [`nav_social${i + 1}Link`, link(document, href, href)]
+            [`media_startSocial${i + 1}Icon`, image(document, file, name)],
+            [`media_startSocial${i + 1}Link`, link(document, href, href)]
           ])
-        ])]
+        ])],
+        // brand: the logo, copyright, button, privacy policy and social heading
+        [group(document, [
+          ["brand_logo", image(document, "jsw-motors-wordmark.svg", "JSW Motors")],
+          ["brand_copyright", el(document, "p", "\xA9 2026 JSW Motors  Mumbai, India")],
+          ["brand_ctaButton", link(document, "/jsw-phase-3#register-interest", "REGISTER INTEREST")],
+          ["brand_privacyPolicy", link(document, "#privacy-policy", "PRIVACY POLICY")],
+          ["brand_socialHeading", el(document, "p", "CONNECT")]
+        ])],
+        // the footer columns and social icons: multi-fields, added in Universal Editor (md2jcr
+        // does not carry them)
+        [hinted(document, "footerColumns", [])],
+        [hinted(document, "socialIcons", [])]
       ];
       const main = document.createElement("div");
       main.append(WebImporter.Blocks.createBlock(document, { name: "jsw-footer", cells }));
