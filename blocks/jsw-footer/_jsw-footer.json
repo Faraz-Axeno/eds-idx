@@ -214,7 +214,7 @@
           "valueType": "string",
           "name": "connectHeading",
           "label": "Social heading",
-          "description": "Above the Social Icons. At most 20 characters.",
+          "description": "Above the Social Icons. At most 20 characters. Warning: You can add multiple social icons, but a maximum of 5 will be displayed on the live site.",
           "value": "CONNECT",
           "required": true,
           "validation": {
@@ -231,7 +231,7 @@
           "valueType": "string",
           "name": "columnHeading",
           "label": "Column heading",
-          "description": "Starts a navigation column, e.g. TECHNOLOGY. Its links are the Footer Links that follow it, up to the next Footer Column. At most 20 characters.",
+          "description": "Starts a navigation column, e.g. TECHNOLOGY. Its links are the Footer Links that follow it, up to the next Footer Column. Warning: You can add multiple links, but a maximum of 4 (TECHNOLOGY) or 5 (EXPLORE) will be displayed on the live site. At most 20 characters.",
           "value": "",
           "required": true,
           "validation": {
@@ -248,7 +248,7 @@
           "valueType": "string",
           "name": "link",
           "label": "Link URL",
-          "description": "A link of the Footer Column above it (a page, #section, or a full URL).",
+          "description": "A link of the Footer Column above it (a page, #section, or a full URL). Warning: You can add multiple links, but a maximum of 4 under TECHNOLOGY and 5 under EXPLORE will be displayed on the live site.",
           "required": true
         },
         {
@@ -273,7 +273,7 @@
           "valueType": "string",
           "name": "iconImage",
           "label": "Icon image",
-          "description": "The network's logo, white on transparent (SVG or PNG).",
+          "description": "The network's logo, white on transparent (SVG or PNG). Warning: You can add multiple social icons, but a maximum of 5 will be displayed on the live site.",
           "multi": false,
           "required": true
         },
