@@ -863,7 +863,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "actions_ctaButton",
+        "name": "brand_ctaButton",
         "label": "CTA button link",
         "description": "Where the white button leads (a page, or #section on one).",
         "required": true
@@ -871,7 +871,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "actions_ctaButtonText",
+        "name": "brand_ctaButtonText",
         "label": "CTA button text",
         "description": "The \"+\" after it is added on the page. At most 24 characters.",
         "value": "REGISTER INTEREST",
@@ -883,14 +883,14 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "actions_privacyPolicy",
+        "name": "brand_privacyPolicy",
         "label": "Privacy policy link",
         "required": true
       },
       {
         "component": "text",
         "valueType": "string",
-        "name": "actions_privacyPolicyText",
+        "name": "brand_privacyPolicyText",
         "label": "Privacy policy text",
         "description": "At the foot, on the left. At most 30 characters.",
         "value": "PRIVACY POLICY",
@@ -907,15 +907,15 @@
       {
         "component": "container",
         "name": "footerColumns",
-        "label": "Footer columns",
+        "label": "Columns",
         "multi": true,
-        "description": "The navigation columns, e.g. TECHNOLOGY and EXPLORE, left to right, each its heading and its links. Until a column is added here, the footer shows its starting columns (the design's, uploaded with the page).",
+        "description": "The navigation columns, left to right: each its title and its links.",
         "fields": [
           {
             "component": "text",
             "valueType": "string",
             "name": "columnHeading",
-            "label": "Column heading",
+            "label": "Column title",
             "description": "e.g. TECHNOLOGY. At most 20 characters.",
             "required": true,
             "validation": {
@@ -925,7 +925,7 @@
           {
             "component": "container",
             "name": "columnLinks",
-            "label": "Column links",
+            "label": "Links",
             "multi": true,
             "description": "Warning: You can add multiple links, but a maximum of 4 will be displayed on the live site.",
             "fields": [
@@ -933,7 +933,7 @@
                 "component": "aem-content",
                 "valueType": "string",
                 "name": "link",
-                "label": "Link URL",
+                "label": "URL",
                 "description": "A page, #section, or a full URL.",
                 "required": true
               },
@@ -941,8 +941,8 @@
                 "component": "text",
                 "valueType": "string",
                 "name": "linkText",
-                "label": "Link text",
-                "description": "At most 24 characters.",
+                "label": "Label",
+                "description": "e.g. NEVs. At most 24 characters.",
                 "required": true,
                 "validation": {
                   "maxLength": 24
@@ -960,7 +960,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "socialHeading",
+        "name": "brand_socialHeading",
         "label": "Social heading",
         "description": "Above the social icons, e.g. CONNECT. At most 20 characters.",
         "value": "CONNECT",
@@ -974,13 +974,13 @@
         "name": "socialIcons",
         "label": "Social icons",
         "multi": true,
-        "description": "Warning: You can add multiple social icons, but a maximum of 4 will be displayed on the live site. Until an icon is added here, the footer shows its starting icons (the design's).",
+        "description": "Warning: You can add multiple social icons, but a maximum of 4 will be displayed on the live site.",
         "fields": [
           {
             "component": "reference",
             "valueType": "string",
             "name": "iconImage",
-            "label": "Icon image",
+            "label": "Icon",
             "description": "The network's logo, white on transparent (SVG or PNG).",
             "multi": false,
             "required": true
@@ -1000,7 +1000,7 @@
             "component": "aem-content",
             "valueType": "string",
             "name": "iconLink",
-            "label": "Icon link",
+            "label": "URL",
             "description": "The JSW Motors profile on that network (full URL).",
             "required": true
           }
@@ -1009,7 +1009,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_column1Heading",
+        "name": "media_startColumn1Heading",
         "label": "Starting column 1 heading",
         "value": "",
         "validation": {
@@ -1027,7 +1027,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_column1Link1",
+        "name": "media_startColumn1Link1",
         "label": "Starting column 1 link 1 URL",
         "condition": {
           "===": [
@@ -1041,7 +1041,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_column1Link1Text",
+        "name": "media_startColumn1Link1Text",
         "label": "Starting column 1 link 1 text",
         "value": "",
         "validation": {
@@ -1059,7 +1059,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_column1Link2",
+        "name": "media_startColumn1Link2",
         "label": "Starting column 1 link 2 URL",
         "condition": {
           "===": [
@@ -1073,7 +1073,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_column1Link2Text",
+        "name": "media_startColumn1Link2Text",
         "label": "Starting column 1 link 2 text",
         "value": "",
         "validation": {
@@ -1091,7 +1091,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_column1Link3",
+        "name": "media_startColumn1Link3",
         "label": "Starting column 1 link 3 URL",
         "condition": {
           "===": [
@@ -1105,7 +1105,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_column1Link3Text",
+        "name": "media_startColumn1Link3Text",
         "label": "Starting column 1 link 3 text",
         "value": "",
         "validation": {
@@ -1123,7 +1123,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_column1Link4",
+        "name": "media_startColumn1Link4",
         "label": "Starting column 1 link 4 URL",
         "condition": {
           "===": [
@@ -1137,7 +1137,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_column1Link4Text",
+        "name": "media_startColumn1Link4Text",
         "label": "Starting column 1 link 4 text",
         "value": "",
         "validation": {
@@ -1155,7 +1155,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_column2Heading",
+        "name": "media_startColumn2Heading",
         "label": "Starting column 2 heading",
         "value": "",
         "validation": {
@@ -1173,7 +1173,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_column2Link1",
+        "name": "media_startColumn2Link1",
         "label": "Starting column 2 link 1 URL",
         "condition": {
           "===": [
@@ -1187,7 +1187,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_column2Link1Text",
+        "name": "media_startColumn2Link1Text",
         "label": "Starting column 2 link 1 text",
         "value": "",
         "validation": {
@@ -1205,7 +1205,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_column2Link2",
+        "name": "media_startColumn2Link2",
         "label": "Starting column 2 link 2 URL",
         "condition": {
           "===": [
@@ -1219,7 +1219,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_column2Link2Text",
+        "name": "media_startColumn2Link2Text",
         "label": "Starting column 2 link 2 text",
         "value": "",
         "validation": {
@@ -1237,7 +1237,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_column2Link3",
+        "name": "media_startColumn2Link3",
         "label": "Starting column 2 link 3 URL",
         "condition": {
           "===": [
@@ -1251,7 +1251,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_column2Link3Text",
+        "name": "media_startColumn2Link3Text",
         "label": "Starting column 2 link 3 text",
         "value": "",
         "validation": {
@@ -1269,7 +1269,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_column2Link4",
+        "name": "media_startColumn2Link4",
         "label": "Starting column 2 link 4 URL",
         "condition": {
           "===": [
@@ -1283,7 +1283,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_column2Link4Text",
+        "name": "media_startColumn2Link4Text",
         "label": "Starting column 2 link 4 text",
         "value": "",
         "validation": {
@@ -1301,7 +1301,7 @@
       {
         "component": "reference",
         "valueType": "string",
-        "name": "nav_social1Icon",
+        "name": "media_startSocial1Icon",
         "label": "Starting icon 1 image",
         "multi": false,
         "condition": {
@@ -1316,7 +1316,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_social1IconAlt",
+        "name": "media_startSocial1IconAlt",
         "label": "Starting icon 1 network name",
         "value": "",
         "validation": {
@@ -1334,7 +1334,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_social1Link",
+        "name": "media_startSocial1Link",
         "label": "Starting icon 1 link",
         "condition": {
           "===": [
@@ -1348,7 +1348,7 @@
       {
         "component": "reference",
         "valueType": "string",
-        "name": "nav_social2Icon",
+        "name": "media_startSocial2Icon",
         "label": "Starting icon 2 image",
         "multi": false,
         "condition": {
@@ -1363,7 +1363,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_social2IconAlt",
+        "name": "media_startSocial2IconAlt",
         "label": "Starting icon 2 network name",
         "value": "",
         "validation": {
@@ -1381,7 +1381,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_social2Link",
+        "name": "media_startSocial2Link",
         "label": "Starting icon 2 link",
         "condition": {
           "===": [
@@ -1395,7 +1395,7 @@
       {
         "component": "reference",
         "valueType": "string",
-        "name": "nav_social3Icon",
+        "name": "media_startSocial3Icon",
         "label": "Starting icon 3 image",
         "multi": false,
         "condition": {
@@ -1410,7 +1410,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_social3IconAlt",
+        "name": "media_startSocial3IconAlt",
         "label": "Starting icon 3 network name",
         "value": "",
         "validation": {
@@ -1428,7 +1428,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_social3Link",
+        "name": "media_startSocial3Link",
         "label": "Starting icon 3 link",
         "condition": {
           "===": [
@@ -1442,7 +1442,7 @@
       {
         "component": "reference",
         "valueType": "string",
-        "name": "nav_social4Icon",
+        "name": "media_startSocial4Icon",
         "label": "Starting icon 4 image",
         "multi": false,
         "condition": {
@@ -1457,7 +1457,7 @@
       {
         "component": "text",
         "valueType": "string",
-        "name": "nav_social4IconAlt",
+        "name": "media_startSocial4IconAlt",
         "label": "Starting icon 4 network name",
         "value": "",
         "validation": {
@@ -1475,7 +1475,7 @@
       {
         "component": "aem-content",
         "valueType": "string",
-        "name": "nav_social4Link",
+        "name": "media_startSocial4Link",
         "label": "Starting icon 4 link",
         "condition": {
           "===": [
@@ -1485,6 +1485,79 @@
             "starting-content-only"
           ]
         }
+      }
+    ]
+  },
+  {
+    "id": "jsw-footer-column",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "columnHeading",
+        "label": "Column title",
+        "description": "e.g. TECHNOLOGY. At most 20 characters.",
+        "required": true,
+        "validation": {
+          "maxLength": 20
+        }
+      }
+    ]
+  },
+  {
+    "id": "jsw-footer-link",
+    "fields": [
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "link",
+        "label": "URL",
+        "description": "A page, #section, or a full URL.",
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "linkText",
+        "label": "Label",
+        "description": "e.g. NEVs. At most 24 characters.",
+        "required": true,
+        "validation": {
+          "maxLength": 24
+        }
+      }
+    ]
+  },
+  {
+    "id": "jsw-footer-icon",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "iconImage",
+        "label": "Icon",
+        "description": "The network's logo, white on transparent (SVG or PNG).",
+        "multi": false,
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "iconImageAlt",
+        "label": "Network name",
+        "description": "e.g. Facebook: read out by screen readers, and shown as the link in the Variant B layout. At most 30 characters.",
+        "required": true,
+        "validation": {
+          "maxLength": 30
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "iconLink",
+        "label": "URL",
+        "description": "The JSW Motors profile on that network (full URL).",
+        "required": true
       }
     ]
   },

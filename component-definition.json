@@ -388,6 +388,51 @@
           }
         },
         {
+          "title": "Column",
+          "id": "jsw-footer-column",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Column",
+                  "model": "jsw-footer-column"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Link",
+          "id": "jsw-footer-link",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Link",
+                  "model": "jsw-footer-link"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Icon",
+          "id": "jsw-footer-icon",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Icon",
+                  "model": "jsw-footer-icon"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Jsw Nav",
           "id": "jsw-nav",
           "plugins": {

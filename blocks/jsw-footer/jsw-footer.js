@@ -15,17 +15,18 @@
  *   variant-phase-3 (Variant B; the Phase 3 footer): on a gradient (no photo); at the left the
  *     logo, the copyright line and the privacy policy link; the CTA button in the centre; at the
  *     right CONNECT (the social links as text, their network names) and the columns
- * Rows (the block's seven cells, in this order):
- *   footer layout | background type | background image (+ alt) | background video
- *   logo (+ alt) | copyright text
- *   CTA button link + text | privacy policy link + text
- *   footer columns: a list, each item its heading and its list of links
- *   social heading
- *   social icons: a list, each item its image (+ network name) and its link
- *   the starting content (fields hidden in the panel, uploaded with the page): two columns, each
+ * Rows (the block's four cells, in this order):
+ *   media: footer layout | background type | background image (+ alt) | background video, then
+ *     the starting content (fields hidden in the panel, uploaded with the page: two columns, each
  *     its heading and up to MAX_ITEMS links, and up to MAX_ITEMS icons, the design's; shown for
  *     the columns until the footer columns list holds a column, for the icons until the social
- *     icons list holds an icon
+ *     icons list holds an icon)
+ *   brand: logo (+ alt) | copyright text | CTA button link + text | privacy policy link + text |
+ *     social heading
+ *   footer columns: a list, each item its heading and its list of links
+ *   social icons: a list, each item its image (+ network name) and its link
+ * (Content saved before had seven cells: media, brand, actions, the footer columns, the social
+ * heading, the social icons, then the starting content.)
  * A multi-field's items are rendered as a list (<ul>, items of one element each) or one after the
  * other between <hr> (items of more than one), so both are read: a heading starts a column, a
  * picture an icon. Content saved before is read too: with the columns and icons as numbered
@@ -165,9 +166,9 @@ function readNav(cell) {
     const prop = node.dataset.aueProp || node.querySelector('[data-aue-prop]')?.dataset.aueProp || '';
     const picture = node.querySelector('picture') || (node.matches('picture') ? node : null);
     const link = node.matches('a') ? node : node.querySelector('a');
-    const column = prop.match(/^nav_column(\d)/)?.[1];
+    const column = prop.match(/^(?:nav_column|media_startColumn)(\d)/)?.[1];
     if (column) part = Number(column) - 1;
-    else if (prop.startsWith('nav_social')) part = 2;
+    else if (/^(?:nav_social|media_startSocial)/.test(prop)) part = 2;
     if (picture) {
       part = 2;
       social.icons.push({ picture, link: null });
@@ -325,6 +326,49 @@ function buildLegal(link, editing) {
   return legal;
 }
 
+const MODES = ['image', 'video'];
+
+/**
+ * the block's four cells (the model now): media (with the starting content after its own
+ * fields), brand (with the button, privacy policy and social heading), the footer columns list
+ * and the social icons list; told from content saved before by its brand cell holding the links
+ */
+function isCompact(rows) {
+  if (rows.length !== 4) return false;
+  const [, brand, columns, icons] = rows.map((r) => cellsOf(r)[0]);
+  if (!brand?.querySelector('a')) return false;
+  const empty = (cell) => !cell || (!cell.textContent.trim() && !cell.querySelector('picture, a'));
+  return (empty(columns) || Boolean(columns.querySelector('hr, ul, a')))
+    && (empty(icons) || Boolean(icons.querySelector('hr, ul, picture, a')));
+}
+
+/**
+ * the media cell's own fields (layout, background type, image, video) and, after them, the
+ * starting content (named media_start… in the editor; else from its first heading, a text other
+ * than the layout and background type, or a second picture)
+ */
+function splitMedia(cell) {
+  const own = el('div');
+  const starting = el('div');
+  let inStarting = false;
+  let pictures = 0;
+  [...(cell?.children || [])].forEach((node) => {
+    const prop = node.dataset.aueProp || node.querySelector('[data-aue-prop]')?.dataset.aueProp || '';
+    const text = node.textContent.trim();
+    const value = text.toLowerCase();
+    const hasPicture = Boolean(node.querySelector('picture') || node.matches('picture'));
+    if (!inStarting) {
+      if (prop.startsWith('media_start')) inStarting = true;
+      else if (!prop && !hasPicture && !node.querySelector('a') && text
+        && !VARIANTS.includes(value) && !MODES.includes(value)) inStarting = true;
+      else if (!prop && hasPicture && pictures > 0) inStarting = true;
+    }
+    if (hasPicture && !inStarting) pictures += 1;
+    (inStarting ? starting : own).append(node);
+  });
+  return { own, starting };
+}
+
 /**
  * the multi-fields' cells: the fourth to sixth cells hold lists, or are empty (none added yet);
  * a seventh, the starting content (hidden fields), may follow
@@ -381,18 +425,75 @@ function readIcons(cell) {
   return icons.map(({ picture, link }) => ({ picture, link }));
 }
 
-/**
- * in the editor, a multi-field's element marked as the editor's container for it: the cell's own
- * instrumentation when it has it, else its name (data-aue-prop) and data-aue-type="container"
+/** an element's editor instrumentation (data-aue-*: resource, prop, type, model, filter, label) */
+function instrument(node, attrs) {
+  if (!node) return;
+  Object.entries(attrs).forEach(([k, v]) => {
+    if (v) node.setAttribute(`data-aue-${k}`, v);
+  });
+}
+
+/** no editor instrumentation inside an element (what it was moved from: set again below) */
+function stripInstrumentation(root) {
+  [root, ...root.querySelectorAll('*')].forEach((node) => [...node.attributes]
+    .filter(({ name }) => name.startsWith('data-aue-') || name.startsWith('data-richtext-'))
+    .forEach(({ name }) => node.removeAttribute(name)));
+}
+
+/*
+ * In the editor, the navigation as the editor's content tree shows it, nested: the Columns list
+ * (footerColumns, a container) holding a Column item for each column (its Column title, then its
+ * Links list, columnLinks, a container holding a Link item for each link, its Label), and the
+ * Social icons list (socialIcons) holding an Icon item for each icon. The lists' entries are
+ * stored under the block as <list>/item<n>, in order: those are the items' resources, so each can
+ * be selected, edited in the properties panel (its own model), moved and deleted. The starting
+ * content (shown while a list is empty) is not the lists': it is left out of the tree.
  */
-function markContainer(node, cell, name, label, editing) {
-  if (!editing) return node;
-  const instrumented = cell?.matches?.('[data-aue-prop]') ? cell : cell?.querySelector(`[data-aue-prop="${name}"]`);
-  if (instrumented) moveInstrumentation(instrumented, node);
-  if (!node.dataset.aueProp) node.dataset.aueProp = name;
-  node.dataset.aueType = 'container';
-  if (!node.dataset.aueLabel) node.dataset.aueLabel = label;
-  return node;
+function instrumentNav(nav, block, {
+  columnsFromList, iconsFromList, asText, socialHeadingProp,
+}) {
+  const base = block.dataset.aueResource;
+  if (!base) return;
+  stripInstrumentation(nav);
+  instrument(nav.querySelector('.jsw-footer-columns'), {
+    resource: `${base}/footerColumns`, prop: 'footerColumns', type: 'container', filter: 'jsw-footer-columns', label: 'Columns',
+  });
+  if (columnsFromList) {
+    [...nav.querySelectorAll('.jsw-footer-columns > .jsw-footer-column')].forEach((column, i) => {
+      const path = `${base}/footerColumns/item${i}`;
+      const heading = column.querySelector('.jsw-footer-heading');
+      instrument(column, {
+        resource: path, type: 'component', model: 'jsw-footer-column', label: `Column: ${heading?.textContent.trim() || i + 1}`,
+      });
+      instrument(heading, { prop: 'columnHeading', type: 'text', label: 'Column title' });
+      instrument(column.querySelector('.jsw-footer-links'), {
+        resource: `${path}/columnLinks`, prop: 'columnLinks', type: 'container', filter: 'jsw-footer-links', label: 'Links',
+      });
+      [...column.querySelectorAll('.jsw-footer-links > li')].forEach((item, j) => {
+        const a = item.querySelector('a');
+        instrument(item, {
+          resource: `${path}/columnLinks/item${j}`, type: 'component', model: 'jsw-footer-link', label: `Link: ${a?.textContent.trim() || j + 1}`,
+        });
+        instrument(a, { prop: 'linkText', type: 'text', label: 'Label' });
+      });
+    });
+  }
+  const connect = nav.querySelector('.jsw-footer-connect');
+  instrument(connect?.querySelector('.jsw-footer-heading'), { prop: socialHeadingProp, type: 'text', label: 'Social heading' });
+  instrument(connect?.querySelector('ul'), {
+    resource: `${base}/socialIcons`, prop: 'socialIcons', type: 'container', filter: 'jsw-footer-icons', label: 'Social icons',
+  });
+  if (iconsFromList) {
+    [...(connect?.querySelectorAll('ul > li') || [])].forEach((item, i) => {
+      const a = item.querySelector('a');
+      const name = a?.getAttribute('aria-label') || a?.textContent.trim() || `${i + 1}`;
+      instrument(item, {
+        resource: `${base}/socialIcons/item${i}`, type: 'component', model: 'jsw-footer-icon', label: `Icon: ${name}`,
+      });
+      if (asText) instrument(a, { prop: 'iconImageAlt', type: 'text', label: 'Network name' });
+      else instrument(item.querySelector('img'), { prop: 'iconImage', type: 'media', label: 'Icon' });
+    });
+  }
 }
 
 /** a heading of the navigation, from its authored text (its editor instrumentation kept) */
@@ -457,12 +558,40 @@ function buildSocial({ heading, icons }, asText, editing) {
 export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const rows = [...block.children];
-  const multiFields = isMultiFields(rows);
-  const {
-    media, brand, actions, nav: navCell, items,
-  } = multiFields ? { ...sortRows(rows.slice(0, 3)), nav: null, items: [] } : sortRows(rows);
-  const [columnsCell, socialHeadingCell, iconsCell, startingCell] = multiFields
-    ? rows.slice(3).map((r) => cellsOf(r)[0] || null) : [];
+  const compact = isCompact(rows);
+  const multiFields = compact || isMultiFields(rows);
+  let media;
+  let brand;
+  let actions;
+  let navCell = null;
+  let items = [];
+  let columnsCell;
+  let socialHeadingCell;
+  let iconsCell;
+  let startingCell;
+  if (compact) {
+    // the four cells: media (+ starting content) | brand (+ button, privacy, social heading) |
+    // footer columns | social icons
+    const [mediaCell, brandCell] = rows.slice(0, 2).map((r) => cellsOf(r)[0] || null);
+    [, , columnsCell, iconsCell] = rows.map((r) => cellsOf(r)[0] || null);
+    const { own, starting } = splitMedia(mediaCell);
+    media = own;
+    startingCell = starting;
+    brand = brandCell;
+    actions = brandCell;
+    // the social heading: the brand cell's text after its links (named in the editor)
+    const texts = textsOf(brandCell);
+    socialHeadingCell = el('div');
+    const named = brandCell?.querySelector('[data-aue-prop="brand_socialHeading"]');
+    const heading = named || (texts.length > 1 ? texts[texts.length - 1] : null);
+    if (heading) socialHeadingCell.append(heading);
+  } else {
+    ({
+      media, brand, actions, nav: navCell, items,
+    } = multiFields ? { ...sortRows(rows.slice(0, 3)), nav: null, items: [] } : sortRows(rows));
+    [columnsCell, socialHeadingCell, iconsCell, startingCell] = multiFields
+      ? rows.slice(3).map((r) => cellsOf(r)[0] || null) : [];
+  }
   const variant = variantOf(block, media);
   const phase3 = variant === 'variant-phase-3';
   block.classList.remove(...VARIANTS);
@@ -470,11 +599,13 @@ export default function decorate(block) {
 
   // the columns and social links: the block's multi-fields, else content saved before
   let data = readSiblingBlocks(block);
+  let listed = null;
   if (!data && multiFields) {
     // a list with no items yet: the starting content's (the design's, uploaded with the page)
     const starting = readNav(startingCell);
     const columns = readColumns(columnsCell);
     const icons = readIcons(iconsCell);
+    listed = { columnsFromList: columns.length > 0, iconsFromList: icons.length > 0 };
     data = {
       columns: columns.length ? columns : starting.columns,
       social: {
@@ -487,20 +618,20 @@ export default function decorate(block) {
   const { columns, social } = data;
 
   const nav = el('nav', 'jsw-footer-nav', { 'aria-label': 'Footer' });
-  // the columns, in the editor marked as the footerColumns multi-field (a box-less wrapper)
+  // the columns, in a box-less wrapper (in the editor the Columns list's container)
   const columnsList = el('div', 'jsw-footer-columns');
-  columns.filter((c) => c.heading || c.links.length).forEach((c) => {
-    const column = buildColumn(c, editing);
-    if (multiFields) markContainer(column.querySelector('.jsw-footer-links'), null, 'columnLinks', 'Column links', editing);
-    columnsList.append(column);
-  });
-  if (multiFields) markContainer(columnsList, columnsCell, 'footerColumns', 'Footer columns', editing);
+  columns.filter((c) => c.heading || c.links.length)
+    .forEach((c) => columnsList.append(buildColumn(c, editing)));
   nav.append(columnsList);
   // CONNECT: the last column (Variant B: the first)
   const connect = buildSocial(social, phase3, editing);
-  if (multiFields) markContainer(connect.querySelector('ul'), iconsCell, 'socialIcons', 'Social icons', editing);
   if (phase3) nav.prepend(connect);
   else nav.append(connect);
+  if (editing && listed) {
+    instrumentNav(nav, block, {
+      ...listed, asText: phase3, socialHeadingProp: compact ? 'brand_socialHeading' : 'socialHeading',
+    });
+  }
 
   // the actions cell's links, read before either is moved: the CTA button, the privacy policy
   const [ctaLink, privacyLink] = [...(actions?.querySelectorAll('a') || [])];
