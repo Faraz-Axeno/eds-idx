@@ -1,11 +1,13 @@
 /*
  * jsw-footer: the JSW footer, one block, authored once on its own page (/jsw-footer) and shown as
  * the footer of the JSW pages (scripts.js, loadJswFooter: in their <footer>, instead of the
- * site's). Everything is the block's own fields (_jsw-footer.json, its properties panel in tabs):
- * the layout, background, logo, copyright, button and privacy policy (Footer tab), two navigation
- * columns, each a heading and up to MAX_ITEMS links (Column 1 and Column 2 tabs), and the social
- * links, a heading and up to MAX_ITEMS icons (Social icons tab). In one of two layouts (the Footer
- * layout field, a class on the block, jsw-footer.css):
+ * site's). Everything is the block's own (_jsw-footer.json, its properties panel in tabs): the
+ * layout, background, logo, copyright, button and privacy policy (Footer tab); the navigation
+ * columns, a multi-field (footerColumns), each column its heading and its own multi-field of links
+ * (columnLinks) (Columns tab); the social heading and the social icons, a multi-field
+ * (socialIcons) (Social icons tab). Each column shows its first MAX_ITEMS links, the footer its
+ * first MAX_ITEMS icons. In one of two layouts (the Footer layout field, a class on the block,
+ * jsw-footer.css):
  *   variant-phase-5 (Variant A, the default; "Desktop Footer"): a photo (or a muted looping video)
  *     behind the whole footer; at the top left the logo, the copyright line and the CTA button; at
  *     the top right the columns and the social icons (CONNECT); at the foot, on the left, the
@@ -13,15 +15,22 @@
  *   variant-phase-3 (Variant B; the Phase 3 footer): on a gradient (no photo); at the left the
  *     logo, the copyright line and the privacy policy link; the CTA button in the centre; at the
  *     right CONNECT (the social links as text, their network names) and the columns
- * Rows (the block's four cells, in this order):
+ * Rows (the block's seven cells, in this order):
  *   footer layout | background type | background image (+ alt) | background video
  *   logo (+ alt) | copyright text
  *   CTA button link + text | privacy policy link + text
- *   column 1 heading | its links | column 2 heading | its links | social heading | the icons
- *     (image + network name, link), each field present only when filled in
- * Content saved before is read too: with the columns, links and icons as items of this block
- * (a fourth cell holding the social heading, then the items), or as jsw-footer-column and
- * jsw-footer-social blocks beside it in its section (then taken into this block).
+ *   footer columns: a list, each item its heading and its list of links
+ *   social heading
+ *   social icons: a list, each item its image (+ network name) and its link
+ *   the starting content (fields hidden in the panel, uploaded with the page): two columns, each
+ *     its heading and up to MAX_ITEMS links, and up to MAX_ITEMS icons, the design's; shown for
+ *     the columns until the footer columns list holds a column, for the icons until the social
+ *     icons list holds an icon
+ * A multi-field's items are rendered as a list (<ul>, items of one element each) or one after the
+ * other between <hr> (items of more than one), so both are read: a heading starts a column, a
+ * picture an icon. Content saved before is read too: with the columns and icons as numbered
+ * fields (a fourth cell), as items of this block, or as jsw-footer-column and jsw-footer-social
+ * blocks beside it in its section (then taken into this block).
  */
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
@@ -316,6 +325,76 @@ function buildLegal(link, editing) {
   return legal;
 }
 
+/**
+ * the multi-fields' cells: the fourth to sixth cells hold lists, or are empty (none added yet);
+ * a seventh, the starting content (hidden fields), may follow
+ */
+function isMultiFields(rows) {
+  if (rows.length !== 6 && rows.length !== 7) return false;
+  const [columns, heading, icons] = rows.slice(3).map((r) => cellsOf(r)[0]);
+  const named = (cell, name) => Boolean(cell?.querySelector(`[data-aue-prop="${name}"]`)
+    || cell?.matches?.(`[data-aue-prop="${name}"]`));
+  if (named(columns, 'footerColumns') || named(icons, 'socialIcons')) return true;
+  // the columns hold links (content saved before had a text only there, its social heading), the
+  // social heading a text only, the icons pictures and links; each list may be empty
+  const empty = (cell) => !cell || (!cell.textContent.trim() && !cell.querySelector('picture, a'));
+  const columnsList = empty(columns) || Boolean(columns.querySelector('hr, ul, a'));
+  const iconsList = empty(icons) || Boolean(icons.querySelector('hr, ul, picture, a'));
+  return columnsList && iconsList && !heading?.querySelector('a, picture');
+}
+
+/**
+ * the footer columns (footerColumns): in order, a heading starts a column (as does a <hr>), the
+ * links after it are its links (columnLinks, listed or one after the other)
+ */
+function readColumns(cell) {
+  const columns = [];
+  let current = null;
+  const start = () => {
+    current = { heading: null, links: [] };
+    columns.push(current);
+  };
+  [...(cell?.querySelectorAll('hr, a, p, h1, h2, h3, h4, h5, h6') || [])].forEach((node) => {
+    if (node.matches('hr')) current = null;
+    else if (node.matches('a')) {
+      if (!current) start();
+      current.links.push(node);
+    } else if (!node.closest('li, a') && !node.querySelector('a, picture') && node.textContent.trim()) {
+      if (!current || current.heading || current.links.length) start();
+      current.heading = node;
+    }
+  });
+  return columns;
+}
+
+/** the social icons (socialIcons): in order, a picture starts an icon, the link after it is its */
+function readIcons(cell) {
+  const icons = [];
+  [...(cell?.querySelectorAll('hr, picture, a') || [])].forEach((node) => {
+    const last = icons[icons.length - 1];
+    if (node.matches('hr')) {
+      if (last) last.closed = true;
+    } else if (node.matches('picture')) icons.push({ picture: node, link: null });
+    else if (last && !last.link && !last.closed) last.link = node;
+    else icons.push({ picture: null, link: node });
+  });
+  return icons.map(({ picture, link }) => ({ picture, link }));
+}
+
+/**
+ * in the editor, a multi-field's element marked as the editor's container for it: the cell's own
+ * instrumentation when it has it, else its name (data-aue-prop) and data-aue-type="container"
+ */
+function markContainer(node, cell, name, label, editing) {
+  if (!editing) return node;
+  const instrumented = cell?.matches?.('[data-aue-prop]') ? cell : cell?.querySelector(`[data-aue-prop="${name}"]`);
+  if (instrumented) moveInstrumentation(instrumented, node);
+  if (!node.dataset.aueProp) node.dataset.aueProp = name;
+  node.dataset.aueType = 'container';
+  if (!node.dataset.aueLabel) node.dataset.aueLabel = label;
+  return node;
+}
+
 /** a heading of the navigation, from its authored text (its editor instrumentation kept) */
 function buildHeading(node, editing) {
   const heading = retag(node, 'h2', 'jsw-footer-heading');
@@ -377,23 +456,49 @@ function buildSocial({ heading, icons }, asText, editing) {
  */
 export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
+  const rows = [...block.children];
+  const multiFields = isMultiFields(rows);
   const {
     media, brand, actions, nav: navCell, items,
-  } = sortRows([...block.children]);
+  } = multiFields ? { ...sortRows(rows.slice(0, 3)), nav: null, items: [] } : sortRows(rows);
+  const [columnsCell, socialHeadingCell, iconsCell, startingCell] = multiFields
+    ? rows.slice(3).map((r) => cellsOf(r)[0] || null) : [];
   const variant = variantOf(block, media);
   const phase3 = variant === 'variant-phase-3';
   block.classList.remove(...VARIANTS);
   block.classList.add(variant);
 
-  // the columns and social links: the block's fields, else content saved before
-  const { columns, social } = readSiblingBlocks(block)
-    || (items.length ? readItems(items, navCell) : readNav(navCell));
+  // the columns and social links: the block's multi-fields, else content saved before
+  let data = readSiblingBlocks(block);
+  if (!data && multiFields) {
+    // a list with no items yet: the starting content's (the design's, uploaded with the page)
+    const starting = readNav(startingCell);
+    const columns = readColumns(columnsCell);
+    const icons = readIcons(iconsCell);
+    data = {
+      columns: columns.length ? columns : starting.columns,
+      social: {
+        heading: headingOf(socialHeadingCell) || starting.social.heading,
+        icons: icons.length ? icons : starting.social.icons,
+      },
+    };
+  }
+  if (!data) data = items.length ? readItems(items, navCell) : readNav(navCell);
+  const { columns, social } = data;
 
   const nav = el('nav', 'jsw-footer-nav', { 'aria-label': 'Footer' });
-  columns.filter((c) => c.heading || c.links.length)
-    .forEach((c) => nav.append(buildColumn(c, editing)));
+  // the columns, in the editor marked as the footerColumns multi-field (a box-less wrapper)
+  const columnsList = el('div', 'jsw-footer-columns');
+  columns.filter((c) => c.heading || c.links.length).forEach((c) => {
+    const column = buildColumn(c, editing);
+    if (multiFields) markContainer(column.querySelector('.jsw-footer-links'), null, 'columnLinks', 'Column links', editing);
+    columnsList.append(column);
+  });
+  if (multiFields) markContainer(columnsList, columnsCell, 'footerColumns', 'Footer columns', editing);
+  nav.append(columnsList);
   // CONNECT: the last column (Variant B: the first)
   const connect = buildSocial(social, phase3, editing);
+  if (multiFields) markContainer(connect.querySelector('ul'), iconsCell, 'socialIcons', 'Social icons', editing);
   if (phase3) nav.prepend(connect);
   else nav.append(connect);
 

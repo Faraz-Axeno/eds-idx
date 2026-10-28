@@ -120,6 +120,12 @@ body.jsw-footer-page main:not([data-aue-resource]) {
   outline-offset: 2px;
 }
 
+/* the columns' wrapper (in the editor the footerColumns multi-field's container): no box of its
+   own, the columns laid out as the navigation's own items */
+.jsw-footer .jsw-footer-columns {
+  display: contents;
+}
+
 /* ---- Phase 5 layout ---- */
 
 /* branding at the top left, the navigation at the top right, the privacy policy at the foot on
