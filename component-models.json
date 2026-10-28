@@ -749,13 +749,106 @@
     ]
   },
   {
+    "id": "jsw-footer-column",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "columnHeading",
+        "label": "Column heading",
+        "description": "e.g. TECHNOLOGY. Add this column's links inside it (Footer Links). Warning: You can add multiple links, but a maximum of 4 will be displayed on the live site. At most 20 characters.",
+        "value": "",
+        "required": true,
+        "validation": {
+          "maxLength": 20
+        }
+      }
+    ]
+  },
+  {
+    "id": "jsw-footer-link",
+    "fields": [
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "link",
+        "label": "Link URL",
+        "description": "A page, #section, or a full URL. Warning: You can add multiple links, but a maximum of 4 will be displayed on the live site.",
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "linkText",
+        "label": "Link text",
+        "description": "At most 24 characters.",
+        "value": "",
+        "required": true,
+        "validation": {
+          "maxLength": 24
+        }
+      }
+    ]
+  },
+  {
+    "id": "jsw-footer-social",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "connectHeading",
+        "label": "Social heading",
+        "description": "Above the Social Icons, e.g. CONNECT. Add the icons inside this block (Social Icons). Warning: You can add multiple social icons, but a maximum of 4 will be displayed on the live site. At most 20 characters.",
+        "value": "CONNECT",
+        "required": true,
+        "validation": {
+          "maxLength": 20
+        }
+      }
+    ]
+  },
+  {
+    "id": "jsw-footer-social-icon",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "iconImage",
+        "label": "Icon image",
+        "description": "The network's logo, white on transparent (SVG or PNG). Warning: You can add multiple social icons, but a maximum of 4 will be displayed on the live site.",
+        "multi": false,
+        "required": true
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "iconImageAlt",
+        "label": "Network name",
+        "description": "e.g. Facebook: read out by screen readers for the link, and shown as the link in the Variant B layout. At most 30 characters.",
+        "value": "",
+        "required": true,
+        "validation": {
+          "maxLength": 30
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "iconLink",
+        "label": "Icon link",
+        "description": "The JSW Motors profile on that network (full URL).",
+        "required": true
+      }
+    ]
+  },
+  {
     "id": "jsw-footer",
     "fields": [
       {
         "component": "select",
         "name": "media_footerVariant",
         "label": "Footer layout",
-        "description": "Variant A: the photo (or video) behind; the logo, copyright and button at the left, the columns and social icons at the right. Variant B: the black-to-teal gradient (no photo); the logo, copyright and privacy policy at the left, the button in the centre, CONNECT (the social links as text) and the columns at the right. Both use the same content below.",
+        "description": "Variant A: the photo (or video) behind; the logo, copyright and button at the left, the columns and social icons at the right. Variant B: the black-to-teal gradient (no photo); the logo, copyright and privacy policy at the left, the button in the centre, CONNECT (the social links as text) and the columns at the right. The columns and social links are the Jsw Footer Column and Jsw Footer Social blocks in this section.",
         "valueType": "string",
         "value": "variant-phase-5",
         "required": true,
@@ -893,94 +986,6 @@
         "validation": {
           "maxLength": 30
         }
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "connectHeading",
-        "label": "Social heading",
-        "description": "Above the Social Icons. At most 20 characters. Warning: You can add multiple social icons, but a maximum of 5 will be displayed on the live site.",
-        "value": "CONNECT",
-        "required": true,
-        "validation": {
-          "maxLength": 20
-        }
-      }
-    ]
-  },
-  {
-    "id": "jsw-footer-column",
-    "fields": [
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "columnHeading",
-        "label": "Column heading",
-        "description": "Starts a navigation column, e.g. TECHNOLOGY. Its links are the Footer Links that follow it, up to the next Footer Column. Warning: You can add multiple links, but a maximum of 4 (TECHNOLOGY) or 5 (EXPLORE) will be displayed on the live site. At most 20 characters.",
-        "value": "",
-        "required": true,
-        "validation": {
-          "maxLength": 20
-        }
-      }
-    ]
-  },
-  {
-    "id": "jsw-footer-link",
-    "fields": [
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "link",
-        "label": "Link URL",
-        "description": "A link of the Footer Column above it (a page, #section, or a full URL). Warning: You can add multiple links, but a maximum of 4 under TECHNOLOGY and 5 under EXPLORE will be displayed on the live site.",
-        "required": true
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "linkText",
-        "label": "Link text",
-        "description": "At most 24 characters.",
-        "value": "",
-        "required": true,
-        "validation": {
-          "maxLength": 24
-        }
-      }
-    ]
-  },
-  {
-    "id": "jsw-footer-social",
-    "fields": [
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "iconImage",
-        "label": "Icon image",
-        "description": "The network's logo, white on transparent (SVG or PNG). Warning: You can add multiple social icons, but a maximum of 5 will be displayed on the live site.",
-        "multi": false,
-        "required": true
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "iconImageAlt",
-        "label": "Network name",
-        "description": "e.g. Facebook: read out by screen readers for the link. At most 30 characters.",
-        "value": "",
-        "required": true,
-        "validation": {
-          "maxLength": 30
-        }
-      },
-      {
-        "component": "aem-content",
-        "valueType": "string",
-        "name": "iconLink",
-        "label": "Icon link",
-        "description": "The JSW Motors profile on that network (full URL).",
-        "required": true
       }
     ]
   },

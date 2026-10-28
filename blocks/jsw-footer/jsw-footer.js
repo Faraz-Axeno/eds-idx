@@ -1,41 +1,32 @@
 /*
  * jsw-footer: the JSW footer, authored once on its own page (/jsw-footer) and shown as the footer
- * of the JSW pages (scripts.js, loadJswFooter: in their <footer>, instead of the site's). In one of
- * two layouts, its Footer layout field (a class on the block, jsw-footer.css), from the same
- * content:
- *   variant-phase-5 ("Desktop Footer", the default): a photo (or a muted looping video) behind the
- *     whole footer; at the top left the logo, the copyright line and the CTA button; at the top
- *     right the navigation columns and the social icons (CONNECT); at the foot, on the left, the
+ * of the JSW pages (scripts.js, loadJswFooter: in their <footer>, instead of the site's). The
+ * footer is this block's section (scripts/jsw-footer-parts.js): this block (logo, copyright,
+ * button, privacy policy, background, layout), a jsw-footer-column block for each navigation
+ * column (holding its Footer Links) and a jsw-footer-social block (holding its Social Icons). This
+ * block marks the section (jsw-footer-section, and the layout's class) and jsw-footer.css lays the
+ * blocks out in it, in one of two layouts (its Footer layout field):
+ *   variant-phase-5 (Variant A, the default; "Desktop Footer"): a photo (or a muted looping video)
+ *     behind the whole footer; at the top left the logo, the copyright line and the CTA button; at
+ *     the top right the columns and the social icons (CONNECT); at the foot, on the left, the
  *     privacy policy link
- *   variant-phase-3 (the Phase 3 footer): on a gradient (no photo); at the left the logo, the
- *     copyright line and the privacy policy link; the CTA button in the centre; at the right
- *     CONNECT (the social links as text, their network names) and the navigation columns
- * Rows (model, _jsw-footer.json):
- *   the block's fields, four cells, in this order:
- *     footer layout | background type | background image (+ alt) | background video
- *     logo (+ alt) | copyright text
- *     CTA button link + text | privacy policy link + text
- *     social heading (CONNECT)
- *   then its items, in authored order:
- *     Footer Column — a column heading: starts a navigation column
- *     Footer Link   — link URL + text: a link of the Footer Column before it
- *     Social Icon   — icon image (+ network name) | icon link
- * Items are told apart by their type (the editor's model, or the type cell of imported
- * content), else by what they hold: a picture (Social Icon), a link (Footer Link), a text
- * (Footer Column).
+ *   variant-phase-3 (Variant B; the Phase 3 footer): on a gradient (no photo); at the left the
+ *     logo, the copyright line and the privacy policy link; the CTA button in the centre; at the
+ *     right CONNECT (the social links as text, their network names) and the columns
+ * Rows (model, _jsw-footer.json), three cells:
+ *   footer layout | background type | background image (+ alt) | background video
+ *   logo (+ alt) | copyright text
+ *   CTA button link + text | privacy policy link + text
+ * Content saved before the columns and social links were blocks (a fourth cell, the social
+ * heading, then Footer Column / Footer Link / Social Icon items in this block) is shown the same
+ * way: this block builds those columns and social links beside itself in the section.
  */
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
-
-// the most items each part shows on the page (the design's count + 1): a column's links (its
-// limit by its heading, TECHNOLOGY or EXPLORE, else by its place: the first column, the second,
-// then MAX_OTHER_LINKS) and the social icons. Authors may add more: the page shows the first ones
-// only (.slice); the editor keeps the others too, but shows them only while editing (dimmed, so
-// they can be found and removed), never in its Preview mode (jsw-footer.css)
-const MAX_TECH_LINKS = 4;
-const MAX_EXPLORE_LINKS = 5;
-const MAX_OTHER_LINKS = 5;
-const MAX_SOCIAL_ICONS = 5;
+import { loadCSS } from '../../scripts/aem.js';
+import {
+  el, cap, plain, external, fillColumn, fillSocial,
+} from '../../scripts/jsw-footer-parts.js';
 
 // the most characters each text shows on the page, as the model's limits (_jsw-footer.json): a
 // longer text, if saved anyway, is cut there with "…" (its whole wording as a tooltip); the
@@ -44,12 +35,10 @@ const TEXT_LIMITS = {
   copyright: 60,
   ctaButtonText: 24,
   privacyPolicyText: 30,
-  connectHeading: 20,
-  columnHeading: 20,
-  linkText: 24,
 };
 
-const ITEM_TYPE = /^jsw-footer-(column|link|social)$/;
+// the items of content saved before the columns and social links were blocks
+const LEGACY_ITEM = /^jsw-footer-(column|link|social)$/;
 
 // the layouts (the Footer layout field's values, and the block's class); the first the default
 const VARIANTS = ['variant-phase-5', 'variant-phase-3'];
@@ -59,13 +48,6 @@ const VIDEO_TYPES = {
   webm: 'video/webm',
   mov: 'video/quicktime',
 };
-
-function el(tag, className, attrs = {}) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
-  return node;
-}
 
 const cellsOf = (row) => [...(row?.children || [])];
 
@@ -78,44 +60,17 @@ function retag(node, tag, className) {
   return out;
 }
 
-/** an element's text cut to its limit with "…" (not in the editor), its whole text a tooltip */
-function cap(node, limit, editing) {
-  const text = node.textContent.trim();
-  if (editing || text.length <= limit) return;
-  node.title = text;
-  node.textContent = `${text.slice(0, limit).trimEnd()}…`;
-}
-
-/** a link without the site's button decoration (scripts.js decorateButtons) */
-function plain(a) {
-  a.classList.remove('button', 'primary', 'secondary', 'accent');
-  a.closest('p')?.classList.remove('button-container', 'button-wrapper');
-  return a;
-}
-
-/** links off the site open in a new tab */
-function external(a) {
-  try {
-    const url = new URL(a.href, window.location.href);
-    if (url.origin !== window.location.origin && /^https?:$/.test(url.protocol)) {
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-    }
-  } catch (e) { /* keep it as it is */ }
-  return a;
-}
-
 /** the text elements of a cell, each paragraph (or named field) without a picture or link */
 const textsOf = (cell) => [...(cell?.querySelectorAll('p, [data-aue-prop]') || [])]
   .filter((n) => !n.querySelector('picture, a') && !n.closest('a') && n.textContent.trim()
     && !(n.matches('[data-aue-prop]') && n.parentElement.closest('[data-aue-prop]')));
 
-/** an item row's type: the editor's model, the imported type cell (then dropped), its content */
+/** a saved item row's type: the editor's model, the imported type cell (then dropped) */
 function itemType(row) {
-  const model = row.dataset.aueModel?.match(ITEM_TYPE)?.[1];
+  const model = row.dataset.aueModel?.match(LEGACY_ITEM)?.[1];
   if (model) return model;
   const [first] = cellsOf(row);
-  const typed = first?.textContent.trim().match(ITEM_TYPE)?.[1];
+  const typed = first?.textContent.trim().match(LEGACY_ITEM)?.[1];
   if (typed && !first.querySelector('picture, a')) {
     first.remove();
     return typed;
@@ -123,23 +78,27 @@ function itemType(row) {
   return null;
 }
 
-/** the block's rows: its four field cells and its items in order */
+/**
+ * the block's rows: its three field cells (content saved before: four, the social heading the
+ * fourth) and the items of content saved before, in order
+ */
 function sortRows(rows) {
   const typed = rows.map((row) => ({ row, type: itemType(row) }));
   // imported content and the editor mark every item; published pages mark none: there the
-  // block's fields are its first four rows
+  // block's fields are its first three rows (content saved before: four, then its items)
   const marked = typed.some(({ type }) => type);
-  const fieldRows = marked ? typed.filter(({ type }) => !type) : typed.slice(0, 4);
-  const itemRows = marked ? typed.filter(({ type }) => type) : typed.slice(4);
+  const fields = rows.length > 3 ? 4 : 3;
+  const fieldRows = marked ? typed.filter(({ type }) => !type) : typed.slice(0, fields);
+  const itemRows = marked ? typed.filter(({ type }) => type) : typed.slice(fields);
   const items = itemRows.map(({ row, type }) => {
     if (type) return { row, type };
     if (row.querySelector('picture')) return { row, type: 'social' };
     if (row.querySelector('a')) return { row, type: 'link' };
     return { row, type: 'column' };
   });
-  const [media, brand, actions, connect] = fieldRows.map(({ row }) => cellsOf(row)[0] || null);
+  const [media, brand, actions] = fieldRows.map(({ row }) => cellsOf(row)[0] || null);
   return {
-    media, brand, actions, connect, items,
+    media, brand, actions, connectRow: fieldRows[3]?.row || null, items,
   };
 }
 
@@ -235,126 +194,44 @@ function buildLegal(link, editing) {
   return legal;
 }
 
-/*
- * Universal Editor builds its content tree from where the instrumented elements sit in the page:
- * an item inside another item's element is shown as that item's child (and, its parent not being
- * a container, cannot be deleted or moved). The Footer Columns, Footer Links and Social Icons are
- * all the block's own items, side by side (_jsw-footer.json): so a column's instrumentation goes
- * on its heading only (.jsw-footer-column-head), never on an element around its links, and every
- * item's element sits directly under the block's, as in the content.
- */
-
-/** an item the author has not filled in yet (just added in the editor) */
-const isEmptyLink = (row) => !row.querySelector('a[href]')?.getAttribute('href')?.trim();
-const isEmptySocial = (row) => !row.querySelector('picture, a[href]');
-
-/** in the editor, an empty item's place: something to select (never on the page) */
-function placeholder(text) {
-  const span = el('span', 'jsw-footer-placeholder');
-  span.textContent = text;
-  return span;
-}
-
-/** a navigation column: its heading (the Footer Column item), then its links' list */
-function buildColumn(row, editing) {
-  const column = el('div', 'jsw-footer-column');
-  const head = el('div', 'jsw-footer-column-head');
-  if (row) moveInstrumentation(row, head);
-  const [node] = row ? textsOf(cellsOf(row)[0]) : [];
-  const heading = retag(node, 'h2', 'jsw-footer-heading');
-  cap(heading, TEXT_LIMITS.columnHeading, editing);
-  if (!heading.textContent.trim() && editing && row) heading.append(placeholder('Column heading'));
-  if (heading.textContent.trim()) head.append(heading);
-  if (head.children.length || head.hasAttribute('data-aue-resource')) column.append(head);
-  column.append(el('ul', 'jsw-footer-links'));
-  return column;
-}
-
-function buildLink(row, editing) {
-  const item = el('li', 'jsw-footer-link');
-  moveInstrumentation(row, item);
-  const a = row.querySelector('a');
-  if (a && !isEmptyLink(row)) {
-    external(plain(a));
-    a.removeAttribute('class');
-    cap(a, TEXT_LIMITS.linkText, editing);
-    item.append(a);
-  } else if (editing) {
-    item.classList.add('is-empty');
-    item.append(placeholder('New link'));
-  }
-  return item;
-}
-
-/** a Social Icon: its icon in a tile, or (asText, the Phase 3 layout) its network name as a link */
-function buildSocial(row, asText) {
-  const item = el('li', asText ? 'jsw-footer-link' : 'jsw-footer-social-item');
-  moveInstrumentation(row, item);
-  const picture = row.querySelector('picture');
-  const img = picture?.querySelector('img');
-  const name = img?.getAttribute('alt')?.trim() || '';
-  const authored = row.querySelector('a');
-  const a = authored ? external(plain(authored)) : el('a');
-  if (isEmptySocial(row)) {
-    item.classList.add('is-empty');
-    a.className = asText ? '' : 'jsw-footer-social-link';
-    a.replaceChildren(placeholder(asText ? 'New icon' : '+'));
-    item.append(a);
-    return item;
-  }
-  if (asText) {
-    a.removeAttribute('class');
-    a.textContent = name || a.textContent;
-    item.append(a);
-    return item;
-  }
-  a.className = 'jsw-footer-social-link';
-  if (name) a.setAttribute('aria-label', name);
-  // the link reads as the network's name; the icon is its picture
-  if (img) img.alt = '';
-  a.replaceChildren(...(picture ? [picture] : []));
-  item.append(a);
-  return item;
-}
-
-/** a column's link limit: by its heading, else by its place among the columns */
-function linkLimit(headingText, index) {
-  const heading = headingText.trim().toUpperCase();
-  if (heading === 'TECHNOLOGY') return MAX_TECH_LINKS;
-  if (heading === 'EXPLORE') return MAX_EXPLORE_LINKS;
-  return [MAX_TECH_LINKS, MAX_EXPLORE_LINKS][index] ?? MAX_OTHER_LINKS;
-}
-
 /**
- * the item rows to build: on the page the first `limit` filled-in ones (.slice: the others are
- * never put into it); in the editor every one, empty ones too, so each can be selected, moved
- * and deleted
- * @param {Element[]} rows the items' rows
- * @param {number} limit the most shown on the page
- * @param {boolean} editing in the editor
- * @param {function(Element): boolean} isEmpty an item not filled in yet
- * @returns {Element[]}
+ * content saved before the columns and social links were blocks: its Footer Columns (each with
+ * the Footer Links after it) and Social Icons built as jsw-footer-column and jsw-footer-social
+ * blocks beside this one in the section, so they are laid out the same. In the editor they cannot
+ * be edited where they are (they are this block's items, not those blocks'): re-import the page.
  */
-function rowsToBuild(rows, limit, editing, isEmpty) {
-  return editing ? rows : rows.filter((r) => !isEmpty(r)).slice(0, limit);
-}
-
-/**
- * in the editor, the filled-in items after the first `limit` marked (shown dimmed only while
- * editing, never in Preview mode: jsw-footer.css); empty ones are not counted
- * @param {Element[]} built the items, built (in the rows' order)
- * @param {number} limit the most shown on the page
- * @param {boolean} editing in the editor
- * @param {string} what what they are, for the editor's note
- * @returns {Element[]}
- */
-function limited(built, limit, editing, what) {
-  if (!editing) return built;
-  built.filter((item) => !item.classList.contains('is-empty')).slice(limit).forEach((item) => {
-    item.classList.add('is-over-limit');
-    item.title = `Not shown on the page: only the first ${limit} ${what} are.`;
+function buildLegacyParts(block, connectRow, items, editing) {
+  if (!items.length) return;
+  const columns = [];
+  const socialRows = [];
+  items.forEach(({ row, type }) => {
+    // their editor instrumentation is left out: they would show outside this block's tree
+    [row, ...row.querySelectorAll('*')].forEach((n) => [...n.attributes]
+      .filter(({ name }) => name.startsWith('data-aue-'))
+      .forEach(({ name }) => n.removeAttribute(name)));
+    if (type === 'column') columns.push({ row, links: [] });
+    else if (type === 'social') socialRows.push(row);
+    else {
+      if (!columns.length) columns.push({ row: null, links: [] });
+      columns[columns.length - 1].links.push(row);
+    }
   });
-  return built;
+  const part = (name) => {
+    const wrapper = el('div', `${name}-wrapper`);
+    const part0 = el('div', `${name} block`, { 'data-block-name': name, 'data-block-status': 'loaded' });
+    wrapper.append(part0);
+    loadCSS(`${window.hlx.codeBasePath}/blocks/${name}/${name}.css`);
+    return { wrapper, part: part0 };
+  };
+  const wrappers = columns.map(({ row, links }) => {
+    const { wrapper, part: column } = part('jsw-footer-column');
+    fillColumn(column, row, links, editing);
+    return wrapper;
+  });
+  const { wrapper, part: social } = part('jsw-footer-social');
+  fillSocial(social, connectRow, socialRows, editing);
+  wrappers.push(wrapper);
+  (block.parentElement || block).after(...wrappers);
 }
 
 /**
@@ -364,50 +241,16 @@ function limited(built, limit, editing, what) {
 export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const {
-    media, brand, actions, connect, items,
+    media, brand, actions, connectRow, items,
   } = sortRows([...block.children]);
   const variant = variantOf(block, media);
   const phase3 = variant === 'variant-phase-3';
-  block.classList.remove(...VARIANTS);
-  block.classList.add(variant);
-
-  const nav = el('nav', 'jsw-footer-nav', { 'aria-label': 'Footer' });
-  // the social links: icons in tiles, or (Phase 3) a list of their names
-  const socials = el('ul', phase3 ? 'jsw-footer-links' : 'jsw-footer-social');
-  // the items in order: each Footer Column with the Footer Links after it, and the Social Icons
-  const columns = [];
-  const socialRows = [];
-  items.forEach(({ row, type }) => {
-    if (type === 'column') columns.push({ row, links: [] });
-    else if (type === 'social') socialRows.push(row);
-    else {
-      // a link before any Footer Column starts a column without a heading
-      if (!columns.length) columns.push({ row: null, links: [] });
-      columns[columns.length - 1].links.push(row);
-    }
+  // the section is the footer: laid out by jsw-footer.css with its column and social blocks
+  [block, block.closest('.section')].filter(Boolean).forEach((node) => {
+    node.classList.remove(...VARIANTS);
+    node.classList.add(variant);
   });
-  columns.forEach(({ row, links }, i) => {
-    const column = buildColumn(row, editing);
-    const heading = column.querySelector('.jsw-footer-heading');
-    const named = heading && !heading.querySelector('.jsw-footer-placeholder');
-    const limit = linkLimit(named ? heading.textContent : '', i);
-    const built = rowsToBuild(links, limit, editing, isEmptyLink).map((r) => buildLink(r, editing));
-    column.querySelector('.jsw-footer-links').append(...limited(built, limit, editing, 'links'));
-    // on the page, a column with neither a heading nor links is left out
-    if (editing || column.querySelector('.jsw-footer-heading, li')) nav.append(column);
-  });
-  const builtSocials = rowsToBuild(socialRows, MAX_SOCIAL_ICONS, editing, isEmptySocial)
-    .map((r) => buildSocial(r, phase3));
-  socials.append(...limited(builtSocials, MAX_SOCIAL_ICONS, editing, 'social icons'));
-
-  // CONNECT: the social heading over the social links; the last column (Phase 3: the first)
-  const connectColumn = el('div', 'jsw-footer-column jsw-footer-connect');
-  const [connectNode] = textsOf(connect);
-  const connectHeading = retag(connectNode, 'h2', 'jsw-footer-heading');
-  cap(connectHeading, TEXT_LIMITS.connectHeading, editing);
-  connectColumn.append(connectHeading, socials);
-  if (phase3) nav.prepend(connectColumn);
-  else nav.append(connectColumn);
+  block.closest('.section')?.classList.add('jsw-footer-section');
 
   // the actions cell's links, read before either is moved: the CTA button, the privacy policy
   const [ctaLink, privacyLink] = [...(actions?.querySelectorAll('a') || [])];
@@ -415,15 +258,16 @@ export default function decorate(block) {
   const legal = buildLegal(privacyLink, editing);
   const inner = el('div', 'jsw-footer-inner');
   if (phase3) {
-    // branding (with the privacy policy under it) | the CTA, centred | the columns; no photo
+    // the branding with the privacy policy under it, then the CTA (centred); no photo
     branding.append(legal);
-    inner.append(branding, cta, nav);
+    inner.append(branding, cta);
     block.replaceChildren(inner);
   } else {
-    // branding with the CTA under it | the columns; the privacy policy at the foot
+    // the branding with the CTA under it; the privacy policy at the foot of the footer
     branding.append(cta);
-    inner.append(branding, nav, legal);
+    inner.append(branding, legal);
     block.replaceChildren(buildMedia(media), inner);
   }
+  buildLegacyParts(block, connectRow, items, editing);
   if (editing) block.classList.add('jsw-footer-editing');
 }

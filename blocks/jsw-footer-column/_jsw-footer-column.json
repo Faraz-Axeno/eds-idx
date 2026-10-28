@@ -1,0 +1,87 @@
+{
+  "definitions": [
+    {
+      "title": "Jsw Footer Column",
+      "id": "jsw-footer-column",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Jsw Footer Column",
+              "model": "jsw-footer-column",
+              "filter": "jsw-footer-column"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Footer Link",
+      "id": "jsw-footer-link",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Footer Link",
+              "model": "jsw-footer-link"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "jsw-footer-column",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "columnHeading",
+          "label": "Column heading",
+          "description": "e.g. TECHNOLOGY. Add this column's links inside it (Footer Links). Warning: You can add multiple links, but a maximum of 4 will be displayed on the live site. At most 20 characters.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "jsw-footer-link",
+      "fields": [
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "link",
+          "label": "Link URL",
+          "description": "A page, #section, or a full URL. Warning: You can add multiple links, but a maximum of 4 will be displayed on the live site.",
+          "required": true
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "linkText",
+          "label": "Link text",
+          "description": "At most 24 characters.",
+          "value": "",
+          "required": true,
+          "validation": {
+            "maxLength": 24
+          }
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "jsw-footer-column",
+      "components": [
+        "jsw-footer-link"
+      ]
+    }
+  ]
+}
