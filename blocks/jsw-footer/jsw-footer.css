@@ -131,6 +131,23 @@ html.adobe-ue-edit .jsw-footer li.is-over-limit {
   opacity: 0.45;
 }
 
+/* items just added and not filled in yet (in Universal Editor only, never on the page): a
+   placeholder to select them by, shown only while editing, like the items over a limit */
+.jsw-footer li.is-empty,
+.jsw-footer .jsw-footer-placeholder {
+  display: none;
+}
+
+html.adobe-ue-edit .jsw-footer li.is-empty {
+  display: list-item;
+}
+
+html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
+  display: inline;
+  opacity: 0.55;
+  font-style: italic;
+}
+
 /* ---- Phase 5 layout ---- */
 
 /* branding at the top left, the navigation at the top right, the privacy policy at the foot on
