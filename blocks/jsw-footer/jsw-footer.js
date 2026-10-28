@@ -1,11 +1,11 @@
 /*
- * jsw-footer: the JSW footer, authored once on its own page (/jsw-footer) and shown as the footer
- * of the JSW pages (scripts.js, loadJswFooter: in their <footer>, instead of the site's). The
- * footer is this block's section (scripts/jsw-footer-parts.js): this block (logo, copyright,
- * button, privacy policy, background, layout), a jsw-footer-column block for each navigation
- * column (holding its Footer Links) and a jsw-footer-social block (holding its Social Icons). This
- * block marks the section (jsw-footer-section, and the layout's class) and jsw-footer.css lays the
- * blocks out in it, in one of two layouts (its Footer layout field):
+ * jsw-footer: the JSW footer, one block, authored once on its own page (/jsw-footer) and shown as
+ * the footer of the JSW pages (scripts.js, loadJswFooter: in their <footer>, instead of the
+ * site's). Everything is the block's own fields (_jsw-footer.json, its properties panel in tabs):
+ * the layout, background, logo, copyright, button and privacy policy (Footer tab), two navigation
+ * columns, each a heading and up to MAX_ITEMS links (Column 1 and Column 2 tabs), and the social
+ * links, a heading and up to MAX_ITEMS icons (Social icons tab). In one of two layouts (the Footer
+ * layout field, a class on the block, jsw-footer.css):
  *   variant-phase-5 (Variant A, the default; "Desktop Footer"): a photo (or a muted looping video)
  *     behind the whole footer; at the top left the logo, the copyright line and the CTA button; at
  *     the top right the columns and the social icons (CONNECT); at the foot, on the left, the
@@ -13,20 +13,22 @@
  *   variant-phase-3 (Variant B; the Phase 3 footer): on a gradient (no photo); at the left the
  *     logo, the copyright line and the privacy policy link; the CTA button in the centre; at the
  *     right CONNECT (the social links as text, their network names) and the columns
- * Rows (model, _jsw-footer.json), three cells:
+ * Rows (the block's four cells, in this order):
  *   footer layout | background type | background image (+ alt) | background video
  *   logo (+ alt) | copyright text
  *   CTA button link + text | privacy policy link + text
- * Content saved before the columns and social links were blocks (a fourth cell, the social
- * heading, then Footer Column / Footer Link / Social Icon items in this block) is shown the same
- * way: this block builds those columns and social links beside itself in the section.
+ *   column 1 heading | its links | column 2 heading | its links | social heading | the icons
+ *     (image + network name, link), each field present only when filled in
+ * Content saved before is read too: with the columns, links and icons as items of this block
+ * (a fourth cell holding the social heading, then the items), or as jsw-footer-column and
+ * jsw-footer-social blocks beside it in its section (then taken into this block).
  */
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
-import { loadCSS } from '../../scripts/aem.js';
-import {
-  el, cap, plain, external, fillColumn, fillSocial,
-} from '../../scripts/jsw-footer-parts.js';
+
+// the most links a column shows, and the most social icons: the model has MAX_ITEMS of each;
+// content saved before could hold more, the page shows the first MAX_ITEMS only (.slice)
+const MAX_ITEMS = 4;
 
 // the most characters each text shows on the page, as the model's limits (_jsw-footer.json): a
 // longer text, if saved anyway, is cut there with "…" (its whole wording as a tooltip); the
@@ -35,9 +37,11 @@ const TEXT_LIMITS = {
   copyright: 60,
   ctaButtonText: 24,
   privacyPolicyText: 30,
+  heading: 20,
+  linkText: 24,
 };
 
-// the items of content saved before the columns and social links were blocks
+// the items of content saved before (Footer Column, Footer Link, Social Icon)
 const LEGACY_ITEM = /^jsw-footer-(column|link|social)$/;
 
 // the layouts (the Footer layout field's values, and the block's class); the first the default
@@ -48,6 +52,13 @@ const VIDEO_TYPES = {
   webm: 'video/webm',
   mov: 'video/quicktime',
 };
+
+function el(tag, className, attrs = {}) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+  return node;
+}
 
 const cellsOf = (row) => [...(row?.children || [])];
 
@@ -60,13 +71,40 @@ function retag(node, tag, className) {
   return out;
 }
 
+/** an element's text cut to its limit with "…" (not in the editor), its whole text a tooltip */
+function cap(node, limit, editing) {
+  const text = node.textContent.trim();
+  if (editing || text.length <= limit) return;
+  node.title = text;
+  node.textContent = `${text.slice(0, limit).trimEnd()}…`;
+}
+
+/** a link without the site's button decoration (scripts.js decorateButtons) */
+function plain(a) {
+  a.classList.remove('button', 'primary', 'secondary', 'accent');
+  a.closest('p')?.classList.remove('button-container', 'button-wrapper');
+  return a;
+}
+
+/** links off the site open in a new tab */
+function external(a) {
+  try {
+    const url = new URL(a.href, window.location.href);
+    if (url.origin !== window.location.origin && /^https?:$/.test(url.protocol)) {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    }
+  } catch (e) { /* keep it as it is */ }
+  return a;
+}
+
 /** the text elements of a cell, each paragraph (or named field) without a picture or link */
 const textsOf = (cell) => [...(cell?.querySelectorAll('p, [data-aue-prop]') || [])]
   .filter((n) => !n.querySelector('picture, a') && !n.closest('a') && n.textContent.trim()
     && !(n.matches('[data-aue-prop]') && n.parentElement.closest('[data-aue-prop]')));
 
-/** a saved item row's type: the editor's model, the imported type cell (then dropped) */
-function itemType(row) {
+/** a saved item row's type (content saved before): the editor's model, the imported type cell */
+function legacyType(row) {
   const model = row.dataset.aueModel?.match(LEGACY_ITEM)?.[1];
   if (model) return model;
   const [first] = cellsOf(row);
@@ -79,27 +117,111 @@ function itemType(row) {
 }
 
 /**
- * the block's rows: its three field cells (content saved before: four, the social heading the
- * fourth) and the items of content saved before, in order
+ * the block's rows: its four field cells; content saved with items has its items after them (and
+ * a social heading for its fourth cell), told by their type (editor, imported) or by place
  */
 function sortRows(rows) {
-  const typed = rows.map((row) => ({ row, type: itemType(row) }));
-  // imported content and the editor mark every item; published pages mark none: there the
-  // block's fields are its first three rows (content saved before: four, then its items)
+  const typed = rows.map((row) => ({ row, type: legacyType(row) }));
   const marked = typed.some(({ type }) => type);
-  const fields = rows.length > 3 ? 4 : 3;
-  const fieldRows = marked ? typed.filter(({ type }) => !type) : typed.slice(0, fields);
-  const itemRows = marked ? typed.filter(({ type }) => type) : typed.slice(fields);
+  const fieldRows = marked ? typed.filter(({ type }) => !type) : typed.slice(0, 4);
+  const itemRows = marked ? typed.filter(({ type }) => type) : typed.slice(4);
   const items = itemRows.map(({ row, type }) => {
     if (type) return { row, type };
     if (row.querySelector('picture')) return { row, type: 'social' };
     if (row.querySelector('a')) return { row, type: 'link' };
     return { row, type: 'column' };
   });
-  const [media, brand, actions] = fieldRows.map(({ row }) => cellsOf(row)[0] || null);
+  const [media, brand, actions, nav] = fieldRows.map(({ row }) => cellsOf(row)[0] || null);
   return {
-    media, brand, actions, connectRow: fieldRows[3]?.row || null, items,
+    media, brand, actions, nav, items,
   };
+}
+
+/** the text element of a cell or row (a heading): its paragraph without a link or picture */
+const headingOf = (node) => textsOf(node)[0] || null;
+
+/**
+ * the navigation from the fourth cell's fields, in the model's order: column 1's heading and
+ * links, column 2's, then the social heading and icons (each icon its picture, then its link).
+ * In the editor the fields are named (data-aue-prop): an empty heading does not shift the others
+ * @returns {{columns: {heading: Element, links: Element[]}[], social: {heading: Element,
+ *   icons: {picture: Element, link: Element}[]}}}
+ */
+function readNav(cell) {
+  const columns = [{ heading: null, links: [] }, { heading: null, links: [] }];
+  const social = { heading: null, icons: [] };
+  let part = 0; // 0, 1: the columns; 2: the social links
+  let headings = 0;
+  [...(cell?.children || [])].forEach((node) => {
+    const prop = node.dataset.aueProp || node.querySelector('[data-aue-prop]')?.dataset.aueProp || '';
+    const picture = node.querySelector('picture') || (node.matches('picture') ? node : null);
+    const link = node.matches('a') ? node : node.querySelector('a');
+    const column = prop.match(/^nav_column(\d)/)?.[1];
+    if (column) part = Number(column) - 1;
+    else if (prop.startsWith('nav_social')) part = 2;
+    if (picture) {
+      part = 2;
+      social.icons.push({ picture, link: null });
+    } else if (link) {
+      if (part < 2) columns[part].links.push(link);
+      else {
+        const last = social.icons[social.icons.length - 1];
+        if (last && !last.link) last.link = link;
+        else social.icons.push({ picture: null, link });
+      }
+    } else if (node.textContent.trim()) {
+      // a heading: the next one in order (column 1, column 2, the social links), unless named
+      if (!prop) part = Math.min(headings, 2);
+      headings = Math.max(headings, part + 1);
+      if (part < 2) columns[part].heading = node;
+      else social.heading = node;
+    }
+  });
+  return { columns, social };
+}
+
+/** content saved with items: its Footer Columns (each with the Footer Links after it) and icons */
+function readItems(items, connectCell) {
+  const columns = [];
+  const social = { heading: headingOf(connectCell), icons: [] };
+  items.forEach(({ row, type }) => {
+    if (type === 'column') columns.push({ heading: headingOf(row), links: [] });
+    else if (type === 'social') {
+      social.icons.push({ picture: row.querySelector('picture'), link: row.querySelector('a') });
+    } else {
+      if (!columns.length) columns.push({ heading: null, links: [] });
+      const link = row.querySelector('a');
+      if (link) columns[columns.length - 1].links.push(link);
+    }
+  });
+  return { columns, social };
+}
+
+/**
+ * content saved with jsw-footer-column and jsw-footer-social blocks beside this one: their
+ * headings, links and icons, those blocks taken out of the section (not loaded)
+ */
+function readSiblingBlocks(block) {
+  const section = block.closest('.section');
+  const blocks = [...(section?.querySelectorAll('.jsw-footer-column, .jsw-footer-social') || [])];
+  if (!blocks.length) return null;
+  const columns = [];
+  const social = { heading: null, icons: [] };
+  blocks.forEach((part) => {
+    const [first, ...rows] = [...part.children];
+    if (part.classList.contains('jsw-footer-social')) {
+      social.heading = headingOf(first);
+      rows.forEach((r) => social.icons.push({
+        picture: r.querySelector('picture'), link: r.querySelector('a'),
+      }));
+    } else {
+      const links = rows.map((r) => r.querySelector('a')).filter(Boolean);
+      columns.push({ heading: headingOf(first), links });
+    }
+    part.dataset.blockStatus = 'loaded';
+    (part.parentElement?.matches('[class$="-wrapper"]') ? part.parentElement : part).remove();
+  });
+  return { columns, social };
 }
 
 /** the background: the picture, or the video over it (the picture until it plays) */
@@ -194,44 +316,59 @@ function buildLegal(link, editing) {
   return legal;
 }
 
+/** a heading of the navigation, from its authored text (its editor instrumentation kept) */
+function buildHeading(node, editing) {
+  const heading = retag(node, 'h2', 'jsw-footer-heading');
+  cap(heading, TEXT_LIMITS.heading, editing);
+  return heading;
+}
+
+/** a column: its heading, then its first MAX_ITEMS links */
+function buildColumn({ heading, links }, editing) {
+  const column = el('div', 'jsw-footer-column');
+  if (heading) column.append(buildHeading(heading, editing));
+  const list = el('ul', 'jsw-footer-links');
+  links.slice(0, MAX_ITEMS).forEach((a) => {
+    const item = el('li', 'jsw-footer-link');
+    external(plain(a));
+    a.classList.remove('button', 'primary', 'secondary');
+    cap(a, TEXT_LIMITS.linkText, editing);
+    item.append(a);
+    list.append(item);
+  });
+  column.append(list);
+  return column;
+}
+
 /**
- * content saved before the columns and social links were blocks: its Footer Columns (each with
- * the Footer Links after it) and Social Icons built as jsw-footer-column and jsw-footer-social
- * blocks beside this one in the section, so they are laid out the same. In the editor they cannot
- * be edited where they are (they are this block's items, not those blocks'): re-import the page.
+ * the social links (CONNECT): their heading, then their first MAX_ITEMS icons, as icons in tiles
+ * or (asText, Variant B) their networks' names as links
  */
-function buildLegacyParts(block, connectRow, items, editing) {
-  if (!items.length) return;
-  const columns = [];
-  const socialRows = [];
-  items.forEach(({ row, type }) => {
-    // their editor instrumentation is left out: they would show outside this block's tree
-    [row, ...row.querySelectorAll('*')].forEach((n) => [...n.attributes]
-      .filter(({ name }) => name.startsWith('data-aue-'))
-      .forEach(({ name }) => n.removeAttribute(name)));
-    if (type === 'column') columns.push({ row, links: [] });
-    else if (type === 'social') socialRows.push(row);
-    else {
-      if (!columns.length) columns.push({ row: null, links: [] });
-      columns[columns.length - 1].links.push(row);
+function buildSocial({ heading, icons }, asText, editing) {
+  const column = el('div', 'jsw-footer-column jsw-footer-connect');
+  if (heading) column.append(buildHeading(heading, editing));
+  const list = el('ul', asText ? 'jsw-footer-links' : 'jsw-footer-social');
+  const shown = icons.filter(({ picture, link }) => picture || link).slice(0, MAX_ITEMS);
+  shown.forEach(({ picture, link }) => {
+    const img = picture?.querySelector('img');
+    const name = img?.getAttribute('alt')?.trim() || '';
+    const a = link ? external(plain(link)) : el('a');
+    const item = el('li', asText ? 'jsw-footer-link' : 'jsw-footer-social-item');
+    if (asText) {
+      a.removeAttribute('class');
+      a.textContent = name || a.textContent;
+    } else {
+      a.className = 'jsw-footer-social-link';
+      if (name) a.setAttribute('aria-label', name);
+      // the link reads as the network's name; the icon is its picture
+      if (img) img.alt = '';
+      a.replaceChildren(...(picture ? [picture] : []));
     }
+    item.append(a);
+    list.append(item);
   });
-  const part = (name) => {
-    const wrapper = el('div', `${name}-wrapper`);
-    const part0 = el('div', `${name} block`, { 'data-block-name': name, 'data-block-status': 'loaded' });
-    wrapper.append(part0);
-    loadCSS(`${window.hlx.codeBasePath}/blocks/${name}/${name}.css`);
-    return { wrapper, part: part0 };
-  };
-  const wrappers = columns.map(({ row, links }) => {
-    const { wrapper, part: column } = part('jsw-footer-column');
-    fillColumn(column, row, links, editing);
-    return wrapper;
-  });
-  const { wrapper, part: social } = part('jsw-footer-social');
-  fillSocial(social, connectRow, socialRows, editing);
-  wrappers.push(wrapper);
-  (block.parentElement || block).after(...wrappers);
+  column.append(list);
+  return column;
 }
 
 /**
@@ -241,16 +378,24 @@ function buildLegacyParts(block, connectRow, items, editing) {
 export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const {
-    media, brand, actions, connectRow, items,
+    media, brand, actions, nav: navCell, items,
   } = sortRows([...block.children]);
   const variant = variantOf(block, media);
   const phase3 = variant === 'variant-phase-3';
-  // the section is the footer: laid out by jsw-footer.css with its column and social blocks
-  [block, block.closest('.section')].filter(Boolean).forEach((node) => {
-    node.classList.remove(...VARIANTS);
-    node.classList.add(variant);
-  });
-  block.closest('.section')?.classList.add('jsw-footer-section');
+  block.classList.remove(...VARIANTS);
+  block.classList.add(variant);
+
+  // the columns and social links: the block's fields, else content saved before
+  const { columns, social } = readSiblingBlocks(block)
+    || (items.length ? readItems(items, navCell) : readNav(navCell));
+
+  const nav = el('nav', 'jsw-footer-nav', { 'aria-label': 'Footer' });
+  columns.filter((c) => c.heading || c.links.length)
+    .forEach((c) => nav.append(buildColumn(c, editing)));
+  // CONNECT: the last column (Variant B: the first)
+  const connect = buildSocial(social, phase3, editing);
+  if (phase3) nav.prepend(connect);
+  else nav.append(connect);
 
   // the actions cell's links, read before either is moved: the CTA button, the privacy policy
   const [ctaLink, privacyLink] = [...(actions?.querySelectorAll('a') || [])];
@@ -258,16 +403,15 @@ export default function decorate(block) {
   const legal = buildLegal(privacyLink, editing);
   const inner = el('div', 'jsw-footer-inner');
   if (phase3) {
-    // the branding with the privacy policy under it, then the CTA (centred); no photo
+    // branding (with the privacy policy under it) | the CTA, centred | the columns; no photo
     branding.append(legal);
-    inner.append(branding, cta);
+    inner.append(branding, cta, nav);
     block.replaceChildren(inner);
   } else {
-    // the branding with the CTA under it; the privacy policy at the foot of the footer
+    // branding with the CTA under it | the columns; the privacy policy at the foot
     branding.append(cta);
-    inner.append(branding, legal);
+    inner.append(branding, nav, legal);
     block.replaceChildren(buildMedia(media), inner);
   }
-  buildLegacyParts(block, connectRow, items, editing);
   if (editing) block.classList.add('jsw-footer-editing');
 }
