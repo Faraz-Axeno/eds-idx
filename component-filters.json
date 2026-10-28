@@ -97,20 +97,9 @@
     ]
   },
   {
-    "id": "jsw-footer-columns",
+    "id": "jsw-footer",
     "components": [
-      "jsw-footer-column"
-    ]
-  },
-  {
-    "id": "jsw-footer-links",
-    "components": [
-      "jsw-footer-link"
-    ]
-  },
-  {
-    "id": "jsw-footer-icons",
-    "components": [
+      "jsw-footer-column",
       "jsw-footer-icon"
     ]
   },

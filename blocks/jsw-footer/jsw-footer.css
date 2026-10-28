@@ -120,8 +120,31 @@ body.jsw-footer-page main:not([data-aue-resource]) {
   outline-offset: 2px;
 }
 
-/* the columns' wrapper (in the editor the footerColumns multi-field's container): no box of its
-   own, the columns laid out as the navigation's own items */
+/* in Universal Editor: icons over the limit (MAX_ITEMS, jsw-footer.js; never on the page) and
+   items not filled in yet (a placeholder to select them by) shown only while editing (the editor
+   marks it with adobe-ue-edit), the first dimmed; hidden in its Preview mode */
+.jsw-footer li.is-over-limit,
+.jsw-footer li.is-empty,
+.jsw-footer .jsw-footer-placeholder {
+  display: none;
+}
+
+html.adobe-ue-edit .jsw-footer li.is-over-limit,
+html.adobe-ue-edit .jsw-footer li.is-empty {
+  display: list-item;
+}
+
+html.adobe-ue-edit .jsw-footer li.is-over-limit {
+  opacity: 0.45;
+}
+
+html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
+  display: inline;
+  opacity: 0.55;
+  font-style: italic;
+}
+
+/* the columns' wrapper: no box of its own, the columns laid out as the navigation's own items */
 .jsw-footer .jsw-footer-columns {
   display: contents;
 }

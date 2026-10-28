@@ -72,21 +72,13 @@ var CustomImportScript = (() => {
   ];
   var import_jsw_footer_default = {
     transform: ({ document }) => {
+      const typed = (id, cells2) => [document.createTextNode(id), ...cells2];
       const cells = [
-        // media: the layout and background, then the starting content (fields hidden in the
-        // editor's panel): the design's columns and icons, shown until the lists hold items
+        // media: the layout and background
         [group(document, [
           ["media_footerVariant", el(document, "p", "variant-phase-5")],
           ["media_backgroundMode", el(document, "p", "image")],
-          ["media_backgroundImage", image(document, "jsw-footer-bg.jpg", "")],
-          ...COLUMNS.flatMap(([heading, links], c) => [
-            [`media_startColumn${c + 1}Heading`, el(document, "p", heading)],
-            ...links.map(([text, href], i) => [`media_startColumn${c + 1}Link${i + 1}`, link(document, href, text)])
-          ]),
-          ...SOCIALS.flatMap(([file, name, href], i) => [
-            [`media_startSocial${i + 1}Icon`, image(document, file, name)],
-            [`media_startSocial${i + 1}Link`, link(document, href, href)]
-          ])
+          ["media_backgroundImage", image(document, "jsw-footer-bg.jpg", "")]
         ])],
         // brand: the logo, copyright, button, privacy policy and social heading
         [group(document, [
@@ -96,10 +88,17 @@ var CustomImportScript = (() => {
           ["brand_privacyPolicy", link(document, "#privacy-policy", "PRIVACY POLICY")],
           ["brand_socialHeading", el(document, "p", "CONNECT")]
         ])],
-        // the footer columns and social icons: multi-fields, added in Universal Editor (md2jcr
-        // does not carry them)
-        [hinted(document, "footerColumns", [])],
-        [hinted(document, "socialIcons", [])]
+        // the Columns: each its title, then its links (up to 4); no type cell (md2jcr does not take
+        // one here: a row without one is the first item type, a Column)
+        ...COLUMNS.map(([heading, links]) => [
+          hinted(document, "columnHeading", [el(document, "p", heading)]),
+          group(document, links.map(([text, href], i) => [`links_link${i + 1}`, link(document, href, text)]))
+        ]),
+        // the Icons: each its image (named) and its link
+        ...SOCIALS.map(([file, name, href]) => typed("jsw-footer-icon", [
+          hinted(document, "iconImage", [image(document, file, name)]),
+          hinted(document, "iconLink", [link(document, href, href)])
+        ]))
       ];
       const main = document.createElement("div");
       main.append(WebImporter.Blocks.createBlock(document, { name: "jsw-footer", cells }));

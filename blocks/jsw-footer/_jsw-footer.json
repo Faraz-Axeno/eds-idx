@@ -9,7 +9,8 @@
             "resourceType": "core/franklin/components/block/v1/block",
             "template": {
               "name": "Jsw Footer",
-              "model": "jsw-footer"
+              "model": "jsw-footer",
+              "filter": "jsw-footer"
             }
           }
         }
@@ -25,21 +26,6 @@
             "template": {
               "name": "Column",
               "model": "jsw-footer-column"
-            }
-          }
-        }
-      }
-    },
-    {
-      "title": "Link",
-      "id": "jsw-footer-link",
-      "plugins": {
-        "xwalk": {
-          "page": {
-            "resourceType": "core/franklin/components/block/v1/block/item",
-            "template": {
-              "name": "Link",
-              "model": "jsw-footer-link"
             }
           }
         }
@@ -66,15 +52,10 @@
       "id": "jsw-footer",
       "fields": [
         {
-          "component": "tab",
-          "name": "tab_footer",
-          "label": "Footer"
-        },
-        {
           "component": "select",
           "name": "media_footerVariant",
           "label": "Footer layout",
-          "description": "Variant A: the photo (or video) behind; the logo, copyright and button at the left, the columns and social icons at the right. Variant B: the black-to-teal gradient (no photo); the logo, copyright and privacy policy at the left, the button in the centre, CONNECT (the social links as text) and the columns at the right. The columns and social icons: the Columns and Social icons tabs.",
+          "description": "Variant A: the photo (or video) behind; the logo, copyright and button at the left, the columns and social icons at the right. Variant B: the black-to-teal gradient (no photo); the logo, copyright and privacy policy at the left, the button in the centre, CONNECT (the social links as text) and the columns at the right. Columns and Icons: add them to this block.",
           "valueType": "string",
           "value": "variant-phase-5",
           "required": true,
@@ -214,64 +195,6 @@
           }
         },
         {
-          "component": "tab",
-          "name": "tab_columns",
-          "label": "Columns"
-        },
-        {
-          "component": "container",
-          "name": "footerColumns",
-          "label": "Columns",
-          "multi": true,
-          "description": "The navigation columns, left to right: each its title and its links.",
-          "fields": [
-            {
-              "component": "text",
-              "valueType": "string",
-              "name": "columnHeading",
-              "label": "Column title",
-              "description": "e.g. TECHNOLOGY. At most 20 characters.",
-              "required": true,
-              "validation": {
-                "maxLength": 20
-              }
-            },
-            {
-              "component": "container",
-              "name": "columnLinks",
-              "label": "Links",
-              "multi": true,
-              "description": "Warning: You can add multiple links, but a maximum of 4 will be displayed on the live site.",
-              "fields": [
-                {
-                  "component": "aem-content",
-                  "valueType": "string",
-                  "name": "link",
-                  "label": "URL",
-                  "description": "A page, #section, or a full URL.",
-                  "required": true
-                },
-                {
-                  "component": "text",
-                  "valueType": "string",
-                  "name": "linkText",
-                  "label": "Label",
-                  "description": "e.g. NEVs. At most 24 characters.",
-                  "required": true,
-                  "validation": {
-                    "maxLength": 24
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "component": "tab",
-          "name": "tab_social",
-          "label": "Social icons"
-        },
-        {
           "component": "text",
           "valueType": "string",
           "name": "brand_socialHeading",
@@ -281,523 +204,6 @@
           "required": true,
           "validation": {
             "maxLength": 20
-          }
-        },
-        {
-          "component": "container",
-          "name": "socialIcons",
-          "label": "Social icons",
-          "multi": true,
-          "description": "Warning: You can add multiple social icons, but a maximum of 4 will be displayed on the live site.",
-          "fields": [
-            {
-              "component": "reference",
-              "valueType": "string",
-              "name": "iconImage",
-              "label": "Icon",
-              "description": "The network's logo, white on transparent (SVG or PNG).",
-              "multi": false,
-              "required": true
-            },
-            {
-              "component": "text",
-              "valueType": "string",
-              "name": "iconImageAlt",
-              "label": "Network name",
-              "description": "e.g. Facebook: read out by screen readers, and shown as the link in the Variant B layout. At most 30 characters.",
-              "required": true,
-              "validation": {
-                "maxLength": 30
-              }
-            },
-            {
-              "component": "aem-content",
-              "valueType": "string",
-              "name": "iconLink",
-              "label": "URL",
-              "description": "The JSW Motors profile on that network (full URL).",
-              "required": true
-            }
-          ]
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startColumn1Heading",
-          "label": "Starting column 1 heading",
-          "value": "",
-          "validation": {
-            "maxLength": 20
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startColumn1Link1",
-          "label": "Starting column 1 link 1 URL",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startColumn1Link1Text",
-          "label": "Starting column 1 link 1 text",
-          "value": "",
-          "validation": {
-            "maxLength": 24
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startColumn1Link2",
-          "label": "Starting column 1 link 2 URL",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startColumn1Link2Text",
-          "label": "Starting column 1 link 2 text",
-          "value": "",
-          "validation": {
-            "maxLength": 24
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startColumn1Link3",
-          "label": "Starting column 1 link 3 URL",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startColumn1Link3Text",
-          "label": "Starting column 1 link 3 text",
-          "value": "",
-          "validation": {
-            "maxLength": 24
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startColumn1Link4",
-          "label": "Starting column 1 link 4 URL",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startColumn1Link4Text",
-          "label": "Starting column 1 link 4 text",
-          "value": "",
-          "validation": {
-            "maxLength": 24
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startColumn2Heading",
-          "label": "Starting column 2 heading",
-          "value": "",
-          "validation": {
-            "maxLength": 20
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startColumn2Link1",
-          "label": "Starting column 2 link 1 URL",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startColumn2Link1Text",
-          "label": "Starting column 2 link 1 text",
-          "value": "",
-          "validation": {
-            "maxLength": 24
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startColumn2Link2",
-          "label": "Starting column 2 link 2 URL",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startColumn2Link2Text",
-          "label": "Starting column 2 link 2 text",
-          "value": "",
-          "validation": {
-            "maxLength": 24
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startColumn2Link3",
-          "label": "Starting column 2 link 3 URL",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startColumn2Link3Text",
-          "label": "Starting column 2 link 3 text",
-          "value": "",
-          "validation": {
-            "maxLength": 24
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startColumn2Link4",
-          "label": "Starting column 2 link 4 URL",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startColumn2Link4Text",
-          "label": "Starting column 2 link 4 text",
-          "value": "",
-          "validation": {
-            "maxLength": 24
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "reference",
-          "valueType": "string",
-          "name": "media_startSocial1Icon",
-          "label": "Starting icon 1 image",
-          "multi": false,
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startSocial1IconAlt",
-          "label": "Starting icon 1 network name",
-          "value": "",
-          "validation": {
-            "maxLength": 30
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startSocial1Link",
-          "label": "Starting icon 1 link",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "reference",
-          "valueType": "string",
-          "name": "media_startSocial2Icon",
-          "label": "Starting icon 2 image",
-          "multi": false,
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startSocial2IconAlt",
-          "label": "Starting icon 2 network name",
-          "value": "",
-          "validation": {
-            "maxLength": 30
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startSocial2Link",
-          "label": "Starting icon 2 link",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "reference",
-          "valueType": "string",
-          "name": "media_startSocial3Icon",
-          "label": "Starting icon 3 image",
-          "multi": false,
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startSocial3IconAlt",
-          "label": "Starting icon 3 network name",
-          "value": "",
-          "validation": {
-            "maxLength": 30
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startSocial3Link",
-          "label": "Starting icon 3 link",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "reference",
-          "valueType": "string",
-          "name": "media_startSocial4Icon",
-          "label": "Starting icon 4 image",
-          "multi": false,
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "media_startSocial4IconAlt",
-          "label": "Starting icon 4 network name",
-          "value": "",
-          "validation": {
-            "maxLength": 30
-          },
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
-          }
-        },
-        {
-          "component": "aem-content",
-          "valueType": "string",
-          "name": "media_startSocial4Link",
-          "label": "Starting icon 4 link",
-          "condition": {
-            "===": [
-              {
-                "var": "media_footerVariant"
-              },
-              "starting-content-only"
-            ]
           }
         }
       ]
@@ -815,27 +221,71 @@
           "validation": {
             "maxLength": 20
           }
-        }
-      ]
-    },
-    {
-      "id": "jsw-footer-link",
-      "fields": [
+        },
         {
           "component": "aem-content",
           "valueType": "string",
-          "name": "link",
-          "label": "URL",
-          "description": "A page, #section, or a full URL.",
-          "required": true
+          "name": "links_link1",
+          "label": "Link 1 URL",
+          "description": "A page, #section, or a full URL. A link without a URL is not shown."
         },
         {
           "component": "text",
           "valueType": "string",
-          "name": "linkText",
-          "label": "Label",
+          "name": "links_link1Text",
+          "label": "Link 1 text",
           "description": "e.g. NEVs. At most 24 characters.",
-          "required": true,
+          "validation": {
+            "maxLength": 24
+          }
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "links_link2",
+          "label": "Link 2 URL",
+          "description": "A page, #section, or a full URL. A link without a URL is not shown."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "links_link2Text",
+          "label": "Link 2 text",
+          "description": "e.g. NEVs. At most 24 characters.",
+          "validation": {
+            "maxLength": 24
+          }
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "links_link3",
+          "label": "Link 3 URL",
+          "description": "A page, #section, or a full URL. A link without a URL is not shown."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "links_link3Text",
+          "label": "Link 3 text",
+          "description": "e.g. NEVs. At most 24 characters.",
+          "validation": {
+            "maxLength": 24
+          }
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "links_link4",
+          "label": "Link 4 URL",
+          "description": "A page, #section, or a full URL. A link without a URL is not shown."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "links_link4Text",
+          "label": "Link 4 text",
+          "description": "e.g. NEVs. At most 24 characters.",
           "validation": {
             "maxLength": 24
           }
@@ -850,7 +300,7 @@
           "valueType": "string",
           "name": "iconImage",
           "label": "Icon",
-          "description": "The network's logo, white on transparent (SVG or PNG).",
+          "description": "The network's logo, white on transparent (SVG or PNG). Warning: You can add multiple icons, but a maximum of 4 will be displayed on the live site.",
           "multi": false,
           "required": true
         },
@@ -878,20 +328,9 @@
   ],
   "filters": [
     {
-      "id": "jsw-footer-columns",
+      "id": "jsw-footer",
       "components": [
-        "jsw-footer-column"
-      ]
-    },
-    {
-      "id": "jsw-footer-links",
-      "components": [
-        "jsw-footer-link"
-      ]
-    },
-    {
-      "id": "jsw-footer-icons",
-      "components": [
+        "jsw-footer-column",
         "jsw-footer-icon"
       ]
     }

@@ -342,6 +342,46 @@ function isCompact(rows) {
     && (empty(icons) || Boolean(icons.querySelector('hr, ul, picture, a')));
 }
 
+// the block's items (the model now): a Column (its title | its links) and an Icon
+const ITEM_MODELS = { 'jsw-footer-column': 'column', 'jsw-footer-icon': 'icon' };
+const ITEM_TYPE_CELL = /^jsw-footer-(column|icon)$/;
+
+/** the block's two cells (media, brand: with the button), then its Column and Icon items */
+function isItemsFormat(rows) {
+  if (rows.length < 2 || !cellsOf(rows[1])[0]?.querySelector('a') || isCompact(rows)) return false;
+  return rows.slice(2).every((row) => ITEM_MODELS[row.dataset.aueModel]
+    || ITEM_TYPE_CELL.test(cellsOf(row)[0]?.textContent.trim() || '') || cellsOf(row).length >= 2);
+}
+
+/** the block's Column and Icon items, in order, each with its row (its editor instrumentation) */
+function readFooterItems(rows) {
+  const columns = [];
+  const icons = [];
+  rows.forEach((row) => {
+    let type = ITEM_MODELS[row.dataset.aueModel];
+    const first = cellsOf(row)[0];
+    const typed = first?.textContent.trim().match(ITEM_TYPE_CELL)?.[1];
+    if (!type && typed && !first.querySelector('a, picture')) {
+      type = typed;
+      first.remove();
+    }
+    if (!type) type = row.querySelector('picture') ? 'icon' : 'column';
+    const [titleCell, linksCell] = cellsOf(row);
+    if (type === 'column') {
+      const links = [...(linksCell?.querySelectorAll('a') || [])].filter((a) => a.getAttribute('href'));
+      columns.push({ heading: headingOf(titleCell), links, row });
+    } else icons.push({ picture: row.querySelector('picture'), link: row.querySelector('a[href]'), row });
+  });
+  return { columns, icons };
+}
+
+/** in the editor, an empty item's place: something to select (never on the page) */
+function placeholder(text) {
+  const span = el('span', 'jsw-footer-placeholder');
+  span.textContent = text;
+  return span;
+}
+
 /**
  * the media cell's own fields (layout, background type, image, video) and, after them, the
  * starting content (named media_start… in the editor; else from its first heading, a text other
@@ -524,12 +564,22 @@ function buildColumn({ heading, links }, editing) {
  * the social links (CONNECT): their heading, then their first MAX_ITEMS icons, as icons in tiles
  * or (asText, Variant B) their networks' names as links
  */
-function buildSocial({ heading, icons }, asText, editing) {
+function buildSocial({ heading, icons }, asText, editing, keepAll = false) {
   const column = el('div', 'jsw-footer-column jsw-footer-connect');
   if (heading) column.append(buildHeading(heading, editing));
   const list = el('ul', asText ? 'jsw-footer-links' : 'jsw-footer-social');
-  const shown = icons.filter(({ picture, link }) => picture || link).slice(0, MAX_ITEMS);
+  const shown = keepAll ? icons
+    : icons.filter(({ picture, link }) => picture || link).slice(0, MAX_ITEMS);
   shown.forEach(({ picture, link }) => {
+    if (!picture && !link) {
+      // in the editor, an Icon not filled in yet
+      const item = el('li', `${asText ? 'jsw-footer-link' : 'jsw-footer-social-item'} is-empty`);
+      const a = el('a', asText ? '' : 'jsw-footer-social-link');
+      a.append(placeholder(asText ? 'New icon' : '+'));
+      item.append(a);
+      list.append(item);
+      return;
+    }
     const img = picture?.querySelector('img');
     const name = img?.getAttribute('alt')?.trim() || '';
     const a = link ? external(plain(link)) : el('a');
@@ -558,8 +608,10 @@ function buildSocial({ heading, icons }, asText, editing) {
 export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const rows = [...block.children];
-  const compact = isCompact(rows);
-  const multiFields = compact || isMultiFields(rows);
+  const itemsFormat = isItemsFormat(rows);
+  const compact = !itemsFormat && isCompact(rows);
+  const multiFields = !itemsFormat && (compact || isMultiFields(rows));
+  let footerItems = null;
   let media;
   let brand;
   let actions;
@@ -569,7 +621,17 @@ export default function decorate(block) {
   let socialHeadingCell;
   let iconsCell;
   let startingCell;
-  if (compact) {
+  if (itemsFormat) {
+    // the two cells: media | brand (+ button, privacy policy, social heading); then the items
+    [media, brand] = rows.slice(0, 2).map((r) => cellsOf(r)[0] || null);
+    actions = brand;
+    footerItems = readFooterItems(rows.slice(2));
+    const texts = textsOf(brand);
+    socialHeadingCell = el('div');
+    const named = brand?.querySelector('[data-aue-prop="brand_socialHeading"]');
+    const heading = named || (texts.length > 1 ? texts[texts.length - 1] : null);
+    if (heading) socialHeadingCell.append(heading);
+  } else if (compact) {
     // the four cells: media (+ starting content) | brand (+ button, privacy, social heading) |
     // footer columns | social icons
     const [mediaCell, brandCell] = rows.slice(0, 2).map((r) => cellsOf(r)[0] || null);
@@ -598,7 +660,10 @@ export default function decorate(block) {
   block.classList.add(variant);
 
   // the columns and social links: the block's multi-fields, else content saved before
-  let data = readSiblingBlocks(block);
+  let data = footerItems ? {
+    columns: footerItems.columns,
+    social: { heading: headingOf(socialHeadingCell), icons: footerItems.icons },
+  } : readSiblingBlocks(block);
   let listed = null;
   if (!data && multiFields) {
     // a list with no items yet: the starting content's (the design's, uploaded with the page)
@@ -620,11 +685,49 @@ export default function decorate(block) {
   const nav = el('nav', 'jsw-footer-nav', { 'aria-label': 'Footer' });
   // the columns, in a box-less wrapper (in the editor the Columns list's container)
   const columnsList = el('div', 'jsw-footer-columns');
-  columns.filter((c) => c.heading || c.links.length)
-    .forEach((c) => columnsList.append(buildColumn(c, editing)));
+  columns.filter((c) => c.heading || c.links.length || (editing && c.row))
+    .forEach((c) => {
+      const title = c.heading?.textContent.trim();
+      const column = buildColumn(c, editing);
+      if (itemsFormat && editing) {
+        // the Column item: selectable, named by its title (an empty one shown as a placeholder)
+        moveInstrumentation(c.row, column);
+        column.dataset.aueLabel = `Column: ${title || 'New column'}`;
+        if (!title) column.prepend(el('h2', 'jsw-footer-heading'));
+        if (!title) column.querySelector('.jsw-footer-heading').append(placeholder('New column'));
+      }
+      columnsList.append(column);
+    });
   nav.append(columnsList);
   // CONNECT: the last column (Variant B: the first)
-  const connect = buildSocial(social, phase3, editing);
+  const connect = buildSocial(social, phase3, editing, itemsFormat && editing);
+  if (itemsFormat && editing) {
+    // each Icon item: selectable, named by its network; those after the first MAX_ITEMS filled
+    // ones dimmed (never on the page)
+    let filled = 0;
+    [...connect.querySelectorAll('ul > li')].forEach((item, i) => {
+      const { row, picture, link } = social.icons[i] || {};
+      if (!row) return;
+      moveInstrumentation(row, item);
+      // the icon's own field, its image, in the tree under the Icon (its link, around the image
+      // in a tile, edited in the properties panel)
+      const tile = item.querySelector('a');
+      if (tile?.querySelector('img')) {
+        [...tile.attributes].filter(({ name: attr }) => attr.startsWith('data-aue-'))
+          .forEach(({ name: attr }) => tile.removeAttribute(attr));
+      }
+      const name = picture?.querySelector('img')?.getAttribute('alt')?.trim()
+        || item.querySelector('a')?.getAttribute('aria-label') || '';
+      item.dataset.aueLabel = `Icon: ${name || 'New icon'}`;
+      if (picture || link) {
+        filled += 1;
+        if (filled > MAX_ITEMS) {
+          item.classList.add('is-over-limit');
+          item.title = `Not shown on the page: only the first ${MAX_ITEMS} icons are.`;
+        }
+      }
+    });
+  }
   if (phase3) nav.prepend(connect);
   else nav.append(connect);
   if (editing && listed) {

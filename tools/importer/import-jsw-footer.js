@@ -4,13 +4,10 @@
 /**
  * JSW footer page (/jsw-footer), from the "Desktop Footer" design frame (no source site: the
  * fetched document is ignored): one jsw-footer block, the footer of the JSW pages (scripts.js
- * loads this page as their footer, instead of the site's). Its four cells: media (layout,
- * background, then the starting content) | brand (logo, copyright, button, privacy policy, social
- * heading) | footer columns | social icons. The footer columns and social icons are multi-fields,
- * which md2jcr (the conversion to AEM content) does not carry: their cells are left empty here,
- * and the design's columns and icons (COLUMNS, SOCIALS below) go into the starting content
- * (fields hidden in the editor's panel), which the footer shows until columns and icons are added
- * to the lists in Universal Editor. The background was cut from the design.
+ * loads this page as their footer, instead of the site's). Its two cells: media (layout,
+ * background) | brand (logo, copyright, button, privacy policy, social heading); then its items:
+ * a Column for each navigation column (its title | its links, up to 4) and an Icon for each social
+ * icon (its image, named | its link). The background was cut from the design.
  */
 
 const IMG = 'images/jsw';
@@ -72,21 +69,15 @@ const SOCIALS = [
 
 export default {
   transform: ({ document }) => {
+    // an Icon row starts with its item type (jsw-footer-icon): md2jcr reads it to create that item;
+    // the block's code reads and drops it
+    const typed = (id, cells) => [document.createTextNode(id), ...cells];
     const cells = [
-      // media: the layout and background, then the starting content (fields hidden in the
-      // editor's panel): the design's columns and icons, shown until the lists hold items
+      // media: the layout and background
       [group(document, [
         ['media_footerVariant', el(document, 'p', 'variant-phase-5')],
         ['media_backgroundMode', el(document, 'p', 'image')],
         ['media_backgroundImage', image(document, 'jsw-footer-bg.jpg', '')],
-        ...COLUMNS.flatMap(([heading, links], c) => [
-          [`media_startColumn${c + 1}Heading`, el(document, 'p', heading)],
-          ...links.map(([text, href], i) => [`media_startColumn${c + 1}Link${i + 1}`, link(document, href, text)]),
-        ]),
-        ...SOCIALS.flatMap(([file, name, href], i) => [
-          [`media_startSocial${i + 1}Icon`, image(document, file, name)],
-          [`media_startSocial${i + 1}Link`, link(document, href, href)],
-        ]),
       ])],
       // brand: the logo, copyright, button, privacy policy and social heading
       [group(document, [
@@ -96,10 +87,17 @@ export default {
         ['brand_privacyPolicy', link(document, '#privacy-policy', 'PRIVACY POLICY')],
         ['brand_socialHeading', el(document, 'p', 'CONNECT')],
       ])],
-      // the footer columns and social icons: multi-fields, added in Universal Editor (md2jcr
-      // does not carry them)
-      [hinted(document, 'footerColumns', [])],
-      [hinted(document, 'socialIcons', [])],
+      // the Columns: each its title, then its links (up to 4); no type cell (md2jcr does not take
+      // one here: a row without one is the first item type, a Column)
+      ...COLUMNS.map(([heading, links]) => [
+        hinted(document, 'columnHeading', [el(document, 'p', heading)]),
+        group(document, links.map(([text, href], i) => [`links_link${i + 1}`, link(document, href, text)])),
+      ]),
+      // the Icons: each its image (named) and its link
+      ...SOCIALS.map(([file, name, href]) => typed('jsw-footer-icon', [
+        hinted(document, 'iconImage', [image(document, file, name)]),
+        hinted(document, 'iconLink', [link(document, href, href)]),
+      ])),
     ];
 
     const main = document.createElement('div');
