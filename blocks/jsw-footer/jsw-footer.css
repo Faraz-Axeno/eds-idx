@@ -119,6 +119,18 @@ body.jsw-footer-page main:not([data-aue-resource]) {
   outline-offset: 2px;
 }
 
+/* links and social icons over their limit (MAX_*, jsw-footer.js): never on the page (not put
+   into it); in Universal Editor hidden too, also in its Preview mode, and only while editing (the
+   editor marks it with adobe-ue-edit) shown dimmed, so they can be found and removed */
+.jsw-footer li.is-over-limit {
+  display: none;
+}
+
+html.adobe-ue-edit .jsw-footer li.is-over-limit {
+  display: list-item;
+  opacity: 0.45;
+}
+
 /* ---- Phase 5 layout ---- */
 
 /* branding at the top left, the navigation at the top right, the privacy policy at the foot on

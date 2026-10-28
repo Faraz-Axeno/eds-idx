@@ -27,6 +27,16 @@
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
+// the most items each part shows on the page (the design's count + 1): a column's links (its
+// limit by its heading, TECHNOLOGY or EXPLORE, else by its place: the first column, the second,
+// then MAX_OTHER_LINKS) and the social icons. Authors may add more: the page shows the first ones
+// only (.slice); the editor keeps the others too, but shows them only while editing (dimmed, so
+// they can be found and removed), never in its Preview mode (jsw-footer.css)
+const MAX_TECH_LINKS = 4;
+const MAX_EXPLORE_LINKS = 5;
+const MAX_OTHER_LINKS = 5;
+const MAX_SOCIAL_ICONS = 5;
+
 // the most characters each text shows on the page, as the model's limits (_jsw-footer.json): a
 // longer text, if saved anyway, is cut there with "…" (its whole wording as a tooltip); the
 // editor shows every text whole
@@ -273,6 +283,32 @@ function buildSocial(row, asText) {
   return item;
 }
 
+/** a column's link limit: by its heading, else by its place among the columns */
+function linkLimit(headingText, index) {
+  const heading = headingText.trim().toUpperCase();
+  if (heading === 'TECHNOLOGY') return MAX_TECH_LINKS;
+  if (heading === 'EXPLORE') return MAX_EXPLORE_LINKS;
+  return [MAX_TECH_LINKS, MAX_EXPLORE_LINKS][index] ?? MAX_OTHER_LINKS;
+}
+
+/**
+ * the items shown: on the page the first `limit` (already sliced); in the editor all of them,
+ * those over the limit marked
+ * @param {Element[]} built the items, built
+ * @param {number} limit the most shown on the page
+ * @param {boolean} editing in the editor
+ * @param {string} what what they are, for the editor's note
+ * @returns {Element[]}
+ */
+function limited(built, limit, editing, what) {
+  if (!editing) return built;
+  built.slice(limit).forEach((item) => {
+    item.classList.add('is-over-limit');
+    item.title = `Not shown on the page: only the first ${limit} ${what} are.`;
+  });
+  return built;
+}
+
 /**
  * loads and decorates the block
  * @param {Element} block The block element
@@ -290,23 +326,33 @@ export default function decorate(block) {
   const nav = el('nav', 'jsw-footer-nav', { 'aria-label': 'Footer' });
   // the social links: icons in tiles, or (Phase 3) a list of their names
   const socials = el('ul', phase3 ? 'jsw-footer-links' : 'jsw-footer-social');
-  let column = null;
+  // the items in order: each Footer Column with the Footer Links after it, and the Social Icons
+  const columns = [];
+  const socialRows = [];
   items.forEach(({ row, type }) => {
-    if (type === 'column') {
-      column = buildColumn(row, editing);
-      nav.append(column);
-    } else if (type === 'link') {
+    if (type === 'column') columns.push({ row, links: [] });
+    else if (type === 'social') socialRows.push(row);
+    else {
       // a link before any Footer Column starts a column without a heading
-      if (!column) {
-        column = el('div', 'jsw-footer-column');
-        column.append(el('ul', 'jsw-footer-links'));
-        nav.append(column);
-      }
-      column.querySelector('.jsw-footer-links').append(buildLink(row, editing));
-    } else {
-      socials.append(buildSocial(row, phase3));
+      if (!columns.length) columns.push({ row: null, links: [] });
+      columns[columns.length - 1].links.push(row);
     }
   });
+  columns.forEach(({ row, links }, i) => {
+    let column;
+    if (row) column = buildColumn(row, editing);
+    else {
+      column = el('div', 'jsw-footer-column');
+      column.append(el('ul', 'jsw-footer-links'));
+    }
+    const limit = linkLimit(column.querySelector('.jsw-footer-heading')?.textContent || '', i);
+    const built = (editing ? links : links.slice(0, limit)).map((r) => buildLink(r, editing));
+    column.querySelector('.jsw-footer-links').append(...limited(built, limit, editing, 'links'));
+    nav.append(column);
+  });
+  const builtSocials = (editing ? socialRows : socialRows.slice(0, MAX_SOCIAL_ICONS))
+    .map((r) => buildSocial(r, phase3));
+  socials.append(...limited(builtSocials, MAX_SOCIAL_ICONS, editing, 'social icons'));
 
   // CONNECT: the social heading over the social links; the last column (Phase 3: the first)
   const connectColumn = el('div', 'jsw-footer-column jsw-footer-connect');
