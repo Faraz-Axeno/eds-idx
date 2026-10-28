@@ -86,14 +86,18 @@ var CustomImportScript = (() => {
           ["actions_ctaButton", link(document, "/jsw-phase-3#register-interest", "REGISTER INTEREST")],
           ["actions_privacyPolicy", link(document, "#privacy-policy", "PRIVACY POLICY")]
         ])],
-        // the columns (each its heading, then its links) and the social links (their heading, then
-        // the icons: each its image, named, then its link)
+        // the footer columns and social icons: multi-fields, added in Universal Editor (md2jcr
+        // does not carry them); the social heading
+        [hinted(document, "footerColumns", [])],
+        [hinted(document, "socialHeading", [el(document, "p", "CONNECT")])],
+        [hinted(document, "socialIcons", [])],
+        // the starting content (fields hidden in the editor's panel): the design's columns and icons,
+        // shown until the lists above hold items
         [group(document, [
           ...COLUMNS.flatMap(([heading, links], c) => [
             [`nav_column${c + 1}Heading`, el(document, "p", heading)],
             ...links.map(([text, href], i) => [`nav_column${c + 1}Link${i + 1}`, link(document, href, text)])
           ]),
-          ["nav_socialHeading", el(document, "p", "CONNECT")],
           ...SOCIALS.flatMap(([file, name, href], i) => [
             [`nav_social${i + 1}Icon`, image(document, file, name)],
             [`nav_social${i + 1}Link`, link(document, href, href)]
