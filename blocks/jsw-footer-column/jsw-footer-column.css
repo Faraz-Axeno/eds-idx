@@ -1,0 +1,143 @@
+/*
+ * jsw-footer-column: a navigation column of the JSW footer: its heading, then its links. Placed
+ * in the footer by blocks/jsw-footer/jsw-footer.css (the footer's section, jsw-footer-section,
+ * with the layout's class); its own styles here, for each layout.
+ */
+
+.jsw-footer-column {
+  min-width: 0;
+}
+
+.jsw-footer-column h2,
+.jsw-footer-column ul {
+  margin: 0;
+  padding: 0;
+}
+
+.jsw-footer-column .jsw-footer-heading {
+  overflow: hidden;
+  color: #fff;
+  font-weight: 400;
+  line-height: 1.3;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.jsw-footer-column .jsw-footer-links {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.jsw-footer-column .jsw-footer-link {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.jsw-footer-column a:any-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.jsw-footer-column a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.jsw-footer-column .jsw-footer-link a:hover {
+  color: #fff;
+}
+
+/* links over the limit (MAX_ITEMS, scripts/jsw-footer-parts.js): never on the page (not put into
+   it); in Universal Editor hidden too, also in its Preview mode, and only while editing (the
+   editor marks it with adobe-ue-edit) shown dimmed, so they can be found and removed; links just
+   added and not filled in yet: a placeholder, also only while editing */
+.jsw-footer-column li.is-over-limit,
+.jsw-footer-column li.is-empty,
+.jsw-footer-column .jsw-footer-placeholder {
+  display: none;
+}
+
+html.adobe-ue-edit .jsw-footer-column li.is-over-limit,
+html.adobe-ue-edit .jsw-footer-column li.is-empty {
+  display: list-item;
+}
+
+html.adobe-ue-edit .jsw-footer-column li.is-over-limit {
+  opacity: 0.45;
+}
+
+html.adobe-ue-edit .jsw-footer-column .jsw-footer-placeholder {
+  display: inline;
+  opacity: 0.55;
+  font-style: italic;
+}
+
+/* ---- Variant A (Phase 5 layout) ---- */
+
+.variant-phase-5 .jsw-footer-column .jsw-footer-heading {
+  font-family: inherit;
+  font-size: calc(12.4 * var(--jsw-footer-unit, 1px));
+  letter-spacing: 0;
+}
+
+.variant-phase-5 .jsw-footer-column .jsw-footer-links {
+  gap: calc(10 * var(--jsw-footer-unit, 1px));
+  margin-top: calc(10 * var(--jsw-footer-unit, 1px));
+}
+
+.variant-phase-5 .jsw-footer-column .jsw-footer-link {
+  color: rgb(255 255 255 / 65%);
+  font-size: calc(11 * var(--jsw-footer-unit, 1px));
+  line-height: 1.5;
+}
+
+/* phones: the small texts a little larger, to read on a phone */
+@media (max-width: 599.98px) {
+  .variant-phase-5 .jsw-footer-column .jsw-footer-heading {
+    font-size: 14px;
+  }
+
+  .variant-phase-5 .jsw-footer-column .jsw-footer-link {
+    font-size: 13px;
+  }
+}
+
+/* ---- Variant B (Phase 3 layout) ---- */
+
+.variant-phase-3 .jsw-footer-column .jsw-footer-heading {
+  margin-bottom: 10px;
+  font-family: jsw-footer-display, michroma, 'Helvetica Neue', arial, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.variant-phase-3 .jsw-footer-column .jsw-footer-links {
+  gap: 6px;
+  color: rgb(255 255 255 / 70%);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.variant-phase-3 .jsw-footer-column .jsw-footer-link a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* phones: a long heading such as TECHNOLOGY keeps to its column (15px, not the frame's 17px for
+   its two short ones) */
+@media (max-width: 599.98px) {
+  .variant-phase-3 .jsw-footer-column .jsw-footer-heading {
+    margin-bottom: 12px;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+  }
+
+  .variant-phase-3 .jsw-footer-column .jsw-footer-links {
+    gap: 9px;
+    color: rgb(255 255 255 / 80%);
+    font-size: 13px;
+  }
+}

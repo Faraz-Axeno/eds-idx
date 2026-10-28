@@ -38,6 +38,8 @@
       "career-hero",
       "career-route",
       "jsw-footer",
+      "jsw-footer-column",
+      "jsw-footer-social",
       "jsw-nav"
     ]
   },
@@ -97,11 +99,15 @@
     ]
   },
   {
-    "id": "jsw-footer",
+    "id": "jsw-footer-column",
     "components": [
-      "jsw-footer-column",
-      "jsw-footer-link",
-      "jsw-footer-social"
+      "jsw-footer-link"
+    ]
+  },
+  {
+    "id": "jsw-footer-social",
+    "components": [
+      "jsw-footer-social-icon"
     ]
   },
   {

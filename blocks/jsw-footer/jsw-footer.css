@@ -1,12 +1,17 @@
 /*
  * jsw-footer: the JSW footer, full-bleed (edge to edge, square-cornered: rounded corners would
- * show the white page behind them), in one of two layouts (its Footer layout field, as a class):
- *   variant-phase-5 — the "Desktop Footer" frame (1280 x 500): the photo covering the whole footer;
- *     the logo, copyright line and CTA button 42px in from the left; the navigation columns 197px
- *     apart, the social icons ending 54px in from the right; the privacy policy 40px above the foot
- *   variant-phase-3 — the Phase 3 footer ("NEV / Footer"): a black-to-teal gradient; the logo,
- *     copyright line and privacy policy at the left, the CTA button in the centre, CONNECT (the
- *     social links as text) and the navigation columns at the right
+ * show the white page behind them). The footer is this block's section (jsw-footer-section, set
+ * by jsw-footer.js): this block (logo, copyright, button, privacy policy, background) beside the
+ * section's jsw-footer-column blocks (the navigation columns) and its jsw-footer-social block
+ * (CONNECT), laid out here in one of two layouts (the Footer layout field, a class on the section):
+ *   variant-phase-5 (Variant A) — the "Desktop Footer" frame (1280 x 500): the photo covering the
+ *     whole footer; the logo, copyright line and CTA button 42px in from the left; the columns
+ *     197px apart, the social icons ending 54px in from the right; the privacy policy 40px above
+ *     the foot
+ *   variant-phase-3 (Variant B) — the Phase 3 footer ("NEV / Footer"): a black-to-teal gradient;
+ *     the logo, copyright line and privacy policy at the left, the CTA button in the centre,
+ *     CONNECT (the social links as text) and the columns at the right
+ * The columns' and social links' own styles: blocks/jsw-footer-column, blocks/jsw-footer-social.
  * Shared rules first, then each layout's, scoped to its class.
  */
 
@@ -26,19 +31,47 @@
   src: url('../../fonts/michroma.woff2') format('woff2');
 }
 
-/* full-bleed: the section and wrapper holding the footer (on the JSW pages in their <footer>, on
-   its own page in main) edge to edge, with no space around it */
-:is(main, footer) > .section:has(> .jsw-footer-wrapper),
-.jsw-footer-wrapper {
+/* the footer: its section, full-bleed (on the JSW pages in their <footer>, on its own page in
+   main), the frame its blocks are laid out in */
+.section.jsw-footer-section {
+  --jsw-footer-unit: 1px;
+  --jsw-footer-font: new-science, jsw-footer-text, 'Helvetica Neue', arial, sans-serif;
+  --jsw-footer-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
+
+  position: relative;
+  isolation: isolate;
   box-sizing: border-box;
+  display: flex;
   width: 100%;
+  max-width: none;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 0;
+  color: #fff;
+  background-color: #030506;
+  font-family: var(--jsw-footer-font);
+  letter-spacing: 0;
+}
+
+/* desktop: sized in "units", 1px each in the 1280-wide frame, so on narrower desktops the footer
+   shrinks as a whole (at least 0.7px); tablets and phones keep 1px units */
+@media (min-width: 900px) {
+  .section.jsw-footer-section {
+    --jsw-footer-unit: clamp(0.7px, calc(100vw / 1280), 1px);
+  }
+}
+
+/* the blocks' wrappers: no space of their own (styles/styles.css centres them) */
+.section.jsw-footer-section > div {
+  box-sizing: border-box;
+  min-width: 0;
   max-width: none;
   margin: 0;
   padding: 0;
 }
 
 /* on its own page the section as tall as the footer, not a screen tall (styles/styles.css) */
-main > .section:has(> .jsw-footer-wrapper) {
+main > .section.jsw-footer-section {
   min-height: 0;
 }
 
@@ -57,34 +90,7 @@ body.jsw-footer-page main:not([data-aue-resource]) {
   min-height: 100svh;
 }
 
-.jsw-footer {
-  --jsw-footer-unit: 1px;
-  --jsw-footer-font: new-science, jsw-footer-text, 'Helvetica Neue', arial, sans-serif;
-  --jsw-footer-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
-
-  position: relative;
-  isolation: isolate;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  overflow: hidden;
-  border-radius: 0;
-  color: #fff;
-  background-color: #030506;
-  font-family: var(--jsw-footer-font);
-  letter-spacing: 0;
-}
-
-/* desktop: sized in "units", 1px each in the 1280-wide frame, so on narrower desktops the footer
-   shrinks as a whole (at least 0.7px); tablets and phones keep 1px units */
-@media (min-width: 900px) {
-  .jsw-footer {
-    --jsw-footer-unit: clamp(0.7px, calc(100vw / 1280), 1px);
-  }
-}
-
-/* the background: the picture (or the video over it) covering the whole footer */
+/* the background: the picture (or the video over it) covering the whole footer (the section) */
 .jsw-footer .jsw-footer-media,
 .jsw-footer .jsw-footer-media picture,
 .jsw-footer .jsw-footer-media img,
@@ -102,9 +108,7 @@ body.jsw-footer-page main:not([data-aue-resource]) {
   object-position: center bottom;
 }
 
-.jsw-footer p,
-.jsw-footer h2,
-.jsw-footer ul {
+.jsw-footer p {
   margin: 0;
   padding: 0;
 }
@@ -119,61 +123,72 @@ body.jsw-footer-page main:not([data-aue-resource]) {
   outline-offset: 2px;
 }
 
-/* links and social icons over their limit (MAX_*, jsw-footer.js): never on the page (not put
-   into it); in Universal Editor hidden too, also in its Preview mode, and only while editing (the
-   editor marks it with adobe-ue-edit) shown dimmed, so they can be found and removed */
-.jsw-footer li.is-over-limit {
-  display: none;
+.jsw-footer .jsw-footer-legal a:hover {
+  color: #fff;
 }
 
-html.adobe-ue-edit .jsw-footer li.is-over-limit {
-  display: list-item;
-  opacity: 0.45;
+.jsw-footer .jsw-footer-logo {
+  line-height: 0;
 }
 
-/* items just added and not filled in yet (in Universal Editor only, never on the page): a
-   placeholder to select them by, shown only while editing, like the items over a limit */
-.jsw-footer li.is-empty,
-.jsw-footer .jsw-footer-placeholder {
-  display: none;
+.jsw-footer .jsw-footer-logo img {
+  height: auto;
 }
 
-html.adobe-ue-edit .jsw-footer li.is-empty {
-  display: list-item;
+.jsw-footer .jsw-footer-copyright {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
-html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
-  display: inline;
-  opacity: 0.55;
-  font-style: italic;
-}
-
-/* ---- Phase 5 layout ---- */
-
-/* branding at the top left, the navigation at the top right, the privacy policy at the foot on
-   the left */
-.jsw-footer.variant-phase-5 .jsw-footer-inner {
+/* the CTA: a white button */
+.jsw-footer a.jsw-footer-cta-link:any-link {
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto 1fr auto;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  background-color: #fff;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.jsw-footer a.jsw-footer-cta-link:hover {
+  background-color: #e6e6e6;
+}
+
+.jsw-footer .jsw-footer-cta-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Variant A (Phase 5 layout) ---- */
+
+/* this block at the top left, taking the room the columns leave; the columns, then CONNECT, at
+   the top right; the privacy policy at the foot on the left */
+.section.jsw-footer-section.variant-phase-5 {
+  align-items: flex-start;
   column-gap: calc(40 * var(--jsw-footer-unit));
   min-height: calc(500 * var(--jsw-footer-unit));
   padding: calc(37 * var(--jsw-footer-unit)) calc(54 * var(--jsw-footer-unit)) calc(39 * var(--jsw-footer-unit)) calc(42 * var(--jsw-footer-unit));
 }
 
-.jsw-footer.variant-phase-5 .jsw-footer-brand {
-  grid-area: 1 / 1;
-  min-width: 0;
+.section.jsw-footer-section.variant-phase-5 > .jsw-footer-wrapper {
+  flex: 1 1 auto;
+  order: -1;
 }
 
-.jsw-footer.variant-phase-5 .jsw-footer-logo {
-  line-height: 0;
+.section.jsw-footer-section.variant-phase-5 > .jsw-footer-column-wrapper {
+  flex: 0 0 calc(157 * var(--jsw-footer-unit));
+}
+
+.section.jsw-footer-section.variant-phase-5 > .jsw-footer-social-wrapper {
+  flex: 0 0 auto;
+  order: 1;
 }
 
 .jsw-footer.variant-phase-5 .jsw-footer-logo img {
   width: calc(164 * var(--jsw-footer-unit));
-  height: auto;
   margin-top: calc(2 * var(--jsw-footer-unit));
 }
 
@@ -182,135 +197,31 @@ html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
   color: rgb(255 255 255 / 80%);
   font-size: calc(11 * var(--jsw-footer-unit));
   line-height: 1.4;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
 }
 
-/* the CTA: a white button, its "+" after the text */
+/* the CTA: its "+" after the text */
 .jsw-footer.variant-phase-5 .jsw-footer-cta {
   margin-top: calc(51 * var(--jsw-footer-unit));
 }
 
 .jsw-footer.variant-phase-5 a.jsw-footer-cta-link:any-link {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
   gap: calc(16 * var(--jsw-footer-unit));
-  max-width: 100%;
   height: calc(39 * var(--jsw-footer-unit));
   padding: 0 calc(24 * var(--jsw-footer-unit));
   border-radius: calc(6 * var(--jsw-footer-unit));
   color: #2b2b2b;
-  background-color: #fff;
   font-size: calc(11.5 * var(--jsw-footer-unit));
-  line-height: 1;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: background-color 0.2s ease;
-}
-
-.jsw-footer.variant-phase-5 a.jsw-footer-cta-link:hover {
-  background-color: #e6e6e6;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-cta-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .jsw-footer.variant-phase-5 .jsw-footer-cta-plus {
   font-size: calc(15 * var(--jsw-footer-unit));
 }
 
-/* the navigation: the columns side by side, 197px apart, CONNECT last */
-.jsw-footer.variant-phase-5 .jsw-footer-nav {
-  grid-area: 1 / 2;
-  display: flex;
-  align-items: flex-start;
-  gap: calc(40 * var(--jsw-footer-unit));
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-column {
-  width: calc(157 * var(--jsw-footer-unit));
-  min-width: 0;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-column.jsw-footer-connect {
-  width: auto;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-heading {
-  overflow: hidden;
-  color: #fff;
-  font-family: inherit;
-  font-size: calc(12.4 * var(--jsw-footer-unit));
-  font-weight: 400;
-  line-height: 1.3;
-  letter-spacing: 0;
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-links {
-  display: flex;
-  flex-direction: column;
-  gap: calc(10 * var(--jsw-footer-unit));
-  margin-top: calc(10 * var(--jsw-footer-unit));
-  list-style: none;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-link {
-  overflow: hidden;
-  color: rgb(255 255 255 / 65%);
-  font-size: calc(11 * var(--jsw-footer-unit));
-  line-height: 1.5;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-link a:hover,
-.jsw-footer.variant-phase-5 .jsw-footer-legal a:hover {
-  color: #fff;
-}
-
-/* the social icons: 36px dark tiles, 4px apart */
-.jsw-footer.variant-phase-5 .jsw-footer-social {
-  display: flex;
-  gap: calc(4 * var(--jsw-footer-unit));
-  margin-top: calc(17 * var(--jsw-footer-unit));
-  list-style: none;
-}
-
-.jsw-footer.variant-phase-5 a.jsw-footer-social-link:any-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(36 * var(--jsw-footer-unit));
-  height: calc(36 * var(--jsw-footer-unit));
-  border-radius: calc(6 * var(--jsw-footer-unit));
-  background-color: rgb(255 255 255 / 9%);
-  transition: background-color 0.2s ease;
-}
-
-.jsw-footer.variant-phase-5 a.jsw-footer-social-link:hover {
-  background-color: rgb(255 255 255 / 18%);
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-social-link picture {
-  display: contents;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-social-link img {
-  width: calc(15 * var(--jsw-footer-unit));
-  height: calc(15 * var(--jsw-footer-unit));
-  object-fit: contain;
-}
-
-/* the privacy policy: small mono capitals, underlined */
+/* the privacy policy: small mono capitals, underlined, at the foot of the footer (the section) */
 .jsw-footer.variant-phase-5 .jsw-footer-legal {
-  grid-area: 3 / 1 / 4 / 3;
-  align-self: end;
+  position: absolute;
+  bottom: calc(39 * var(--jsw-footer-unit));
+  left: calc(42 * var(--jsw-footer-unit));
   color: rgb(255 255 255 / 70%);
   font-family: var(--jsw-footer-font-mono);
   font-size: calc(10 * var(--jsw-footer-unit));
@@ -322,90 +233,94 @@ html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
   text-underline-offset: calc(2 * var(--jsw-footer-unit));
 }
 
-/* tablets: the branding, then the navigation, then the privacy policy, one under the other */
+/* tablets: this block across, then the columns side by side, then the privacy policy */
 @media (max-width: 899.98px) {
-  .jsw-footer.variant-phase-5 .jsw-footer-inner {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto 1fr auto;
-    row-gap: 48px;
-    min-height: 520px;
-    padding: 40px 32px 32px;
-  }
-
-  .jsw-footer.variant-phase-5 .jsw-footer-nav {
-    grid-area: 2 / 1;
+  /* the rows packed at the top (a wrapping footer taller than its rows would share the room out
+     between them) */
+  .section.jsw-footer-section.variant-phase-5 {
     flex-wrap: wrap;
-    row-gap: 32px;
+    align-content: flex-start;
+    gap: 32px 40px;
+    min-height: 520px;
+    padding: 40px 32px 96px;
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-legal {
-    grid-area: 4 / 1;
+  .section.jsw-footer-section.variant-phase-5 > .jsw-footer-wrapper {
+    flex: 0 0 100%;
+    margin-bottom: 16px;
   }
 
   .jsw-footer.variant-phase-5 .jsw-footer-cta {
     margin-top: 32px;
   }
+
+  .jsw-footer.variant-phase-5 .jsw-footer-legal {
+    bottom: 32px;
+    left: 32px;
+  }
 }
 
 /* phones: the columns two a row, CONNECT across */
 @media (max-width: 599.98px) {
-  .jsw-footer.variant-phase-5 .jsw-footer-inner {
-    row-gap: 40px;
-    min-height: 0;
-    padding: 36px 20px 28px;
-  }
-
-  .jsw-footer.variant-phase-5 .jsw-footer-nav {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .section.jsw-footer-section.variant-phase-5 {
     gap: 28px 20px;
+    min-height: 0;
+    padding: 36px 20px 145px;
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-column {
-    width: auto;
+  .section.jsw-footer-section.variant-phase-5 > .jsw-footer-wrapper {
+    margin-bottom: 12px;
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-column.jsw-footer-connect {
-    grid-column: 1 / -1;
+  .section.jsw-footer-section.variant-phase-5 > .jsw-footer-column-wrapper {
+    flex: 0 0 calc(50% - 10px);
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-legal {
-    margin-top: 24px;
-    font-size: 11px;
-  }
-
-  /* the small texts a little larger, to read on a phone */
-  .jsw-footer.variant-phase-5 .jsw-footer-heading {
-    font-size: 14px;
-  }
-
-  .jsw-footer.variant-phase-5 .jsw-footer-link {
-    font-size: 13px;
+  .section.jsw-footer-section.variant-phase-5 > .jsw-footer-social-wrapper {
+    flex: 0 0 100%;
   }
 
   .jsw-footer.variant-phase-5 .jsw-footer-copyright,
   .jsw-footer.variant-phase-5 a.jsw-footer-cta-link:any-link {
     font-size: 12px;
   }
+
+  .jsw-footer.variant-phase-5 .jsw-footer-legal {
+    bottom: 27px;
+    left: 20px;
+    font-size: 11px;
+  }
 }
 
-/* ---- Phase 3 layout (values from /jsw-phase-3's footer) ---- */
+/* ---- Variant B (Phase 3 layout; values from /jsw-phase-3's footer) ---- */
 
-/* the gradient for a background (no photo); the texts in the site face */
-.jsw-footer.variant-phase-3 {
+/* the gradient for a background (no photo), the texts in the site face; phones and tablets: this
+   block across (the branding, then the CTA), then the columns side by side, CONNECT first */
+.section.jsw-footer-section.variant-phase-3 {
   --jsw-footer-edge: 20px;
 
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-start;
+  gap: 36px 56px;
+  padding: 40px var(--jsw-footer-edge) 120px;
   background: linear-gradient(180deg, #050505 0%, #050505 28%, #06363b 62%, #0c7d88 88%, #12a0ab 100%);
   font-family: inter, 'Helvetica Neue', arial, sans-serif;
 }
 
-/* phones and tablets: branding, CTA, then the columns, one under the other (phones: below) */
+.section.jsw-footer-section.variant-phase-3 > .jsw-footer-wrapper {
+  flex: 0 0 100%;
+  order: -1;
+}
+
+.section.jsw-footer-section.variant-phase-3 > .jsw-footer-column-wrapper {
+  order: 1;
+}
+
 .jsw-footer.variant-phase-3 .jsw-footer-inner {
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 36px;
-  padding: 40px var(--jsw-footer-edge) 120px;
 }
 
 .jsw-footer.variant-phase-3 .jsw-footer-brand {
@@ -417,20 +332,16 @@ html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
 
 .jsw-footer.variant-phase-3 .jsw-footer-logo {
   margin-bottom: 6px;
-  line-height: 0;
 }
 
 .jsw-footer.variant-phase-3 .jsw-footer-logo img {
   width: 160px;
-  height: auto;
 }
 
 .jsw-footer.variant-phase-3 .jsw-footer-copyright {
   color: rgb(255 255 255 / 70%);
   font-size: 12px;
   line-height: 1.5;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
 }
 
 /* the privacy policy under the branding, in small mono capitals */
@@ -441,40 +352,21 @@ html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
   letter-spacing: 0.08em;
 }
 
-.jsw-footer.variant-phase-3 .jsw-footer-legal a:hover,
-.jsw-footer.variant-phase-3 .jsw-footer-link a:hover {
-  color: #fff;
+.jsw-footer.variant-phase-3 .jsw-footer-legal a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-/* the CTA: a white button, its "+" before the text */
+/* the CTA: its "+" before the text */
 .jsw-footer.variant-phase-3 a.jsw-footer-cta-link:any-link {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
   gap: 10px;
-  max-width: 100%;
   height: 38px;
   padding: 0 18px;
   border-radius: 8px;
   color: #111;
-  background-color: #fff;
   font-family: var(--jsw-footer-font-mono);
   font-size: 12px;
-  line-height: 1;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.jsw-footer.variant-phase-3 a.jsw-footer-cta-link:hover {
-  background-color: #e6e6e6;
-}
-
-.jsw-footer.variant-phase-3 .jsw-footer-cta-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .jsw-footer.variant-phase-3 .jsw-footer-cta-plus {
@@ -482,86 +374,29 @@ html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
   font-size: 15px;
 }
 
-/* the columns: CONNECT first, side by side */
-.jsw-footer.variant-phase-3 .jsw-footer-nav {
-  display: grid;
-  grid-auto-columns: minmax(0, max-content);
-  grid-auto-flow: column;
-  gap: 56px;
-}
-
-.jsw-footer.variant-phase-3 .jsw-footer-column {
-  min-width: 0;
-}
-
-.jsw-footer.variant-phase-3 .jsw-footer-heading {
-  margin-bottom: 10px;
-  overflow: hidden;
-  color: #fff;
-  font-family: jsw-footer-display, michroma, 'Helvetica Neue', arial, sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.3;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.jsw-footer.variant-phase-3 .jsw-footer-links {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  list-style: none;
-  color: rgb(255 255 255 / 70%);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.jsw-footer.variant-phase-3 .jsw-footer-link {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
 /* phones ("M / Footer 375x815"): a screen tall (at most 815px, as the frame, so the editor's
    growing canvas is not stretched) on the gradient; from the top: the columns, the CTA, then the
    branding with the privacy policy last */
 @media (max-width: 599.98px) {
-  .jsw-footer.variant-phase-3 .jsw-footer-inner {
-    align-content: end;
-    gap: 0;
+  .section.jsw-footer-section.variant-phase-3 {
+    align-content: flex-end;
+    gap: 24px 32px;
     min-height: min(100vh, 815px);
     min-height: min(100svh, 815px);
     padding: min(120px, 14.7vh) 24px 34px;
     padding: min(120px, 14.7svh) 24px 34px;
   }
 
-  /* two columns a row, each as wide as its texts (a long heading such as TECHNOLOGY keeps to its
-     column: the headings 15px, not the frame's 17px for its two short ones) */
-  .jsw-footer.variant-phase-3 .jsw-footer-nav {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(2, minmax(0, max-content));
-    order: 1;
-    gap: 24px 32px;
-  }
-
-  .jsw-footer.variant-phase-3 .jsw-footer-heading {
-    margin-bottom: 12px;
-    font-size: 15px;
-    letter-spacing: 0.02em;
-  }
-
-  .jsw-footer.variant-phase-3 .jsw-footer-links {
-    gap: 9px;
-    color: rgb(255 255 255 / 80%);
-    font-size: 13px;
-  }
-
-  .jsw-footer.variant-phase-3 .jsw-footer-cta {
+  .section.jsw-footer-section.variant-phase-3 > .jsw-footer-wrapper {
     order: 2;
-    margin-top: min(72px, 8.8vh);
-    margin-top: min(72px, 8.8svh);
+    margin-top: min(48px, 5.9vh);
+    margin-top: min(48px, 5.9svh);
+  }
+
+  .jsw-footer.variant-phase-3 .jsw-footer-inner {
+    flex-direction: column-reverse;
+    gap: min(140px, 17.2vh);
+    gap: min(140px, 17.2svh);
   }
 
   .jsw-footer.variant-phase-3 a.jsw-footer-cta-link:any-link {
@@ -571,10 +406,7 @@ html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
   }
 
   .jsw-footer.variant-phase-3 .jsw-footer-brand {
-    order: 3;
     gap: 10px;
-    margin-top: min(140px, 17.2vh);
-    margin-top: min(140px, 17.2svh);
   }
 
   .jsw-footer.variant-phase-3 .jsw-footer-logo {
@@ -601,24 +433,25 @@ html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
   }
 }
 
-/* desktop: branding at the left, the CTA in the centre, the columns at the right */
+/* desktop: the branding at the left, the CTA in the centre of the footer, the columns at the
+   right */
 @media (min-width: 900px) {
-  .jsw-footer.variant-phase-3 {
+  .section.jsw-footer-section.variant-phase-3 {
     --jsw-footer-edge: 5.4vw;
-  }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-inner {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: start;
+    flex-wrap: nowrap;
+    column-gap: 64px;
     padding: 28px var(--jsw-footer-edge) 150px;
   }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-cta {
-    padding-top: 6px;
+  .section.jsw-footer-section.variant-phase-3 > .jsw-footer-wrapper {
+    flex: 1 1 auto;
   }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-nav {
-    justify-self: end;
-    gap: 64px;
+  .jsw-footer.variant-phase-3 .jsw-footer-cta {
+    position: absolute;
+    top: 34px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }

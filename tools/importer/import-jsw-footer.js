@@ -3,12 +3,13 @@
 
 /**
  * JSW footer page (/jsw-footer), from the "Desktop Footer" design frame (no source site: the
- * fetched document is ignored): one jsw-footer block, the footer of the JSW pages (scripts.js
- * loads this page as their footer, instead of the site's). The block's fields (grouped in four cells:
- * media | brand | actions | connect), then its items: the Footer Columns, each followed by its
- * Footer Links, and the Social Icons. Every item row starts with its item type (jsw-footer-column,
- * jsw-footer-link, jsw-footer-social) so md2jcr (the conversion to AEM content) creates it as that
- * item; the block's code reads and drops it. The background was cut from the design.
+ * fetched document is ignored): the footer of the JSW pages (scripts.js loads this page as their
+ * footer, instead of the site's), one section holding:
+ *   - a jsw-footer block: its fields, grouped in three cells (media | brand | actions);
+ *   - a jsw-footer-column block for each navigation column: its heading, then its Footer Links;
+ *   - a jsw-footer-social block: its heading (CONNECT), then its Social Icons.
+ * Each column and the social block hold their own items (one item type each, so md2jcr, the
+ * conversion to AEM content, needs no type cell). The background was cut from the design.
  */
 
 const IMG = 'images/jsw';
@@ -70,7 +71,6 @@ const SOCIALS = [
 
 export default {
   transform: ({ document }) => {
-    const typed = (id, cells) => [document.createTextNode(id), ...cells];
     const cells = [
       [group(document, [
         ['media_footerVariant', el(document, 'p', 'variant-phase-5')],
@@ -85,19 +85,32 @@ export default {
         ['actions_ctaButton', link(document, '/jsw-phase-3#register-interest', 'REGISTER INTEREST')],
         ['actions_privacyPolicy', link(document, '#privacy-policy', 'PRIVACY POLICY')],
       ])],
-      [hinted(document, 'connectHeading', [el(document, 'p', 'CONNECT')])],
-      ...COLUMNS.flatMap(([heading, links]) => [
-        typed('jsw-footer-column', [hinted(document, 'columnHeading', [el(document, 'p', heading)])]),
-        ...links.map(([text, href]) => typed('jsw-footer-link', [hinted(document, 'link', [link(document, href, text)])])),
-      ]),
-      ...SOCIALS.map(([file, name, href]) => typed('jsw-footer-social', [
-        hinted(document, 'iconImage', [image(document, file, name)]),
-        hinted(document, 'iconLink', [link(document, href, href)]),
-      ])),
     ];
 
+    // the columns: each its heading, then its links
+    const columns = COLUMNS.map(([heading, links]) => WebImporter.Blocks.createBlock(document, {
+      name: 'jsw-footer-column',
+      cells: [
+        [hinted(document, 'columnHeading', [el(document, 'p', heading)])],
+        ...links.map(([text, href]) => [hinted(document, 'link', [link(document, href, text)])]),
+      ],
+    }));
+
+    // the social links: their heading, then the icons
+    const social = WebImporter.Blocks.createBlock(document, {
+      name: 'jsw-footer-social',
+      cells: [
+        [hinted(document, 'connectHeading', [el(document, 'p', 'CONNECT')])],
+        ...SOCIALS.map(([file, name, href]) => [
+          hinted(document, 'iconImage', [image(document, file, name)]),
+          hinted(document, 'iconLink', [link(document, href, href)]),
+        ]),
+      ],
+    });
+
+    // one section: the footer
     const main = document.createElement('div');
-    main.append(WebImporter.Blocks.createBlock(document, { name: 'jsw-footer', cells }));
+    main.append(WebImporter.Blocks.createBlock(document, { name: 'jsw-footer', cells }), ...columns, social);
     return [{ element: main, path: '/jsw-footer', report: { title: 'jsw-footer' } }];
   },
 };
