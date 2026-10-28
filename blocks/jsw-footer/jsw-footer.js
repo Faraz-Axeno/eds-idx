@@ -1,13 +1,18 @@
 /*
- * jsw-footer: the JSW footer ("Desktop Footer"), authored once on its own page (/jsw-footer) and
- * shown as the footer of the JSW pages (scripts.js, loadJswFooter: in their <footer>, instead of
- * the site's). A photo (or a muted looping video)
- * behind the whole footer; at the top left the logo, the copyright line and the CTA button; at
- * the top right the navigation columns and the social icons (CONNECT); at the foot, on the
- * left, the privacy policy link.
+ * jsw-footer: the JSW footer, authored once on its own page (/jsw-footer) and shown as the footer
+ * of the JSW pages (scripts.js, loadJswFooter: in their <footer>, instead of the site's). In one of
+ * two layouts, its Footer layout field (a class on the block, jsw-footer.css), from the same
+ * content:
+ *   variant-phase-5 ("Desktop Footer", the default): a photo (or a muted looping video) behind the
+ *     whole footer; at the top left the logo, the copyright line and the CTA button; at the top
+ *     right the navigation columns and the social icons (CONNECT); at the foot, on the left, the
+ *     privacy policy link
+ *   variant-phase-3 (the Phase 3 footer): on a gradient (no photo); at the left the logo, the
+ *     copyright line and the privacy policy link; the CTA button in the centre; at the right
+ *     CONNECT (the social links as text, their network names) and the navigation columns
  * Rows (model, _jsw-footer.json):
  *   the block's fields, four cells, in this order:
- *     background type | background image (+ alt) | background video
+ *     footer layout | background type | background image (+ alt) | background video
  *     logo (+ alt) | copyright text
  *     CTA button link + text | privacy policy link + text
  *     social heading (CONNECT)
@@ -35,6 +40,9 @@ const TEXT_LIMITS = {
 };
 
 const ITEM_TYPE = /^jsw-footer-(column|link|social)$/;
+
+// the layouts (the Footer layout field's values, and the block's class); the first the default
+const VARIANTS = ['variant-phase-5', 'variant-phase-3'];
 const VIDEO_TYPES = {
   mp4: 'video/mp4',
   m4v: 'video/mp4',
@@ -171,7 +179,14 @@ function buildMedia(cell) {
   return media;
 }
 
-/** the top left: logo, copyright line, CTA button (the first link of the actions cell) */
+/** the layout: the Footer layout field (in the first cell), else a class, else the default */
+function variantOf(block, mediaCell) {
+  const chosen = textsOf(mediaCell).map((n) => n.textContent.trim().toLowerCase())
+    .find((t) => VARIANTS.includes(t));
+  return chosen || VARIANTS.find((v) => block.classList.contains(v)) || VARIANTS[0];
+}
+
+/** the logo and copyright line, and the CTA button (the first link of the actions cell) */
 function buildBrand(brandCell, ctaLink, editing) {
   const brand = el('div', 'jsw-footer-brand');
   const logo = el('p', 'jsw-footer-logo');
@@ -194,8 +209,8 @@ function buildBrand(brandCell, ctaLink, editing) {
     a.replaceChildren(label, plus);
     cta.append(a);
   }
-  brand.append(logo, copyright, cta);
-  return brand;
+  brand.append(logo, copyright);
+  return { brand, cta };
 }
 
 /** the privacy policy link (the second link of the actions cell), at the foot */
@@ -234,14 +249,21 @@ function buildLink(row, editing) {
   return item;
 }
 
-function buildSocial(row) {
-  const item = el('li', 'jsw-footer-social-item');
+/** a Social Icon: its icon in a tile, or (asText, the Phase 3 layout) its network name as a link */
+function buildSocial(row, asText) {
+  const item = el('li', asText ? 'jsw-footer-link' : 'jsw-footer-social-item');
   moveInstrumentation(row, item);
   const picture = row.querySelector('picture');
   const img = picture?.querySelector('img');
   const name = img?.getAttribute('alt')?.trim() || '';
   const authored = row.querySelector('a');
   const a = authored ? external(plain(authored)) : el('a');
+  if (asText) {
+    a.removeAttribute('class');
+    a.textContent = name || a.textContent;
+    item.append(a);
+    return item;
+  }
   a.className = 'jsw-footer-social-link';
   if (name) a.setAttribute('aria-label', name);
   // the link reads as the network's name; the icon is its picture
@@ -260,9 +282,14 @@ export default function decorate(block) {
   const {
     media, brand, actions, connect, items,
   } = sortRows([...block.children]);
+  const variant = variantOf(block, media);
+  const phase3 = variant === 'variant-phase-3';
+  block.classList.remove(...VARIANTS);
+  block.classList.add(variant);
 
   const nav = el('nav', 'jsw-footer-nav', { 'aria-label': 'Footer' });
-  const socials = el('ul', 'jsw-footer-social');
+  // the social links: icons in tiles, or (Phase 3) a list of their names
+  const socials = el('ul', phase3 ? 'jsw-footer-links' : 'jsw-footer-social');
   let column = null;
   items.forEach(({ row, type }) => {
     if (type === 'column') {
@@ -277,22 +304,34 @@ export default function decorate(block) {
       }
       column.querySelector('.jsw-footer-links').append(buildLink(row, editing));
     } else {
-      socials.append(buildSocial(row));
+      socials.append(buildSocial(row, phase3));
     }
   });
 
-  // CONNECT: the social heading over the icons, the last column
+  // CONNECT: the social heading over the social links; the last column (Phase 3: the first)
   const connectColumn = el('div', 'jsw-footer-column jsw-footer-connect');
   const [connectNode] = textsOf(connect);
   const connectHeading = retag(connectNode, 'h2', 'jsw-footer-heading');
   cap(connectHeading, TEXT_LIMITS.connectHeading, editing);
   connectColumn.append(connectHeading, socials);
-  nav.append(connectColumn);
+  if (phase3) nav.prepend(connectColumn);
+  else nav.append(connectColumn);
 
   // the actions cell's links, read before either is moved: the CTA button, the privacy policy
   const [ctaLink, privacyLink] = [...(actions?.querySelectorAll('a') || [])];
+  const { brand: branding, cta } = buildBrand(brand, ctaLink, editing);
+  const legal = buildLegal(privacyLink, editing);
   const inner = el('div', 'jsw-footer-inner');
-  inner.append(buildBrand(brand, ctaLink, editing), nav, buildLegal(privacyLink, editing));
-  block.replaceChildren(buildMedia(media), inner);
+  if (phase3) {
+    // branding (with the privacy policy under it) | the CTA, centred | the columns; no photo
+    branding.append(legal);
+    inner.append(branding, cta, nav);
+    block.replaceChildren(inner);
+  } else {
+    // branding with the CTA under it | the columns; the privacy policy at the foot
+    branding.append(cta);
+    inner.append(branding, nav, legal);
+    block.replaceChildren(buildMedia(media), inner);
+  }
   if (editing) block.classList.add('jsw-footer-editing');
 }

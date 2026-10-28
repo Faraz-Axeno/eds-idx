@@ -75,6 +75,7 @@ var CustomImportScript = (() => {
       const typed = (id, cells2) => [document.createTextNode(id), ...cells2];
       const cells = [
         [group(document, [
+          ["media_footerVariant", el(document, "p", "variant-phase-5")],
           ["media_backgroundMode", el(document, "p", "image")],
           ["media_backgroundImage", image(document, "jsw-footer-bg.jpg", "")]
         ])],

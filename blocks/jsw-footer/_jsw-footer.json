@@ -68,6 +68,25 @@
       "fields": [
         {
           "component": "select",
+          "name": "media_footerVariant",
+          "label": "Footer layout",
+          "description": "Phase 5 Layout: the photo (or video) behind; the logo, copyright and button at the left, the columns and social icons at the right. Phase 3 Layout: the black-to-teal gradient (no photo); the logo, copyright and privacy policy at the left, the button in the centre, CONNECT (the social links as text) and the columns at the right. Both use the same content below.",
+          "valueType": "string",
+          "value": "variant-phase-5",
+          "required": true,
+          "options": [
+            {
+              "name": "Phase 5 Layout",
+              "value": "variant-phase-5"
+            },
+            {
+              "name": "Phase 3 Layout",
+              "value": "variant-phase-3"
+            }
+          ]
+        },
+        {
+          "component": "select",
           "name": "media_backgroundMode",
           "label": "Background type",
           "description": "Image: the background image. Video: the background video, playing muted on a loop (the background image shows until it plays, and instead of it if it cannot).",
