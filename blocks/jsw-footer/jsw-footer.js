@@ -240,11 +240,12 @@ function buildMedia(cell) {
   if (!cell) return media;
   const picture = cell.querySelector('picture');
   const mode = textsOf(cell).map((n) => n.textContent.trim().toLowerCase())
-    .find((t) => t === 'image' || t === 'video') || 'image';
+    .find((t) => t === 'image' || t === 'video' || t === 'both') || 'image';
   const videoUrl = cell.querySelector('a')?.href;
   if (picture) media.append(picture);
   const ext = videoUrl?.split(/[?#]/)[0].split('.').pop().toLowerCase();
-  if (mode !== 'video' || !videoUrl) return media;
+  // Video, or Image and video (for now shown as Video): the video over the picture
+  if (mode === 'image' || !videoUrl) return media;
 
   const video = el('video', 'jsw-footer-video', {
     loop: '', muted: '', playsinline: '', 'aria-hidden': 'true', preload: 'none',
@@ -326,7 +327,7 @@ function buildLegal(link, editing) {
   return legal;
 }
 
-const MODES = ['image', 'video'];
+const MODES = ['image', 'video', 'both'];
 
 /**
  * the block's four cells (the model now): media (with the starting content after its own

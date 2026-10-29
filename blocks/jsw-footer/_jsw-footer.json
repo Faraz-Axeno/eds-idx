@@ -74,7 +74,7 @@
           "component": "select",
           "name": "media_backgroundMode",
           "label": "Background type",
-          "description": "Image: the background image. Video: the background video, playing muted on a loop (the background image shows until it plays, and instead of it if it cannot).",
+          "description": "Image: the background image. Video: the background video, playing muted on a loop (the background image shows until it plays, and instead of it if it cannot). Image and video: both the background image and the background video (shown as Video for now).",
           "valueType": "string",
           "value": "image",
           "required": true,
@@ -86,6 +86,10 @@
             {
               "name": "Video",
               "value": "video"
+            },
+            {
+              "name": "Image and video",
+              "value": "both"
             }
           ]
         },
@@ -94,7 +98,7 @@
           "valueType": "string",
           "name": "media_backgroundImage",
           "label": "Background image",
-          "description": "Covers the whole footer (with Video: shown until the video plays).",
+          "description": "Covers the whole footer (with Video, or Image and video: shown until the video plays).",
           "multi": false,
           "required": true
         },
@@ -114,13 +118,25 @@
           "valueType": "string",
           "name": "media_backgroundVideo",
           "label": "Background video",
-          "description": "An MP4 video from Assets, or its full URL. Used when Background type is Video.",
+          "description": "An MP4 video from Assets, or its full URL. Used when Background type is Video, or Image and video.",
           "condition": {
-            "===": [
+            "or": [
               {
-                "var": "media_backgroundMode"
+                "===": [
+                  {
+                    "var": "media_backgroundMode"
+                  },
+                  "video"
+                ]
               },
-              "video"
+              {
+                "===": [
+                  {
+                    "var": "media_backgroundMode"
+                  },
+                  "both"
+                ]
+              }
             ]
           }
         },
