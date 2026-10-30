@@ -120,21 +120,25 @@ body.jsw-footer-page main:not([data-aue-resource]) {
   outline-offset: 2px;
 }
 
-/* in Universal Editor: icons over the limit (MAX_ITEMS, jsw-footer.js; never on the page) and
-   items not filled in yet (a placeholder to select them by) shown only while editing (the editor
-   marks it with adobe-ue-edit), the first dimmed; hidden in its Preview mode */
+/* in Universal Editor: icons over the limit (MAX_ITEMS, jsw-footer.js) or missing their image,
+   network name or URL (never on the page), and items not filled in yet (a placeholder to select
+   them by) shown only while editing (the editor marks it with adobe-ue-edit), the first two
+   dimmed; hidden in its Preview mode */
 .jsw-footer li.is-over-limit,
+.jsw-footer li.is-incomplete,
 .jsw-footer li.is-empty,
 .jsw-footer .jsw-footer-placeholder {
   display: none;
 }
 
 html.adobe-ue-edit .jsw-footer li.is-over-limit,
+html.adobe-ue-edit .jsw-footer li.is-incomplete,
 html.adobe-ue-edit .jsw-footer li.is-empty {
   display: list-item;
 }
 
-html.adobe-ue-edit .jsw-footer li.is-over-limit {
+html.adobe-ue-edit .jsw-footer li.is-over-limit,
+html.adobe-ue-edit .jsw-footer li.is-incomplete {
   opacity: 0.45;
 }
 

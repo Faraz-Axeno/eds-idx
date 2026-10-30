@@ -544,12 +544,28 @@ function buildHeading(node, editing) {
   return heading;
 }
 
-/** a column: its heading, then its first MAX_ITEMS links */
+/**
+ * a link with both its text and its URL: one with only its URL (a link field without its text
+ * shows its URL as its text) or only its text (no link) is not shown
+ */
+function isCompleteLink(a) {
+  const href = a?.getAttribute('href')?.trim();
+  const text = a?.textContent.trim();
+  return Boolean(href && text && text !== href && text !== a.href);
+}
+
+/** an icon with its image, its network name (its label: the link reads as it) and its URL */
+function isCompleteIcon({ picture, link }) {
+  const name = picture?.querySelector('img')?.getAttribute('alt')?.trim();
+  return Boolean(picture && name && link?.getAttribute('href')?.trim());
+}
+
+/** a column: its heading, then its first MAX_ITEMS links that have both their text and URL */
 function buildColumn({ heading, links }, editing) {
   const column = el('div', 'jsw-footer-column');
   if (heading) column.append(buildHeading(heading, editing));
   const list = el('ul', 'jsw-footer-links');
-  links.slice(0, MAX_ITEMS).forEach((a) => {
+  links.filter(isCompleteLink).slice(0, MAX_ITEMS).forEach((a) => {
     const item = el('li', 'jsw-footer-link');
     external(plain(a));
     a.classList.remove('button', 'primary', 'secondary');
@@ -569,9 +585,11 @@ function buildSocial({ heading, icons }, asText, editing, keepAll = false) {
   const column = el('div', 'jsw-footer-column jsw-footer-connect');
   if (heading) column.append(buildHeading(heading, editing));
   const list = el('ul', asText ? 'jsw-footer-links' : 'jsw-footer-social');
-  const shown = keepAll ? icons
-    : icons.filter(({ picture, link }) => picture || link).slice(0, MAX_ITEMS);
+  // on the page: the first MAX_ITEMS icons with their image, network name and URL; in the editor
+  // (keepAll) every icon, those missing one of them marked (shown only while editing)
+  const shown = keepAll ? icons : icons.filter(isCompleteIcon).slice(0, MAX_ITEMS);
   shown.forEach(({ picture, link }) => {
+    const incomplete = !isCompleteIcon({ picture, link });
     if (!picture && !link) {
       // in the editor, an Icon not filled in yet
       const item = el('li', `${asText ? 'jsw-footer-link' : 'jsw-footer-social-item'} is-empty`);
@@ -585,6 +603,10 @@ function buildSocial({ heading, icons }, asText, editing, keepAll = false) {
     const name = img?.getAttribute('alt')?.trim() || '';
     const a = link ? external(plain(link)) : el('a');
     const item = el('li', asText ? 'jsw-footer-link' : 'jsw-footer-social-item');
+    if (incomplete) {
+      item.classList.add('is-incomplete');
+      item.title = 'Not shown on the page: an icon needs its image, network name and URL.';
+    }
     if (asText) {
       a.removeAttribute('class');
       a.textContent = name || a.textContent;
@@ -707,7 +729,7 @@ export default function decorate(block) {
     // ones dimmed (never on the page)
     let filled = 0;
     [...connect.querySelectorAll('ul > li')].forEach((item, i) => {
-      const { row, picture, link } = social.icons[i] || {};
+      const { row, picture } = social.icons[i] || {};
       if (!row) return;
       moveInstrumentation(row, item);
       // the icon's own field, its image, in the tree under the Icon (its link, around the image
@@ -720,7 +742,8 @@ export default function decorate(block) {
       const name = picture?.querySelector('img')?.getAttribute('alt')?.trim()
         || item.querySelector('a')?.getAttribute('aria-label') || '';
       item.dataset.aueLabel = `Icon: ${name || 'New icon'}`;
-      if (picture || link) {
+      // the icons shown on the page (complete ones) counted against the limit
+      if (!item.classList.contains('is-incomplete') && !item.classList.contains('is-empty')) {
         filled += 1;
         if (filled > MAX_ITEMS) {
           item.classList.add('is-over-limit');
@@ -743,7 +766,8 @@ export default function decorate(block) {
   const legal = buildLegal(privacyLink, editing);
   const inner = el('div', 'jsw-footer-inner');
   if (phase3) {
-    // branding (with the privacy policy under it) | the CTA, centred | the columns; no photo
+    // branding (with the privacy policy under it) | the CTA, centred | the columns; on its
+    // gradient: the background image and video are not used, not even built (buildMedia)
     branding.append(legal);
     inner.append(branding, cta, nav);
     block.replaceChildren(inner);
