@@ -31,6 +31,10 @@
   --body-font-family: var(--mg-font-body);
   --heading-font-family: var(--mg-font-display);
 
+  /* the JSW footer's faces (styles/fonts.css), with their fallbacks */
+  --font-jsw-footer-text: jsw-footer-text, 'Helvetica Neue', arial, sans-serif;
+  --font-jsw-footer-display: jsw-footer-display, michroma, 'Helvetica Neue', arial, sans-serif;
+
   /* body sizes */
   --body-font-size-m: 22px;
   --body-font-size-s: 19px;
