@@ -236,7 +236,7 @@ function readSiblingBlocks(block) {
 
 /** the background: the picture, or the video over it (the picture until it plays) */
 function buildMedia(cell) {
-  const media = el('div', 'jsw-footer-media');
+  const media = el('div', 'media');
   if (!cell) return media;
   const picture = cell.querySelector('picture');
   const mode = textsOf(cell).map((n) => n.textContent.trim().toLowerCase())
@@ -247,7 +247,7 @@ function buildMedia(cell) {
   // Video, or Image and video (for now shown as Video): the video over the picture
   if (mode === 'image' || !videoUrl) return media;
 
-  const video = el('video', 'jsw-footer-video', {
+  const video = el('video', 'video', {
     loop: '', muted: '', playsinline: '', 'aria-hidden': 'true', preload: 'none',
   });
   video.muted = true;
@@ -290,23 +290,23 @@ function variantOf(block, mediaCell) {
 
 /** the logo and copyright line, and the CTA button (the first link of the actions cell) */
 function buildBrand(brandCell, ctaLink, editing) {
-  const brand = el('div', 'jsw-footer-brand');
-  const logo = el('p', 'jsw-footer-logo');
+  const brand = el('div', 'brand');
+  const logo = el('p', 'logo');
   const picture = brandCell?.querySelector('picture');
   if (picture) logo.append(picture);
   const [copyrightNode] = textsOf(brandCell);
-  const copyright = retag(copyrightNode, 'p', 'jsw-footer-copyright');
+  const copyright = retag(copyrightNode, 'p', 'copyright');
   cap(copyright, TEXT_LIMITS.copyright, editing);
 
-  const cta = el('p', 'jsw-footer-cta');
+  const cta = el('p', 'cta');
   if (ctaLink) {
     const a = external(plain(ctaLink));
-    a.className = 'jsw-footer-cta-link';
+    a.className = 'cta-link';
     // the "+" is the design's, after the text: one typed at its end is not doubled
-    const label = el('span', 'jsw-footer-cta-text');
+    const label = el('span', 'cta-text');
     label.textContent = a.textContent.trim().replace(/\s*\+$/, '');
     cap(label, TEXT_LIMITS.ctaButtonText, editing);
-    const plus = el('span', 'jsw-footer-cta-plus', { 'aria-hidden': 'true' });
+    const plus = el('span', 'cta-plus', { 'aria-hidden': 'true' });
     plus.textContent = '+';
     a.replaceChildren(label, plus);
     cta.append(a);
@@ -317,10 +317,10 @@ function buildBrand(brandCell, ctaLink, editing) {
 
 /** the privacy policy link (the second link of the actions cell), at the foot */
 function buildLegal(link, editing) {
-  const legal = el('p', 'jsw-footer-legal');
+  const legal = el('p', 'legal');
   if (link) {
     const a = external(plain(link));
-    a.className = 'jsw-footer-legal-link';
+    a.className = 'legal-link';
     cap(a, TEXT_LIMITS.privacyPolicyText, editing);
     legal.append(a);
   }
@@ -378,7 +378,7 @@ function readFooterItems(rows) {
 
 /** in the editor, an empty item's place: something to select (never on the page) */
 function placeholder(text) {
-  const span = el('span', 'jsw-footer-placeholder');
+  const span = el('span', 'placeholder');
   span.textContent = text;
   return span;
 }
@@ -496,21 +496,21 @@ function instrumentNav(nav, block, {
   const base = block.dataset.aueResource;
   if (!base) return;
   stripInstrumentation(nav);
-  instrument(nav.querySelector('.jsw-footer-columns'), {
+  instrument(nav.querySelector('.nav-columns'), {
     resource: `${base}/footerColumns`, prop: 'footerColumns', type: 'container', filter: 'jsw-footer-columns', label: 'Columns',
   });
   if (columnsFromList) {
-    [...nav.querySelectorAll('.jsw-footer-columns > .jsw-footer-column')].forEach((column, i) => {
+    [...nav.querySelectorAll('.nav-columns > .column')].forEach((column, i) => {
       const path = `${base}/footerColumns/item${i}`;
-      const heading = column.querySelector('.jsw-footer-heading');
+      const heading = column.querySelector('.heading');
       instrument(column, {
         resource: path, type: 'component', model: 'jsw-footer-column', label: `Column: ${heading?.textContent.trim() || i + 1}`,
       });
       instrument(heading, { prop: 'columnHeading', type: 'text', label: 'Column title' });
-      instrument(column.querySelector('.jsw-footer-links'), {
+      instrument(column.querySelector('.links'), {
         resource: `${path}/columnLinks`, prop: 'columnLinks', type: 'container', filter: 'jsw-footer-links', label: 'Links',
       });
-      [...column.querySelectorAll('.jsw-footer-links > li')].forEach((item, j) => {
+      [...column.querySelectorAll('.links > li')].forEach((item, j) => {
         const a = item.querySelector('a');
         instrument(item, {
           resource: `${path}/columnLinks/item${j}`, type: 'component', model: 'jsw-footer-link', label: `Link: ${a?.textContent.trim() || j + 1}`,
@@ -519,8 +519,8 @@ function instrumentNav(nav, block, {
       });
     });
   }
-  const connect = nav.querySelector('.jsw-footer-connect');
-  instrument(connect?.querySelector('.jsw-footer-heading'), { prop: socialHeadingProp, type: 'text', label: 'Social heading' });
+  const connect = nav.querySelector('.connect');
+  instrument(connect?.querySelector('.heading'), { prop: socialHeadingProp, type: 'text', label: 'Social heading' });
   instrument(connect?.querySelector('ul'), {
     resource: `${base}/socialIcons`, prop: 'socialIcons', type: 'container', filter: 'jsw-footer-icons', label: 'Social icons',
   });
@@ -539,7 +539,7 @@ function instrumentNav(nav, block, {
 
 /** a heading of the navigation, from its authored text (its editor instrumentation kept) */
 function buildHeading(node, editing) {
-  const heading = retag(node, 'h2', 'jsw-footer-heading');
+  const heading = retag(node, 'h2', 'heading');
   cap(heading, TEXT_LIMITS.heading, editing);
   return heading;
 }
@@ -562,11 +562,11 @@ function isCompleteIcon({ picture, link }) {
 
 /** a column: its heading, then its first MAX_ITEMS links that have both their text and URL */
 function buildColumn({ heading, links }, editing) {
-  const column = el('div', 'jsw-footer-column');
+  const column = el('div', 'column');
   if (heading) column.append(buildHeading(heading, editing));
-  const list = el('ul', 'jsw-footer-links');
+  const list = el('ul', 'links');
   links.filter(isCompleteLink).slice(0, MAX_ITEMS).forEach((a) => {
-    const item = el('li', 'jsw-footer-link');
+    const item = el('li', 'link');
     external(plain(a));
     a.classList.remove('button', 'primary', 'secondary');
     cap(a, TEXT_LIMITS.linkText, editing);
@@ -582,9 +582,9 @@ function buildColumn({ heading, links }, editing) {
  * or (asText, Variant B) their networks' names as links
  */
 function buildSocial({ heading, icons }, asText, editing, keepAll = false) {
-  const column = el('div', 'jsw-footer-column jsw-footer-connect');
+  const column = el('div', 'column connect');
   if (heading) column.append(buildHeading(heading, editing));
-  const list = el('ul', asText ? 'jsw-footer-links' : 'jsw-footer-social');
+  const list = el('ul', asText ? 'links' : 'social-icons');
   // on the page: the first MAX_ITEMS icons with their image, network name and URL; in the editor
   // (keepAll) every icon, those missing one of them marked (shown only while editing)
   const shown = keepAll ? icons : icons.filter(isCompleteIcon).slice(0, MAX_ITEMS);
@@ -592,8 +592,8 @@ function buildSocial({ heading, icons }, asText, editing, keepAll = false) {
     const incomplete = !isCompleteIcon({ picture, link });
     if (!picture && !link) {
       // in the editor, an Icon not filled in yet
-      const item = el('li', `${asText ? 'jsw-footer-link' : 'jsw-footer-social-item'} is-empty`);
-      const a = el('a', asText ? '' : 'jsw-footer-social-link');
+      const item = el('li', `${asText ? 'link' : 'social-icon'} is-empty`);
+      const a = el('a', asText ? '' : 'social-link');
       a.append(placeholder(asText ? 'New icon' : '+'));
       item.append(a);
       list.append(item);
@@ -602,7 +602,7 @@ function buildSocial({ heading, icons }, asText, editing, keepAll = false) {
     const img = picture?.querySelector('img');
     const name = img?.getAttribute('alt')?.trim() || '';
     const a = link ? external(plain(link)) : el('a');
-    const item = el('li', asText ? 'jsw-footer-link' : 'jsw-footer-social-item');
+    const item = el('li', asText ? 'link' : 'social-icon');
     if (incomplete) {
       item.classList.add('is-incomplete');
       item.title = 'Not shown on the page: an icon needs its image, network name and URL.';
@@ -611,7 +611,7 @@ function buildSocial({ heading, icons }, asText, editing, keepAll = false) {
       a.removeAttribute('class');
       a.textContent = name || a.textContent;
     } else {
-      a.className = 'jsw-footer-social-link';
+      a.className = 'social-link';
       if (name) a.setAttribute('aria-label', name);
       // the link reads as the network's name; the icon is its picture
       if (img) img.alt = '';
@@ -705,9 +705,9 @@ export default function decorate(block) {
   if (!data) data = items.length ? readItems(items, navCell) : readNav(navCell);
   const { columns, social } = data;
 
-  const nav = el('nav', 'jsw-footer-nav', { 'aria-label': 'Footer' });
+  const nav = el('nav', 'nav', { 'aria-label': 'Footer' });
   // the columns, in a box-less wrapper (in the editor the Columns list's container)
-  const columnsList = el('div', 'jsw-footer-columns');
+  const columnsList = el('div', 'nav-columns');
   columns.filter((c) => c.heading || c.links.length || (editing && c.row))
     .forEach((c) => {
       const title = c.heading?.textContent.trim();
@@ -716,8 +716,8 @@ export default function decorate(block) {
         // the Column item: selectable, named by its title (an empty one shown as a placeholder)
         moveInstrumentation(c.row, column);
         column.dataset.aueLabel = `Column: ${title || 'New column'}`;
-        if (!title) column.prepend(el('h2', 'jsw-footer-heading'));
-        if (!title) column.querySelector('.jsw-footer-heading').append(placeholder('New column'));
+        if (!title) column.prepend(el('h2', 'heading'));
+        if (!title) column.querySelector('.heading').append(placeholder('New column'));
       }
       columnsList.append(column);
     });
@@ -764,7 +764,7 @@ export default function decorate(block) {
   const [ctaLink, privacyLink] = [...(actions?.querySelectorAll('a') || [])];
   const { brand: branding, cta } = buildBrand(brand, ctaLink, editing);
   const legal = buildLegal(privacyLink, editing);
-  const inner = el('div', 'jsw-footer-inner');
+  const inner = el('div', 'inner');
   if (phase3) {
     // branding (with the privacy policy under it) | the CTA, centred | the columns; on its
     // gradient: the background image and video are not used, not even built (buildMedia)
@@ -777,5 +777,5 @@ export default function decorate(block) {
     inner.append(branding, nav, legal);
     block.replaceChildren(buildMedia(media), inner);
   }
-  if (editing) block.classList.add('jsw-footer-editing');
+  if (editing) block.classList.add('editing');
 }

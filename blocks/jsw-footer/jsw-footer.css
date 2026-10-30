@@ -8,7 +8,11 @@
  *   variant-phase-3 — the Phase 3 footer ("NEV / Footer"): a black-to-teal gradient; the logo,
  *     copyright line and privacy policy at the left, the CTA button in the centre, CONNECT (the
  *     social links as text) and the navigation columns at the right
- * Shared rules first, then each layout's, scoped to its class.
+ * Native CSS nesting: the wrapper first, then one root, the block in its section's wrapper (in
+ * main on the footer's own page, in <footer> on the JSW pages), holding every rule: variables,
+ * the block's own styles, its parts (short class names, safe inside the root), the section and
+ * page around it (by :has(&)), the editor's states, each layout (&.variant-…) and the media
+ * queries. Only the @font-face rules stay outside: CSS does not allow them inside a style rule.
  */
 
 /* the text face until New Science is loaded: Michroma drawn at 80%, about as wide as New Science
@@ -27,42 +31,20 @@
   src: url('../../fonts/michroma.woff2') format('woff2');
 }
 
-/* full-bleed: the section and wrapper holding the footer (on the JSW pages in their <footer>, on
-   its own page in main) edge to edge, with no space around it */
-:is(main, footer) > .section:has(> .jsw-footer-wrapper),
-.jsw-footer-wrapper {
-  box-sizing: border-box;
-  width: 100%;
+/* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
+main > .section > .jsw-footer-wrapper {
   max-width: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
 
-/* on its own page the section as tall as the footer, not a screen tall (styles/styles.css) */
-main > .section:has(> .jsw-footer-wrapper) {
-  min-height: 0;
-}
-
-/* its own page (/jsw-footer, body class from scripts.js): dark, the footer at the foot of the
-   window (not in the editor, whose canvas grows to fit the page: a screen-tall page would grow it
-   without end) */
-body.jsw-footer-page {
-  background-color: #030506;
-}
-
-body.jsw-footer-page main:not([data-aue-resource]) {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: 100vh;
-  min-height: 100svh;
-}
-
-.jsw-footer {
+:is(main, footer) > .section > .jsw-footer-wrapper > .block {
+  /* 1. variables: desktop "units" (1px each in the 1280-wide frame), the faces */
   --jsw-footer-unit: 1px;
   --jsw-footer-font: new-science, jsw-footer-text, 'Helvetica Neue', arial, sans-serif;
   --jsw-footer-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
 
+  /* 2. the block */
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
@@ -75,555 +57,584 @@ body.jsw-footer-page main:not([data-aue-resource]) {
   background-color: #030506;
   font-family: var(--jsw-footer-font);
   letter-spacing: 0;
-}
 
-/* desktop: sized in "units", 1px each in the 1280-wide frame, so on narrower desktops the footer
-   shrinks as a whole (at least 0.7px); tablets and phones keep 1px units */
-@media (min-width: 900px) {
-  .jsw-footer {
+  /* the section holding the footer (on its own page in main, on the JSW pages in their
+     <footer>): edge to edge, with no space around it */
+  :is(main, footer) > .section:has(> .jsw-footer-wrapper > &) {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* on its own page the section as tall as the footer, not a screen tall (styles/styles.css) */
+  main > .section:has(> .jsw-footer-wrapper > &) {
+    min-height: 0;
+  }
+
+  /* its own page (/jsw-footer, body class from scripts.js): dark, the footer at the foot of the
+     window (not in the editor, whose canvas grows to fit the page: a screen-tall page would grow
+     it without end) */
+  body.jsw-footer-page:has(&) {
+    background-color: #030506;
+  }
+
+  body.jsw-footer-page main:not([data-aue-resource]):has(&) {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  /* desktop: the units follow the width, so on narrower desktops the footer shrinks as a whole
+     (at least 0.7px); tablets and phones keep 1px units */
+  @media (min-width: 900px) {
     --jsw-footer-unit: clamp(0.7px, calc(100vw / 1280), 1px);
   }
-}
 
-/* the background: the picture (or the video over it) covering the whole footer */
-.jsw-footer .jsw-footer-media,
-.jsw-footer .jsw-footer-media picture,
-.jsw-footer .jsw-footer-media img,
-.jsw-footer .jsw-footer-media video {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-}
+  /* 3. the parts */
 
-.jsw-footer .jsw-footer-media img,
-.jsw-footer .jsw-footer-media video {
-  object-fit: cover;
-  object-position: center bottom;
-}
-
-.jsw-footer p,
-.jsw-footer h2,
-.jsw-footer ul {
-  margin: 0;
-  padding: 0;
-}
-
-.jsw-footer a:any-link {
-  color: inherit;
-  text-decoration: none;
-}
-
-.jsw-footer a:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-}
-
-/* in Universal Editor: icons over the limit (MAX_ITEMS, jsw-footer.js) or missing their image,
-   network name or URL (never on the page), and items not filled in yet (a placeholder to select
-   them by) shown only while editing (the editor marks it with adobe-ue-edit), the first two
-   dimmed; hidden in its Preview mode */
-.jsw-footer li.is-over-limit,
-.jsw-footer li.is-incomplete,
-.jsw-footer li.is-empty,
-.jsw-footer .jsw-footer-placeholder {
-  display: none;
-}
-
-html.adobe-ue-edit .jsw-footer li.is-over-limit,
-html.adobe-ue-edit .jsw-footer li.is-incomplete,
-html.adobe-ue-edit .jsw-footer li.is-empty {
-  display: list-item;
-}
-
-html.adobe-ue-edit .jsw-footer li.is-over-limit,
-html.adobe-ue-edit .jsw-footer li.is-incomplete {
-  opacity: 0.45;
-}
-
-html.adobe-ue-edit .jsw-footer .jsw-footer-placeholder {
-  display: inline;
-  opacity: 0.55;
-  font-style: italic;
-}
-
-/* the columns' wrapper: no box of its own, the columns laid out as the navigation's own items */
-.jsw-footer .jsw-footer-columns {
-  display: contents;
-}
-
-/* ---- Phase 5 layout ---- */
-
-/* branding at the top left, the navigation at the top right, the privacy policy at the foot on
-   the left */
-.jsw-footer.variant-phase-5 .jsw-footer-inner {
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto 1fr auto;
-  column-gap: calc(40 * var(--jsw-footer-unit));
-  min-height: calc(500 * var(--jsw-footer-unit));
-  padding: calc(37 * var(--jsw-footer-unit)) calc(54 * var(--jsw-footer-unit)) calc(39 * var(--jsw-footer-unit)) calc(42 * var(--jsw-footer-unit));
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-brand {
-  grid-area: 1 / 1;
-  min-width: 0;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-logo {
-  line-height: 0;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-logo img {
-  width: calc(164 * var(--jsw-footer-unit));
-  height: auto;
-  margin-top: calc(2 * var(--jsw-footer-unit));
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-copyright {
-  margin-top: calc(5 * var(--jsw-footer-unit));
-  color: rgb(255 255 255 / 80%);
-  font-size: calc(11 * var(--jsw-footer-unit));
-  line-height: 1.4;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-/* the CTA: a white button, its "+" after the text */
-.jsw-footer.variant-phase-5 .jsw-footer-cta {
-  margin-top: calc(51 * var(--jsw-footer-unit));
-}
-
-.jsw-footer.variant-phase-5 a.jsw-footer-cta-link:any-link {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  gap: calc(16 * var(--jsw-footer-unit));
-  max-width: 100%;
-  height: calc(39 * var(--jsw-footer-unit));
-  padding: 0 calc(24 * var(--jsw-footer-unit));
-  border-radius: calc(6 * var(--jsw-footer-unit));
-  color: #2b2b2b;
-  background-color: #fff;
-  font-size: calc(11.5 * var(--jsw-footer-unit));
-  line-height: 1;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: background-color 0.2s ease;
-}
-
-.jsw-footer.variant-phase-5 a.jsw-footer-cta-link:hover {
-  background-color: #e6e6e6;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-cta-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-cta-plus {
-  font-size: calc(15 * var(--jsw-footer-unit));
-}
-
-/* the navigation: the columns side by side, 197px apart, CONNECT last */
-.jsw-footer.variant-phase-5 .jsw-footer-nav {
-  grid-area: 1 / 2;
-  display: flex;
-  align-items: flex-start;
-  gap: calc(40 * var(--jsw-footer-unit));
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-column {
-  width: calc(157 * var(--jsw-footer-unit));
-  min-width: 0;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-column.jsw-footer-connect {
-  width: auto;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-heading {
-  overflow: hidden;
-  color: #fff;
-  font-family: inherit;
-  font-size: calc(12.4 * var(--jsw-footer-unit));
-  font-weight: 400;
-  line-height: 1.3;
-  letter-spacing: 0;
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-links {
-  display: flex;
-  flex-direction: column;
-  gap: calc(10 * var(--jsw-footer-unit));
-  margin-top: calc(10 * var(--jsw-footer-unit));
-  list-style: none;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-link {
-  overflow: hidden;
-  color: rgb(255 255 255 / 65%);
-  font-size: calc(11 * var(--jsw-footer-unit));
-  line-height: 1.5;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-link a:hover,
-.jsw-footer.variant-phase-5 .jsw-footer-legal a:hover {
-  color: #fff;
-}
-
-/* the social icons: 36px dark tiles, 4px apart */
-.jsw-footer.variant-phase-5 .jsw-footer-social {
-  display: flex;
-  gap: calc(4 * var(--jsw-footer-unit));
-  margin-top: calc(17 * var(--jsw-footer-unit));
-  list-style: none;
-}
-
-.jsw-footer.variant-phase-5 a.jsw-footer-social-link:any-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(36 * var(--jsw-footer-unit));
-  height: calc(36 * var(--jsw-footer-unit));
-  border-radius: calc(6 * var(--jsw-footer-unit));
-  background-color: rgb(255 255 255 / 9%);
-  transition: background-color 0.2s ease;
-}
-
-.jsw-footer.variant-phase-5 a.jsw-footer-social-link:hover {
-  background-color: rgb(255 255 255 / 18%);
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-social-link picture {
-  display: contents;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-social-link img {
-  width: calc(15 * var(--jsw-footer-unit));
-  height: calc(15 * var(--jsw-footer-unit));
-  object-fit: contain;
-}
-
-/* the privacy policy: small mono capitals, underlined */
-.jsw-footer.variant-phase-5 .jsw-footer-legal {
-  grid-area: 3 / 1 / 4 / 3;
-  align-self: end;
-  color: rgb(255 255 255 / 70%);
-  font-family: var(--jsw-footer-font-mono);
-  font-size: calc(10 * var(--jsw-footer-unit));
-  line-height: 1.2;
-}
-
-.jsw-footer.variant-phase-5 .jsw-footer-legal a:any-link {
-  text-decoration: underline;
-  text-underline-offset: calc(2 * var(--jsw-footer-unit));
-}
-
-/* tablets: the branding, then the navigation, then the privacy policy, one under the other */
-@media (max-width: 899.98px) {
-  .jsw-footer.variant-phase-5 .jsw-footer-inner {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto 1fr auto;
-    row-gap: 48px;
-    min-height: 520px;
-    padding: 40px 32px 32px;
+  /* the background: the picture (or the video over it) covering the whole footer */
+  .media,
+  .media picture,
+  .media img,
+  .media video {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-nav {
-    grid-area: 2 / 1;
-    flex-wrap: wrap;
-    row-gap: 32px;
+  .media img,
+  .media video {
+    object-fit: cover;
+    object-position: center bottom;
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-legal {
-    grid-area: 4 / 1;
+  & p,
+  & h2,
+  & ul {
+    margin: 0;
+    padding: 0;
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-cta {
-    margin-top: 32px;
-  }
-}
-
-/* phones: the columns two a row, CONNECT across */
-@media (max-width: 599.98px) {
-  .jsw-footer.variant-phase-5 .jsw-footer-inner {
-    row-gap: 40px;
-    min-height: 0;
-    padding: 36px 20px 28px;
+  & a:any-link {
+    color: inherit;
+    text-decoration: none;
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-nav {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 28px 20px;
+  & a:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-column {
-    width: auto;
+  /* in Universal Editor: icons over the limit (MAX_ITEMS, jsw-footer.js) or missing their image,
+     network name or URL (never on the page), and items not filled in yet (a placeholder to select
+     them by) shown only while editing (the editor marks it with adobe-ue-edit), the first two
+     dimmed; hidden in its Preview mode */
+  & li.is-over-limit,
+  & li.is-incomplete,
+  & li.is-empty,
+  .placeholder {
+    display: none;
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-column.jsw-footer-connect {
-    grid-column: 1 / -1;
+  html.adobe-ue-edit & {
+    & li.is-over-limit,
+    & li.is-incomplete,
+    & li.is-empty {
+      display: list-item;
+    }
+
+    & li.is-over-limit,
+    & li.is-incomplete {
+      opacity: 0.45;
+    }
+
+    .placeholder {
+      display: inline;
+      opacity: 0.55;
+      font-style: italic;
+    }
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-legal {
-    margin-top: 24px;
-    font-size: 11px;
+  /* the columns' wrapper: no box of its own, the columns laid out as the navigation's own items */
+  .nav-columns {
+    display: contents;
   }
 
-  /* the small texts a little larger, to read on a phone */
-  .jsw-footer.variant-phase-5 .jsw-footer-heading {
-    font-size: 14px;
+  /* 4. Phase 5 layout: branding at the top left, the navigation at the top right, the privacy
+     policy at the foot on the left */
+  &.variant-phase-5 {
+    .inner {
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-rows: auto 1fr auto;
+      column-gap: calc(40 * var(--jsw-footer-unit));
+      min-height: calc(500 * var(--jsw-footer-unit));
+      padding: calc(37 * var(--jsw-footer-unit)) calc(54 * var(--jsw-footer-unit)) calc(39 * var(--jsw-footer-unit)) calc(42 * var(--jsw-footer-unit));
+    }
+
+    .brand {
+      grid-area: 1 / 1;
+      min-width: 0;
+    }
+
+    .logo {
+      line-height: 0;
+    }
+
+    .logo img {
+      width: calc(164 * var(--jsw-footer-unit));
+      height: auto;
+      margin-top: calc(2 * var(--jsw-footer-unit));
+    }
+
+    .copyright {
+      margin-top: calc(5 * var(--jsw-footer-unit));
+      color: rgb(255 255 255 / 80%);
+      font-size: calc(11 * var(--jsw-footer-unit));
+      line-height: 1.4;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    /* the CTA: a white button, its "+" after the text */
+    .cta {
+      margin-top: calc(51 * var(--jsw-footer-unit));
+    }
+
+    & a.cta-link:any-link {
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      gap: calc(16 * var(--jsw-footer-unit));
+      max-width: 100%;
+      height: calc(39 * var(--jsw-footer-unit));
+      padding: 0 calc(24 * var(--jsw-footer-unit));
+      border-radius: calc(6 * var(--jsw-footer-unit));
+      color: #2b2b2b;
+      background-color: #fff;
+      font-size: calc(11.5 * var(--jsw-footer-unit));
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: background-color 0.2s ease;
+    }
+
+    & a.cta-link:hover {
+      background-color: #e6e6e6;
+    }
+
+    .cta-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cta-plus {
+      font-size: calc(15 * var(--jsw-footer-unit));
+    }
+
+    /* the navigation: the columns side by side, 197px apart, CONNECT last */
+    .nav {
+      grid-area: 1 / 2;
+      display: flex;
+      align-items: flex-start;
+      gap: calc(40 * var(--jsw-footer-unit));
+    }
+
+    .column {
+      width: calc(157 * var(--jsw-footer-unit));
+      min-width: 0;
+    }
+
+    .column.connect {
+      width: auto;
+    }
+
+    .heading {
+      overflow: hidden;
+      color: #fff;
+      font-family: inherit;
+      font-size: calc(12.4 * var(--jsw-footer-unit));
+      font-weight: 400;
+      line-height: 1.3;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: calc(10 * var(--jsw-footer-unit));
+      margin-top: calc(10 * var(--jsw-footer-unit));
+      list-style: none;
+    }
+
+    .link {
+      overflow: hidden;
+      color: rgb(255 255 255 / 65%);
+      font-size: calc(11 * var(--jsw-footer-unit));
+      line-height: 1.5;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .link a:hover,
+    .legal a:hover {
+      color: #fff;
+    }
+
+    /* the social icons: 36px dark tiles, 4px apart */
+    .social-icons {
+      display: flex;
+      gap: calc(4 * var(--jsw-footer-unit));
+      margin-top: calc(17 * var(--jsw-footer-unit));
+      list-style: none;
+    }
+
+    & a.social-link:any-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: calc(36 * var(--jsw-footer-unit));
+      height: calc(36 * var(--jsw-footer-unit));
+      border-radius: calc(6 * var(--jsw-footer-unit));
+      background-color: rgb(255 255 255 / 9%);
+      transition: background-color 0.2s ease;
+    }
+
+    & a.social-link:hover {
+      background-color: rgb(255 255 255 / 18%);
+    }
+
+    .social-link picture {
+      display: contents;
+    }
+
+    .social-link img {
+      width: calc(15 * var(--jsw-footer-unit));
+      height: calc(15 * var(--jsw-footer-unit));
+      object-fit: contain;
+    }
+
+    /* the privacy policy: small mono capitals, underlined */
+    .legal {
+      grid-area: 3 / 1 / 4 / 3;
+      align-self: end;
+      color: rgb(255 255 255 / 70%);
+      font-family: var(--jsw-footer-font-mono);
+      font-size: calc(10 * var(--jsw-footer-unit));
+      line-height: 1.2;
+    }
+
+    .legal a:any-link {
+      text-decoration: underline;
+      text-underline-offset: calc(2 * var(--jsw-footer-unit));
+    }
+
+    /* tablets: the branding, then the navigation, then the privacy policy, one under the other */
+    @media (max-width: 899.98px) {
+      .inner {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto 1fr auto;
+        row-gap: 48px;
+        min-height: 520px;
+        padding: 40px 32px 32px;
+      }
+
+      .nav {
+        grid-area: 2 / 1;
+        flex-wrap: wrap;
+        row-gap: 32px;
+      }
+
+      .legal {
+        grid-area: 4 / 1;
+      }
+
+      .cta {
+        margin-top: 32px;
+      }
+    }
+
+    /* phones: the columns two a row, CONNECT across */
+    @media (max-width: 599.98px) {
+      .inner {
+        row-gap: 40px;
+        min-height: 0;
+        padding: 36px 20px 28px;
+      }
+
+      .nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 28px 20px;
+      }
+
+      .column {
+        width: auto;
+      }
+
+      .column.connect {
+        grid-column: 1 / -1;
+      }
+
+      .legal {
+        margin-top: 24px;
+        font-size: 11px;
+      }
+
+      /* the small texts a little larger, to read on a phone */
+      .heading {
+        font-size: 14px;
+      }
+
+      .link {
+        font-size: 13px;
+      }
+
+      .copyright,
+      & a.cta-link:any-link {
+        font-size: 12px;
+      }
+    }
   }
 
-  .jsw-footer.variant-phase-5 .jsw-footer-link {
-    font-size: 13px;
-  }
+  /* 5. Phase 3 layout (values from /jsw-phase-3's footer): the gradient for a background (no
+     photo), the texts in the site face */
+  &.variant-phase-3 {
+    --jsw-footer-edge: 20px;
 
-  .jsw-footer.variant-phase-5 .jsw-footer-copyright,
-  .jsw-footer.variant-phase-5 a.jsw-footer-cta-link:any-link {
-    font-size: 12px;
-  }
-}
+    background: linear-gradient(180deg, #050505 0%, #050505 28%, #06363b 62%, #0c7d88 88%, #12a0ab 100%);
+    font-family: inter, 'Helvetica Neue', arial, sans-serif;
 
-/* ---- Phase 3 layout (values from /jsw-phase-3's footer) ---- */
+    /* phones and tablets: branding, CTA, then the columns, one under the other (phones: below) */
+    .inner {
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
+      padding: 40px var(--jsw-footer-edge) 120px;
+    }
 
-/* the gradient for a background (no photo); the texts in the site face */
-.jsw-footer.variant-phase-3 {
-  --jsw-footer-edge: 20px;
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
 
-  background: linear-gradient(180deg, #050505 0%, #050505 28%, #06363b 62%, #0c7d88 88%, #12a0ab 100%);
-  font-family: inter, 'Helvetica Neue', arial, sans-serif;
-}
+    .logo {
+      margin-bottom: 6px;
+      line-height: 0;
+    }
 
-/* phones and tablets: branding, CTA, then the columns, one under the other (phones: below) */
-.jsw-footer.variant-phase-3 .jsw-footer-inner {
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 36px;
-  padding: 40px var(--jsw-footer-edge) 120px;
-}
+    .logo img {
+      width: 160px;
+      height: auto;
+    }
 
-.jsw-footer.variant-phase-3 .jsw-footer-brand {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
+    .copyright {
+      color: rgb(255 255 255 / 70%);
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
 
-.jsw-footer.variant-phase-3 .jsw-footer-logo {
-  margin-bottom: 6px;
-  line-height: 0;
-}
+    /* the privacy policy under the branding, in small mono capitals */
+    .legal {
+      margin-top: 22px;
+      font-family: var(--jsw-footer-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
 
-.jsw-footer.variant-phase-3 .jsw-footer-logo img {
-  width: 160px;
-  height: auto;
-}
+    .legal a:hover,
+    .link a:hover {
+      color: #fff;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
 
-.jsw-footer.variant-phase-3 .jsw-footer-copyright {
-  color: rgb(255 255 255 / 70%);
-  font-size: 12px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
+    /* the CTA: a white button, its "+" before the text */
+    & a.cta-link:any-link {
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 100%;
+      height: 38px;
+      padding: 0 18px;
+      border-radius: 8px;
+      color: #111;
+      background-color: #fff;
+      font-family: var(--jsw-footer-font-mono);
+      font-size: 12px;
+      line-height: 1;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
 
-/* the privacy policy under the branding, in small mono capitals */
-.jsw-footer.variant-phase-3 .jsw-footer-legal {
-  margin-top: 22px;
-  font-family: var(--jsw-footer-font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-}
+    & a.cta-link:hover {
+      background-color: #e6e6e6;
+    }
 
-.jsw-footer.variant-phase-3 .jsw-footer-legal a:hover,
-.jsw-footer.variant-phase-3 .jsw-footer-link a:hover {
-  color: #fff;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
+    .cta-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-/* the CTA: a white button, its "+" before the text */
-.jsw-footer.variant-phase-3 a.jsw-footer-cta-link:any-link {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  max-width: 100%;
-  height: 38px;
-  padding: 0 18px;
-  border-radius: 8px;
-  color: #111;
-  background-color: #fff;
-  font-family: var(--jsw-footer-font-mono);
-  font-size: 12px;
-  line-height: 1;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
+    .cta-plus {
+      order: -1;
+      font-size: 15px;
+    }
 
-.jsw-footer.variant-phase-3 a.jsw-footer-cta-link:hover {
-  background-color: #e6e6e6;
-}
+    /* the columns: CONNECT first, side by side */
+    .nav {
+      display: grid;
+      grid-auto-columns: minmax(0, max-content);
+      grid-auto-flow: column;
+      gap: 56px;
+    }
 
-.jsw-footer.variant-phase-3 .jsw-footer-cta-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    .column {
+      min-width: 0;
+    }
 
-.jsw-footer.variant-phase-3 .jsw-footer-cta-plus {
-  order: -1;
-  font-size: 15px;
-}
+    .heading {
+      margin-bottom: 10px;
+      overflow: hidden;
+      color: #fff;
+      font-family: jsw-footer-display, michroma, 'Helvetica Neue', arial, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.3;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
 
-/* the columns: CONNECT first, side by side */
-.jsw-footer.variant-phase-3 .jsw-footer-nav {
-  display: grid;
-  grid-auto-columns: minmax(0, max-content);
-  grid-auto-flow: column;
-  gap: 56px;
-}
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      list-style: none;
+      color: rgb(255 255 255 / 70%);
+      font-size: 12px;
+      line-height: 1.5;
+    }
 
-.jsw-footer.variant-phase-3 .jsw-footer-column {
-  min-width: 0;
-}
+    .link {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
 
-.jsw-footer.variant-phase-3 .jsw-footer-heading {
-  margin-bottom: 10px;
-  overflow: hidden;
-  color: #fff;
-  font-family: jsw-footer-display, michroma, 'Helvetica Neue', arial, sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.3;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+    /* phones ("M / Footer 375x815"): a screen tall (at most 815px, as the frame, so the editor's
+       growing canvas is not stretched) on the gradient; from the top: the columns, the CTA, then
+       the branding with the privacy policy last */
+    @media (max-width: 599.98px) {
+      .inner {
+        align-content: end;
+        gap: 0;
+        min-height: min(100vh, 815px);
+        min-height: min(100svh, 815px);
+        padding: min(120px, 14.7vh) 24px 34px;
+        padding: min(120px, 14.7svh) 24px 34px;
+      }
 
-.jsw-footer.variant-phase-3 .jsw-footer-links {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  list-style: none;
-  color: rgb(255 255 255 / 70%);
-  font-size: 12px;
-  line-height: 1.5;
-}
+      /* two columns a row, each as wide as its texts (a long heading such as TECHNOLOGY keeps to
+         its column: the headings 15px, not the frame's 17px for its two short ones) */
+      .nav {
+        grid-auto-flow: row;
+        grid-template-columns: repeat(2, minmax(0, max-content));
+        order: 1;
+        gap: 24px 32px;
+      }
 
-.jsw-footer.variant-phase-3 .jsw-footer-link {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+      .heading {
+        margin-bottom: 12px;
+        font-size: 15px;
+        letter-spacing: 0.02em;
+      }
 
-/* phones ("M / Footer 375x815"): a screen tall (at most 815px, as the frame, so the editor's
-   growing canvas is not stretched) on the gradient; from the top: the columns, the CTA, then the
-   branding with the privacy policy last */
-@media (max-width: 599.98px) {
-  .jsw-footer.variant-phase-3 .jsw-footer-inner {
-    align-content: end;
-    gap: 0;
-    min-height: min(100vh, 815px);
-    min-height: min(100svh, 815px);
-    padding: min(120px, 14.7vh) 24px 34px;
-    padding: min(120px, 14.7svh) 24px 34px;
-  }
+      .links {
+        gap: 9px;
+        color: rgb(255 255 255 / 80%);
+        font-size: 13px;
+      }
 
-  /* two columns a row, each as wide as its texts (a long heading such as TECHNOLOGY keeps to its
-     column: the headings 15px, not the frame's 17px for its two short ones) */
-  .jsw-footer.variant-phase-3 .jsw-footer-nav {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(2, minmax(0, max-content));
-    order: 1;
-    gap: 24px 32px;
-  }
+      .cta {
+        order: 2;
+        margin-top: min(72px, 8.8vh);
+        margin-top: min(72px, 8.8svh);
+      }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-heading {
-    margin-bottom: 12px;
-    font-size: 15px;
-    letter-spacing: 0.02em;
-  }
+      & a.cta-link:any-link {
+        height: 34px;
+        padding: 0 14px;
+        font-size: 13px;
+      }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-links {
-    gap: 9px;
-    color: rgb(255 255 255 / 80%);
-    font-size: 13px;
-  }
+      .brand {
+        order: 3;
+        gap: 10px;
+        margin-top: min(140px, 17.2vh);
+        margin-top: min(140px, 17.2svh);
+      }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-cta {
-    order: 2;
-    margin-top: min(72px, 8.8vh);
-    margin-top: min(72px, 8.8svh);
-  }
+      .logo {
+        margin-bottom: 4px;
+      }
 
-  .jsw-footer.variant-phase-3 a.jsw-footer-cta-link:any-link {
-    height: 34px;
-    padding: 0 14px;
-    font-size: 13px;
-  }
+      .logo img {
+        width: 183px;
+      }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-brand {
-    order: 3;
-    gap: 10px;
-    margin-top: min(140px, 17.2vh);
-    margin-top: min(140px, 17.2svh);
-  }
+      .copyright {
+        font-size: 13px;
+      }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-logo {
-    margin-bottom: 4px;
-  }
+      .legal {
+        margin-top: min(44px, 5.4vh);
+        margin-top: min(44px, 5.4svh);
+        font-size: 13px;
+      }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-logo img {
-    width: 183px;
-  }
+      .legal a:any-link {
+        text-decoration: underline;
+        text-underline-offset: 4px;
+      }
+    }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-copyright {
-    font-size: 13px;
-  }
+    /* desktop: branding at the left, the CTA in the centre, the columns at the right */
+    @media (min-width: 900px) {
+      --jsw-footer-edge: 5.4vw;
 
-  .jsw-footer.variant-phase-3 .jsw-footer-legal {
-    margin-top: min(44px, 5.4vh);
-    margin-top: min(44px, 5.4svh);
-    font-size: 13px;
-  }
+      .inner {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: start;
+        padding: 28px var(--jsw-footer-edge) 150px;
+      }
 
-  .jsw-footer.variant-phase-3 .jsw-footer-legal a:any-link {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-}
+      .cta {
+        padding-top: 6px;
+      }
 
-/* desktop: branding at the left, the CTA in the centre, the columns at the right */
-@media (min-width: 900px) {
-  .jsw-footer.variant-phase-3 {
-    --jsw-footer-edge: 5.4vw;
-  }
-
-  .jsw-footer.variant-phase-3 .jsw-footer-inner {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: start;
-    padding: 28px var(--jsw-footer-edge) 150px;
-  }
-
-  .jsw-footer.variant-phase-3 .jsw-footer-cta {
-    padding-top: 6px;
-  }
-
-  .jsw-footer.variant-phase-3 .jsw-footer-nav {
-    justify-self: end;
-    gap: 64px;
+      .nav {
+        justify-self: end;
+        gap: 64px;
+      }
+    }
   }
 }
