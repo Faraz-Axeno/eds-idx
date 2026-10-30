@@ -774,7 +774,7 @@
         "component": "select",
         "name": "media_backgroundMode",
         "label": "Background type",
-        "description": "Image: the background image. Video: the background video, playing muted on a loop (the background image shows until it plays, and instead of it if it cannot). Image and video: both the background image and the background video (shown as Video for now).",
+        "description": "Image: the background image. Video: the background video, playing muted on a loop (the background image shows until it plays, and instead of it if it cannot). Image and video: both the background image and the background video (shown as Video for now). Note: Background media is only used in Variant A. This field is ignored if Variant B is selected.",
         "valueType": "string",
         "value": "image",
         "required": true,
@@ -798,7 +798,7 @@
         "valueType": "string",
         "name": "media_backgroundImage",
         "label": "Background image",
-        "description": "Covers the whole footer (with Video, or Image and video: shown until the video plays).",
+        "description": "Covers the whole footer (with Video, or Image and video: shown until the video plays). Note: Background media is only used in Variant A. This field is ignored if Variant B is selected.",
         "multi": false,
         "required": true
       },
@@ -818,7 +818,7 @@
         "valueType": "string",
         "name": "media_backgroundVideo",
         "label": "Background video",
-        "description": "An MP4 video from Assets, or its full URL. Used when Background type is Video, or Image and video.",
+        "description": "An MP4 video from Assets, or its full URL. Used when Background type is Video, or Image and video. Note: Background media is only used in Variant A. This field is ignored if Variant B is selected.",
         "condition": {
           "or": [
             {
@@ -943,14 +943,14 @@
         "valueType": "string",
         "name": "links_link1",
         "label": "Link 1 URL",
-        "description": "A page, #section, or a full URL. A link without a URL is not shown."
+        "description": "A page, #section, or a full URL. A link without a URL is not shown. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page."
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "links_link1Text",
         "label": "Link 1 text",
-        "description": "e.g. NEVs. At most 24 characters.",
+        "description": "e.g. NEVs. At most 24 characters. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page.",
         "validation": {
           "maxLength": 24
         }
@@ -960,14 +960,14 @@
         "valueType": "string",
         "name": "links_link2",
         "label": "Link 2 URL",
-        "description": "A page, #section, or a full URL. A link without a URL is not shown."
+        "description": "A page, #section, or a full URL. A link without a URL is not shown. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page."
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "links_link2Text",
         "label": "Link 2 text",
-        "description": "e.g. NEVs. At most 24 characters.",
+        "description": "e.g. NEVs. At most 24 characters. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page.",
         "validation": {
           "maxLength": 24
         }
@@ -977,14 +977,14 @@
         "valueType": "string",
         "name": "links_link3",
         "label": "Link 3 URL",
-        "description": "A page, #section, or a full URL. A link without a URL is not shown."
+        "description": "A page, #section, or a full URL. A link without a URL is not shown. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page."
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "links_link3Text",
         "label": "Link 3 text",
-        "description": "e.g. NEVs. At most 24 characters.",
+        "description": "e.g. NEVs. At most 24 characters. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page.",
         "validation": {
           "maxLength": 24
         }
@@ -994,14 +994,14 @@
         "valueType": "string",
         "name": "links_link4",
         "label": "Link 4 URL",
-        "description": "A page, #section, or a full URL. A link without a URL is not shown."
+        "description": "A page, #section, or a full URL. A link without a URL is not shown. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page."
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "links_link4Text",
         "label": "Link 4 text",
-        "description": "e.g. NEVs. At most 24 characters.",
+        "description": "e.g. NEVs. At most 24 characters. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page.",
         "validation": {
           "maxLength": 24
         }
@@ -1016,7 +1016,7 @@
         "valueType": "string",
         "name": "iconImage",
         "label": "Icon",
-        "description": "The network's logo, white on transparent (SVG or PNG). Warning: You can add multiple icons, but a maximum of 4 will be displayed on the live site.",
+        "description": "The network's logo, white on transparent (SVG or PNG). Warning: You can add multiple icons, but a maximum of 4 will be displayed on the live site. Warning: The icon, its network name and its URL must all be provided. If one is missing, the icon will not be displayed on the page.",
         "multi": false,
         "required": true
       },
@@ -1025,7 +1025,7 @@
         "valueType": "string",
         "name": "iconImageAlt",
         "label": "Network name",
-        "description": "e.g. Facebook: read out by screen readers, and shown as the link in the Variant B layout. At most 30 characters.",
+        "description": "e.g. Facebook: read out by screen readers, and shown as the link in the Variant B layout. At most 30 characters. Warning: The icon, its network name and its URL must all be provided. If one is missing, the icon will not be displayed on the page.",
         "required": true,
         "validation": {
           "maxLength": 30
@@ -1036,7 +1036,7 @@
         "valueType": "string",
         "name": "iconLink",
         "label": "URL",
-        "description": "The JSW Motors profile on that network (full URL).",
+        "description": "The JSW Motors profile on that network (full URL). Warning: The icon, its network name and its URL must all be provided. If one is missing, the icon will not be displayed on the page.",
         "required": true
       }
     ]
