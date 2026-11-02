@@ -75,15 +75,15 @@ function sortRows(rows) {
 
 function buildStep(row, editing) {
   const [numberCell, titleCell, descriptionCell] = cellsOf(row);
-  const step = el('li', 'career-route-step');
+  const step = el('li', 'step');
   moveInstrumentation(row, step);
-  const number = retag(textOf(numberCell), 'p', 'career-route-step-number');
-  const title = retag(textOf(titleCell), 'h3', 'career-route-step-title');
-  const description = retag(textOf(descriptionCell), 'p', 'career-route-step-description');
+  const number = retag(textOf(numberCell), 'p', 'step-number');
+  const title = retag(textOf(titleCell), 'h3', 'step-title');
+  const description = retag(textOf(descriptionCell), 'p', 'step-description');
   cap(number, TEXT_LIMITS.stepNumber, editing);
   cap(title, TEXT_LIMITS.stepTitle, editing);
   cap(description, TEXT_LIMITS.stepDescription, editing);
-  const text = el('div', 'career-route-step-text');
+  const text = el('div', 'step-text');
   text.append(title, description);
   step.append(number, text);
   return step;
@@ -98,27 +98,27 @@ export default function decorate(block) {
   const { picture, headingCell, steps } = sortRows([...block.children]);
 
   // the photo behind everything
-  const media = el('div', 'career-route-media');
+  const media = el('div', 'media');
   if (picture) media.append(picture);
 
-  const heading = retag(textOf(headingCell), 'h2', 'career-route-heading');
+  const heading = retag(textOf(headingCell), 'h2', 'heading');
   cap(heading, TEXT_LIMITS.heading, editing);
 
   // the first MAX_STEPS steps; in the editor the others too, dimmed
-  const list = el('ol', 'career-route-steps');
+  const list = el('ol', 'steps');
   (editing ? steps : steps.slice(0, MAX_STEPS)).forEach((row, i) => {
     const step = buildStep(row, editing);
     if (i >= MAX_STEPS) {
       step.classList.add('is-over-limit');
-      const note = el('p', 'career-route-step-limit');
+      const note = el('p', 'step-limit');
       note.textContent = `Not shown on the page: only the first ${MAX_STEPS} steps are.`;
       step.append(note);
     }
     list.append(step);
   });
 
-  const inner = el('div', 'career-route-inner');
+  const inner = el('div', 'inner');
   inner.append(heading, list);
   block.replaceChildren(media, inner);
-  if (editing) block.classList.add('career-route-editing');
+  if (editing) block.classList.add('editing');
 }

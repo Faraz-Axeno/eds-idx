@@ -14,7 +14,7 @@
  *                       the dropdowns on the left
  *     Gallery Image   — image (+ alt): the gallery
  * Content written for the conversion to AEM content names each row's type in a first cell
- * (open-roles-filter, …): that cell is read, not shown. Rows are told apart by what they are
+ * (filter, …): that cell is read, not shown. Rows are told apart by what they are
  * (sortRows), not by their place, so the layout is the same whatever order they come in. Pages
  * published with earlier models keep working: a labels field row (Clear all, Back to top), or
  * the filter dropdowns and gallery as composite multi-fields.
@@ -162,7 +162,7 @@ function highlighted(text, words) {
     if (end <= last) return;
     const from = Math.max(start, last);
     frag.append(text.slice(last, from));
-    const mark = el('mark', 'open-roles-match');
+    const mark = el('mark', 'match');
     mark.textContent = text.slice(from, end);
     frag.append(mark);
     last = end;
@@ -206,15 +206,15 @@ function buildJob(row) {
   const tagsField = meta('meta_tags', 2);
   const link = (linkCell || row).querySelector('a');
 
-  const item = el('li', 'open-roles-job');
+  const item = el('li', 'job');
   moveInstrumentation(row, item);
-  const text = el('div', 'open-roles-job-text');
-  const title = retag(titleField, 'h3', 'open-roles-job-title');
-  const line = el('p', 'open-roles-job-meta');
-  const department = retag(departmentField, 'span', 'open-roles-job-department');
+  const text = el('div', 'job-text');
+  const title = retag(titleField, 'h3', 'job-title');
+  const line = el('p', 'job-meta');
+  const department = retag(departmentField, 'span', 'job-department');
   // the location: the pin, then its text (its own element, so a long one can end in "…")
-  const locationText = retag(locationField, 'span', 'open-roles-job-location-text');
-  const location = el('span', 'open-roles-job-location');
+  const locationText = retag(locationField, 'span', 'job-location-text');
+  const location = el('span', 'job-location');
   const shown = {
     title: title.textContent.trim(),
     department: department.textContent.trim(),
@@ -229,7 +229,7 @@ function buildJob(row) {
   cap(department, TEXT_LIMITS.department);
   cap(locationText, TEXT_LIMITS.location);
   if (departmentField) line.append(department);
-  if (departmentField && locationField) line.append(el('span', 'open-roles-job-dot', { 'aria-hidden': 'true' }));
+  if (departmentField && locationField) line.append(el('span', 'job-dot', { 'aria-hidden': 'true' }));
   if (locationField) line.append(location);
   text.append(title);
   if (line.children.length) text.append(line);
@@ -238,17 +238,17 @@ function buildJob(row) {
   const tags = (tagsField?.textContent || '').split(',').map(norm).filter(Boolean);
   // the other filter values are not shown; in the editor they stay selectable in the tree
   if (tagsField) {
-    const hidden = retag(tagsField, 'span', 'open-roles-job-tags');
+    const hidden = retag(tagsField, 'span', 'job-tags');
     hidden.hidden = true;
     item.append(hidden);
   }
 
   if (link) {
     link.classList.remove('button', 'primary', 'secondary', 'accent');
-    link.className = 'open-roles-apply';
+    link.className = 'apply';
     if (!link.textContent.trim()) link.textContent = 'APPLY NOW';
     // its text in a span, so a long one ends in "…" while the button keeps its size
-    const label = el('span', 'open-roles-apply-label');
+    const label = el('span', 'apply-label');
     label.append(...link.childNodes);
     link.append(label);
     cap(label, TEXT_LIMITS.button);
@@ -376,25 +376,25 @@ function buildFilter({
   const field = fieldOf(fieldValue, name);
   const values = rawValues.map((o) => o.trim()).filter(Boolean);
 
-  const wrapper = el('div', 'open-roles-filter');
+  const wrapper = el('div', 'filter');
   if (source) moveInstrumentation(source, wrapper);
   const panelId = `open-roles-${instance}-filter-${index}`;
-  const toggle = el('button', 'open-roles-filter-toggle', {
+  const toggle = el('button', 'filter-toggle', {
     type: 'button', 'aria-expanded': 'false', 'aria-controls': panelId,
   });
-  const summary = el('span', 'open-roles-filter-summary');
+  const summary = el('span', 'filter-summary');
   summary.textContent = name;
-  toggle.append(summary, el('span', 'open-roles-filter-chevron', { 'aria-hidden': 'true' }));
-  const panel = el('div', 'open-roles-filter-panel', { id: panelId, role: 'group', 'aria-label': name });
+  toggle.append(summary, el('span', 'filter-chevron', { 'aria-hidden': 'true' }));
+  const panel = el('div', 'filter-panel', { id: panelId, role: 'group', 'aria-label': name });
   panel.hidden = true;
 
   const options = [...new Set(values)].map((value, i) => {
-    const option = el('label', 'open-roles-option');
-    const input = el('input', 'open-roles-checkbox', { type: 'checkbox', value, id: `${panelId}-${i}` });
-    const label = el('span', 'open-roles-option-label');
+    const option = el('label', 'option');
+    const input = el('input', 'checkbox', { type: 'checkbox', value, id: `${panelId}-${i}` });
+    const label = el('span', 'option-label');
     label.textContent = capped(value, TEXT_LIMITS.option);
     if (label.textContent !== value) label.title = value;
-    const count = el('span', 'open-roles-option-count');
+    const count = el('span', 'option-count');
     option.append(input, label, count);
     panel.append(option);
     return {
@@ -404,7 +404,7 @@ function buildFilter({
   wrapper.append(toggle, panel);
   // the filter name stays in the block for the editor (picking it outlines the dropdown)
   if (nameField?.isConnected && nameField.tagName !== 'DIV') {
-    const keep = retag(nameField, 'span', 'open-roles-filter-name');
+    const keep = retag(nameField, 'span', 'filter-name');
     keep.hidden = true;
     wrapper.append(keep);
   }
@@ -440,7 +440,7 @@ function buildGallery(cell, rows, editing) {
   // the Gallery Images field: its pictures, in order (the field's instrumentation on the gallery)
   const pictures = [...(cell?.querySelectorAll('picture') || [])];
   let slides = pictures.map((picture) => {
-    const slide = el('div', 'open-roles-slide');
+    const slide = el('div', 'slide');
     slide.append(picture);
     return slide;
   });
@@ -448,7 +448,7 @@ function buildGallery(cell, rows, editing) {
   // as an empty frame, so it stays in the page (and in the content tree)
   if (!slides.length) {
     slides = rows.map((row) => {
-      const slide = el('div', 'open-roles-slide');
+      const slide = el('div', 'slide');
       moveInstrumentation(row, slide);
       const picture = row.querySelector('picture');
       if (picture) slide.append(picture);
@@ -458,9 +458,9 @@ function buildGallery(cell, rows, editing) {
   }
   if (!slides.length) return null;
 
-  const gallery = el('div', 'open-roles-gallery');
+  const gallery = el('div', 'gallery');
   if (pictures.length) moveInstrumentation(instrumented(cell), gallery);
-  const track = el('div', 'open-roles-track');
+  const track = el('div', 'track');
   track.append(...slides);
   gallery.append(track);
   return gallery;
@@ -542,10 +542,10 @@ export default function decorate(block) {
   }
 
   // left: heading, search, description, filters
-  const intro = el('div', 'open-roles-intro');
-  const heading = el('h2', 'open-roles-heading');
-  const muted = retag(content('content_heading', 0), 'span', 'open-roles-heading-muted');
-  const strong = retag(content('content_headingHighlight', 1), 'span', 'open-roles-heading-strong');
+  const intro = el('div', 'intro');
+  const heading = el('h2', 'heading');
+  const muted = retag(content('content_heading', 0), 'span', 'heading-muted');
+  const strong = retag(content('content_headingHighlight', 1), 'span', 'heading-strong');
   cap(muted, TEXT_LIMITS.heading);
   cap(strong, TEXT_LIMITS.headingHighlight);
   heading.append(muted, strong);
@@ -559,11 +559,11 @@ export default function decorate(block) {
   const noResults = emptyField?.textContent.trim() || 'No roles found matching your criteria.';
 
   // the search box: a combobox with its suggestions under it, and × to clear it
-  const searchBox = el('div', 'open-roles-search');
+  const searchBox = el('div', 'search');
   const placeholder = capped(placeholderField?.textContent.trim() || 'Search Roles', TEXT_LIMITS.placeholder);
-  const suggestions = el('ul', 'open-roles-suggestions', { id: `${id}-suggestions`, role: 'listbox', 'aria-label': placeholder });
+  const suggestions = el('ul', 'suggestions', { id: `${id}-suggestions`, role: 'listbox', 'aria-label': placeholder });
   suggestions.hidden = true;
-  const input = el('input', 'open-roles-search-input', {
+  const input = el('input', 'search-input', {
     id: `${id}-search`,
     type: 'text',
     inputmode: 'search',
@@ -581,12 +581,12 @@ export default function decorate(block) {
     moveInstrumentation(placeholderField, input);
     placeholderField.remove();
   }
-  const clear = el('button', 'open-roles-search-clear', { type: 'button', 'aria-label': 'Clear search' });
+  const clear = el('button', 'search-clear', { type: 'button', 'aria-label': 'Clear search' });
   clear.innerHTML = CLOSE_ICON;
   clear.hidden = true;
   searchBox.append(input, clear, suggestions);
-  searchBox.insertAdjacentHTML('beforeend', `<span class="open-roles-search-icon">${SEARCH_ICON}</span>`);
-  const help = retag(helpField, 'p', 'open-roles-help');
+  searchBox.insertAdjacentHTML('beforeend', `<span class="search-icon">${SEARCH_ICON}</span>`);
+  const help = retag(helpField, 'p', 'help');
   help.id = `${id}-help`;
   cap(help, TEXT_LIMITS.help);
   input.setAttribute('aria-describedby', help.id);
@@ -596,16 +596,16 @@ export default function decorate(block) {
   // the filters: label and Clear all, then one dropdown per Filter item
   const filters = (useFilterItems ? groups.filter.map(filterItem) : categories)
     .map(buildFilter);
-  const clearAll = el('button', 'open-roles-clear-all', { type: 'button' });
-  const clearAllLabel = retag(clearAllField, 'span', 'open-roles-clear-all-label');
+  const clearAll = el('button', 'clear-all', { type: 'button' });
+  const clearAllLabel = retag(clearAllField, 'span', 'clear-all-label');
   if (!clearAllLabel.textContent.trim()) clearAllLabel.textContent = 'Clear all';
   cap(clearAllLabel, TEXT_LIMITS.clearAll);
   clearAll.append(clearAllLabel);
   clearAll.insertAdjacentHTML('beforeend', CLOSE_ICON);
   if (filters.length) {
-    const filterBox = el('div', 'open-roles-filters');
-    const head = el('div', 'open-roles-filters-head');
-    const label = retag(labelField, 'p', 'open-roles-filters-label');
+    const filterBox = el('div', 'filters');
+    const head = el('div', 'filters-head');
+    const label = retag(labelField, 'p', 'filters-label');
     if (!label.textContent.trim()) label.textContent = 'Filter Roles';
     cap(label, TEXT_LIMITS.filtersLabel);
     head.append(label, clearAll);
@@ -620,28 +620,28 @@ export default function decorate(block) {
   const overLimit = editing ? groups.job.slice(MAX_JOB_LIMIT).map((row) => {
     const { item } = buildJob(row);
     item.classList.add('is-over-limit');
-    const note = el('p', 'open-roles-job-limit');
+    const note = el('p', 'job-limit');
     note.textContent = `Not shown on the page: only the first ${MAX_JOB_LIMIT} roles are.`;
-    item.querySelector('.open-roles-job-text').append(note);
+    item.querySelector('.job-text').append(note);
     return item;
   }) : [];
-  const listWrap = el('div', 'open-roles-results');
-  const list = el('div', 'open-roles-list', {
+  const listWrap = el('div', 'results');
+  const list = el('div', 'list', {
     role: 'region', 'aria-label': `${muted.textContent} ${strong.textContent}`.trim() || 'Open roles', tabindex: '0',
   });
-  const jobList = el('ul', 'open-roles-jobs');
-  const more = el('div', 'open-roles-more', { 'aria-hidden': 'true' });
+  const jobList = el('ul', 'jobs');
+  const more = el('div', 'more', { 'aria-hidden': 'true' });
   list.append(jobList, more);
-  const empty = retag(emptyField, 'p', 'open-roles-empty');
+  const empty = retag(emptyField, 'p', 'empty');
   empty.textContent = noResults;
   cap(empty, TEXT_LIMITS.emptyMessage);
-  const toTop = el('button', 'open-roles-top', { type: 'button' });
+  const toTop = el('button', 'top', { type: 'button' });
   toTop.insertAdjacentHTML('afterbegin', ARROW_UP);
-  const toTopLabel = retag(backToTopField, 'span', 'open-roles-top-label');
+  const toTopLabel = retag(backToTopField, 'span', 'top-label');
   if (!toTopLabel.textContent.trim()) toTopLabel.textContent = 'Back to top';
   cap(toTopLabel, TEXT_LIMITS.backToTop);
   toTop.append(toTopLabel);
-  const status = el('p', 'open-roles-status', { 'aria-live': 'polite' });
+  const status = el('p', 'status', { 'aria-live': 'polite' });
   listWrap.append(list, empty, toTop, status);
 
   // the state: the words searched for and the ticked options
@@ -730,7 +730,7 @@ export default function decorate(block) {
     active = -1;
   };
   const setActive = (i) => {
-    const items = [...suggestions.querySelectorAll('.open-roles-suggestion')];
+    const items = [...suggestions.querySelectorAll('.suggestion')];
     if (!items.length) return;
     active = (i + items.length) % items.length;
     items.forEach((item, n) => item.setAttribute('aria-selected', String(n === active)));
@@ -756,15 +756,15 @@ export default function decorate(block) {
     suggestions.replaceChildren();
     active = -1;
     if (!offered.length) {
-      const none = el('li', 'open-roles-suggestion-empty', { role: 'presentation' });
+      const none = el('li', 'suggestion-empty', { role: 'presentation' });
       none.textContent = noResults;
       suggestions.append(none);
     }
     offered.forEach((job, i) => {
-      const item = el('li', 'open-roles-suggestion', { id: `${id}-suggestion-${i}`, role: 'option', 'aria-selected': 'false' });
-      const name = el('span', 'open-roles-suggestion-title');
+      const item = el('li', 'suggestion', { id: `${id}-suggestion-${i}`, role: 'option', 'aria-selected': 'false' });
+      const name = el('span', 'suggestion-title');
       name.append(highlighted(job.shown.title, words));
-      const where = el('span', 'open-roles-suggestion-meta');
+      const where = el('span', 'suggestion-meta');
       where.append(highlighted([job.shown.department, job.shown.location].filter(Boolean).join(' · '), words));
       item.append(name, where);
       // keeps the focus in the search box, so the choice is not lost to its blur
@@ -842,14 +842,14 @@ export default function decorate(block) {
     update();
   });
 
-  const inner = el('div', 'open-roles-inner');
+  const inner = el('div', 'inner');
   inner.append(intro, listWrap);
   const gallery = buildGallery(galleryCell, useImageItems ? groups.image : [], editing);
   block.replaceChildren(inner, ...(gallery ? [gallery] : []));
-  if (editing) block.classList.add('open-roles-editing');
+  if (editing) block.classList.add('editing');
   // until New Science is loaded, Michroma stands in: its one weight is thickened to look like
   // the frames' Medium (open-roles.css); with New Science its own Medium is used
-  const standIn = () => block.classList.toggle('open-roles-standin', ![...(document.fonts || [])]
+  const standIn = () => block.classList.toggle('standin', ![...(document.fonts || [])]
     .some((face) => /^["']?new-science["']?$/i.test(face.family) && face.status === 'loaded'));
   standIn();
   document.fonts?.addEventListener('loadingdone', standIn);

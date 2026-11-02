@@ -8,8 +8,8 @@
  *   variant-phase-3 — the Phase 3 footer ("NEV / Footer"): a black-to-teal gradient; the logo,
  *     copyright line and privacy policy at the left, the CTA button in the centre, CONNECT (the
  *     social links as text) and the navigation columns at the right
- * Native CSS nesting: the wrapper first, then one root, the block in its section's wrapper (in
- * main on the footer's own page, in <footer> on the JSW pages), holding every rule: variables,
+ * Native CSS nesting: the wrapper first, then one root, .block.jsw-footer (in main on the
+ * footer's own page, in <footer> on the JSW pages), holding every rule: variables,
  * the block's own styles, its parts (short class names, safe inside the root), the section and
  * page around it (by :has(&)), the editor's states, each layout (&.variant-…) and the media
  * queries. Its faces: the global jsw-footer-text and jsw-footer-display (@font-face in
@@ -24,7 +24,9 @@ main > .section > .jsw-footer-wrapper {
   margin: 0;
 }
 
-:is(main, footer) > .section > .jsw-footer-wrapper > .block {
+/* the block, as Adobe's guide (Develop a block with CSS and JS) scopes it: .block.jsw-footer, every rule
+   nested inside it */
+.block.jsw-footer {
   /* 1. variables: desktop "units" (1px each in the 1280-wide frame), the faces (New Science
      first, once its web project is loaded; else the global footer faces) */
   --jsw-footer-unit: 1px;

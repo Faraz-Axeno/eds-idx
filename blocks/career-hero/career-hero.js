@@ -91,15 +91,15 @@ function sortRows(rows) {
 
 function buildCard(row, editing) {
   const [subtitleCell, valueCell, descriptionCell] = cellsOf(row);
-  const card = el('li', 'career-hero-card');
+  const card = el('li', 'card');
   moveInstrumentation(row, card);
-  const subtitle = retag(textOf(subtitleCell), 'p', 'career-hero-card-subtitle');
-  const value = retag(textOf(valueCell), 'p', 'career-hero-card-value');
-  const description = retag(textOf(descriptionCell), 'p', 'career-hero-card-description');
+  const subtitle = retag(textOf(subtitleCell), 'p', 'card-subtitle');
+  const value = retag(textOf(valueCell), 'p', 'card-value');
+  const description = retag(textOf(descriptionCell), 'p', 'card-description');
   cap(subtitle, TEXT_LIMITS.subtitle, editing);
   cap(value, TEXT_LIMITS.statValue, editing);
   cap(description, TEXT_LIMITS.description, editing);
-  const foot = el('div', 'career-hero-card-foot');
+  const foot = el('div', 'card-foot');
   foot.append(value, description);
   card.append(subtitle, foot);
   return card;
@@ -115,43 +115,43 @@ export default function decorate(block) {
     picture, headingCell, scrollCell, cards,
   } = sortRows([...block.children]);
 
-  const media = el('div', 'career-hero-media');
+  const media = el('div', 'media');
   if (picture) {
     picture.querySelector('img')?.setAttribute('loading', 'eager');
     media.append(picture);
   }
 
   // the top: a screen tall less the cards' top edge, the heading and scroll label at its foot
-  const top = el('div', 'career-hero-top');
-  const heading = retag(textOf(headingCell), 'h1', 'career-hero-heading');
+  const top = el('div', 'top');
+  const heading = retag(textOf(headingCell), 'h1', 'heading');
   if (!heading.textContent.trim()) heading.textContent = 'THE WORLD NEEDS PIONEERS';
   cap(heading, TEXT_LIMITS.heading, editing);
-  const scroll = el('p', 'career-hero-scroll', { 'aria-hidden': 'true' });
+  const scroll = el('p', 'scroll', { 'aria-hidden': 'true' });
   scroll.innerHTML = MOUSE_ICON;
-  const scrollLabel = retag(textOf(scrollCell), 'span', 'career-hero-scroll-label');
+  const scrollLabel = retag(textOf(scrollCell), 'span', 'scroll-label');
   if (!scrollLabel.textContent.trim()) scrollLabel.textContent = 'SCROLL';
   cap(scrollLabel, TEXT_LIMITS.scrollLabel, editing);
   scroll.append(scrollLabel);
   top.append(heading, scroll);
 
   // the cards: the first MAX_CARDS; in the editor the others too, dimmed
-  const list = el('ul', 'career-hero-cards');
+  const list = el('ul', 'cards');
   cards.forEach((row, i) => {
     if (i >= MAX_CARDS && !editing) return;
     const card = buildCard(row, editing);
     if (i >= MAX_CARDS) {
       card.classList.add('is-over-limit');
-      const note = el('p', 'career-hero-card-limit');
+      const note = el('p', 'card-limit');
       note.textContent = `Not shown on the page: only the first ${MAX_CARDS} cards are.`;
       card.append(note);
     }
     list.append(card);
   });
 
-  const inner = el('div', 'career-hero-inner');
+  const inner = el('div', 'inner');
   inner.append(top, list);
   block.replaceChildren(media, inner);
-  if (editing) block.classList.add('career-hero-editing');
+  if (editing) block.classList.add('editing');
   // the JSW navigation over the photo, once read from /jsw-phase-3
   loadJswNav().then((nav) => block.prepend(nav));
 }

@@ -49,10 +49,10 @@
   src: url('../fonts/inter.woff2') format('woff2');
 }
 
-/* the JSW footer's text face (blocks/jsw-footer) until New Science is loaded: Michroma drawn at
-   80%, about as wide as New Science in the frames (as in the other Phase 5 blocks) */
+/* the JSW text face (the Phase 5 blocks and the JSW footer) until New Science is loaded: Michroma
+   drawn at 80%, about as wide as New Science in the frames */
 @font-face {
-  font-family: jsw-footer-text;
+  font-family: jsw-text;
   font-display: swap;
   src: url('../fonts/michroma.woff2') format('woff2');
   size-adjust: 80%;

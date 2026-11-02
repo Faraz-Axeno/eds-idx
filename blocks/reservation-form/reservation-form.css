@@ -1,16 +1,25 @@
-@import url('../../styles/jsw-pill-nav.css');
-
 /*
  * reservation-form: values from the "Opt 2 / Reserve 1280x720" frame. The page is a rounded
  * panel inset on the dark page (as the JSW light panels) with the landscape behind; the card is
  * 956 x 556, 107px from the top: the car on its left 435px, the form on the right (36px in).
  */
 
-/* desktop: the card and everything in it are sized in "units" (1px each in the Figma frame),
-   so on screens too short for the 556px card (most laptops: 1366 x 768 leaves about 657px) it
-   shrinks as a whole to fit below the navigation: units are 1px down to the frame's own
-   height, smaller on shorter screens (at least 0.6px). Tablets and phones keep 1px units */
-.reservation-form {
+@import url('../../styles/jsw-pill-nav.css');
+
+/* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
+main > .section > .reservation-form-wrapper {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* the block, as Adobe's guide (Develop a block with CSS and JS) scopes it: .block.reservation-form, every rule
+   nested inside it */
+.block.reservation-form {
+  /* desktop: the card and everything in it are sized in "units" (1px each in the Figma frame),
+     so on screens too short for the 556px card (most laptops: 1366 x 768 leaves about 657px) it
+     shrinks as a whole to fit below the navigation: units are 1px down to the frame's own
+     height, smaller on shorter screens (at least 0.6px). Tablets and phones keep 1px units */
   --reservation-form-unit: 1px;
 
   box-sizing: border-box;
@@ -19,400 +28,398 @@
   color: #111;
   background-color: #050505;
   font-family: inter, 'Helvetica Neue', arial, sans-serif;
-}
 
-@supports (height: 1svh) and (width: clamp(1px, 1px, 1px)) {
-  @media (min-width: 900px) {
-    .reservation-form {
+  @supports (height: 1svh) and (width: clamp(1px, 1px, 1px)) {
+    @media (min-width: 900px) {
       --reservation-form-unit: clamp(0.6px, calc((var(--mg-panel-height, 100svh) - 146px) / 556), 1px);
     }
   }
-}
 
-.reservation-form .reservation-form-frame {
-  position: relative;
-  isolation: isolate;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(var(--mg-panel-height, 100svh) - 16px);
-  padding: 90px 24px 40px;
-  overflow: hidden;
-  border-radius: 24px;
-  background-color: #97b5cd;
-}
-
-.reservation-form .reservation-form-background,
-.reservation-form .reservation-form-background img {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* the navigation 26px from the top of the screen (18px into the inset panel) */
-@media (min-width: 600px) {
-  .reservation-form .jsw-pill-nav {
-    top: 18px;
-  }
-}
-
-.reservation-form .reservation-form-card {
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: 435fr 521fr;
-  width: min(calc(956 * var(--reservation-form-unit)), 100%);
-  min-height: calc(556 * var(--reservation-form-unit));
-  overflow: hidden;
-  border-radius: calc(24 * var(--reservation-form-unit));
-  background-color: #fff;
-}
-
-/* the car: its front and roof, as in the frame */
-.reservation-form .reservation-form-visual {
-  position: relative;
-  min-height: 220px;
-  overflow: hidden;
-  background-color: #000;
-}
-
-.reservation-form .reservation-form-visual picture,
-.reservation-form .reservation-form-visual img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 50%;
-}
-
-/* desktop: zoomed in on the windscreen and roof rail (the 2560 x 1440 car shot at 137% of the
-   card's height, its first roof light 70% across the panel) */
-@media (min-width: 900px) {
-  .reservation-form .reservation-form-visual img {
-    top: -12.4%;
-    left: -80%;
-    width: auto;
-    max-width: none;
-    height: 137%;
-  }
-}
-
-/* the pricing panel at the foot of the car ("Opt 2 / Reserve" with pricing): label and badge,
-   the amount, then the note; 390 x 149, 22px from the left, 25px from the bottom */
-.reservation-form .reservation-form-pricing {
-  position: absolute;
-  right: calc(24 * var(--reservation-form-unit));
-  bottom: calc(25 * var(--reservation-form-unit));
-  left: calc(22 * var(--reservation-form-unit));
-  z-index: 1;
-  box-sizing: border-box;
-  padding: calc(20 * var(--reservation-form-unit)) calc(21 * var(--reservation-form-unit)) calc(19 * var(--reservation-form-unit));
-  color: #fff;
-}
-
-.reservation-form .reservation-form-pricing p {
-  margin: 0;
-}
-
-.reservation-form .reservation-form-pricing-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: calc(12 * var(--reservation-form-unit));
-  min-height: calc(24 * var(--reservation-form-unit));
-}
-
-.reservation-form .reservation-form-pricing-label {
-  color: #a9a9a9;
-  font-size: calc(10 * var(--reservation-form-unit));
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.reservation-form .reservation-form-pricing-badge {
-  flex: none;
-  box-sizing: border-box;
-  height: calc(24 * var(--reservation-form-unit));
-  padding: 0 calc(10 * var(--reservation-form-unit));
-  border: 1px solid rgb(255 255 255 / 55%);
-  border-radius: calc(6 * var(--reservation-form-unit));
-  font-size: calc(9 * var(--reservation-form-unit));
-  line-height: calc(calc(24 * var(--reservation-form-unit)) - 2px);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.reservation-form .reservation-form-pricing-amount {
-  margin-top: calc(2 * var(--reservation-form-unit));
-  font-family: var(--jsw-pill-font-display);
-  font-size: calc(36 * var(--reservation-form-unit));
-  font-weight: 300;
-  line-height: calc(40 * var(--reservation-form-unit));
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-
-.reservation-form .reservation-form-pricing p.reservation-form-pricing-note {
-  margin-top: calc(10 * var(--reservation-form-unit));
-  color: #9b9b9b;
-  font-size: calc(11 * var(--reservation-form-unit));
-  line-height: calc(17 * var(--reservation-form-unit));
-}
-
-.reservation-form .reservation-form-body {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  padding: calc(40 * var(--reservation-form-unit)) calc(36 * var(--reservation-form-unit)) calc(36 * var(--reservation-form-unit));
-}
-
-.reservation-form .reservation-form-heading {
-  margin: 0 0 calc(10 * var(--reservation-form-unit));
-  font-family: var(--jsw-pill-font-display);
-  font-size: calc(26 * var(--reservation-form-unit));
-  font-weight: 400;
-  line-height: 1.15;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
-}
-
-.reservation-form .reservation-form-subheading {
-  margin: 0 0 calc(20 * var(--reservation-form-unit));
-  color: #666;
-  font-size: calc(13.5 * var(--reservation-form-unit));
-  line-height: 1.45;
-}
-
-.reservation-form .reservation-form-fields {
-  position: relative;
-  display: grid;
-  gap: calc(13 * var(--reservation-form-unit));
-  margin: 0;
-}
-
-.reservation-form .reservation-form-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: calc(12 * var(--reservation-form-unit));
-}
-
-.reservation-form .reservation-form-phone {
-  grid-template-columns: calc(55 * var(--reservation-form-unit)) minmax(0, 1fr);
-}
-
-/* the fields: 46px tall, #f2f2f2, 6px corners, light grey placeholders */
-.reservation-form .reservation-form-input,
-.reservation-form .reservation-form-prefix {
-  box-sizing: border-box;
-  width: 100%;
-  height: calc(46 * var(--reservation-form-unit));
-  margin: 0;
-  padding: 0 calc(14 * var(--reservation-form-unit));
-  border: 1px solid transparent;
-  border-radius: calc(6 * var(--reservation-form-unit));
-  color: #111;
-  background-color: #f2f2f2;
-  font-family: inherit;
-  font-size: calc(12 * var(--reservation-form-unit));
-  line-height: calc(calc(46 * var(--reservation-form-unit)) - 2px);
-  transition: border-color 0.2s ease;
-}
-
-.reservation-form .reservation-form-input::placeholder {
-  color: #b7b7b7;
-  opacity: 1;
-}
-
-.reservation-form .reservation-form-input:focus {
-  border-color: #c9c9c9;
-  outline: none;
-}
-
-.reservation-form .reservation-form-input:focus-visible {
-  outline: 2px solid #111;
-  outline-offset: 1px;
-}
-
-/* a field breaking its rule is outlined until it is corrected (reservation-form.js) */
-.reservation-form .reservation-form-input.is-invalid {
-  border-color: #d64545;
-}
-
-/* a field and, under it, its error message: in the gap below the field, so nothing moves */
-.reservation-form .reservation-form-field {
-  position: relative;
-  min-width: 0;
-}
-
-.reservation-form .reservation-form-error {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin: calc(1 * var(--reservation-form-unit)) 0 0;
-  overflow: hidden;
-  color: #d64545;
-  font-size: calc(10 * var(--reservation-form-unit));
-  line-height: calc(11 * var(--reservation-form-unit));
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.reservation-form .reservation-form-error:empty {
-  display: none;
-}
-
-.reservation-form .reservation-form-prefix {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  color: #b7b7b7;
-}
-
-/* the city list: its own chevron, grey until a city is picked */
-.reservation-form .reservation-form-select select {
-  padding-right: calc(44 * var(--reservation-form-unit));
-  color: #b7b7b7;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23111' stroke-width='1.4'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right calc(18 * var(--reservation-form-unit)) center;
-  background-size: calc(14 * var(--reservation-form-unit)) calc(8 * var(--reservation-form-unit));
-  cursor: pointer;
-  appearance: none;
-}
-
-.reservation-form .reservation-form-select select.is-chosen {
-  color: #111;
-}
-
-.reservation-form .reservation-form-select option {
-  color: #111;
-}
-
-/* the button: 126 x 46, black, 34px below the fields */
-.reservation-form .reservation-form-submit {
-  justify-self: start;
-  min-width: calc(126 * var(--reservation-form-unit));
-  height: calc(46 * var(--reservation-form-unit));
-  margin: calc(21 * var(--reservation-form-unit)) 0 0;
-  padding: 0 calc(24 * var(--reservation-form-unit));
-  border: 0;
-  border-radius: calc(6 * var(--reservation-form-unit));
-  color: #fff;
-  background-color: #000;
-  font-family: inherit;
-  font-size: calc(12 * var(--reservation-form-unit));
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.reservation-form .reservation-form-submit:hover {
-  background-color: #2a2a2a;
-}
-
-.reservation-form .reservation-form-submit:focus-visible {
-  outline: 2px solid #111;
-  outline-offset: 3px;
-}
-
-.reservation-form .reservation-form-disclaimer {
-  max-width: calc(420 * var(--reservation-form-unit));
-  margin: calc(22 * var(--reservation-form-unit)) 0 0;
-  color: #707070;
-  font-size: calc(9 * var(--reservation-form-unit));
-  line-height: 1.55;
-}
-
-/* settings that are not shown (action URL, cities, the button link): published they are
-   hidden; in Universal Editor they lie invisibly over the form, so picking one outlines it */
-.reservation-form .reservation-form-settings {
-  display: none;
-}
-
-.reservation-form.reservation-form-editing .reservation-form-settings {
-  position: absolute;
-  inset: 0;
-  display: block;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* tablets and phones: the car above the form */
-@media (max-width: 899.98px) {
-  .reservation-form .reservation-form-card {
-    grid-template-columns: minmax(0, 1fr);
-    min-height: 0;
-  }
-
-  .reservation-form .reservation-form-visual {
-    min-height: 0;
-    aspect-ratio: 16 / 7;
-  }
-
-  /* with the pricing panel: the car area as tall as before, the panel below it */
-  .reservation-form .reservation-form-visual:has(.reservation-form-pricing) {
-    aspect-ratio: auto;
-    padding-top: 43.75%;
-  }
-
-  .reservation-form .reservation-form-pricing {
+  .frame {
     position: relative;
-    inset: auto;
-    margin: 0 16px 16px;
-  }
-}
-
-@media (max-width: 599.98px) {
-  .reservation-form .reservation-form-frame {
-    padding: 16px 12px;
-  }
-
-  .reservation-form .reservation-form-body {
-    padding: 28px 20px 24px;
+    isolation: isolate;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(var(--mg-panel-height, 100svh) - 16px);
+    padding: 90px 24px 40px;
+    overflow: hidden;
+    border-radius: 24px;
+    background-color: #97b5cd;
   }
 
-  .reservation-form .reservation-form-pricing {
-    margin: 0 8px 8px;
-    padding: 16px;
-  }
-
-  .reservation-form .reservation-form-pricing-amount {
-    font-size: 32px;
-    line-height: 38px;
-  }
-
-  .reservation-form .reservation-form-heading {
-    font-size: 22px;
-  }
-
-  .reservation-form .reservation-form-subheading {
-    margin-bottom: 22px;
-  }
-
-  .reservation-form .reservation-form-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .reservation-form .reservation-form-phone {
-    grid-template-columns: 55px minmax(0, 1fr);
-  }
-
-  .reservation-form .reservation-form-submit {
+  .background,
+  .background img {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
-}
 
-/* Universal Editor (its markup carries data-aue-resource; never on the published page): the
-   editor's canvas can grow to fit the page, and a page one screen tall would then grow it
-   without end, so there the page is at most 1000px tall (as on /jsw-phase-3) */
-body:has(.reservation-form[data-aue-resource]) {
-  --mg-panel-height: min(100svh, 1000px);
+  /* the navigation 26px from the top of the screen (18px into the inset panel) */
+  @media (min-width: 600px) {
+    .jsw-pill-nav {
+      top: 18px;
+    }
+  }
+
+  .card {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 435fr 521fr;
+    width: min(calc(956 * var(--reservation-form-unit)), 100%);
+    min-height: calc(556 * var(--reservation-form-unit));
+    overflow: hidden;
+    border-radius: calc(24 * var(--reservation-form-unit));
+    background-color: #fff;
+  }
+
+  /* the car: its front and roof, as in the frame */
+  .visual {
+    position: relative;
+    min-height: 220px;
+    overflow: hidden;
+    background-color: #000;
+  }
+
+  .visual picture,
+  .visual img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+  }
+
+  /* desktop: zoomed in on the windscreen and roof rail (the 2560 x 1440 car shot at 137% of the
+     card's height, its first roof light 70% across the panel) */
+  @media (min-width: 900px) {
+    .visual img {
+      top: -12.4%;
+      left: -80%;
+      width: auto;
+      max-width: none;
+      height: 137%;
+    }
+  }
+
+  /* the pricing panel at the foot of the car ("Opt 2 / Reserve" with pricing): label and badge,
+     the amount, then the note; 390 x 149, 22px from the left, 25px from the bottom */
+  .pricing {
+    position: absolute;
+    right: calc(24 * var(--reservation-form-unit));
+    bottom: calc(25 * var(--reservation-form-unit));
+    left: calc(22 * var(--reservation-form-unit));
+    z-index: 1;
+    box-sizing: border-box;
+    padding: calc(20 * var(--reservation-form-unit)) calc(21 * var(--reservation-form-unit)) calc(19 * var(--reservation-form-unit));
+    color: #fff;
+  }
+
+  .pricing p {
+    margin: 0;
+  }
+
+  .pricing-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(12 * var(--reservation-form-unit));
+    min-height: calc(24 * var(--reservation-form-unit));
+  }
+
+  .pricing-label {
+    color: #a9a9a9;
+    font-size: calc(10 * var(--reservation-form-unit));
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .pricing-badge {
+    flex: none;
+    box-sizing: border-box;
+    height: calc(24 * var(--reservation-form-unit));
+    padding: 0 calc(10 * var(--reservation-form-unit));
+    border: 1px solid rgb(255 255 255 / 55%);
+    border-radius: calc(6 * var(--reservation-form-unit));
+    font-size: calc(9 * var(--reservation-form-unit));
+    line-height: calc(calc(24 * var(--reservation-form-unit)) - 2px);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .pricing-amount {
+    margin-top: calc(2 * var(--reservation-form-unit));
+    font-family: var(--jsw-pill-font-display);
+    font-size: calc(36 * var(--reservation-form-unit));
+    font-weight: 300;
+    line-height: calc(40 * var(--reservation-form-unit));
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .pricing p.pricing-note {
+    margin-top: calc(10 * var(--reservation-form-unit));
+    color: #9b9b9b;
+    font-size: calc(11 * var(--reservation-form-unit));
+    line-height: calc(17 * var(--reservation-form-unit));
+  }
+
+  .body {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: calc(40 * var(--reservation-form-unit)) calc(36 * var(--reservation-form-unit)) calc(36 * var(--reservation-form-unit));
+  }
+
+  .heading {
+    margin: 0 0 calc(10 * var(--reservation-form-unit));
+    font-family: var(--jsw-pill-font-display);
+    font-size: calc(26 * var(--reservation-form-unit));
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+
+  .subheading {
+    margin: 0 0 calc(20 * var(--reservation-form-unit));
+    color: #666;
+    font-size: calc(13.5 * var(--reservation-form-unit));
+    line-height: 1.45;
+  }
+
+  .fields {
+    position: relative;
+    display: grid;
+    gap: calc(13 * var(--reservation-form-unit));
+    margin: 0;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(12 * var(--reservation-form-unit));
+  }
+
+  .phone {
+    grid-template-columns: calc(55 * var(--reservation-form-unit)) minmax(0, 1fr);
+  }
+
+  /* the fields: 46px tall, #f2f2f2, 6px corners, light grey placeholders */
+  .input,
+  .prefix {
+    box-sizing: border-box;
+    width: 100%;
+    height: calc(46 * var(--reservation-form-unit));
+    margin: 0;
+    padding: 0 calc(14 * var(--reservation-form-unit));
+    border: 1px solid transparent;
+    border-radius: calc(6 * var(--reservation-form-unit));
+    color: #111;
+    background-color: #f2f2f2;
+    font-family: inherit;
+    font-size: calc(12 * var(--reservation-form-unit));
+    line-height: calc(calc(46 * var(--reservation-form-unit)) - 2px);
+    transition: border-color 0.2s ease;
+  }
+
+  .input::placeholder {
+    color: #b7b7b7;
+    opacity: 1;
+  }
+
+  .input:focus {
+    border-color: #c9c9c9;
+    outline: none;
+  }
+
+  .input:focus-visible {
+    outline: 2px solid #111;
+    outline-offset: 1px;
+  }
+
+  /* a field breaking its rule is outlined until it is corrected (reservation-form.js) */
+  .input.is-invalid {
+    border-color: #d64545;
+  }
+
+  /* a field and, under it, its error message: in the gap below the field, so nothing moves */
+  .field {
+    position: relative;
+    min-width: 0;
+  }
+
+  .error {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: calc(1 * var(--reservation-form-unit)) 0 0;
+    overflow: hidden;
+    color: #d64545;
+    font-size: calc(10 * var(--reservation-form-unit));
+    line-height: calc(11 * var(--reservation-form-unit));
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .error:empty {
+    display: none;
+  }
+
+  .prefix {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: #b7b7b7;
+  }
+
+  /* the city list: its own chevron, grey until a city is picked */
+  .select select {
+    padding-right: calc(44 * var(--reservation-form-unit));
+    color: #b7b7b7;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23111' stroke-width='1.4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right calc(18 * var(--reservation-form-unit)) center;
+    background-size: calc(14 * var(--reservation-form-unit)) calc(8 * var(--reservation-form-unit));
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .select select.is-chosen {
+    color: #111;
+  }
+
+  .select option {
+    color: #111;
+  }
+
+  /* the button: 126 x 46, black, 34px below the fields */
+  .submit {
+    justify-self: start;
+    min-width: calc(126 * var(--reservation-form-unit));
+    height: calc(46 * var(--reservation-form-unit));
+    margin: calc(21 * var(--reservation-form-unit)) 0 0;
+    padding: 0 calc(24 * var(--reservation-form-unit));
+    border: 0;
+    border-radius: calc(6 * var(--reservation-form-unit));
+    color: #fff;
+    background-color: #000;
+    font-family: inherit;
+    font-size: calc(12 * var(--reservation-form-unit));
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .submit:hover {
+    background-color: #2a2a2a;
+  }
+
+  .submit:focus-visible {
+    outline: 2px solid #111;
+    outline-offset: 3px;
+  }
+
+  .disclaimer {
+    max-width: calc(420 * var(--reservation-form-unit));
+    margin: calc(22 * var(--reservation-form-unit)) 0 0;
+    color: #707070;
+    font-size: calc(9 * var(--reservation-form-unit));
+    line-height: 1.55;
+  }
+
+  /* settings that are not shown (action URL, cities, the button link): published they are
+     hidden; in Universal Editor they lie invisibly over the form, so picking one outlines it */
+  .settings {
+    display: none;
+  }
+
+  &.editing .settings {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* tablets and phones: the car above the form */
+  @media (max-width: 899.98px) {
+    .card {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .visual {
+      min-height: 0;
+      aspect-ratio: 16 / 7;
+    }
+
+    /* with the pricing panel: the car area as tall as before, the panel below it */
+    .visual:has(.pricing) {
+      aspect-ratio: auto;
+      padding-top: 43.75%;
+    }
+
+    .pricing {
+      position: relative;
+      inset: auto;
+      margin: 0 16px 16px;
+    }
+  }
+
+  @media (max-width: 599.98px) {
+    .frame {
+      padding: 16px 12px;
+    }
+
+    .body {
+      padding: 28px 20px 24px;
+    }
+
+    .pricing {
+      margin: 0 8px 8px;
+      padding: 16px;
+    }
+
+    .pricing-amount {
+      font-size: 32px;
+      line-height: 38px;
+    }
+
+    .heading {
+      font-size: 22px;
+    }
+
+    .subheading {
+      margin-bottom: 22px;
+    }
+
+    .row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .phone {
+      grid-template-columns: 55px minmax(0, 1fr);
+    }
+
+    .submit {
+      width: 100%;
+    }
+  }
+
+  /* Universal Editor (its markup carries data-aue-resource; never on the published page): the
+     editor's canvas can grow to fit the page, and a page one screen tall would then grow it
+     without end, so there the page is at most 1000px tall (as on /jsw-phase-3) */
+  body:has(&[data-aue-resource]) {
+    --mg-panel-height: min(100svh, 1000px);
+  }
 }

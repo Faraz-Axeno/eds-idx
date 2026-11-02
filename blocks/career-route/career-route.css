@@ -1,21 +1,21 @@
-@import url('../../styles/jsw-pill-nav.css');
-
 /*
  * career-route: values from the "Phase 5 / Route In" frame (1280 wide), tightened: the photo
  * covering the section, darkened; the heading 54px in, 48px from the top; at the foot, 32px above
  * the end, four compact frosted-glass step cards side by side, 8px apart. A static section.
  */
 
-/* the text face until New Science is loaded: Michroma drawn at 80%, about as wide as New Science
-   in the frames (as in open-roles and career-hero) */
-@font-face {
-  font-family: career-route-text;
-  font-display: swap;
-  src: url('../../fonts/michroma.woff2') format('woff2');
-  size-adjust: 80%;
+@import url('../../styles/jsw-pill-nav.css');
+
+/* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
+main > .section > .career-route-wrapper {
+  max-width: none;
+  padding: 0;
+  margin: 0;
 }
 
-.career-route {
+/* the block, as Adobe's guide (Develop a block with CSS and JS) scopes it: .block.career-route, every rule
+   nested inside it */
+.block.career-route {
   --career-route-unit: 1px;
 
   position: relative;
@@ -23,209 +23,211 @@
   overflow: hidden;
   color: #fff;
   background-color: #1a120b;
-  font-family: new-science, career-route-text, 'Helvetica Neue', arial, sans-serif;
-}
+  font-family: new-science, var(--font-jsw-text);
 
-/* desktop: the heading and the cards sized in "units", 1px each in the 1280-wide frame, so on
-   narrower desktops they shrink as a whole and their texts wrap as in the frame (at least 0.7px);
-   tablets and phones keep 1px units */
-@media (min-width: 900px) {
-  .career-route {
+  /* desktop: the heading and the cards sized in "units", 1px each in the 1280-wide frame, so on
+     narrower desktops they shrink as a whole and their texts wrap as in the frame (at least 0.7px);
+     tablets and phones keep 1px units */
+  @media (min-width: 900px) {
     --career-route-unit: clamp(0.7px, calc(100vw / 1280), 1px);
   }
-}
 
-/* the photo: covering the whole section, centred (object-fit and object-position do for the
-   picture what background-size: cover and background-position: center do for a background) */
-.career-route .career-route-media,
-.career-route .career-route-media picture,
-.career-route .career-route-media img {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-}
+  /* the photo: covering the whole section, centred (object-fit and object-position do for the
+     picture what background-size: cover and background-position: center do for a background) */
+  .media,
+  .media picture,
+  .media img {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+  }
 
-.career-route .career-route-media img {
-  object-fit: cover;
-  object-position: center;
-}
+  .media img {
+    object-fit: cover;
+    object-position: center;
+  }
 
-/* darker at the top for the heading and at the foot behind the cards, as in the frame */
-.career-route .career-route-media::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(180deg, rgb(0 0 0 / 55%) 0%, rgb(0 0 0 / 22%) 45%, rgb(0 0 0 / 40%) 100%);
-}
+  /* darker at the top for the heading and at the foot behind the cards, as in the frame */
+  .media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(180deg, rgb(0 0 0 / 55%) 0%, rgb(0 0 0 / 22%) 45%, rgb(0 0 0 / 40%) 100%);
+  }
 
-/* the section as tall as the block, not a screen tall (main > .section, styles/styles.css), so no
-   empty band below the photo on taller screens or in the editor (whose canvas can grow to fit the
-   page: a section a screen tall would grow it without end); only the section holding the block */
-main > .section.career-route-container {
-  min-height: 0;
-}
-
-/* the heading at the top, the steps anchored to the foot (margin-top: auto below); 640 tall in the
-   1280-wide frame, in units, so on narrower desktops it shrinks with the width */
-.career-route .career-route-inner {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: calc(48 * var(--career-route-unit));
-  min-height: calc(640 * var(--career-route-unit));
-  padding: calc(48 * var(--career-route-unit)) calc(54 * var(--career-route-unit)) calc(32 * var(--career-route-unit));
-}
-
-.career-route .career-route-heading {
-  /* stylelint-disable-next-line value-no-vendor-prefix -- line clamping needs the old box */
-  display: -webkit-box;
-  max-width: calc(660 * var(--career-route-unit));
-  margin: 0;
-  overflow: hidden;
-  color: #fff;
-  font-family: var(--jsw-pill-font-display);
-  font-size: calc(38 * var(--career-route-unit));
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
-  overflow-wrap: anywhere;
-  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
-  -webkit-box-orient: vertical;
-  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-}
-
-/* the steps: four side by side, the same size whatever their texts */
-.career-route .career-route-steps {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: calc(8 * var(--career-route-unit));
-  margin: 0;
-  margin-top: auto;
-  padding: 0;
-  list-style: none;
-}
-
-/* frosted glass: the photo blurred behind a gradient, darker at the foot, lighter at the top;
-   as tall as its texts (the cards of a row match the tallest), the number, title and description
-   grouped from the top so the titles line up */
-.career-route .career-route-step {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: calc(24 * var(--career-route-unit));
-  min-width: 0;
-  padding: calc(18 * var(--career-route-unit)) calc(22 * var(--career-route-unit)) calc(20 * var(--career-route-unit));
-  border-radius: calc(8 * var(--career-route-unit));
-  background: linear-gradient(0deg, rgb(12 9 6 / 62%) 0%, rgb(12 9 6 / 34%) 55%, rgb(12 9 6 / 18%) 100%);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-}
-
-.career-route .career-route-step p,
-.career-route .career-route-step h3 {
-  margin: 0;
-}
-
-.career-route .career-route-step-number {
-  overflow: hidden;
-  color: #d9d9d9;
-  font-family: var(--jsw-pill-font-display);
-  font-size: calc(18 * var(--career-route-unit));
-  font-weight: 300;
-  line-height: 1;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.career-route .career-route-step-text {
-  min-width: 0;
-}
-
-.career-route .career-route-step-title {
-  overflow: hidden;
-  color: #fff;
-  font-family: inherit;
-  font-size: calc(14 * var(--career-route-unit));
-  font-weight: 500;
-  line-height: 1.2;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-/* the description: three lines at most, ending in "…" */
-.career-route .career-route-step .career-route-step-description {
-  /* stylelint-disable-next-line value-no-vendor-prefix -- line clamping needs the old box */
-  display: -webkit-box;
-  margin-top: calc(5 * var(--career-route-unit));
-  overflow: hidden;
-  color: rgb(255 255 255 / 72%);
-  font-size: calc(13 * var(--career-route-unit));
-  line-height: 1.4;
-  letter-spacing: 0;
-  overflow-wrap: anywhere;
-  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
-  -webkit-box-orient: vertical;
-  /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-}
-
-/* steps over the limit (MAX_STEPS, career-route.js): never on the live page (not put into it);
-   in Universal Editor hidden too, also in its Preview mode, and only while editing (the editor
-   marks it with adobe-ue-edit) shown dimmed with a note, so they can be found and removed */
-.career-route .career-route-step.is-over-limit {
-  display: none;
-}
-
-html.adobe-ue-edit .career-route .career-route-step.is-over-limit {
-  display: flex;
-  opacity: 0.45;
-}
-
-.career-route .career-route-step .career-route-step-limit {
-  color: #ffb27a;
-  font-size: 12px;
-}
-
-/* tablets: two steps a row */
-@media (max-width: 899.98px) {
-  .career-route .career-route-inner {
-    gap: 120px;
+  /* the section as tall as the block, not a screen tall (main > .section, styles/styles.css), so no
+     empty band below the photo on taller screens or in the editor (whose canvas can grow to fit the
+     page: a section a screen tall would grow it without end); only the section holding the block */
+  main > .section:has(> .career-route-wrapper > &) {
     min-height: 0;
-    padding: 48px 24px 28px;
   }
 
-  .career-route .career-route-heading {
-    font-size: 30px;
+  /* the heading at the top, the steps anchored to the foot (margin-top: auto below); 640 tall in the
+     1280-wide frame, in units, so on narrower desktops it shrinks with the width */
+  .inner {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: calc(48 * var(--career-route-unit));
+    min-height: calc(640 * var(--career-route-unit));
+    padding: calc(48 * var(--career-route-unit)) calc(54 * var(--career-route-unit)) calc(32 * var(--career-route-unit));
   }
 
-  .career-route .career-route-steps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
+  .heading {
+    /* stylelint-disable-next-line value-no-vendor-prefix -- line clamping needs the old box */
+    display: -webkit-box;
+    max-width: calc(660 * var(--career-route-unit));
+    margin: 0;
+    overflow: hidden;
+    color: #fff;
+    font-family: var(--jsw-pill-font-display);
+    font-size: calc(38 * var(--career-route-unit));
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
 
-/* phones: one step a row */
-@media (max-width: 599.98px) {
-  .career-route .career-route-inner {
-    gap: 96px;
-    padding: 40px 20px 20px;
+    /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+    -webkit-box-orient: vertical;
+
+    /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 
-  .career-route .career-route-heading {
-    font-size: 21px;
+  /* the steps: four side by side, the same size whatever their texts */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: calc(8 * var(--career-route-unit));
+    margin: 0;
+    margin-top: auto;
+    padding: 0;
+    list-style: none;
   }
 
-  .career-route .career-route-steps {
-    grid-template-columns: minmax(0, 1fr);
+  /* frosted glass: the photo blurred behind a gradient, darker at the foot, lighter at the top;
+     as tall as its texts (the cards of a row match the tallest), the number, title and description
+     grouped from the top so the titles line up */
+  .step {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: calc(24 * var(--career-route-unit));
+    min-width: 0;
+    padding: calc(18 * var(--career-route-unit)) calc(22 * var(--career-route-unit)) calc(20 * var(--career-route-unit));
+    border-radius: calc(8 * var(--career-route-unit));
+    background: linear-gradient(0deg, rgb(12 9 6 / 62%) 0%, rgb(12 9 6 / 34%) 55%, rgb(12 9 6 / 18%) 100%);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   }
 
-  .career-route .career-route-step {
-    gap: 18px;
-    padding: 16px 18px 18px;
+  .step p,
+  .step h3 {
+    margin: 0;
+  }
+
+  .step-number {
+    overflow: hidden;
+    color: #d9d9d9;
+    font-family: var(--jsw-pill-font-display);
+    font-size: calc(18 * var(--career-route-unit));
+    font-weight: 300;
+    line-height: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .step-text {
+    min-width: 0;
+  }
+
+  .step-title {
+    overflow: hidden;
+    color: #fff;
+    font-family: inherit;
+    font-size: calc(14 * var(--career-route-unit));
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* the description: three lines at most, ending in "…" */
+  .step .step-description {
+    /* stylelint-disable-next-line value-no-vendor-prefix -- line clamping needs the old box */
+    display: -webkit-box;
+    margin-top: calc(5 * var(--career-route-unit));
+    overflow: hidden;
+    color: rgb(255 255 255 / 72%);
+    font-size: calc(13 * var(--career-route-unit));
+    line-height: 1.4;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+
+    /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+    -webkit-box-orient: vertical;
+
+    /* stylelint-disable-next-line property-no-vendor-prefix -- line clamping needs the old box */
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+
+  /* steps over the limit (MAX_STEPS, career-route.js): never on the live page (not put into it);
+     in Universal Editor hidden too, also in its Preview mode, and only while editing (the editor
+     marks it with adobe-ue-edit) shown dimmed with a note, so they can be found and removed */
+  .step.is-over-limit {
+    display: none;
+  }
+
+  html.adobe-ue-edit & .step.is-over-limit {
+    display: flex;
+    opacity: 0.45;
+  }
+
+  .step .step-limit {
+    color: #ffb27a;
+    font-size: 12px;
+  }
+
+  /* tablets: two steps a row */
+  @media (max-width: 899.98px) {
+    .inner {
+      gap: 120px;
+      min-height: 0;
+      padding: 48px 24px 28px;
+    }
+
+    .heading {
+      font-size: 30px;
+    }
+
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* phones: one step a row */
+  @media (max-width: 599.98px) {
+    .inner {
+      gap: 96px;
+      padding: 40px 20px 20px;
+    }
+
+    .heading {
+      font-size: 21px;
+    }
+
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .step {
+      gap: 18px;
+      padding: 16px 18px 18px;
+    }
   }
 }
