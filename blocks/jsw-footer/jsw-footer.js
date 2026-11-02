@@ -56,12 +56,44 @@ const LEGACY_ITEM = /^jsw-footer-(column|link|social)$/;
 
 // the layouts (the Footer layout field's values, and the block's class); the first the default
 const VARIANTS = ['variant-phase-5', 'variant-phase-3'];
+
+// the file types each media field accepts, by the asset's extension (published images keep their
+// file's: media_….jpg): an asset of another type is not shown, a console warning instead
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png']; // the background image
+const LOGO_EXTENSIONS = ['svg']; // the logo: the only field for SVG alone
+const ICON_EXTENSIONS = [...IMAGE_EXTENSIONS, 'svg']; // the social icons: images, or SVG like the logo
+const VIDEO_EXTENSIONS = ['mp4', 'mov']; // the background video
+// the source's type, where it helps: none for .mov (as video/quicktime, Chrome would skip MOV files
+// it can play, those in H.264): the browser tries the file, the picture stays if it cannot play it
 const VIDEO_TYPES = {
   mp4: 'video/mp4',
-  m4v: 'video/mp4',
-  webm: 'video/webm',
-  mov: 'video/quicktime',
 };
+
+/** an asset's file extension, from its URL's path ('' when it has none) */
+function extensionOf(url) {
+  try {
+    const name = new URL(url, window.location.href).pathname.split('/').pop();
+    return name.includes('.') ? name.split('.').pop().toLowerCase() : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+/** whether an asset's file type is accepted for its field; if not, a warning (it is not shown) */
+function acceptedType(url, allowed, field) {
+  const ext = extensionOf(url);
+  if (allowed.includes(ext)) return true;
+  // eslint-disable-next-line no-console
+  console.warn(`jsw-footer: the ${field} ${url} is not shown: its file type (${ext ? `.${ext}` : 'none'}) is not .${allowed.join(', .')}`);
+  return false;
+}
+
+/** a picture whose image is of an accepted file type for its field, else null (not shown) */
+function acceptedPicture(picture, allowed, field) {
+  const src = picture?.querySelector('img')?.getAttribute('src');
+  if (!picture || !src) return picture || null;
+  return acceptedType(src, allowed, field) ? picture : null;
+}
 
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
@@ -238,14 +270,16 @@ function readSiblingBlocks(block) {
 function buildMedia(cell) {
   const media = el('div', 'media');
   if (!cell) return media;
-  const picture = cell.querySelector('picture');
+  // the background image: JPG, JPEG or PNG; the video: MP4 or MOV (else not shown)
+  const picture = acceptedPicture(cell.querySelector('picture'), IMAGE_EXTENSIONS, 'background image');
   const mode = textsOf(cell).map((n) => n.textContent.trim().toLowerCase())
     .find((t) => t === 'image' || t === 'video' || t === 'both') || 'image';
   const videoUrl = cell.querySelector('a')?.href;
   if (picture) media.append(picture);
-  const ext = videoUrl?.split(/[?#]/)[0].split('.').pop().toLowerCase();
+  const ext = extensionOf(videoUrl || '');
   // Video, or Image and video (for now shown as Video): the video over the picture
   if (mode === 'image' || !videoUrl) return media;
+  if (!acceptedType(videoUrl, VIDEO_EXTENSIONS, 'background video')) return media;
 
   const video = el('video', 'video', {
     loop: '', muted: '', playsinline: '', 'aria-hidden': 'true', preload: 'none',
@@ -292,7 +326,8 @@ function variantOf(block, mediaCell) {
 function buildBrand(brandCell, ctaLink, editing) {
   const brand = el('div', 'brand');
   const logo = el('p', 'logo');
-  const picture = brandCell?.querySelector('picture');
+  // the logo: SVG only (else not shown)
+  const picture = acceptedPicture(brandCell?.querySelector('picture'), LOGO_EXTENSIONS, 'logo');
   if (picture) logo.append(picture);
   const [copyrightNode] = textsOf(brandCell);
   const copyright = retag(copyrightNode, 'p', 'copyright');
@@ -585,9 +620,13 @@ function buildSocial({ heading, icons }, asText, editing, keepAll = false) {
   const column = el('div', 'column connect');
   if (heading) column.append(buildHeading(heading, editing));
   const list = el('ul', asText ? 'links' : 'social-icons');
+  // an icon's image: JPG, JPEG, PNG or SVG (else not shown: the icon counts as incomplete)
+  const typed = icons.map((icon) => ({
+    ...icon, picture: acceptedPicture(icon.picture, ICON_EXTENSIONS, 'social icon'),
+  }));
   // on the page: the first MAX_ITEMS icons with their image, network name and URL; in the editor
   // (keepAll) every icon, those missing one of them marked (shown only while editing)
-  const shown = keepAll ? icons : icons.filter(isCompleteIcon).slice(0, MAX_ITEMS);
+  const shown = keepAll ? typed : typed.filter(isCompleteIcon).slice(0, MAX_ITEMS);
   shown.forEach(({ picture, link }) => {
     const incomplete = !isCompleteIcon({ picture, link });
     if (!picture && !link) {

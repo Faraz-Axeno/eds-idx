@@ -55,7 +55,7 @@
           "component": "select",
           "name": "media_footerVariant",
           "label": "Footer layout",
-          "description": "Variant A: the photo (or video) behind; the logo, copyright and button at the left, the columns and social icons at the right. Variant B: the black-to-teal gradient (no photo); the logo, copyright and privacy policy at the left, the button in the centre, CONNECT (the social links as text) and the columns at the right. Columns and Icons: add them to this block.",
+          "description": "A: photo/video background, columns right. B: Phase 3 gradient, button centred.",
           "valueType": "string",
           "value": "variant-phase-5",
           "required": true,
@@ -74,7 +74,7 @@
           "component": "select",
           "name": "media_backgroundMode",
           "label": "Background type",
-          "description": "Image: the background image. Video: the background video, playing muted on a loop (the background image shows until it plays, and instead of it if it cannot). Image and video: both the background image and the background video (shown as Video for now). Note: Background media is only used in Variant A. This field is ignored if Variant B is selected.",
+          "description": "Image, Video (muted loop over the image), or both. Variant A only.",
           "valueType": "string",
           "value": "image",
           "required": true,
@@ -98,7 +98,7 @@
           "valueType": "string",
           "name": "media_backgroundImage",
           "label": "Background image",
-          "description": "Covers the whole footer (with Video, or Image and video: shown until the video plays). Note: Background media is only used in Variant A. This field is ignored if Variant B is selected.",
+          "description": "JPG, JPEG or PNG covering the footer. Variant A only; ignored in B.",
           "multi": false,
           "required": true
         },
@@ -107,7 +107,7 @@
           "valueType": "string",
           "name": "media_backgroundImageAlt",
           "label": "Background image alt text",
-          "description": "Leave empty when the image is decoration only. At most 125 characters.",
+          "description": "Leave empty if decorative. Max 125 chars.",
           "value": "",
           "validation": {
             "maxLength": 125
@@ -118,7 +118,7 @@
           "valueType": "string",
           "name": "media_backgroundVideo",
           "label": "Background video",
-          "description": "An MP4 video from Assets, or its full URL. Used when Background type is Video, or Image and video. Note: Background media is only used in Variant A. This field is ignored if Variant B is selected.",
+          "description": "MP4 or MOV from Assets, or its full URL. Variant A only; ignored in B.",
           "condition": {
             "or": [
               {
@@ -145,7 +145,7 @@
           "valueType": "string",
           "name": "brand_logo",
           "label": "Logo",
-          "description": "The JSW MOTORS wordmark, white.",
+          "description": "The white JSW MOTORS wordmark. SVG only.",
           "multi": false,
           "required": true
         },
@@ -164,7 +164,7 @@
           "valueType": "string",
           "name": "brand_copyright",
           "label": "Copyright text",
-          "description": "Under the logo, e.g. © 2026 JSW Motors  Mumbai, India. At most 60 characters.",
+          "description": "Under the logo, e.g. © 2026 JSW Motors  Mumbai, India. Max 60 chars.",
           "value": "© 2026 JSW Motors  Mumbai, India",
           "required": true,
           "validation": {
@@ -176,7 +176,7 @@
           "valueType": "string",
           "name": "brand_ctaButton",
           "label": "CTA button link",
-          "description": "Where the white button leads (a page, or #section on one).",
+          "description": "Where the white button leads: a page, or #section on one.",
           "required": true
         },
         {
@@ -184,7 +184,7 @@
           "valueType": "string",
           "name": "brand_ctaButtonText",
           "label": "CTA button text",
-          "description": "The \"+\" after it is added on the page. At most 24 characters.",
+          "description": "The \"+\" is added on the page. Max 24 chars.",
           "value": "REGISTER INTEREST",
           "required": true,
           "validation": {
@@ -203,7 +203,7 @@
           "valueType": "string",
           "name": "brand_privacyPolicyText",
           "label": "Privacy policy text",
-          "description": "At the foot, on the left. At most 30 characters.",
+          "description": "At the foot, on the left. Max 30 chars.",
           "value": "PRIVACY POLICY",
           "required": true,
           "validation": {
@@ -215,7 +215,7 @@
           "valueType": "string",
           "name": "brand_socialHeading",
           "label": "Social heading",
-          "description": "Above the social icons, e.g. CONNECT. At most 20 characters.",
+          "description": "Above the social icons, e.g. CONNECT. Max 20 chars.",
           "value": "CONNECT",
           "required": true,
           "validation": {
@@ -232,7 +232,7 @@
           "valueType": "string",
           "name": "columnHeading",
           "label": "Column title",
-          "description": "e.g. TECHNOLOGY. At most 20 characters.",
+          "description": "e.g. TECHNOLOGY. Max 20 chars.",
           "required": true,
           "validation": {
             "maxLength": 20
@@ -243,14 +243,14 @@
           "valueType": "string",
           "name": "links_link1",
           "label": "Link 1 URL",
-          "description": "A page, #section, or a full URL. A link without a URL is not shown. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page."
+          "description": "Page, #section or full URL. Needs its text too, or it is hidden."
         },
         {
           "component": "text",
           "valueType": "string",
           "name": "links_link1Text",
           "label": "Link 1 text",
-          "description": "e.g. NEVs. At most 24 characters. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page.",
+          "description": "e.g. NEVs, max 24 chars. Needs its URL too, or it is hidden.",
           "validation": {
             "maxLength": 24
           }
@@ -260,14 +260,14 @@
           "valueType": "string",
           "name": "links_link2",
           "label": "Link 2 URL",
-          "description": "A page, #section, or a full URL. A link without a URL is not shown. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page."
+          "description": "Page, #section or full URL. Needs its text too, or it is hidden."
         },
         {
           "component": "text",
           "valueType": "string",
           "name": "links_link2Text",
           "label": "Link 2 text",
-          "description": "e.g. NEVs. At most 24 characters. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page.",
+          "description": "e.g. NEVs, max 24 chars. Needs its URL too, or it is hidden.",
           "validation": {
             "maxLength": 24
           }
@@ -277,14 +277,14 @@
           "valueType": "string",
           "name": "links_link3",
           "label": "Link 3 URL",
-          "description": "A page, #section, or a full URL. A link without a URL is not shown. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page."
+          "description": "Page, #section or full URL. Needs its text too, or it is hidden."
         },
         {
           "component": "text",
           "valueType": "string",
           "name": "links_link3Text",
           "label": "Link 3 text",
-          "description": "e.g. NEVs. At most 24 characters. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page.",
+          "description": "e.g. NEVs, max 24 chars. Needs its URL too, or it is hidden.",
           "validation": {
             "maxLength": 24
           }
@@ -294,14 +294,14 @@
           "valueType": "string",
           "name": "links_link4",
           "label": "Link 4 URL",
-          "description": "A page, #section, or a full URL. A link without a URL is not shown. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page."
+          "description": "Page, #section or full URL. Needs its text too, or it is hidden."
         },
         {
           "component": "text",
           "valueType": "string",
           "name": "links_link4Text",
           "label": "Link 4 text",
-          "description": "e.g. NEVs. At most 24 characters. Warning: Both the text and the URL must be provided. If one is missing, the link will not be displayed on the page.",
+          "description": "e.g. NEVs, max 24 chars. Needs its URL too, or it is hidden.",
           "validation": {
             "maxLength": 24
           }
@@ -316,7 +316,7 @@
           "valueType": "string",
           "name": "iconImage",
           "label": "Icon",
-          "description": "The network's logo, white on transparent (SVG or PNG). Warning: You can add multiple icons, but a maximum of 4 will be displayed on the live site. Warning: The icon, its network name and its URL must all be provided. If one is missing, the icon will not be displayed on the page.",
+          "description": "White logo, SVG, PNG, JPG or JPEG. Max 4 icons shown; needs name and URL.",
           "multi": false,
           "required": true
         },
@@ -325,7 +325,7 @@
           "valueType": "string",
           "name": "iconImageAlt",
           "label": "Network name",
-          "description": "e.g. Facebook: read out by screen readers, and shown as the link in the Variant B layout. At most 30 characters. Warning: The icon, its network name and its URL must all be provided. If one is missing, the icon will not be displayed on the page.",
+          "description": "e.g. Facebook: read by screen readers, the link text in Variant B. Max 30.",
           "required": true,
           "validation": {
             "maxLength": 30
@@ -336,7 +336,7 @@
           "valueType": "string",
           "name": "iconLink",
           "label": "URL",
-          "description": "The JSW Motors profile on that network (full URL). Warning: The icon, its network name and its URL must all be provided. If one is missing, the icon will not be displayed on the page.",
+          "description": "The JSW Motors profile URL. Needs the icon and name too, or it is hidden.",
           "required": true
         }
       ]
