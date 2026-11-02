@@ -1,8 +1,8 @@
 /*
  * The JSW pill navigation (as on /jsw-phase-3, "NEV / Hero") for blocks that bring their own:
  * logo mark + JSW MOTORS wordmark, a list of links, then the white button.
- * Styles: styles/jsw-pill-nav.css (imported by those blocks' stylesheets).
- * loadJswNav() builds it from the navigation authored once on /jsw-nav (its jsw-nav block), else
+ * Styles: styles/pill-nav.css (imported by those blocks' stylesheets).
+ * loadPillNav() builds it from the navigation authored once on /jsw-nav (its jsw-nav block), else
  * from the one on /jsw-phase-3.
  */
 
@@ -43,10 +43,10 @@ function plain(a) {
  */
 export default function buildPillNav({ brand, links = [], cta } = {}) {
   const nav = document.createElement('nav');
-  nav.className = 'jsw-pill-nav';
+  nav.className = 'pill-nav';
   nav.setAttribute('aria-label', 'Main');
   const inner = document.createElement('div');
-  inner.className = 'jsw-pill-nav-inner';
+  inner.className = 'pill-nav-inner';
   nav.append(inner);
 
   // the logo: home is the page the links point to (e.g. /jsw-phase-3), else the site root
@@ -57,27 +57,27 @@ export default function buildPillNav({ brand, links = [], cta } = {}) {
     if (firstLink) homePath = new URL(firstLink.href, window.location.href).pathname || '/';
   } catch (e) { /* keep the root */ }
   const home = document.createElement('a');
-  home.className = 'jsw-pill-nav-brand';
+  home.className = 'pill-nav-brand';
   home.href = homePath;
   home.setAttribute('aria-label', `${name} home`);
   const mark = document.createElement('span');
-  mark.className = 'jsw-pill-nav-mark';
+  mark.className = 'pill-nav-mark';
   mark.setAttribute('aria-hidden', 'true');
   mark.innerHTML = LOGO_MARK;
   const label = document.createElement('span');
-  label.className = 'jsw-pill-nav-brand-text';
+  label.className = 'pill-nav-brand-text';
   if (name.toUpperCase() === 'JSW MOTORS') {
-    label.classList.add('jsw-pill-nav-wordmark');
+    label.classList.add('pill-nav-wordmark');
     label.innerHTML = WORDMARK;
   } else label.textContent = name;
   home.append(mark, label);
   const brandWrap = brand || document.createElement('p');
   brandWrap.replaceChildren(home);
-  brandWrap.classList.add('jsw-pill-nav-brand-wrap');
+  brandWrap.classList.add('pill-nav-brand-wrap');
   inner.append(brandWrap);
 
   const list = document.createElement('ul');
-  list.className = 'jsw-pill-nav-links';
+  list.className = 'pill-nav-links';
   links.filter(Boolean).forEach((a) => {
     const li = document.createElement('li');
     li.append(plain(a));
@@ -87,8 +87,8 @@ export default function buildPillNav({ brand, links = [], cta } = {}) {
 
   if (cta) {
     const wrap = document.createElement('p');
-    wrap.className = 'jsw-pill-nav-cta-wrap';
-    plain(cta).classList.add('jsw-pill-nav-cta');
+    wrap.className = 'pill-nav-cta-wrap';
+    plain(cta).classList.add('pill-nav-cta');
     wrap.append(cta);
     inner.append(wrap);
   }
@@ -215,7 +215,7 @@ function stripInstrumentation(root) {
  * neither can be read.
  * @returns {Promise<Element>} the <nav>
  */
-export async function loadJswNav() {
+export async function loadPillNav() {
   const navBlock = await fetchNavBlock();
   if (navBlock) {
     stripInstrumentation(navBlock);
@@ -226,7 +226,7 @@ export async function loadJswNav() {
     shown.forEach((a) => capNavText(a, NAV_TEXT_LIMITS.linkText));
     capNavText(cta, NAV_TEXT_LIMITS.ctaText);
     const nav = buildPillNav({ brand, links: shown, cta });
-    const logo = nav.querySelector('.jsw-pill-nav-brand');
+    const logo = nav.querySelector('.pill-nav-brand');
     if (home && logo) logo.setAttribute('href', home.getAttribute('href'));
     return nav;
   }

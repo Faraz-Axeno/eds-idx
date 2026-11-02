@@ -11,7 +11,8 @@
  *   Stat Cards (items)       — subtitle | stat value | description: the first MAX_CARDS shown
  */
 
-import { loadJswNav } from '../../scripts/jsw-pill-nav.js';
+import { loadPillNav } from '../../scripts/pill-nav.js';
+import { IMAGE_EXTENSIONS, acceptedPicture } from '../../scripts/media-types.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
 // the stat cards shown: those after them are left out of the page (the editor shows them
@@ -115,10 +116,12 @@ export default function decorate(block) {
     picture, headingCell, scrollCell, cards,
   } = sortRows([...block.children]);
 
+  // the background image: JPG, JPEG or PNG (else not shown, a warning)
+  const background = acceptedPicture(picture, IMAGE_EXTENSIONS, 'background image', 'career-hero');
   const media = el('div', 'media');
-  if (picture) {
-    picture.querySelector('img')?.setAttribute('loading', 'eager');
-    media.append(picture);
+  if (background) {
+    background.querySelector('img')?.setAttribute('loading', 'eager');
+    media.append(background);
   }
 
   // the top: a screen tall less the cards' top edge, the heading and scroll label at its foot
@@ -153,5 +156,5 @@ export default function decorate(block) {
   block.replaceChildren(media, inner);
   if (editing) block.classList.add('editing');
   // the JSW navigation over the photo, once read from /jsw-phase-3
-  loadJswNav().then((nav) => block.prepend(nav));
+  loadPillNav().then((nav) => block.prepend(nav));
 }

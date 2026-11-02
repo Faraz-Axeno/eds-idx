@@ -2,7 +2,7 @@
    in the frames (at full size, as the heading's stand-in, it is some 30% wider; any smaller and
    its letters, lower than New Science's, would look too small) */
 
-@import url('../../styles/jsw-pill-nav.css');
+@import url('../../styles/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .open-roles-wrapper {
@@ -27,7 +27,7 @@ main > .section > .open-roles-wrapper {
 
   /* all the text in the heading's face (New Science, else Michroma at New Science's width);
      APPLY NOW stays mono */
-  font-family: new-science, var(--font-jsw-text);
+  font-family: new-science, var(--font-brand-text);
 
   /*
      * open-roles: values from the "Phase 5 / Open Roles" frame (1280 wide): a white section, the
@@ -60,7 +60,7 @@ main > .section > .open-roles-wrapper {
     display: flex;
     flex-direction: column;
     margin: 0 0 calc(28 * var(--open-roles-unit));
-    font-family: var(--jsw-pill-font-display);
+    font-family: var(--pill-font-display);
     font-size: calc(30 * var(--open-roles-unit));
     font-weight: 400;
     line-height: 1.12;
@@ -573,7 +573,7 @@ main > .section > .open-roles-wrapper {
     border-radius: calc(6 * var(--open-roles-unit));
     color: #fff;
     background-color: #000;
-    font-family: var(--jsw-pill-font-mono);
+    font-family: var(--pill-font-mono);
     font-size: calc(11 * var(--open-roles-unit));
     letter-spacing: 0.06em;
     text-transform: uppercase;

@@ -318,7 +318,7 @@
         "valueType": "string",
         "name": "backgroundImage",
         "label": "Background image",
-        "description": "The photo behind the whole section, the stat cards included.",
+        "description": "The photo behind the whole section: JPG, JPEG or PNG.",
         "multi": false,
         "required": true
       },
@@ -327,7 +327,7 @@
         "valueType": "string",
         "name": "backgroundImageAlt",
         "label": "Background image alt text",
-        "description": "Describes the photo for screen readers. At most 125 characters.",
+        "description": "Describes the photo for screen readers; at most 125 characters.",
         "value": "",
         "validation": {
           "maxLength": 125
@@ -338,7 +338,7 @@
         "valueType": "string",
         "name": "heading",
         "label": "Heading",
-        "description": "Two lines at most. Warning: text longer than 25 characters is cut short with “…”.",
+        "description": "Two lines at most; text over 25 characters is cut short with “…”.",
         "value": "THE WORLD NEEDS PIONEERS",
         "required": true,
         "validation": {
@@ -350,7 +350,7 @@
         "valueType": "string",
         "name": "scrollLabel",
         "label": "Scroll label",
-        "description": "The label beside the mouse icon. Warning: text longer than 12 characters is cut short with “…”.",
+        "description": "Beside the mouse icon; text over 12 characters is cut short with “…”.",
         "value": "SCROLL",
         "validation": {
           "maxLength": 12
@@ -366,7 +366,7 @@
         "valueType": "string",
         "name": "subtitle",
         "label": "Subtitle",
-        "description": "The small line at the top of the card. Only the first 3 Stat Cards are shown. Warning: text longer than 32 characters is cut short with “…”.",
+        "description": "Top line (first 3 cards shown); over 32 characters is cut with “…”.",
         "value": "",
         "required": true,
         "validation": {
@@ -378,7 +378,7 @@
         "valueType": "string",
         "name": "statValue",
         "label": "Stat value",
-        "description": "The big figure, e.g. 1,000+ or 44 YRS. Warning: text longer than 8 characters is cut short with “…”.",
+        "description": "The big figure, e.g. 1,000+; over 8 characters is cut short with “…”.",
         "value": "",
         "required": true,
         "validation": {
@@ -390,7 +390,7 @@
         "valueType": "string",
         "name": "description",
         "label": "Description",
-        "description": "Two lines at most under the figure. Warning: text longer than 80 characters is cut short with “…”.",
+        "description": "Two lines at most; text over 80 characters is cut short with “…”.",
         "value": "",
         "required": true,
         "validation": {
@@ -407,7 +407,7 @@
         "valueType": "string",
         "name": "backgroundImage",
         "label": "Background image",
-        "description": "The office photo behind the whole section. Route steps: you may add multiple steps, but a maximum of 4 will be displayed on the live site.",
+        "description": "The office photo (JPG, JPEG or PNG); only the first 4 Route steps are shown.",
         "multi": false,
         "required": true
       },
@@ -416,7 +416,7 @@
         "valueType": "string",
         "name": "backgroundImageAlt",
         "label": "Background image alt text",
-        "description": "Describes the photo for screen readers. At most 125 characters.",
+        "description": "Describes the photo for screen readers; at most 125 characters.",
         "value": "",
         "validation": {
           "maxLength": 125
@@ -427,7 +427,7 @@
         "valueType": "string",
         "name": "heading",
         "label": "Heading",
-        "description": "Two lines at most. Warning: text longer than 38 characters is cut short with “…”.",
+        "description": "Two lines at most; text over 38 characters is cut short with “…”.",
         "value": "THE ROAD IS NEW. HERE’S THE ROUTE IN.",
         "required": true,
         "validation": {
@@ -444,7 +444,7 @@
         "valueType": "string",
         "name": "stepNumber",
         "label": "Step number",
-        "description": "Warning: You may add multiple steps, but a maximum of 4 will be displayed on the live site. The number, e.g. 01: at most 3 characters.",
+        "description": "The number, e.g. 01 (at most 3 characters); only 4 steps are shown.",
         "value": "",
         "required": true,
         "validation": {
@@ -456,7 +456,7 @@
         "valueType": "string",
         "name": "stepHeading",
         "label": "Step title",
-        "description": "Warning: text longer than 30 characters is cut short with “…”.",
+        "description": "Text over 30 characters is cut short with “…”.",
         "value": "",
         "required": true,
         "validation": {
@@ -468,7 +468,7 @@
         "valueType": "string",
         "name": "stepDescription",
         "label": "Step description",
-        "description": "Three lines at most. Warning: text longer than 105 characters is cut short with “…”.",
+        "description": "Three lines at most; over 105 characters is cut short with “…”.",
         "value": "",
         "required": true,
         "validation": {
@@ -1016,7 +1016,7 @@
         "valueType": "string",
         "name": "iconImage",
         "label": "Icon",
-        "description": "White logo, SVG, PNG, JPG or JPEG. Max 4 icons shown; needs name and URL.",
+        "description": "White logo, SVG or PNG. Max 4 icons shown; needs name and URL.",
         "multi": false,
         "required": true
       },
@@ -1049,7 +1049,7 @@
         "valueType": "string",
         "name": "brand",
         "label": "Logo text",
-        "description": "JSW MOTORS shows as the JSW MOTORS wordmark, beside the JSW mark. At most 20 characters.",
+        "description": "JSW MOTORS shows as the wordmark beside the JSW mark; max 20 characters.",
         "value": "JSW MOTORS",
         "required": true,
         "validation": {
@@ -1076,7 +1076,7 @@
         "valueType": "string",
         "name": "ctaText",
         "label": "Button text",
-        "description": "At most 17 characters. Nav Links: you may add more, but at most 2 are shown on the pages (more do not fit in the bar).",
+        "description": "At most 17 characters; only the first 2 Nav Links are shown in the bar.",
         "value": "REGISTER INTEREST",
         "required": true,
         "validation": {
@@ -1093,7 +1093,7 @@
         "valueType": "string",
         "name": "link",
         "label": "Link URL",
-        "description": "A page, a section of one (/jsw-phase-3#nev-tech), or a full URL. At most 2 Nav Links are shown on the pages.",
+        "description": "A page, a section (/jsw-phase-3#nev-tech) or a URL; only 2 are shown.",
         "required": true
       },
       {
@@ -1101,7 +1101,7 @@
         "valueType": "string",
         "name": "linkText",
         "label": "Link text",
-        "description": "At most 11 characters (on narrow tablets, under 700px wide, keep the texts short: about 8 characters per link).",
+        "description": "At most 11 characters (about 8 on tablets under 700px wide).",
         "value": "",
         "required": true,
         "validation": {
@@ -1390,7 +1390,7 @@
         "valueType": "string",
         "name": "content_heading",
         "label": "Heading",
-        "description": "The first, grey line of the heading. Warning: text longer than 14 characters is cut short with “…”.",
+        "description": "Grey first line of the heading; over 14 characters is cut with “…”.",
         "value": "OPEN ROLES AT",
         "required": true,
         "validation": {
@@ -1402,7 +1402,7 @@
         "valueType": "string",
         "name": "content_headingHighlight",
         "label": "Heading: dark line",
-        "description": "The second, dark line of the heading. Warning: text longer than 14 characters is cut short with “…”.",
+        "description": "Dark second line of the heading; over 14 characters is cut with “…”.",
         "value": "JSW MOTORS",
         "validation": {
           "maxLength": 14
@@ -1414,7 +1414,7 @@
         "name": "search_placeholder",
         "label": "Search box placeholder",
         "value": "Search Roles",
-        "description": "Warning: text longer than 35 characters is cut short with “…”.",
+        "description": "Text over 35 characters is cut short with “…”.",
         "validation": {
           "maxLength": 35
         }
@@ -1424,7 +1424,7 @@
         "valueType": "string",
         "name": "search_help",
         "label": "Search box description",
-        "description": "The text under the search box (three lines at most). Warning: text longer than 130 characters is cut short with “…”.",
+        "description": "Text under the search box; over 130 characters is cut short with “…”.",
         "value": "Search by role, team, or skill. New roles open up as the team grows, so check back soon for what’s new.",
         "validation": {
           "maxLength": 130
@@ -1435,7 +1435,7 @@
         "valueType": "string",
         "name": "search_filtersLabel",
         "label": "Filters label",
-        "description": "The label above the filter dropdowns (the Filter items of this block). Warning: text longer than 20 characters is cut short with “…”.",
+        "description": "Label above the filters; over 20 characters is cut short with “…”.",
         "value": "Filter Roles",
         "validation": {
           "maxLength": 20
@@ -1446,7 +1446,7 @@
         "valueType": "string",
         "name": "search_emptyMessage",
         "label": "No results message",
-        "description": "Shown when no role matches the search and filters (two lines at most). Warning: text longer than 80 characters is cut short with “…”.",
+        "description": "Shown when no role matches; over 80 characters is cut short with “…”.",
         "value": "No roles found matching your criteria.",
         "validation": {
           "maxLength": 80
@@ -1457,7 +1457,7 @@
         "valueType": "string",
         "name": "search_clearAll",
         "label": "Clear all button",
-        "description": "Beside the filters label, once a filter option is ticked. Warning: text longer than 15 characters is cut short with “…”.",
+        "description": "Shown once a filter is ticked; over 15 characters is cut with “…”.",
         "value": "Clear all",
         "validation": {
           "maxLength": 15
@@ -1468,7 +1468,7 @@
         "valueType": "string",
         "name": "search_backToTop",
         "label": "Back to top button",
-        "description": "Under the role list, once it is scrolled down. Warning: text longer than 25 characters is cut short with “…”.",
+        "description": "Shown under the scrolled list; over 25 characters is cut with “…”.",
         "value": "Back to top",
         "validation": {
           "maxLength": 25
@@ -1486,7 +1486,7 @@
         "label": "Job title",
         "value": "",
         "required": true,
-        "description": "Warning: a title longer than 65 characters is cut short with “…” (two lines at most). Only the first 15 Job Roles are shown on the page.",
+        "description": "First 15 roles shown; a title over 65 characters is cut with “…”.",
         "validation": {
           "maxLength": 65
         }
@@ -1498,7 +1498,7 @@
         "label": "Department",
         "value": "",
         "required": true,
-        "description": "Warning: text longer than 35 characters is cut short with “…”.",
+        "description": "Text over 35 characters is cut short with “…”.",
         "validation": {
           "maxLength": 35
         }
@@ -1508,7 +1508,7 @@
         "valueType": "string",
         "name": "meta_location",
         "label": "Location",
-        "description": "As shown, e.g. Pune, India. The Locations filter matches its options against this. Warning: text longer than 20 characters is cut short with “…”.",
+        "description": "E.g. Pune, India (Locations filter); over 20 characters is cut with “…”.",
         "value": "",
         "required": true,
         "validation": {
@@ -1520,7 +1520,7 @@
         "valueType": "string",
         "name": "meta_tags",
         "label": "Other filter values",
-        "description": "Not shown: words for the other filters (e.g. Experience), separated by commas, e.g. 3-5 years, Full-time. At most 100 characters.",
+        "description": "Hidden filter words, comma-separated (e.g. 3-5 years); max 100 characters.",
         "value": "",
         "validation": {
           "maxLength": 100
@@ -1541,7 +1541,7 @@
         "label": "Button text",
         "value": "APPLY NOW",
         "required": true,
-        "description": "Warning: at most 15 characters, so the button keeps its size.",
+        "description": "At most 15 characters, so the button keeps its size.",
         "validation": {
           "maxLength": 15
         }
@@ -1556,7 +1556,7 @@
         "valueType": "string",
         "name": "categoryName",
         "label": "Dropdown name",
-        "description": "Shown on the dropdown until options are ticked, e.g. Locations. Warning: text longer than 25 characters is cut short with “…”.",
+        "description": "Dropdown label, e.g. Locations; over 25 characters is cut with “…”.",
         "required": true,
         "validation": {
           "maxLength": 25
@@ -1567,7 +1567,7 @@
         "valueType": "string",
         "name": "filterField",
         "label": "Matches the role's",
-        "description": "Which part of each Job Role the chosen option is looked for in.",
+        "description": "The Job Role field the ticked options are matched against.",
         "value": "auto",
         "options": [
           {
@@ -1597,7 +1597,7 @@
         "valueType": "string",
         "name": "filterOptions",
         "label": "Options",
-        "description": "The checkboxes of this dropdown: click Add for each one, e.g. Pune, India. Warning: an option longer than 35 characters is cut short with “…”.",
+        "description": "The checkboxes: Add one per option; over 35 characters is cut with “…”.",
         "required": true,
         "multi": true
       }
@@ -1612,7 +1612,8 @@
         "name": "image",
         "label": "Image",
         "multi": false,
-        "required": true
+        "required": true,
+        "description": "A gallery image: JPG, JPEG or PNG."
       },
       {
         "component": "text",
@@ -1620,7 +1621,7 @@
         "name": "imageAlt",
         "label": "Alt text",
         "value": "",
-        "description": "Describes the image for screen readers. At most 125 characters.",
+        "description": "Describes the image for screen readers; at most 125 characters.",
         "validation": {
           "maxLength": 125
         }
@@ -1729,7 +1730,7 @@
         "valueType": "string",
         "name": "media_background",
         "label": "Background image",
-        "description": "Full-page landscape behind the card.",
+        "description": "Full-page landscape behind the card: JPG, JPEG or PNG.",
         "multi": false
       },
       {
@@ -1744,7 +1745,7 @@
         "valueType": "string",
         "name": "media_foreground",
         "label": "Foreground image",
-        "description": "The car filling the card, behind the text.",
+        "description": "The car filling the card, behind the text: JPG, JPEG or PNG.",
         "multi": false
       },
       {
@@ -1766,7 +1767,7 @@
         "valueType": "string",
         "name": "content_subheading",
         "label": "Personalized subheading",
-        "description": "Type {NAME} where the visitor's name goes, braces included; it is kept as written and filled in on the page.",
+        "description": "Type {NAME} (braces included) where the visitor's name goes.",
         "value": "YOU’RE IN, {NAME}."
       },
       {
@@ -1774,7 +1775,7 @@
         "valueType": "string",
         "name": "content_message",
         "label": "Confirmation message",
-        "description": "Each sentence is shown on its own line. Type {email} where the visitor's email goes, braces included; it is kept as written and filled in on the page.",
+        "description": "One line per sentence; type {email} (braces included) for the email.",
         "value": "We’ll message you when allocation opens. Your receipt is on its way to {email}."
       }
     ]
@@ -1787,7 +1788,7 @@
         "valueType": "string",
         "name": "media_background",
         "label": "Background image",
-        "description": "Full-page landscape behind the card.",
+        "description": "Full-page landscape behind the card: JPG, JPEG or PNG.",
         "multi": false
       },
       {
@@ -1802,7 +1803,7 @@
         "valueType": "string",
         "name": "media_foreground",
         "label": "Foreground image",
-        "description": "The car shown on the left half of the card.",
+        "description": "The car on the left half of the card: JPG, JPEG or PNG.",
         "multi": false
       },
       {
@@ -1825,7 +1826,7 @@
         "name": "media_priceAmount",
         "label": "Pricing: amount (₹)",
         "value": "10000",
-        "description": "The reservation amount in rupees, e.g. 10000 or 10,000: shown as ₹10,000 and charged through Razorpay."
+        "description": "Amount in rupees (e.g. 10000), shown as ₹10,000 and charged via Razorpay."
       },
       {
         "component": "text",
@@ -1869,7 +1870,7 @@
         "valueType": "string",
         "name": "form_action",
         "label": "Form action URL",
-        "description": "Where the form data will be sent. Not used yet: the button currently goes straight to the Button link.",
+        "description": "Where the form data is sent; not used yet (the button uses Button link).",
         "value": ""
       },
       {
@@ -1877,7 +1878,7 @@
         "valueType": "string",
         "name": "form_cities",
         "label": "City options",
-        "description": "The choices of the Select City list: click Add for each city.",
+        "description": "The Select City choices: click Add for each city.",
         "multi": true
       },
       {
@@ -1886,7 +1887,7 @@
         "name": "form_razorpayKey",
         "label": "Razorpay Key ID",
         "value": "",
-        "description": "The public Key ID only: rzp_test_… (testing) or rzp_live_… (live). NEVER enter the Key Secret here: everything in this block is published on the website."
+        "description": "Public Key ID only (rzp_test_… or rzp_live_…); never the Key Secret."
       },
       {
         "component": "text",
@@ -1923,7 +1924,7 @@
         "valueType": "string",
         "name": "form_failure",
         "label": "Failure page link",
-        "description": "The page opened when the payment fails. (The Button link above is the page opened when it succeeds.)"
+        "description": "The page opened when the payment fails."
       },
       {
         "component": "text",
@@ -1959,7 +1960,7 @@
         "name": "fields_cityPlaceholder",
         "label": "City dropdown placeholder",
         "value": "Select City",
-        "description": "The first, empty choice of the city list (the cities are the City options field)."
+        "description": "The first, empty choice of the city list."
       }
     ]
   }

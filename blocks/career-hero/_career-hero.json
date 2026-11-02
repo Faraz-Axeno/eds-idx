@@ -41,7 +41,7 @@
           "valueType": "string",
           "name": "backgroundImage",
           "label": "Background image",
-          "description": "The photo behind the whole section, the stat cards included.",
+          "description": "The photo behind the whole section: JPG, JPEG or PNG.",
           "multi": false,
           "required": true
         },
@@ -50,7 +50,7 @@
           "valueType": "string",
           "name": "backgroundImageAlt",
           "label": "Background image alt text",
-          "description": "Describes the photo for screen readers. At most 125 characters.",
+          "description": "Describes the photo for screen readers; at most 125 characters.",
           "value": "",
           "validation": {
             "maxLength": 125
@@ -61,7 +61,7 @@
           "valueType": "string",
           "name": "heading",
           "label": "Heading",
-          "description": "Two lines at most. Warning: text longer than 25 characters is cut short with “…”.",
+          "description": "Two lines at most; text over 25 characters is cut short with “…”.",
           "value": "THE WORLD NEEDS PIONEERS",
           "required": true,
           "validation": {
@@ -73,7 +73,7 @@
           "valueType": "string",
           "name": "scrollLabel",
           "label": "Scroll label",
-          "description": "The label beside the mouse icon. Warning: text longer than 12 characters is cut short with “…”.",
+          "description": "Beside the mouse icon; text over 12 characters is cut short with “…”.",
           "value": "SCROLL",
           "validation": {
             "maxLength": 12
@@ -89,7 +89,7 @@
           "valueType": "string",
           "name": "subtitle",
           "label": "Subtitle",
-          "description": "The small line at the top of the card. Only the first 3 Stat Cards are shown. Warning: text longer than 32 characters is cut short with “…”.",
+          "description": "Top line (first 3 cards shown); over 32 characters is cut with “…”.",
           "value": "",
           "required": true,
           "validation": {
@@ -101,7 +101,7 @@
           "valueType": "string",
           "name": "statValue",
           "label": "Stat value",
-          "description": "The big figure, e.g. 1,000+ or 44 YRS. Warning: text longer than 8 characters is cut short with “…”.",
+          "description": "The big figure, e.g. 1,000+; over 8 characters is cut short with “…”.",
           "value": "",
           "required": true,
           "validation": {
@@ -113,7 +113,7 @@
           "valueType": "string",
           "name": "description",
           "label": "Description",
-          "description": "Two lines at most under the figure. Warning: text longer than 80 characters is cut short with “…”.",
+          "description": "Two lines at most; text over 80 characters is cut short with “…”.",
           "value": "",
           "required": true,
           "validation": {

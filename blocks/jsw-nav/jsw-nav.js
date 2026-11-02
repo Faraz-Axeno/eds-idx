@@ -1,6 +1,6 @@
 /*
  * jsw-nav: the JSW navigation, authored once on its own page (/jsw-nav) and shown on every JSW
- * page that brings the pill navigation (scripts/jsw-pill-nav.js, loadJswNav: it reads this
+ * page that brings the pill navigation (scripts/pill-nav.js, loadPillNav: it reads this
  * block from that page). Here, on its own page, it shows that navigation as it will look.
  * Rows (model, _jsw-nav.json; read by readNavBlock):
  *   logo text | logo link | button link + text
@@ -12,7 +12,7 @@
 import { moveInstrumentation } from '../../scripts/scripts.js';
 import buildPillNav, {
   readNavBlock, capNavText, MAX_NAV_LINKS, NAV_TEXT_LIMITS,
-} from '../../scripts/jsw-pill-nav.js';
+} from '../../scripts/pill-nav.js';
 
 /**
  * loads and decorates the block
@@ -30,11 +30,11 @@ export default function decorate(block) {
     capNavText(cta, NAV_TEXT_LIMITS.ctaText);
   }
   const nav = buildPillNav({ brand, links: shown.map(({ link }) => link), cta });
-  const logo = nav.querySelector('.jsw-pill-nav-brand');
+  const logo = nav.querySelector('.pill-nav-brand');
   if (home && logo) logo.setAttribute('href', home.getAttribute('href'));
 
   // each Nav Link's editor instrumentation on its place in the pill
-  const items = [...nav.querySelectorAll('.jsw-pill-nav-links > li')];
+  const items = [...nav.querySelectorAll('.pill-nav-links > li')];
   shown.forEach(({ row }, i) => {
     if (!items[i]) return;
     moveInstrumentation(row, items[i]);

@@ -41,7 +41,7 @@
           "valueType": "string",
           "name": "backgroundImage",
           "label": "Background image",
-          "description": "The office photo behind the whole section. Route steps: you may add multiple steps, but a maximum of 4 will be displayed on the live site.",
+          "description": "The office photo (JPG, JPEG or PNG); only the first 4 Route steps are shown.",
           "multi": false,
           "required": true
         },
@@ -50,7 +50,7 @@
           "valueType": "string",
           "name": "backgroundImageAlt",
           "label": "Background image alt text",
-          "description": "Describes the photo for screen readers. At most 125 characters.",
+          "description": "Describes the photo for screen readers; at most 125 characters.",
           "value": "",
           "validation": {
             "maxLength": 125
@@ -61,7 +61,7 @@
           "valueType": "string",
           "name": "heading",
           "label": "Heading",
-          "description": "Two lines at most. Warning: text longer than 38 characters is cut short with “…”.",
+          "description": "Two lines at most; text over 38 characters is cut short with “…”.",
           "value": "THE ROAD IS NEW. HERE’S THE ROUTE IN.",
           "required": true,
           "validation": {
@@ -78,7 +78,7 @@
           "valueType": "string",
           "name": "stepNumber",
           "label": "Step number",
-          "description": "Warning: You may add multiple steps, but a maximum of 4 will be displayed on the live site. The number, e.g. 01: at most 3 characters.",
+          "description": "The number, e.g. 01 (at most 3 characters); only 4 steps are shown.",
           "value": "",
           "required": true,
           "validation": {
@@ -90,7 +90,7 @@
           "valueType": "string",
           "name": "stepHeading",
           "label": "Step title",
-          "description": "Warning: text longer than 30 characters is cut short with “…”.",
+          "description": "Text over 30 characters is cut short with “…”.",
           "value": "",
           "required": true,
           "validation": {
@@ -102,7 +102,7 @@
           "valueType": "string",
           "name": "stepDescription",
           "label": "Step description",
-          "description": "Three lines at most. Warning: text longer than 105 characters is cut short with “…”.",
+          "description": "Three lines at most; over 105 characters is cut short with “…”.",
           "value": "",
           "required": true,
           "validation": {

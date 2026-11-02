@@ -25,7 +25,7 @@
           "valueType": "string",
           "name": "media_background",
           "label": "Background image",
-          "description": "Full-page landscape behind the card.",
+          "description": "Full-page landscape behind the card: JPG, JPEG or PNG.",
           "multi": false
         },
         {
@@ -40,7 +40,7 @@
           "valueType": "string",
           "name": "media_foreground",
           "label": "Foreground image",
-          "description": "The car shown on the left half of the card.",
+          "description": "The car on the left half of the card: JPG, JPEG or PNG.",
           "multi": false
         },
         {
@@ -63,7 +63,7 @@
           "name": "media_priceAmount",
           "label": "Pricing: amount (₹)",
           "value": "10000",
-          "description": "The reservation amount in rupees, e.g. 10000 or 10,000: shown as ₹10,000 and charged through Razorpay."
+          "description": "Amount in rupees (e.g. 10000), shown as ₹10,000 and charged via Razorpay."
         },
         {
           "component": "text",
@@ -107,7 +107,7 @@
           "valueType": "string",
           "name": "form_action",
           "label": "Form action URL",
-          "description": "Where the form data will be sent. Not used yet: the button currently goes straight to the Button link.",
+          "description": "Where the form data is sent; not used yet (the button uses Button link).",
           "value": ""
         },
         {
@@ -115,7 +115,7 @@
           "valueType": "string",
           "name": "form_cities",
           "label": "City options",
-          "description": "The choices of the Select City list: click Add for each city.",
+          "description": "The Select City choices: click Add for each city.",
           "multi": true
         },
         {
@@ -124,7 +124,7 @@
           "name": "form_razorpayKey",
           "label": "Razorpay Key ID",
           "value": "",
-          "description": "The public Key ID only: rzp_test_… (testing) or rzp_live_… (live). NEVER enter the Key Secret here: everything in this block is published on the website."
+          "description": "Public Key ID only (rzp_test_… or rzp_live_…); never the Key Secret."
         },
         {
           "component": "text",
@@ -161,7 +161,7 @@
           "valueType": "string",
           "name": "form_failure",
           "label": "Failure page link",
-          "description": "The page opened when the payment fails. (The Button link above is the page opened when it succeeds.)"
+          "description": "The page opened when the payment fails."
         },
         {
           "component": "text",
@@ -197,7 +197,7 @@
           "name": "fields_cityPlaceholder",
           "label": "City dropdown placeholder",
           "value": "Select City",
-          "description": "The first, empty choice of the city list (the cities are the City options field)."
+          "description": "The first, empty choice of the city list."
         }
       ]
     }

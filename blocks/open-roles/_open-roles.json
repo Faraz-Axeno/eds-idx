@@ -71,7 +71,7 @@
           "valueType": "string",
           "name": "content_heading",
           "label": "Heading",
-          "description": "The first, grey line of the heading. Warning: text longer than 14 characters is cut short with “…”.",
+          "description": "Grey first line of the heading; over 14 characters is cut with “…”.",
           "value": "OPEN ROLES AT",
           "required": true,
           "validation": {
@@ -83,7 +83,7 @@
           "valueType": "string",
           "name": "content_headingHighlight",
           "label": "Heading: dark line",
-          "description": "The second, dark line of the heading. Warning: text longer than 14 characters is cut short with “…”.",
+          "description": "Dark second line of the heading; over 14 characters is cut with “…”.",
           "value": "JSW MOTORS",
           "validation": {
             "maxLength": 14
@@ -95,7 +95,7 @@
           "name": "search_placeholder",
           "label": "Search box placeholder",
           "value": "Search Roles",
-          "description": "Warning: text longer than 35 characters is cut short with “…”.",
+          "description": "Text over 35 characters is cut short with “…”.",
           "validation": {
             "maxLength": 35
           }
@@ -105,7 +105,7 @@
           "valueType": "string",
           "name": "search_help",
           "label": "Search box description",
-          "description": "The text under the search box (three lines at most). Warning: text longer than 130 characters is cut short with “…”.",
+          "description": "Text under the search box; over 130 characters is cut short with “…”.",
           "value": "Search by role, team, or skill. New roles open up as the team grows, so check back soon for what’s new.",
           "validation": {
             "maxLength": 130
@@ -116,7 +116,7 @@
           "valueType": "string",
           "name": "search_filtersLabel",
           "label": "Filters label",
-          "description": "The label above the filter dropdowns (the Filter items of this block). Warning: text longer than 20 characters is cut short with “…”.",
+          "description": "Label above the filters; over 20 characters is cut short with “…”.",
           "value": "Filter Roles",
           "validation": {
             "maxLength": 20
@@ -127,7 +127,7 @@
           "valueType": "string",
           "name": "search_emptyMessage",
           "label": "No results message",
-          "description": "Shown when no role matches the search and filters (two lines at most). Warning: text longer than 80 characters is cut short with “…”.",
+          "description": "Shown when no role matches; over 80 characters is cut short with “…”.",
           "value": "No roles found matching your criteria.",
           "validation": {
             "maxLength": 80
@@ -138,7 +138,7 @@
           "valueType": "string",
           "name": "search_clearAll",
           "label": "Clear all button",
-          "description": "Beside the filters label, once a filter option is ticked. Warning: text longer than 15 characters is cut short with “…”.",
+          "description": "Shown once a filter is ticked; over 15 characters is cut with “…”.",
           "value": "Clear all",
           "validation": {
             "maxLength": 15
@@ -149,7 +149,7 @@
           "valueType": "string",
           "name": "search_backToTop",
           "label": "Back to top button",
-          "description": "Under the role list, once it is scrolled down. Warning: text longer than 25 characters is cut short with “…”.",
+          "description": "Shown under the scrolled list; over 25 characters is cut with “…”.",
           "value": "Back to top",
           "validation": {
             "maxLength": 25
@@ -167,7 +167,7 @@
           "label": "Job title",
           "value": "",
           "required": true,
-          "description": "Warning: a title longer than 65 characters is cut short with “…” (two lines at most). Only the first 15 Job Roles are shown on the page.",
+          "description": "First 15 roles shown; a title over 65 characters is cut with “…”.",
           "validation": {
             "maxLength": 65
           }
@@ -179,7 +179,7 @@
           "label": "Department",
           "value": "",
           "required": true,
-          "description": "Warning: text longer than 35 characters is cut short with “…”.",
+          "description": "Text over 35 characters is cut short with “…”.",
           "validation": {
             "maxLength": 35
           }
@@ -189,7 +189,7 @@
           "valueType": "string",
           "name": "meta_location",
           "label": "Location",
-          "description": "As shown, e.g. Pune, India. The Locations filter matches its options against this. Warning: text longer than 20 characters is cut short with “…”.",
+          "description": "E.g. Pune, India (Locations filter); over 20 characters is cut with “…”.",
           "value": "",
           "required": true,
           "validation": {
@@ -201,7 +201,7 @@
           "valueType": "string",
           "name": "meta_tags",
           "label": "Other filter values",
-          "description": "Not shown: words for the other filters (e.g. Experience), separated by commas, e.g. 3-5 years, Full-time. At most 100 characters.",
+          "description": "Hidden filter words, comma-separated (e.g. 3-5 years); max 100 characters.",
           "value": "",
           "validation": {
             "maxLength": 100
@@ -222,7 +222,7 @@
           "label": "Button text",
           "value": "APPLY NOW",
           "required": true,
-          "description": "Warning: at most 15 characters, so the button keeps its size.",
+          "description": "At most 15 characters, so the button keeps its size.",
           "validation": {
             "maxLength": 15
           }
@@ -237,7 +237,7 @@
           "valueType": "string",
           "name": "categoryName",
           "label": "Dropdown name",
-          "description": "Shown on the dropdown until options are ticked, e.g. Locations. Warning: text longer than 25 characters is cut short with “…”.",
+          "description": "Dropdown label, e.g. Locations; over 25 characters is cut with “…”.",
           "required": true,
           "validation": {
             "maxLength": 25
@@ -248,7 +248,7 @@
           "valueType": "string",
           "name": "filterField",
           "label": "Matches the role's",
-          "description": "Which part of each Job Role the chosen option is looked for in.",
+          "description": "The Job Role field the ticked options are matched against.",
           "value": "auto",
           "options": [
             {
@@ -278,7 +278,7 @@
           "valueType": "string",
           "name": "filterOptions",
           "label": "Options",
-          "description": "The checkboxes of this dropdown: click Add for each one, e.g. Pune, India. Warning: an option longer than 35 characters is cut short with “…”.",
+          "description": "The checkboxes: Add one per option; over 35 characters is cut with “…”.",
           "required": true,
           "multi": true
         }
@@ -293,7 +293,8 @@
           "name": "image",
           "label": "Image",
           "multi": false,
-          "required": true
+          "required": true,
+          "description": "A gallery image: JPG, JPEG or PNG."
         },
         {
           "component": "text",
@@ -301,7 +302,7 @@
           "name": "imageAlt",
           "label": "Alt text",
           "value": "",
-          "description": "Describes the image for screen readers. At most 125 characters.",
+          "description": "Describes the image for screen readers; at most 125 characters.",
           "validation": {
             "maxLength": 125
           }
