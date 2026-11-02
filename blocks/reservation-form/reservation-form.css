@@ -4,7 +4,7 @@
  * 956 x 556, 107px from the top: the car on its left 435px, the form on the right (36px in).
  */
 
-@import url('../../styles/jsw-pill-nav.css');
+@import url('../../styles/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .reservation-form-wrapper {
@@ -61,7 +61,7 @@ main > .section > .reservation-form-wrapper {
 
   /* the navigation 26px from the top of the screen (18px into the inset panel) */
   @media (min-width: 600px) {
-    .jsw-pill-nav {
+    .pill-nav {
       top: 18px;
     }
   }
@@ -154,7 +154,7 @@ main > .section > .reservation-form-wrapper {
 
   .pricing-amount {
     margin-top: calc(2 * var(--reservation-form-unit));
-    font-family: var(--jsw-pill-font-display);
+    font-family: var(--pill-font-display);
     font-size: calc(36 * var(--reservation-form-unit));
     font-weight: 300;
     line-height: calc(40 * var(--reservation-form-unit));
@@ -178,7 +178,7 @@ main > .section > .reservation-form-wrapper {
 
   .heading {
     margin: 0 0 calc(10 * var(--reservation-form-unit));
-    font-family: var(--jsw-pill-font-display);
+    font-family: var(--pill-font-display);
     font-size: calc(26 * var(--reservation-form-unit));
     font-weight: 400;
     line-height: 1.15;

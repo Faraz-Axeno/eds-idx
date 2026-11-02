@@ -1,6 +1,6 @@
 /*
  * jsw-footer: the JSW footer, one block, authored once on its own page (/jsw-footer) and shown as
- * the footer of the JSW pages (scripts.js, loadJswFooter: in their <footer>, instead of the
+ * the footer of the JSW pages (scripts.js, loadPageFooter: in their <footer>, instead of the
  * site's). Everything is the block's own (_jsw-footer.json, its properties panel in tabs): the
  * layout, background, logo, copyright, button and privacy policy (Footer tab); the navigation
  * columns, a multi-field (footerColumns), each column its heading and its own multi-field of links
@@ -35,6 +35,10 @@
  */
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
+import {
+  IMAGE_EXTENSIONS, LOGO_EXTENSIONS, ICON_EXTENSIONS, VIDEO_EXTENSIONS,
+  extensionOf, acceptedType, acceptedPicture,
+} from '../../scripts/media-types.js';
 
 // the most links a column shows, and the most social icons: the model has MAX_ITEMS of each;
 // content saved before could hold more, the page shows the first MAX_ITEMS only (.slice)
@@ -57,43 +61,14 @@ const LEGACY_ITEM = /^jsw-footer-(column|link|social)$/;
 // the layouts (the Footer layout field's values, and the block's class); the first the default
 const VARIANTS = ['variant-phase-5', 'variant-phase-3'];
 
-// the file types each media field accepts, by the asset's extension (published images keep their
-// file's: media_….jpg): an asset of another type is not shown, a console warning instead
-const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png']; // the background image
-const LOGO_EXTENSIONS = ['svg']; // the logo: the only field for SVG alone
-const ICON_EXTENSIONS = [...IMAGE_EXTENSIONS, 'svg']; // the social icons: images, or SVG like the logo
-const VIDEO_EXTENSIONS = ['mp4', 'mov']; // the background video
-// the source's type, where it helps: none for .mov (as video/quicktime, Chrome would skip MOV files
-// it can play, those in H.264): the browser tries the file, the picture stays if it cannot play it
+// the file types each media field accepts are the shared ones (scripts/media-types.js): the
+// background image IMAGE_EXTENSIONS, the logo LOGO_EXTENSIONS, the social icons ICON_EXTENSIONS,
+// the background video VIDEO_EXTENSIONS
+// the video source's type, where it helps: none for .mov (as video/quicktime, Chrome would skip MOV
+// files it can play, those in H.264): the browser tries the file, the picture stays if it cannot
 const VIDEO_TYPES = {
   mp4: 'video/mp4',
 };
-
-/** an asset's file extension, from its URL's path ('' when it has none) */
-function extensionOf(url) {
-  try {
-    const name = new URL(url, window.location.href).pathname.split('/').pop();
-    return name.includes('.') ? name.split('.').pop().toLowerCase() : '';
-  } catch (e) {
-    return '';
-  }
-}
-
-/** whether an asset's file type is accepted for its field; if not, a warning (it is not shown) */
-function acceptedType(url, allowed, field) {
-  const ext = extensionOf(url);
-  if (allowed.includes(ext)) return true;
-  // eslint-disable-next-line no-console
-  console.warn(`jsw-footer: the ${field} ${url} is not shown: its file type (${ext ? `.${ext}` : 'none'}) is not .${allowed.join(', .')}`);
-  return false;
-}
-
-/** a picture whose image is of an accepted file type for its field, else null (not shown) */
-function acceptedPicture(picture, allowed, field) {
-  const src = picture?.querySelector('img')?.getAttribute('src');
-  if (!picture || !src) return picture || null;
-  return acceptedType(src, allowed, field) ? picture : null;
-}
 
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
@@ -271,7 +246,7 @@ function buildMedia(cell) {
   const media = el('div', 'media');
   if (!cell) return media;
   // the background image: JPG, JPEG or PNG; the video: MP4 or MOV (else not shown)
-  const picture = acceptedPicture(cell.querySelector('picture'), IMAGE_EXTENSIONS, 'background image');
+  const picture = acceptedPicture(cell.querySelector('picture'), IMAGE_EXTENSIONS, 'background image', 'jsw-footer');
   const mode = textsOf(cell).map((n) => n.textContent.trim().toLowerCase())
     .find((t) => t === 'image' || t === 'video' || t === 'both') || 'image';
   const videoUrl = cell.querySelector('a')?.href;
@@ -279,7 +254,7 @@ function buildMedia(cell) {
   const ext = extensionOf(videoUrl || '');
   // Video, or Image and video (for now shown as Video): the video over the picture
   if (mode === 'image' || !videoUrl) return media;
-  if (!acceptedType(videoUrl, VIDEO_EXTENSIONS, 'background video')) return media;
+  if (!acceptedType(videoUrl, VIDEO_EXTENSIONS, 'background video', 'jsw-footer')) return media;
 
   const video = el('video', 'video', {
     loop: '', muted: '', playsinline: '', 'aria-hidden': 'true', preload: 'none',
@@ -327,7 +302,7 @@ function buildBrand(brandCell, ctaLink, editing) {
   const brand = el('div', 'brand');
   const logo = el('p', 'logo');
   // the logo: SVG only (else not shown)
-  const picture = acceptedPicture(brandCell?.querySelector('picture'), LOGO_EXTENSIONS, 'logo');
+  const picture = acceptedPicture(brandCell?.querySelector('picture'), LOGO_EXTENSIONS, 'logo', 'jsw-footer');
   if (picture) logo.append(picture);
   const [copyrightNode] = textsOf(brandCell);
   const copyright = retag(copyrightNode, 'p', 'copyright');
@@ -622,7 +597,7 @@ function buildSocial({ heading, icons }, asText, editing, keepAll = false) {
   const list = el('ul', asText ? 'links' : 'social-icons');
   // an icon's image: JPG, JPEG, PNG or SVG (else not shown: the icon counts as incomplete)
   const typed = icons.map((icon) => ({
-    ...icon, picture: acceptedPicture(icon.picture, ICON_EXTENSIONS, 'social icon'),
+    ...icon, picture: acceptedPicture(icon.picture, ICON_EXTENSIONS, 'social icon', 'jsw-footer'),
   }));
   // on the page: the first MAX_ITEMS icons with their image, network name and URL; in the editor
   // (keepAll) every icon, those missing one of them marked (shown only while editing)

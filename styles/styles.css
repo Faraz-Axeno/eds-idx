@@ -33,9 +33,9 @@
 
   /* the JSW faces (styles/fonts.css), with their fallbacks: the text face (the Phase 5 blocks,
      the footer) and the footer's Phase 3 layout display face */
-  --font-jsw-text: jsw-text, 'Helvetica Neue', arial, sans-serif;
-  --font-jsw-footer-text: var(--font-jsw-text);
-  --font-jsw-footer-display: jsw-footer-display, michroma, 'Helvetica Neue', arial, sans-serif;
+  --font-brand-text: brand-text, 'Helvetica Neue', arial, sans-serif;
+  --font-footer-text: var(--font-brand-text);
+  --font-footer-display: footer-display, michroma, 'Helvetica Neue', arial, sans-serif;
 
   /* body sizes */
   --body-font-size-m: 22px;

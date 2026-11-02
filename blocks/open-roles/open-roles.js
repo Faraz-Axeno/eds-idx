@@ -25,6 +25,7 @@
  */
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
+import { IMAGE_EXTENSIONS, acceptedPicture } from '../../scripts/media-types.js';
 
 // the most Job Roles shown: those after it (in authored order) are left out of the page; the
 // editor still shows them, dimmed, so they can be edited or removed
@@ -437,8 +438,11 @@ function buildFilter({
 }
 
 function buildGallery(cell, rows, editing) {
-  // the Gallery Images field: its pictures, in order (the field's instrumentation on the gallery)
-  const pictures = [...(cell?.querySelectorAll('picture') || [])];
+  // the Gallery Images field: its pictures, in order (the field's instrumentation on the gallery);
+  // each JPG, JPEG or PNG (else not shown, a warning)
+  const isImage = (picture) => acceptedPicture(picture, IMAGE_EXTENSIONS, 'gallery image', 'open-roles');
+  const authored = [...(cell?.querySelectorAll('picture') || [])];
+  const pictures = authored.filter(isImage);
   let slides = pictures.map((picture) => {
     const slide = el('div', 'slide');
     slide.append(picture);
@@ -446,11 +450,12 @@ function buildGallery(cell, rows, editing) {
   });
   // else Gallery Image rows of the earlier model; in the editor one without its image yet shows
   // as an empty frame, so it stays in the page (and in the content tree)
-  if (!slides.length) {
+  if (!authored.length) {
     slides = rows.map((row) => {
       const slide = el('div', 'slide');
       moveInstrumentation(row, slide);
-      const picture = row.querySelector('picture');
+      const found = row.querySelector('picture');
+      const picture = found && isImage(found);
       if (picture) slide.append(picture);
       else slide.classList.add('is-empty');
       return slide;
@@ -459,7 +464,7 @@ function buildGallery(cell, rows, editing) {
   if (!slides.length) return null;
 
   const gallery = el('div', 'gallery');
-  if (pictures.length) moveInstrumentation(instrumented(cell), gallery);
+  if (authored.length) moveInstrumentation(instrumented(cell), gallery);
   const track = el('div', 'track');
   track.append(...slides);
   gallery.append(track);

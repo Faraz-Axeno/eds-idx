@@ -12,8 +12,8 @@
  * footer's own page, in <footer> on the JSW pages), holding every rule: variables,
  * the block's own styles, its parts (short class names, safe inside the root), the section and
  * page around it (by :has(&)), the editor's states, each layout (&.variant-…) and the media
- * queries. Its faces: the global jsw-footer-text and jsw-footer-display (@font-face in
- * styles/fonts.css, their families as --font-jsw-footer-text / --font-jsw-footer-display in
+ * queries. Its faces: the global brand-text and footer-display (@font-face in
+ * styles/fonts.css, their families as --font-footer-text / --font-footer-display in
  * styles/styles.css).
  */
 
@@ -29,10 +29,10 @@ main > .section > .jsw-footer-wrapper {
 .block.jsw-footer {
   /* 1. variables: desktop "units" (1px each in the 1280-wide frame), the faces (New Science
      first, once its web project is loaded; else the global footer faces) */
-  --jsw-footer-unit: 1px;
-  --footer-font-body: new-science, var(--font-jsw-footer-text);
-  --footer-font-heading: var(--font-jsw-footer-display);
-  --jsw-footer-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
+  --footer-unit: 1px;
+  --footer-font-body: new-science, var(--font-footer-text);
+  --footer-font-heading: var(--font-footer-display);
+  --footer-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
 
   /* 2. the block */
   position: relative;
@@ -66,11 +66,11 @@ main > .section > .jsw-footer-wrapper {
   /* its own page (/jsw-footer, body class from scripts.js): dark, the footer at the foot of the
      window (not in the editor, whose canvas grows to fit the page: a screen-tall page would grow
      it without end) */
-  body.jsw-footer-page:has(&) {
+  body.footer-page:has(&) {
     background-color: #030506;
   }
 
-  body.jsw-footer-page main:not([data-aue-resource]):has(&) {
+  body.footer-page main:not([data-aue-resource]):has(&) {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -81,7 +81,7 @@ main > .section > .jsw-footer-wrapper {
   /* desktop: the units follow the width, so on narrower desktops the footer shrinks as a whole
      (at least 0.7px); tablets and phones keep 1px units */
   @media (min-width: 900px) {
-    --jsw-footer-unit: clamp(0.7px, calc(100vw / 1280), 1px);
+    --footer-unit: clamp(0.7px, calc(100vw / 1280), 1px);
   }
 
   /* 3. the parts */
@@ -164,9 +164,9 @@ main > .section > .jsw-footer-wrapper {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       grid-template-rows: auto 1fr auto;
-      column-gap: calc(40 * var(--jsw-footer-unit));
-      min-height: calc(500 * var(--jsw-footer-unit));
-      padding: calc(37 * var(--jsw-footer-unit)) calc(54 * var(--jsw-footer-unit)) calc(39 * var(--jsw-footer-unit)) calc(42 * var(--jsw-footer-unit));
+      column-gap: calc(40 * var(--footer-unit));
+      min-height: calc(500 * var(--footer-unit));
+      padding: calc(37 * var(--footer-unit)) calc(54 * var(--footer-unit)) calc(39 * var(--footer-unit)) calc(42 * var(--footer-unit));
     }
 
     .brand {
@@ -179,15 +179,15 @@ main > .section > .jsw-footer-wrapper {
     }
 
     .logo img {
-      width: calc(164 * var(--jsw-footer-unit));
+      width: calc(164 * var(--footer-unit));
       height: auto;
-      margin-top: calc(2 * var(--jsw-footer-unit));
+      margin-top: calc(2 * var(--footer-unit));
     }
 
     .copyright {
-      margin-top: calc(5 * var(--jsw-footer-unit));
+      margin-top: calc(5 * var(--footer-unit));
       color: rgb(255 255 255 / 80%);
-      font-size: calc(11 * var(--jsw-footer-unit));
+      font-size: calc(11 * var(--footer-unit));
       line-height: 1.4;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
@@ -195,21 +195,21 @@ main > .section > .jsw-footer-wrapper {
 
     /* the CTA: a white button, its "+" after the text */
     .cta {
-      margin-top: calc(51 * var(--jsw-footer-unit));
+      margin-top: calc(51 * var(--footer-unit));
     }
 
     & a.cta-link:any-link {
       box-sizing: border-box;
       display: inline-flex;
       align-items: center;
-      gap: calc(16 * var(--jsw-footer-unit));
+      gap: calc(16 * var(--footer-unit));
       max-width: 100%;
-      height: calc(39 * var(--jsw-footer-unit));
-      padding: 0 calc(24 * var(--jsw-footer-unit));
-      border-radius: calc(6 * var(--jsw-footer-unit));
+      height: calc(39 * var(--footer-unit));
+      padding: 0 calc(24 * var(--footer-unit));
+      border-radius: calc(6 * var(--footer-unit));
       color: #2b2b2b;
       background-color: #fff;
-      font-size: calc(11.5 * var(--jsw-footer-unit));
+      font-size: calc(11.5 * var(--footer-unit));
       line-height: 1;
       text-transform: uppercase;
       white-space: nowrap;
@@ -226,7 +226,7 @@ main > .section > .jsw-footer-wrapper {
     }
 
     .cta-plus {
-      font-size: calc(15 * var(--jsw-footer-unit));
+      font-size: calc(15 * var(--footer-unit));
     }
 
     /* the navigation: the columns side by side, 197px apart, CONNECT last */
@@ -234,11 +234,11 @@ main > .section > .jsw-footer-wrapper {
       grid-area: 1 / 2;
       display: flex;
       align-items: flex-start;
-      gap: calc(40 * var(--jsw-footer-unit));
+      gap: calc(40 * var(--footer-unit));
     }
 
     .column {
-      width: calc(157 * var(--jsw-footer-unit));
+      width: calc(157 * var(--footer-unit));
       min-width: 0;
     }
 
@@ -250,7 +250,7 @@ main > .section > .jsw-footer-wrapper {
       overflow: hidden;
       color: #fff;
       font-family: inherit;
-      font-size: calc(12.4 * var(--jsw-footer-unit));
+      font-size: calc(12.4 * var(--footer-unit));
       font-weight: 400;
       line-height: 1.3;
       letter-spacing: 0;
@@ -262,15 +262,15 @@ main > .section > .jsw-footer-wrapper {
     .links {
       display: flex;
       flex-direction: column;
-      gap: calc(10 * var(--jsw-footer-unit));
-      margin-top: calc(10 * var(--jsw-footer-unit));
+      gap: calc(10 * var(--footer-unit));
+      margin-top: calc(10 * var(--footer-unit));
       list-style: none;
     }
 
     .link {
       overflow: hidden;
       color: rgb(255 255 255 / 65%);
-      font-size: calc(11 * var(--jsw-footer-unit));
+      font-size: calc(11 * var(--footer-unit));
       line-height: 1.5;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -284,8 +284,8 @@ main > .section > .jsw-footer-wrapper {
     /* the social icons: 36px dark tiles, 4px apart */
     .social-icons {
       display: flex;
-      gap: calc(4 * var(--jsw-footer-unit));
-      margin-top: calc(17 * var(--jsw-footer-unit));
+      gap: calc(4 * var(--footer-unit));
+      margin-top: calc(17 * var(--footer-unit));
       list-style: none;
     }
 
@@ -293,9 +293,9 @@ main > .section > .jsw-footer-wrapper {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: calc(36 * var(--jsw-footer-unit));
-      height: calc(36 * var(--jsw-footer-unit));
-      border-radius: calc(6 * var(--jsw-footer-unit));
+      width: calc(36 * var(--footer-unit));
+      height: calc(36 * var(--footer-unit));
+      border-radius: calc(6 * var(--footer-unit));
       background-color: rgb(255 255 255 / 9%);
       transition: background-color 0.2s ease;
     }
@@ -309,8 +309,8 @@ main > .section > .jsw-footer-wrapper {
     }
 
     .social-link img {
-      width: calc(15 * var(--jsw-footer-unit));
-      height: calc(15 * var(--jsw-footer-unit));
+      width: calc(15 * var(--footer-unit));
+      height: calc(15 * var(--footer-unit));
       object-fit: contain;
     }
 
@@ -319,14 +319,14 @@ main > .section > .jsw-footer-wrapper {
       grid-area: 3 / 1 / 4 / 3;
       align-self: end;
       color: rgb(255 255 255 / 70%);
-      font-family: var(--jsw-footer-font-mono);
-      font-size: calc(10 * var(--jsw-footer-unit));
+      font-family: var(--footer-font-mono);
+      font-size: calc(10 * var(--footer-unit));
       line-height: 1.2;
     }
 
     .legal a:any-link {
       text-decoration: underline;
-      text-underline-offset: calc(2 * var(--jsw-footer-unit));
+      text-underline-offset: calc(2 * var(--footer-unit));
     }
 
     /* tablets: the branding, then the navigation, then the privacy policy, one under the other */
@@ -400,7 +400,7 @@ main > .section > .jsw-footer-wrapper {
   /* 5. Phase 3 layout (values from /jsw-phase-3's footer): the gradient for a background (no
      photo), the texts in the site face */
   &.variant-phase-3 {
-    --jsw-footer-edge: 20px;
+    --footer-edge: 20px;
 
     background: linear-gradient(180deg, #050505 0%, #050505 28%, #06363b 62%, #0c7d88 88%, #12a0ab 100%);
     font-family: inter, 'Helvetica Neue', arial, sans-serif;
@@ -411,7 +411,7 @@ main > .section > .jsw-footer-wrapper {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       gap: 36px;
-      padding: 40px var(--jsw-footer-edge) 120px;
+      padding: 40px var(--footer-edge) 120px;
     }
 
     .brand {
@@ -442,7 +442,7 @@ main > .section > .jsw-footer-wrapper {
     /* the privacy policy under the branding, in small mono capitals */
     .legal {
       margin-top: 22px;
-      font-family: var(--jsw-footer-font-mono);
+      font-family: var(--footer-font-mono);
       font-size: 11px;
       letter-spacing: 0.08em;
     }
@@ -466,7 +466,7 @@ main > .section > .jsw-footer-wrapper {
       border-radius: 8px;
       color: #111;
       background-color: #fff;
-      font-family: var(--jsw-footer-font-mono);
+      font-family: var(--footer-font-mono);
       font-size: 12px;
       line-height: 1;
       letter-spacing: 0.06em;
@@ -609,12 +609,12 @@ main > .section > .jsw-footer-wrapper {
 
     /* desktop: branding at the left, the CTA in the centre, the columns at the right */
     @media (min-width: 900px) {
-      --jsw-footer-edge: 5.4vw;
+      --footer-edge: 5.4vw;
 
       .inner {
         grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
         align-items: start;
-        padding: 28px var(--jsw-footer-edge) 150px;
+        padding: 28px var(--footer-edge) 150px;
       }
 
       .cta {

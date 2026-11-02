@@ -316,7 +316,7 @@
           "valueType": "string",
           "name": "iconImage",
           "label": "Icon",
-          "description": "White logo, SVG, PNG, JPG or JPEG. Max 4 icons shown; needs name and URL.",
+          "description": "White logo, SVG or PNG. Max 4 icons shown; needs name and URL.",
           "multi": false,
           "required": true
         },

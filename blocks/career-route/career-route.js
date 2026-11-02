@@ -10,6 +10,7 @@
  */
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
+import { IMAGE_EXTENSIONS, acceptedPicture } from '../../scripts/media-types.js';
 
 // the route steps on the page: only the first MAX_STEPS are put into it; the editor keeps the
 // others in its page too, but shows them only while editing (dimmed, so authors can find and
@@ -97,9 +98,10 @@ export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const { picture, headingCell, steps } = sortRows([...block.children]);
 
-  // the photo behind everything
+  // the photo behind everything: JPG, JPEG or PNG (else not shown, a warning)
+  const background = acceptedPicture(picture, IMAGE_EXTENSIONS, 'background image', 'career-route');
   const media = el('div', 'media');
-  if (picture) media.append(picture);
+  if (background) media.append(background);
 
   const heading = retag(textOf(headingCell), 'h2', 'heading');
   cap(heading, TEXT_LIMITS.heading, editing);

@@ -1,7 +1,7 @@
 /*
  * reservation-confirmation: the JSW confirmation page: the full-page landscape and a dark card
  * with the car, CONFIRMED, the personalised subheading (YOU'RE IN, NAME.) and the message.
- * The navigation is the one authored on /jsw-phase-3 (loadJswNav), the same on every JSW page.
+ * The navigation is the one authored on /jsw-phase-3 (loadPillNav), the same on every JSW page.
  * Rows (fields and field groups of the model, _reservation-confirmation.json):
  *   layout  — layoutVariant: layout-centered (default) or layout-split (car left, text right);
  *             pages made before the option existed have no such row
@@ -12,7 +12,8 @@
  * replace it; for now it shows VISITOR_NAME / VISITOR_EMAIL below.
  */
 
-import { loadJswNav } from '../../scripts/jsw-pill-nav.js';
+import { loadPillNav } from '../../scripts/pill-nav.js';
+import { IMAGE_EXTENSIONS, acceptedPicture } from '../../scripts/media-types.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
 // the visitor shown on the page, as in the Figma, until the real name and email are provided
@@ -129,7 +130,8 @@ export default function decorate(block) {
 
   // the full-page landscape behind everything
   const frame = el('div', 'frame');
-  const background = media.picture('media_background', 0);
+  // the background and foreground images: JPG, JPEG or PNG (else not shown, a warning)
+  const background = acceptedPicture(media.picture('media_background', 0), IMAGE_EXTENSIONS, 'background image', 'reservation-confirmation');
   if (background) {
     background.classList.add('background');
     background.querySelector('img')?.setAttribute('loading', 'eager');
@@ -138,7 +140,7 @@ export default function decorate(block) {
 
   // the card: the car behind the text
   const card = el('div', 'card');
-  const foreground = media.picture('media_foreground', 1);
+  const foreground = acceptedPicture(media.picture('media_foreground', 1), IMAGE_EXTENSIONS, 'foreground image', 'reservation-confirmation');
   if (foreground) {
     foreground.classList.add('visual');
     foreground.querySelector('img')?.setAttribute('loading', 'eager');
@@ -165,7 +167,7 @@ export default function decorate(block) {
   card.append(heading, details);
   frame.append(card);
   // the JSW navigation over the landscape, once read from /jsw-phase-3
-  loadJswNav().then((nav) => card.before(nav));
+  loadPillNav().then((nav) => card.before(nav));
   block.replaceChildren(frame);
   block.classList.remove(...LAYOUTS);
   block.classList.add(layout);

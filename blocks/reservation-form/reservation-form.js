@@ -2,7 +2,7 @@
  * reservation-form: the JSW reservation page ("Opt 2 / Reserve 1280x720"): a full-page
  * landscape and a card: the car on its left half, on its right the heading, subheading, the
  * form (first and last name, +91 mobile, email, city) with its button, and the small print.
- * The navigation is the one authored on /jsw-phase-3 (loadJswNav), the same on every JSW page.
+ * The navigation is the one authored on /jsw-phase-3 (loadPillNav), the same on every JSW page.
  * Rows (field groups of the model, _reservation-form.json):
  *   media   — background image, foreground image; the pricing panel over the car: label,
  *             amount (₹, also what Razorpay charges), badge, note
@@ -19,7 +19,7 @@
  * the content tree outlines that input.
  * The button checks and cleans every field (RULES below; a field that fails gets .is-invalid
  * until it is corrected), builds the payload from the cleaned values (HTML tags stripped),
- * announces it (a "jsw:reservation" event on the block, for a later backend), keeps the first
+ * announces it (a "reservation:submit" event on the block, for a later backend), keeps the first
  * name and email in sessionStorage, then takes the payment in Razorpay's window
  * (scripts/razorpay.js), which shows its loading, verification and error steps itself:
  *   paid      — the button link (confirmation page)
@@ -29,15 +29,16 @@
  * public Key ID: no backend creates orders or verifies payments yet.
  */
 
-import { loadJswNav } from '../../scripts/jsw-pill-nav.js';
+import { loadPillNav } from '../../scripts/pill-nav.js';
+import { IMAGE_EXTENSIONS, acceptedPicture } from '../../scripts/media-types.js';
 import { KEY_ID, loadRazorpay, payWithRazorpay } from '../../scripts/razorpay.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
 // where the visitor's first name and email are kept for the confirmation page
-const RESERVATION_KEY = 'jsw-reservation';
+const RESERVATION_KEY = 'reservation-details';
 
 // where the payment's outcome is kept: { status, paymentId } or { status, code, description, … }
-const PAYMENT_KEY = 'jsw-payment';
+const PAYMENT_KEY = 'reservation-payment';
 
 // placeholders when the author has left them empty
 const PLACEHOLDERS = {
@@ -176,7 +177,8 @@ export default function decorate(block) {
 
   // the full-page landscape behind everything
   const frame = el('div', 'frame');
-  const background = media.picture('media_background', 0);
+  // the background and foreground images: JPG, JPEG or PNG (else not shown, a warning)
+  const background = acceptedPicture(media.picture('media_background', 0), IMAGE_EXTENSIONS, 'background image', 'reservation-form');
   if (background) {
     background.classList.add('background');
     background.querySelector('img')?.setAttribute('loading', 'eager');
@@ -186,7 +188,7 @@ export default function decorate(block) {
   // the card: the car on the left, the form on the right
   const card = el('div', 'card');
   const visual = el('div', 'visual');
-  const foreground = media.picture('media_foreground', 1);
+  const foreground = acceptedPicture(media.picture('media_foreground', 1), IMAGE_EXTENSIONS, 'foreground image', 'reservation-form');
   if (foreground) {
     foreground.querySelector('img')?.setAttribute('loading', 'eager');
     visual.append(foreground);
@@ -412,7 +414,7 @@ export default function decorate(block) {
     // the payload: the cleaned values, no HTML tags in any of them
     const payload = Object.fromEntries(Object.entries(results)
       .map(([key, { value }]) => [key, stripTags(value)]));
-    block.dispatchEvent(new CustomEvent('jsw:reservation', { detail: payload, bubbles: true }));
+    block.dispatchEvent(new CustomEvent('reservation:submit', { detail: payload, bubbles: true }));
     remember(RESERVATION_KEY, { firstName: payload.firstName, email: payload.email });
 
     if (!KEY_ID.test(keyId) || !paise) {
@@ -471,7 +473,7 @@ export default function decorate(block) {
   card.append(visual, body);
   frame.append(card);
   // the JSW navigation over the landscape, once read from /jsw-phase-3
-  loadJswNav().then((nav) => card.before(nav));
+  loadPillNav().then((nav) => card.before(nav));
   block.replaceChildren(frame);
   if (editing) block.classList.add('editing');
 }

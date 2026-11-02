@@ -1,5 +1,5 @@
 /*
- * The JSW pill navigation (scripts/jsw-pill-nav.js) and the JSW faces, for blocks that bring
+ * The JSW pill navigation (scripts/pill-nav.js) and the JSW faces, for blocks that bring
  * their own navigation (reservation-form, reservation-confirmation). Imported by their
  * stylesheets. Values from the "NEV / Hero", "Opt 2 / Reserve" and "Confirmed" frames:
  * 672 x 42, 26px from the top, 11px corners.
@@ -14,11 +14,11 @@
 }
 
 :root {
-  --jsw-pill-font-display: new-science, michroma, sequel, 'Helvetica Neue', arial, sans-serif;
-  --jsw-pill-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
+  --pill-font-display: new-science, michroma, sequel, 'Helvetica Neue', arial, sans-serif;
+  --pill-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
 }
 
-.jsw-pill-nav {
+.pill-nav {
   position: absolute;
   top: 12px;
   left: 50%;
@@ -28,7 +28,7 @@
 }
 
 /* the pill: over the blue landscape it reads slate (#54697c): black at 42% */
-.jsw-pill-nav .jsw-pill-nav-inner {
+.pill-nav .pill-nav-inner {
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -42,54 +42,54 @@
   backdrop-filter: blur(12px);
 }
 
-.jsw-pill-nav p {
+.pill-nav p {
   margin: 0;
 }
 
-.jsw-pill-nav .jsw-pill-nav-brand-wrap {
+.pill-nav .pill-nav-brand-wrap {
   display: flex;
   margin-right: auto;
 }
 
-.jsw-pill-nav a:any-link {
+.pill-nav a:any-link {
   color: inherit;
   text-decoration: none;
 }
 
-.jsw-pill-nav .jsw-pill-nav-brand {
+.pill-nav .pill-nav-brand {
   display: inline-flex;
   align-items: center;
   gap: 11px;
 }
 
-.jsw-pill-nav .jsw-pill-nav-mark {
+.pill-nav .pill-nav-mark {
   display: block;
   flex: none;
   width: 28px;
   height: 18px;
 }
 
-.jsw-pill-nav .jsw-pill-nav-mark svg {
+.pill-nav .pill-nav-mark svg {
   display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
 }
 
-.jsw-pill-nav .jsw-pill-nav-brand-text {
-  font-family: var(--jsw-pill-font-display);
+.pill-nav .pill-nav-brand-text {
+  font-family: var(--pill-font-display);
   font-size: 10px;
   letter-spacing: 0.12em;
   white-space: nowrap;
 }
 
-.jsw-pill-nav .jsw-pill-nav-wordmark svg {
+.pill-nav .pill-nav-wordmark svg {
   display: block;
   width: auto;
   height: 6px;
 }
 
-.jsw-pill-nav .jsw-pill-nav-links {
+.pill-nav .pill-nav-links {
   display: none;
   gap: 22px;
   margin: 0;
@@ -97,17 +97,17 @@
   list-style: none;
 }
 
-.jsw-pill-nav .jsw-pill-nav-links a {
+.pill-nav .pill-nav-links a {
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
 }
 
-.jsw-pill-nav .jsw-pill-nav-links a:hover {
+.pill-nav .pill-nav-links a:hover {
   opacity: 0.7;
 }
 
-.jsw-pill-nav a.jsw-pill-nav-cta:any-link {
+.pill-nav a.pill-nav-cta:any-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -118,7 +118,7 @@
   border-radius: 6px;
   color: #111;
   background-color: #fff;
-  font-family: var(--jsw-pill-font-mono);
+  font-family: var(--pill-font-mono);
   font-size: 9px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -127,17 +127,17 @@
 
 /* phones: no navigation, as on /jsw-phase-3 */
 @media (max-width: 599.98px) {
-  .jsw-pill-nav {
+  .pill-nav {
     display: none;
   }
 }
 
 @media (min-width: 600px) {
-  .jsw-pill-nav {
+  .pill-nav {
     top: 26px;
   }
 
-  .jsw-pill-nav .jsw-pill-nav-links {
+  .pill-nav .pill-nav-links {
     display: flex;
   }
 }

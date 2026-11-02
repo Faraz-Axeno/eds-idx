@@ -4,7 +4,7 @@
  * the end, four compact frosted-glass step cards side by side, 8px apart. A static section.
  */
 
-@import url('../../styles/jsw-pill-nav.css');
+@import url('../../styles/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .career-route-wrapper {
@@ -23,7 +23,7 @@ main > .section > .career-route-wrapper {
   overflow: hidden;
   color: #fff;
   background-color: #1a120b;
-  font-family: new-science, var(--font-jsw-text);
+  font-family: new-science, var(--font-brand-text);
 
   /* desktop: the heading and the cards sized in "units", 1px each in the 1280-wide frame, so on
      narrower desktops they shrink as a whole and their texts wrap as in the frame (at least 0.7px);
@@ -82,7 +82,7 @@ main > .section > .career-route-wrapper {
     margin: 0;
     overflow: hidden;
     color: #fff;
-    font-family: var(--jsw-pill-font-display);
+    font-family: var(--pill-font-display);
     font-size: calc(38 * var(--career-route-unit));
     font-weight: 400;
     line-height: 1.1;
@@ -133,7 +133,7 @@ main > .section > .career-route-wrapper {
   .step-number {
     overflow: hidden;
     color: #d9d9d9;
-    font-family: var(--jsw-pill-font-display);
+    font-family: var(--pill-font-display);
     font-size: calc(18 * var(--career-route-unit));
     font-weight: 300;
     line-height: 1;

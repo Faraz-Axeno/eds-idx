@@ -399,21 +399,21 @@ export function decorateMain(main) {
  *   /jsw-phase-3        immersive-hero (+ brand-footer) -> jsw-phase-3 + styles/jsw-phase-3.css
  *   /jsw-sustainability jsw-sustainability (single)     -> jsw-sustainability
  *   /jsw-nev-collage    parallax-collage (+ teaser)     -> jsw-nev-collage
- *   /jsw-phase-5        open-roles                      -> jsw-phase-5, the JSW footer
- *   /jsw-footer         jsw-footer (the JSW footer)     -> jsw-footer-page
- *   /jsw-nav            jsw-nav (the JSW navigation)    -> jsw-nav-page
- * An entry with a footer gets that page as its footer (loadJswFooter) instead of the site's.
+ *   /jsw-phase-5        open-roles                      -> careers-page, the JSW footer
+ *   /jsw-footer         jsw-footer (the JSW footer)     -> footer-page
+ *   /jsw-nav            jsw-nav (the JSW navigation)    -> nav-page
+ * An entry with a footer gets that page as its footer (loadPageFooter) instead of the site's.
  * Every other page is unaffected.
  */
 const STANDALONE_PAGES = [
   { block: 'immersive-hero', bodyClass: 'jsw-phase-3', css: 'jsw-phase-3.css' },
   { block: 'jsw-sustainability', bodyClass: 'jsw-sustainability' },
   { block: 'parallax-collage', bodyClass: 'jsw-nev-collage' },
-  { block: 'reservation-form', bodyClass: 'jsw-reservation' },
-  { block: 'reservation-confirmation', bodyClass: 'jsw-reservation' },
-  { block: 'open-roles', bodyClass: 'jsw-phase-5', footer: '/jsw-footer' },
-  { block: 'jsw-footer', bodyClass: 'jsw-footer-page' },
-  { block: 'jsw-nav', bodyClass: 'jsw-nav-page' },
+  { block: 'reservation-form', bodyClass: 'reservation-page' },
+  { block: 'reservation-confirmation', bodyClass: 'reservation-page' },
+  { block: 'open-roles', bodyClass: 'careers-page', footer: '/jsw-footer' },
+  { block: 'jsw-footer', bodyClass: 'footer-page' },
+  { block: 'jsw-nav', bodyClass: 'nav-page' },
 ];
 
 /**
@@ -423,7 +423,7 @@ const STANDALONE_PAGES = [
  * @param {Element} footer the <footer> element
  * @param {string} path the footer page, from the site root
  */
-async function loadJswFooter(footer, path) {
+async function loadPageFooter(footer, path) {
   if (!footer) return;
   const { pathname } = window.location;
   const siteRoot = pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0];
@@ -504,7 +504,7 @@ async function loadLazy(doc) {
 
   // the site's footer, or (a JSW page with its own) that footer page only
   if (siteChrome) loadFooter(doc.querySelector('footer'));
-  else if (page.footer) loadJswFooter(doc.querySelector('footer'), page.footer);
+  else if (page.footer) loadPageFooter(doc.querySelector('footer'), page.footer);
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();

@@ -42,7 +42,7 @@
           "valueType": "string",
           "name": "media_background",
           "label": "Background image",
-          "description": "Full-page landscape behind the card.",
+          "description": "Full-page landscape behind the card: JPG, JPEG or PNG.",
           "multi": false
         },
         {
@@ -57,7 +57,7 @@
           "valueType": "string",
           "name": "media_foreground",
           "label": "Foreground image",
-          "description": "The car filling the card, behind the text.",
+          "description": "The car filling the card, behind the text: JPG, JPEG or PNG.",
           "multi": false
         },
         {
@@ -79,7 +79,7 @@
           "valueType": "string",
           "name": "content_subheading",
           "label": "Personalized subheading",
-          "description": "Type {NAME} where the visitor's name goes, braces included; it is kept as written and filled in on the page.",
+          "description": "Type {NAME} (braces included) where the visitor's name goes.",
           "value": "YOU’RE IN, {NAME}."
         },
         {
@@ -87,7 +87,7 @@
           "valueType": "string",
           "name": "content_message",
           "label": "Confirmation message",
-          "description": "Each sentence is shown on its own line. Type {email} where the visitor's email goes, braces included; it is kept as written and filled in on the page.",
+          "description": "One line per sentence; type {email} (braces included) for the email.",
           "value": "We’ll message you when allocation opens. Your receipt is on its way to {email}."
         }
       ]

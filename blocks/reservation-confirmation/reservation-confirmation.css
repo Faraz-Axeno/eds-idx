@@ -7,7 +7,7 @@
  *                     left-aligned and vertically centred on the right half
  */
 
-@import url('../../styles/jsw-pill-nav.css');
+@import url('../../styles/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .reservation-confirmation-wrapper {
@@ -64,7 +64,7 @@ main > .section > .reservation-confirmation-wrapper {
 
   /* the navigation 26px from the top of the screen (18px into the inset panel) */
   @media (min-width: 600px) {
-    .jsw-pill-nav {
+    .pill-nav {
       top: 18px;
     }
   }
@@ -93,7 +93,7 @@ main > .section > .reservation-confirmation-wrapper {
   }
 
   .subheading {
-    font-family: var(--jsw-pill-font-display);
+    font-family: var(--pill-font-display);
     font-weight: 400;
     text-transform: uppercase;
   }
@@ -148,7 +148,7 @@ main > .section > .reservation-confirmation-wrapper {
     /* stylelint-disable-next-line property-no-vendor-prefix -- Safari and older Samsung Internet */
     -webkit-background-clip: text;
     background-clip: text;
-    font-family: var(--jsw-pill-font-display);
+    font-family: var(--pill-font-display);
     font-size: calc(84 * var(--reservation-confirmation-unit));
     font-weight: 300;
     line-height: 1.1;
