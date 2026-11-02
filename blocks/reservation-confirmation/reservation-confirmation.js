@@ -64,8 +64,8 @@ function withTokens(text) {
     frag.append(text.slice(last, at));
     const isEmail = key.toLowerCase() === 'email';
     const span = el('span', isEmail
-      ? 'reservation-confirmation-token reservation-confirmation-email'
-      : 'reservation-confirmation-token', { 'data-token': token });
+      ? 'token email'
+      : 'token', { 'data-token': token });
     span.textContent = isEmail ? VISITOR_EMAIL : VISITOR_NAME;
     frag.append(span);
     last = at + token.length;
@@ -83,7 +83,7 @@ function writeMessage(node) {
     if (/\{email\}/i.test(sentence) && !VISITOR_EMAIL) return;
     // a space between the sentences, for the split layout where they run on as one paragraph
     if (node.childNodes.length) node.append(' ');
-    const line = el('span', 'reservation-confirmation-line');
+    const line = el('span', 'line');
     line.append(withTokens(sentence));
     node.append(line);
   });
@@ -128,27 +128,27 @@ export default function decorate(block) {
   const content = fieldsOf(contentCell);
 
   // the full-page landscape behind everything
-  const frame = el('div', 'reservation-confirmation-frame');
+  const frame = el('div', 'frame');
   const background = media.picture('media_background', 0);
   if (background) {
-    background.classList.add('reservation-confirmation-background');
+    background.classList.add('background');
     background.querySelector('img')?.setAttribute('loading', 'eager');
     frame.append(background);
   }
 
   // the card: the car behind the text
-  const card = el('div', 'reservation-confirmation-card');
+  const card = el('div', 'card');
   const foreground = media.picture('media_foreground', 1);
   if (foreground) {
-    foreground.classList.add('reservation-confirmation-visual');
+    foreground.classList.add('visual');
     foreground.querySelector('img')?.setAttribute('loading', 'eager');
     card.append(foreground);
   }
 
-  const heading = retag(content.text('content_heading', 0), 'h1', 'reservation-confirmation-heading');
-  const details = el('div', 'reservation-confirmation-details');
-  const subheading = retag(content.text('content_subheading', 1), 'p', 'reservation-confirmation-subheading');
-  const message = retag(content.text('content_message', 2), 'p', 'reservation-confirmation-message');
+  const heading = retag(content.text('content_heading', 0), 'h1', 'heading');
+  const details = el('div', 'details');
+  const subheading = retag(content.text('content_subheading', 1), 'p', 'subheading');
+  const message = retag(content.text('content_message', 2), 'p', 'message');
 
   // the tokens filled in, published and in the editor alike
   const rawSubheading = subheading.textContent;
@@ -169,5 +169,5 @@ export default function decorate(block) {
   block.replaceChildren(frame);
   block.classList.remove(...LAYOUTS);
   block.classList.add(layout);
-  if (editing) block.classList.add('reservation-confirmation-editing');
+  if (editing) block.classList.add('editing');
 }

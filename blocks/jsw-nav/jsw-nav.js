@@ -44,5 +44,5 @@ export default function decorate(block) {
     }
   });
   block.replaceChildren(nav);
-  if (editing) block.classList.add('jsw-nav-editing');
+  if (editing) block.classList.add('editing');
 }

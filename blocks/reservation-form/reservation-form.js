@@ -155,7 +155,7 @@ function authorUrl(href) {
  * only RULES decide. aria-required tells assistive technology which fields are needed
  */
 function input(name, placeholder, attrs = {}) {
-  return el('input', 'reservation-form-input', {
+  return el('input', 'input', {
     name, placeholder, 'aria-label': placeholder.replace(/\*\s*$/, '').trim() || name, 'aria-required': 'true', ...attrs,
   });
 }
@@ -175,17 +175,17 @@ export default function decorate(block) {
   const placeholderFields = fieldsOf(fieldsCell);
 
   // the full-page landscape behind everything
-  const frame = el('div', 'reservation-form-frame');
+  const frame = el('div', 'frame');
   const background = media.picture('media_background', 0);
   if (background) {
-    background.classList.add('reservation-form-background');
+    background.classList.add('background');
     background.querySelector('img')?.setAttribute('loading', 'eager');
     frame.append(background);
   }
 
   // the card: the car on the left, the form on the right
-  const card = el('div', 'reservation-form-card');
-  const visual = el('div', 'reservation-form-visual');
+  const card = el('div', 'card');
+  const visual = el('div', 'visual');
   const foreground = media.picture('media_foreground', 1);
   if (foreground) {
     foreground.querySelector('img')?.setAttribute('loading', 'eager');
@@ -209,23 +209,23 @@ export default function decorate(block) {
   const rupees = Number((amountField?.textContent || '').replace(/[^\d.]/g, '')) || 0;
   const paise = Math.round(rupees * 100);
   if (labelField || amountField || badgeField || noteField) {
-    const pricing = el('div', 'reservation-form-pricing');
-    const top = el('div', 'reservation-form-pricing-top');
-    if (labelField) top.append(retag(labelField, 'p', 'reservation-form-pricing-label'));
-    if (badgeField) top.append(retag(badgeField, 'p', 'reservation-form-pricing-badge'));
+    const pricing = el('div', 'pricing');
+    const top = el('div', 'pricing-top');
+    if (labelField) top.append(retag(labelField, 'p', 'pricing-label'));
+    if (badgeField) top.append(retag(badgeField, 'p', 'pricing-badge'));
     if (top.children.length) pricing.append(top);
     if (amountField) {
-      const amount = retag(amountField, 'p', 'reservation-form-pricing-amount');
+      const amount = retag(amountField, 'p', 'pricing-amount');
       if (rupees) amount.textContent = `₹${rupees.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
       pricing.append(amount);
     }
-    if (noteField) pricing.append(retag(noteField, 'p', 'reservation-form-pricing-note'));
+    if (noteField) pricing.append(retag(noteField, 'p', 'pricing-note'));
     visual.append(pricing);
   }
-  const body = el('div', 'reservation-form-body');
-  const heading = retag(content.text('content_heading', 0), 'h1', 'reservation-form-heading');
-  const subheading = retag(content.text('content_subheading', 1), 'p', 'reservation-form-subheading');
-  const disclaimer = retag(content.text('content_disclaimer', 2), 'p', 'reservation-form-disclaimer');
+  const body = el('div', 'body');
+  const heading = retag(content.text('content_heading', 0), 'h1', 'heading');
+  const subheading = retag(content.text('content_subheading', 1), 'p', 'subheading');
+  const disclaimer = retag(content.text('content_disclaimer', 2), 'p', 'disclaimer');
 
   // the form; the authored button link is where it leads, the action URL is kept for later
   // published the action URL and comma-separated city options are told apart by their text
@@ -254,7 +254,7 @@ export default function decorate(block) {
   const checkoutDescription = checkoutDescriptionField?.textContent.trim() || '';
   const failurePage = failureLink?.getAttribute('href') || '';
   // the browser's own form checks are off: the fields are checked by RULES only
-  const form = el('form', 'reservation-form-fields', { novalidate: '' });
+  const form = el('form', 'fields', { novalidate: '' });
   const action = actionField?.textContent.trim();
   if (action) form.setAttribute('action', action);
 
@@ -266,9 +266,9 @@ export default function decorate(block) {
 
   // each field with the line below it where its error message shows (empty until then)
   const errors = new Map();
-  const withError = (field, wrapper = el('div', 'reservation-form-field')) => {
+  const withError = (field, wrapper = el('div', 'field')) => {
     errorCount += 1;
-    const message = el('p', 'reservation-form-error', { id: `reservation-form-error-${errorCount}`, 'aria-live': 'polite' });
+    const message = el('p', 'error', { id: `reservation-form-error-${errorCount}`, 'aria-live': 'polite' });
     field.setAttribute('aria-describedby', message.id);
     if (!wrapper.contains(field)) wrapper.append(field);
     wrapper.append(message);
@@ -276,12 +276,12 @@ export default function decorate(block) {
     return wrapper;
   };
 
-  const names = el('div', 'reservation-form-row');
+  const names = el('div', 'row');
   const firstName = input('firstName', placeholderText.firstName, { autocomplete: 'given-name' });
   const lastName = input('lastName', placeholderText.lastName, { autocomplete: 'family-name' });
   names.append(withError(firstName), withError(lastName));
-  const phone = el('div', 'reservation-form-row reservation-form-phone');
-  const prefix = el('span', 'reservation-form-prefix', { 'aria-hidden': 'true' });
+  const phone = el('div', 'row phone');
+  const prefix = el('span', 'prefix', { 'aria-hidden': 'true' });
   prefix.textContent = '+91';
   // at most 10 digits, as typed; a number pasted or filled in with spaces, dashes or +91 is
   // cut down to its 10 digits (the browser's own limit would cut the pasted text instead)
@@ -300,8 +300,8 @@ export default function decorate(block) {
     type: 'text', inputmode: 'email', autocomplete: 'email', autocapitalize: 'off', spellcheck: 'false',
   });
 
-  const cityWrap = el('div', 'reservation-form-select reservation-form-field');
-  const city = el('select', 'reservation-form-input', { name: 'city', 'aria-label': 'City' });
+  const cityWrap = el('div', 'select field');
+  const city = el('select', 'input', { name: 'city', 'aria-label': 'City' });
   const placeholder = el('option', '', { value: '' });
   placeholder.textContent = placeholderText.city;
   placeholder.selected = true;
@@ -325,7 +325,7 @@ export default function decorate(block) {
   cityWrap.append(city);
   withError(city, cityWrap);
 
-  const submit = el('button', 'reservation-form-submit', { type: 'submit' });
+  const submit = el('button', 'submit', { type: 'submit' });
   submit.textContent = buttonLink?.textContent.trim() || 'PROCEED';
   const destination = buttonLink?.getAttribute('href') || '';
   if (buttonLink) moveInstrumentation(buttonLink, submit);
@@ -348,7 +348,7 @@ export default function decorate(block) {
 
   // the authored settings that are not shown (action URL, the button link itself, City Option
   // rows of the earlier model) stay in the block: in the editor they lie over the form
-  const settings = el('div', 'reservation-form-settings', { 'aria-hidden': 'true' });
+  const settings = el('div', 'settings', { 'aria-hidden': 'true' });
   [actionField, buttonLink?.closest('p') || buttonLink, keyField, checkoutNameField,
     checkoutDescriptionField, failureLink?.closest('p') || failureLink, ...cityRows]
     .filter((node) => node && node.isConnected).forEach((node) => settings.append(node));
@@ -473,5 +473,5 @@ export default function decorate(block) {
   // the JSW navigation over the landscape, once read from /jsw-phase-3
   loadJswNav().then((nav) => card.before(nav));
   block.replaceChildren(frame);
-  if (editing) block.classList.add('reservation-form-editing');
+  if (editing) block.classList.add('editing');
 }
