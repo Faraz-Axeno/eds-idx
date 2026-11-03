@@ -38,6 +38,13 @@ main > .section > .reservation-confirmation-wrapper {
     }
   }
 
+  /* the page holding the block scrolls freely: no snapping to its sections (styles/styles.css);
+     scroll snapping can only be set on the page itself, so this one rule sits above the block,
+     keyed on the block being on the page */
+  html.panels-ready:has(&) {
+    scroll-snap-type: none;
+  }
+
   .frame {
     position: relative;
     isolation: isolate;
