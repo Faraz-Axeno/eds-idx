@@ -1868,6 +1868,28 @@
       {
         "component": "text",
         "valueType": "string",
+        "name": "content_pendingHeading",
+        "label": "Pending title",
+        "description": "Shown with the spinner while the payment is processed. Max 64 chars.",
+        "value": "Processing your reservation",
+        "validation": {
+          "maxLength": 64
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_pendingDescription",
+        "label": "Pending description",
+        "description": "The line under the pending title. Max 200 chars.",
+        "value": "Please wait while we process your request.",
+        "validation": {
+          "maxLength": 200
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
         "name": "form_action",
         "label": "Form action URL",
         "description": "Where the form data is sent; not used yet (the button uses Button link).",

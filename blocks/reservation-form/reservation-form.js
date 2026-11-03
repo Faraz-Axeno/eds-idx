@@ -6,7 +6,7 @@
  * Rows (field groups of the model, _reservation-form.json):
  *   media   — background image, foreground image; the pricing panel over the car: label,
  *             amount (₹, also what Razorpay charges), badge, note
- *   content — heading, subheading, disclaimer
+ *   content — heading, subheading, disclaimer, pending title, pending description
  *   form    — form action URL, city options (a multi-value field: a list, or comma-separated
  *             text where multi-field rendering is off), Razorpay Key ID, name and description
  *             for the Razorpay window, button (link + text: the page after a successful
@@ -20,11 +20,13 @@
  * The button checks and cleans every field (RULES below; a field that fails gets .is-invalid
  * until it is corrected), builds the payload from the cleaned values (HTML tags stripped),
  * announces it (a "reservation:submit" event on the block, for a later backend), keeps the first
- * name and email in sessionStorage, then takes the payment in Razorpay's window
+ * name and email in sessionStorage, then shows the pending state (the form gives its place to
+ * a spinner and the pending title and description) and takes the payment in Razorpay's window
  * (scripts/razorpay.js), which shows its loading, verification and error steps itself:
  *   paid      — the button link (confirmation page)
  *   failed    — the failure page link (also when Razorpay cannot be loaded or is not set up)
- *   closed    — back to the form
+ *   closed    — back to the form (also when no page is set for the outcome)
+ * In Universal Editor's edit mode the pending state is shown under the form, to be edited.
  * The outcome is kept in sessionStorage (PAYMENT_KEY) for those pages. Test mode only needs the
  * public Key ID: no backend creates orders or verifies payments yet.
  */
@@ -39,6 +41,15 @@ const RESERVATION_KEY = 'reservation-details';
 
 // where the payment's outcome is kept: { status, paymentId } or { status, code, description, … }
 const PAYMENT_KEY = 'reservation-payment';
+
+// the pending state's texts when the author has left them empty, and the most characters each
+// shows on the page (the model's maxLength, _reservation-form.json): a longer text, if saved
+// anyway, is cut there with "…"; the editor shows it whole
+const PENDING = {
+  title: 'Processing your reservation',
+  description: 'Please wait while we process your request.',
+};
+const PENDING_LIMITS = { title: 64, description: 200 };
 
 // placeholders when the author has left them empty
 const PLACEHOLDERS = {
@@ -229,6 +240,25 @@ export default function decorate(block) {
   const subheading = retag(content.text('content_subheading', 1), 'p', 'subheading');
   const disclaimer = retag(content.text('content_disclaimer', 2), 'p', 'disclaimer');
 
+  // the pending state, shown from the payment's start until the visitor is taken to its
+  // outcome's page: the spinner, then the pending title and description (after the disclaimer
+  // in the content group); a role="status" region, its title focused when it is shown
+  const pendingView = el('div', 'pending-view', { role: 'status' });
+  const spinner = el('div', 'spinner', { 'aria-hidden': 'true' });
+  spinner.append(el('span', 'glow'));
+  const statusTitle = retag(content.text('content_pendingHeading', 3), 'h2', 'status-title');
+  const statusText = retag(content.text('content_pendingDescription', 4), 'p', 'status-text');
+  statusTitle.setAttribute('tabindex', '-1');
+  [[statusTitle, 'title'], [statusText, 'description']].forEach(([node, key]) => {
+    const text = node.textContent.trim();
+    if (!text) node.textContent = PENDING[key];
+    else if (!editing && text.length > PENDING_LIMITS[key]) {
+      node.title = text;
+      node.textContent = `${text.slice(0, PENDING_LIMITS[key] - 1).trimEnd()}…`;
+    }
+  });
+  pendingView.append(spinner, statusTitle, statusText);
+
   // the form; the authored button link is where it leads, the action URL is kept for later
   // published the action URL and comma-separated city options are told apart by their text
   const configTexts = [...(formCell?.querySelectorAll('p') || [])]
@@ -380,8 +410,11 @@ export default function decorate(block) {
     field.addEventListener('change', recheck);
   });
 
+  // to a page (the confirmation or failure page); false when none is set
   const go = (href) => {
-    if (href) window.location.href = authorUrl(href);
+    if (!href) return false;
+    window.location.href = authorUrl(href);
+    return true;
   };
   const remember = (key, value) => {
     try {
@@ -393,6 +426,18 @@ export default function decorate(block) {
     if (on) submit.setAttribute('aria-busy', 'true');
     else submit.removeAttribute('aria-busy');
   };
+  // the pending state (.is-pending): the form keeps its place, hidden, with the spinner and the
+  // status texts over it; its title is focused, so screen readers announce it
+  const pending = (on) => {
+    block.classList.toggle('is-pending', on);
+    busy(on);
+    if (on) statusTitle.focus({ preventScroll: true });
+  };
+  // back from the outcome's page, the browser may show this page as it was left (its
+  // back/forward cache): the form again, not the pending state
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted && block.classList.contains('is-pending')) pending(false);
+  });
   // Razorpay's script fetched as soon as the visitor starts on the form, so its window opens
   // at once on the button (not with the page: it is not needed to show it)
   if (!editing && KEY_ID.test(keyId)) {
@@ -417,15 +462,19 @@ export default function decorate(block) {
     block.dispatchEvent(new CustomEvent('reservation:submit', { detail: payload, bubbles: true }));
     remember(RESERVATION_KEY, { firstName: payload.firstName, email: payload.email });
 
+    // pending from here: behind Razorpay's window while the visitor pays, then until the
+    // outcome's page opens
+    pending(true);
     if (!KEY_ID.test(keyId) || !paise) {
       // eslint-disable-next-line no-console
       console.error('reservation-form: the block needs a Razorpay Key ID (rzp_…) and an amount');
       remember(PAYMENT_KEY, { status: 'failed', code: 'NOT_CONFIGURED' });
-      go(failurePage);
+      if (!go(failurePage)) pending(false);
       return;
     }
 
-    busy(true);
+    // Razorpay's final response: paid (its handler), failed (payment.failed), closed without
+    // paying (ondismiss), or its window not opening within 15s (a failure), scripts/razorpay.js
     let outcome;
     try {
       outcome = await payWithRazorpay({
@@ -448,10 +497,10 @@ export default function decorate(block) {
       outcome = { status: 'failed', error: { code: 'CHECKOUT_UNAVAILABLE', description: error.message } };
     }
 
+    // paid: the confirmation page (the button link); failed: the failure page
     if (outcome.status === 'success') {
       remember(PAYMENT_KEY, { status: 'success', paymentId: outcome.response.razorpay_payment_id });
-      go(destination);
-      return;
+      if (go(destination)) return;
     }
     if (outcome.status === 'failed') {
       const {
@@ -460,16 +509,17 @@ export default function decorate(block) {
       remember(PAYMENT_KEY, {
         status: 'failed', code, description, reason, step, source,
       });
-      if (failurePage) {
-        go(failurePage);
-        return;
-      }
+      if (go(failurePage)) return;
     }
-    // closed without paying (or no failure page set): back to the form
-    busy(false);
+    // closed without paying (or no page set for the outcome): back to the form
+    pending(false);
+    submit.focus();
   });
 
-  body.append(heading, subheading, form, disclaimer);
+  // the form and the pending view in one place (.views), so the card keeps its size
+  const views = el('div', 'views');
+  views.append(form, pendingView);
+  body.append(heading, subheading, views, disclaimer);
   card.append(visual, body);
   frame.append(card);
   // the JSW navigation over the landscape, once read from /jsw-phase-3
