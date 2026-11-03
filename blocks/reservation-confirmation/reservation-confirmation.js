@@ -172,4 +172,6 @@ export default function decorate(block) {
   block.classList.remove(...LAYOUTS);
   block.classList.add(layout);
   if (editing) block.classList.add('editing');
+  // the page scrolls freely: no eased wheel steps from section to section (scripts/delayed.js)
+  document.body.dataset.nativeScroll = 'true';
 }

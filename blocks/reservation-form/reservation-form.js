@@ -476,4 +476,6 @@ export default function decorate(block) {
   loadPillNav().then((nav) => card.before(nav));
   block.replaceChildren(frame);
   if (editing) block.classList.add('editing');
+  // the page scrolls freely: no eased wheel steps from section to section (scripts/delayed.js)
+  document.body.dataset.nativeScroll = 'true';
 }
