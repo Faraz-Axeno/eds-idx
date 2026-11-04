@@ -20,7 +20,8 @@
  * The button checks and cleans every field (RULES below; a field that fails gets .is-invalid
  * until it is corrected), builds the payload from the cleaned values (HTML tags stripped),
  * announces it (a "reservation:submit" event on the block, for a later backend), keeps the first
- * name and email in sessionStorage, then shows the pending state (the form gives its place to
+ * name and email in sessionStorage (FIRST_NAME_KEY, EMAIL_KEY: the confirmation and failure
+ * pages show them), then shows the pending state (the form gives its place to
  * a spinner and the pending title and description) and takes the payment in Razorpay's window
  * (razorpay.js, in this block), which shows its loading, verification and error steps itself:
  *   paid      — the button link (confirmation page)
@@ -71,8 +72,10 @@ function acceptedPicture(picture, allowed, field, block) {
   return acceptedType(src, allowed, field, block) ? picture : null;
 }
 
-// where the visitor's first name and email are kept for the confirmation page
-const RESERVATION_KEY = 'reservation-details';
+// where the visitor's first name and email are kept (sessionStorage) for the confirmation and
+// failure pages (the reservation-confirmation block reads, then clears them)
+const FIRST_NAME_KEY = 'reservationFirstName';
+const EMAIL_KEY = 'reservationEmail';
 
 // where the payment's outcome is kept: { status, paymentId } or { status, code, description, … }
 const PAYMENT_KEY = 'reservation-payment';
@@ -598,7 +601,11 @@ export default function decorate(block) {
     const payload = Object.fromEntries(Object.entries(results)
       .map(([key, { value }]) => [key, stripTags(value)]));
     block.dispatchEvent(new CustomEvent('reservation:submit', { detail: payload, bubbles: true }));
-    remember(RESERVATION_KEY, { firstName: payload.firstName, email: payload.email });
+    // the visitor's first name and email (cleaned), for the outcome's page across the redirect
+    try {
+      sessionStorage.setItem(FIRST_NAME_KEY, payload.firstName);
+      sessionStorage.setItem(EMAIL_KEY, payload.email);
+    } catch (error) { /* private browsing: the outcome's page shows its fallback */ }
 
     // pending from here: behind Razorpay's window while the visitor pays, then until the
     // outcome's page opens
