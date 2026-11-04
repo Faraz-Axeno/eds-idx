@@ -7,7 +7,7 @@
  *                     left-aligned and vertically centred on the right half
  */
 
-@import url('../../styles/pill-nav.css');
+@import url('../jsw-nav/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .reservation-confirmation-wrapper {
@@ -326,6 +326,51 @@ main > .section > .reservation-confirmation-wrapper {
 
     &.layout-split .subheading {
       font-size: 20px;
+    }
+  }
+
+  /* the authored texts keep to their space whatever their length (with the character limits,
+     reservation-confirmation.js): the subheading and message end in "…" after their most lines
+     (--lines), a word longer than its line breaks; CONFIRMED (one line by design) ends in "…"
+     at the card's width. Universal Editor's edit mode shows every text whole, to be edited */
+  :root:not(.adobe-ue-edit) & {
+    :is(.subheading, .message) {
+      /* stylelint-disable-next-line value-no-vendor-prefix -- the line clamp needs it, every engine */
+      display: -webkit-box;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+      /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
+      -webkit-box-orient: vertical;
+      /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
+      -webkit-line-clamp: var(--lines);
+    }
+
+    .subheading {
+      --lines: 3;
+    }
+
+    .message {
+      --lines: 8;
+    }
+
+    /* CONFIRMED may run into the card's side padding (it does on the narrowest phones): its "…"
+       comes at the card's own edges */
+    &.layout-centered .heading {
+      max-width: calc(100% + 64 * var(--reservation-confirmation-unit));
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 899.98px) {
+      &.layout-centered .heading {
+        max-width: calc(100% + 48px);
+      }
+    }
+
+    @media (max-width: 599.98px) {
+      &.layout-centered .heading {
+        max-width: calc(100% + 40px);
+      }
     }
   }
 

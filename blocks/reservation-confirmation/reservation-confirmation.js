@@ -12,9 +12,56 @@
  * replace it; for now it shows VISITOR_NAME / VISITOR_EMAIL below.
  */
 
-import { loadPillNav } from '../../scripts/pill-nav.js';
-import { IMAGE_EXTENSIONS, acceptedPicture } from '../../scripts/media-types.js';
+import { loadPillNav } from '../jsw-nav/pill-nav.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
+
+// the file types the block's media accept, by the asset's extension (published images keep
+// their file's: media_….jpg): an asset of another type is not shown, a console warning instead
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png']; // general images: backgrounds, photos
+
+/** an asset's file extension, from its URL's path ('' when it has none) */
+function extensionOf(url) {
+  try {
+    const name = new URL(url, window.location.href).pathname.split('/').pop();
+    return name.includes('.') ? name.split('.').pop().toLowerCase() : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+/**
+ * whether an asset's file type is accepted for its field; if not, a warning (it is not shown)
+ * @param {string} url the asset
+ * @param {string[]} allowed the field's extensions (IMAGE_EXTENSIONS…)
+ * @param {string} field the field, for the warning (e.g. 'background image')
+ * @param {string} block the block, for the warning
+ */
+function acceptedType(url, allowed, field, block) {
+  const ext = extensionOf(url);
+  if (allowed.includes(ext)) return true;
+  // eslint-disable-next-line no-console
+  console.warn(`${block}: the ${field} ${url} is not shown: its file type (${ext ? `.${ext}` : 'none'}) is not .${allowed.join(', .')}`);
+  return false;
+}
+
+/** a picture whose image is of an accepted file type for its field, else null (not shown) */
+function acceptedPicture(picture, allowed, field, block) {
+  const src = picture?.querySelector('img')?.getAttribute('src');
+  if (!picture || !src) return picture || null;
+  return acceptedType(src, allowed, field, block) ? picture : null;
+}
+
+// the block, as named in its console warnings
+const BLOCK = 'reservation-confirmation';
+
+// the most characters each text shows, as the fields' maxLength (_reservation-confirmation.json),
+// counted as shown (the name and email filled in): a longer text is cut with "..." on the page
+// and named in a console warning; in the editor it stays whole (limitText below)
+const LIMITS = {
+  heading: 64,
+  subheading: 64,
+  message: 200,
+};
 
 // the visitor shown on the page, as in the Figma, until the real name and email are provided
 const VISITOR_NAME = 'Sanjay';
@@ -24,6 +71,57 @@ const LAYOUTS = ['layout-centered', 'layout-split'];
 
 // {NAME} and {email}, in any letter case
 const TOKEN = /\{(name|email)\}/gi;
+
+/** a console warning for the author: a text over its limit (cut on the page, whole in editor) */
+function warnLimit(field, length, limit) {
+  // eslint-disable-next-line no-console
+  console.warn(`${BLOCK}: the ${field} is ${length} characters, over its ${limit}: it is cut with "..." on the page`);
+}
+
+/**
+ * an element's text within its limit (LIMITS), in place: its elements (e.g. a filled-in {NAME})
+ * are kept up to the cut, the rest removed; the whole wording becomes the element's tooltip. In
+ * Universal Editor kept whole (cutting it there could save the cut text), with the warning only
+ * @param {Element} node the element
+ * @param {number} limit its most characters
+ * @param {string} field the field, for the warning
+ * @param {boolean} [editing] in Universal Editor
+ * @returns {boolean} whether the text was over its limit
+ */
+function limitText(node, limit, field, editing = false) {
+  const whole = node?.textContent || '';
+  if (whole.length <= limit) return false;
+  warnLimit(field, whole.length, limit);
+  if (editing) return true;
+  node.title = whole.replace(/\s+/g, ' ').trim();
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+  const texts = [];
+  while (walker.nextNode()) texts.push(walker.currentNode);
+  let left = Math.max(0, limit - 3);
+  let cut = false;
+  const emptied = new Set();
+  texts.forEach((text) => {
+    if (cut) {
+      emptied.add(text.parentElement);
+      text.remove();
+    } else if (text.data.length <= left) {
+      left -= text.data.length;
+    } else {
+      text.data = `${text.data.slice(0, left).trimEnd()}...`;
+      cut = true;
+    }
+  });
+  // the elements the cut left empty (e.g. a {NAME} after it), up to the node itself
+  emptied.forEach((start) => {
+    let empty = start;
+    while (empty && empty !== node && !empty.hasChildNodes()) {
+      const parent = empty.parentElement;
+      empty.remove();
+      empty = parent;
+    }
+  });
+  return true;
+}
 
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
@@ -158,6 +256,9 @@ export default function decorate(block) {
   const fillSubheading = () => subheading.replaceChildren(withTokens(subheading.textContent));
   fillSubheading();
   writeMessage(message);
+  limitText(heading, LIMITS.heading, 'main heading', editing);
+  limitText(subheading, LIMITS.subheading, 'subheading', editing);
+  limitText(message, LIMITS.message, 'message', editing);
   if (editing) {
     keepTokensWhileEditing(subheading, rawSubheading, fillSubheading);
     keepTokensWhileEditing(message, rawMessage, () => writeMessage(message));

@@ -22,7 +22,7 @@
  * announces it (a "reservation:submit" event on the block, for a later backend), keeps the first
  * name and email in sessionStorage, then shows the pending state (the form gives its place to
  * a spinner and the pending title and description) and takes the payment in Razorpay's window
- * (scripts/razorpay.js), which shows its loading, verification and error steps itself:
+ * (razorpay.js, in this block), which shows its loading, verification and error steps itself:
  *   paid      — the button link (confirmation page)
  *   failed    — the failure page link (also when Razorpay cannot be loaded or is not set up)
  *   closed    — back to the form (also when no page is set for the outcome)
@@ -31,10 +31,45 @@
  * public Key ID: no backend creates orders or verifies payments yet.
  */
 
-import { loadPillNav } from '../../scripts/pill-nav.js';
-import { IMAGE_EXTENSIONS, acceptedPicture } from '../../scripts/media-types.js';
-import { KEY_ID, loadRazorpay, payWithRazorpay } from '../../scripts/razorpay.js';
+import { loadPillNav } from '../jsw-nav/pill-nav.js';
+import { KEY_ID, loadRazorpay, payWithRazorpay } from './razorpay.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
+
+// the file types the block's media accept, by the asset's extension (published images keep
+// their file's: media_….jpg): an asset of another type is not shown, a console warning instead
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png']; // general images: backgrounds, photos
+
+/** an asset's file extension, from its URL's path ('' when it has none) */
+function extensionOf(url) {
+  try {
+    const name = new URL(url, window.location.href).pathname.split('/').pop();
+    return name.includes('.') ? name.split('.').pop().toLowerCase() : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+/**
+ * whether an asset's file type is accepted for its field; if not, a warning (it is not shown)
+ * @param {string} url the asset
+ * @param {string[]} allowed the field's extensions (IMAGE_EXTENSIONS…)
+ * @param {string} field the field, for the warning (e.g. 'background image')
+ * @param {string} block the block, for the warning
+ */
+function acceptedType(url, allowed, field, block) {
+  const ext = extensionOf(url);
+  if (allowed.includes(ext)) return true;
+  // eslint-disable-next-line no-console
+  console.warn(`${block}: the ${field} ${url} is not shown: its file type (${ext ? `.${ext}` : 'none'}) is not .${allowed.join(', .')}`);
+  return false;
+}
+
+/** a picture whose image is of an accepted file type for its field, else null (not shown) */
+function acceptedPicture(picture, allowed, field, block) {
+  const src = picture?.querySelector('img')?.getAttribute('src');
+  if (!picture || !src) return picture || null;
+  return acceptedType(src, allowed, field, block) ? picture : null;
+}
 
 // where the visitor's first name and email are kept for the confirmation page
 const RESERVATION_KEY = 'reservation-details';
@@ -42,14 +77,34 @@ const RESERVATION_KEY = 'reservation-details';
 // where the payment's outcome is kept: { status, paymentId } or { status, code, description, … }
 const PAYMENT_KEY = 'reservation-payment';
 
-// the pending state's texts when the author has left them empty, and the most characters each
-// shows on the page (the model's maxLength, _reservation-form.json): a longer text, if saved
-// anyway, is cut there with "…"; the editor shows it whole
+// the pending state's texts when the author has left them empty
 const PENDING = {
   title: 'Processing your reservation',
   description: 'Please wait while we process your request.',
 };
-const PENDING_LIMITS = { title: 64, description: 200 };
+
+// the most characters each authored text shows, as the fields' maxLength (_reservation-form.json):
+// a longer text, saved before a limit or imported, is cut with "..." on the page and named in a
+// console warning; in the editor it stays whole (limitText, limitString below). The amount
+// is not cut (a cut number would be a wrong price): it keeps to one line (reservation-form.css)
+const LIMITS = {
+  heading: 64,
+  subheading: 200,
+  disclaimer: 300,
+  priceLabel: 32,
+  priceBadge: 16,
+  priceNote: 200,
+  pendingTitle: 64,
+  pendingDescription: 200,
+  buttonText: 24,
+  placeholder: 32,
+  city: 40,
+  checkoutName: 64,
+  checkoutDescription: 200,
+};
+
+// the block, as named in its console warnings
+const BLOCK = 'reservation-form';
 
 // placeholders when the author has left them empty
 const PLACEHOLDERS = {
@@ -111,6 +166,76 @@ const RULES = {
 
 // ids of the error messages under the fields
 let errorCount = 0;
+
+/** a console warning for the author: a text over its limit (cut on the page, whole in editor) */
+function warnLimit(field, length, limit) {
+  // eslint-disable-next-line no-console
+  console.warn(`${BLOCK}: the ${field} is ${length} characters, over its ${limit}: it is cut with "..." on the page`);
+}
+
+/** a text at most `limit` characters, cut with "..." when longer */
+const truncate = (text, limit) => (text.length > limit
+  ? `${text.slice(0, Math.max(0, limit - 3)).trimEnd()}...` : text);
+
+/**
+ * a text value (a placeholder, an option, a setting) within its limit (LIMITS); in Universal
+ * Editor kept whole, with the warning only
+ * @param {string} text the authored text
+ * @param {number} limit its most characters
+ * @param {string} field the field, for the warning (e.g. 'button text')
+ * @param {boolean} [editing] in Universal Editor
+ */
+function limitString(text, limit, field, editing = false) {
+  const value = String(text ?? '');
+  if (value.length <= limit) return value;
+  warnLimit(field, value.length, limit);
+  return editing ? value : truncate(value, limit);
+}
+
+/**
+ * an element's text within its limit (LIMITS), in place: its elements (e.g. a filled-in {NAME})
+ * are kept up to the cut, the rest removed; the whole wording becomes the element's tooltip. In
+ * Universal Editor kept whole (cutting it there could save the cut text), with the warning only
+ * @param {Element} node the element
+ * @param {number} limit its most characters
+ * @param {string} field the field, for the warning
+ * @param {boolean} [editing] in Universal Editor
+ * @returns {boolean} whether the text was over its limit
+ */
+function limitText(node, limit, field, editing = false) {
+  const whole = node?.textContent || '';
+  if (whole.length <= limit) return false;
+  warnLimit(field, whole.length, limit);
+  if (editing) return true;
+  node.title = whole.replace(/\s+/g, ' ').trim();
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+  const texts = [];
+  while (walker.nextNode()) texts.push(walker.currentNode);
+  let left = Math.max(0, limit - 3);
+  let cut = false;
+  const emptied = new Set();
+  texts.forEach((text) => {
+    if (cut) {
+      emptied.add(text.parentElement);
+      text.remove();
+    } else if (text.data.length <= left) {
+      left -= text.data.length;
+    } else {
+      text.data = `${text.data.slice(0, left).trimEnd()}...`;
+      cut = true;
+    }
+  });
+  // the elements the cut left empty (e.g. a {NAME} after it), up to the node itself
+  emptied.forEach((start) => {
+    let empty = start;
+    while (empty && empty !== node && !empty.hasChildNodes()) {
+      const parent = empty.parentElement;
+      empty.remove();
+      empty = parent;
+    }
+  });
+  return true;
+}
 
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
@@ -224,21 +349,36 @@ export default function decorate(block) {
   if (labelField || amountField || badgeField || noteField) {
     const pricing = el('div', 'pricing');
     const top = el('div', 'pricing-top');
-    if (labelField) top.append(retag(labelField, 'p', 'pricing-label'));
-    if (badgeField) top.append(retag(badgeField, 'p', 'pricing-badge'));
+    if (labelField) {
+      const label = retag(labelField, 'p', 'pricing-label');
+      limitText(label, LIMITS.priceLabel, 'pricing label', editing);
+      top.append(label);
+    }
+    if (badgeField) {
+      const badge = retag(badgeField, 'p', 'pricing-badge');
+      limitText(badge, LIMITS.priceBadge, 'pricing badge', editing);
+      top.append(badge);
+    }
     if (top.children.length) pricing.append(top);
     if (amountField) {
       const amount = retag(amountField, 'p', 'pricing-amount');
       if (rupees) amount.textContent = `₹${rupees.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
       pricing.append(amount);
     }
-    if (noteField) pricing.append(retag(noteField, 'p', 'pricing-note'));
+    if (noteField) {
+      const note = retag(noteField, 'p', 'pricing-note');
+      limitText(note, LIMITS.priceNote, 'pricing note', editing);
+      pricing.append(note);
+    }
     visual.append(pricing);
   }
   const body = el('div', 'body');
   const heading = retag(content.text('content_heading', 0), 'h1', 'heading');
   const subheading = retag(content.text('content_subheading', 1), 'p', 'subheading');
   const disclaimer = retag(content.text('content_disclaimer', 2), 'p', 'disclaimer');
+  limitText(heading, LIMITS.heading, 'heading', editing);
+  limitText(subheading, LIMITS.subheading, 'subheading', editing);
+  limitText(disclaimer, LIMITS.disclaimer, 'disclaimer', editing);
 
   // the pending state, shown from the payment's start until the visitor is taken to its
   // outcome's page: the spinner, then the pending title and description (after the disclaimer
@@ -249,14 +389,11 @@ export default function decorate(block) {
   const statusTitle = retag(content.text('content_pendingHeading', 3), 'h2', 'status-title');
   const statusText = retag(content.text('content_pendingDescription', 4), 'p', 'status-text');
   statusTitle.setAttribute('tabindex', '-1');
-  [[statusTitle, 'title'], [statusText, 'description']].forEach(([node, key]) => {
-    const text = node.textContent.trim();
-    if (!text) node.textContent = PENDING[key];
-    else if (!editing && text.length > PENDING_LIMITS[key]) {
-      node.title = text;
-      node.textContent = `${text.slice(0, PENDING_LIMITS[key] - 1).trimEnd()}…`;
-    }
-  });
+  [[statusTitle, 'title', 'pendingTitle'], [statusText, 'description', 'pendingDescription']]
+    .forEach(([node, key, limit]) => {
+      if (!node.textContent.trim()) node.textContent = PENDING[key];
+      else limitText(node, LIMITS[limit], `pending ${key}`, editing);
+    });
   pendingView.append(spinner, statusTitle, statusText);
 
   // the form; the authored button link is where it leads, the action URL is kept for later
@@ -282,8 +419,8 @@ export default function decorate(block) {
   const keyId = keyField?.textContent.trim() || '';
   // published, a value that is not a Key ID (a pasted Key Secret?) is not kept in the page
   if (!editing && keyField && !KEY_ID.test(keyId)) keyField.textContent = '';
-  const checkoutName = checkoutNameField?.textContent.trim() || 'JSW Motors';
-  const checkoutDescription = checkoutDescriptionField?.textContent.trim() || '';
+  const checkoutName = limitString(checkoutNameField?.textContent.trim() || 'JSW Motors', LIMITS.checkoutName, 'Razorpay name', editing);
+  const checkoutDescription = limitString(checkoutDescriptionField?.textContent.trim() || '', LIMITS.checkoutDescription, 'Razorpay description', editing);
   const failurePage = failureLink?.getAttribute('href') || '';
   // the browser's own form checks are off: the fields are checked by RULES only
   const form = el('form', 'fields', { novalidate: '' });
@@ -294,7 +431,7 @@ export default function decorate(block) {
   const placeholderNodes = ['firstName', 'lastName', 'mobile', 'email', 'city']
     .map((key, i) => [key, placeholderFields.text(`fields_${key}Placeholder`, i)]);
   const placeholderText = Object.fromEntries(placeholderNodes
-    .map(([key, node]) => [key, node?.textContent.trim() || PLACEHOLDERS[key]]));
+    .map(([key, node]) => [key, limitString(node?.textContent.trim() || PLACEHOLDERS[key], LIMITS.placeholder, `${key} placeholder`, editing)]));
 
   // each field with the line below it where its error message shows (empty until then)
   const errors = new Map();
@@ -346,7 +483,8 @@ export default function decorate(block) {
   const rowCities = cityRows.map((row) => row.textContent.trim()).filter(Boolean);
   // each word starting with a capital letter, whatever the author typed (navi mumbai: Navi Mumbai)
   const capitalised = (name) => name.replace(/(^|\s)(\S)/g, (m, space, letter) => space + letter.toUpperCase());
-  const cityNames = (cities.length ? cities : rowCities).map(capitalised);
+  const cityNames = (cities.length ? cities : rowCities).map(capitalised)
+    .map((name) => limitString(name, LIMITS.city, 'city option', editing));
   cityNames
     .forEach((name) => {
       const option = el('option', '', { value: name });
@@ -358,7 +496,7 @@ export default function decorate(block) {
   withError(city, cityWrap);
 
   const submit = el('button', 'submit', { type: 'submit' });
-  submit.textContent = buttonLink?.textContent.trim() || 'PROCEED';
+  submit.textContent = limitString(buttonLink?.textContent.trim() || 'PROCEED', LIMITS.buttonText, 'button text', editing);
   const destination = buttonLink?.getAttribute('href') || '';
   if (buttonLink) moveInstrumentation(buttonLink, submit);
   form.append(names, phone, withError(email), cityWrap, submit);
@@ -474,7 +612,7 @@ export default function decorate(block) {
     }
 
     // Razorpay's final response: paid (its handler), failed (payment.failed), closed without
-    // paying (ondismiss), or its window not opening within 15s (a failure), scripts/razorpay.js
+    // paying (ondismiss), or its window not opening within 15s (a failure), razorpay.js
     let outcome;
     try {
       outcome = await payWithRazorpay({

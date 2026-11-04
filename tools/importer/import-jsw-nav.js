@@ -4,7 +4,7 @@
 /**
  * JSW navigation page (/jsw-nav), with the navigation of the JSW pages as authored on
  * /jsw-phase-3 (no source site: the fetched document is ignored): one jsw-nav block, read by the
- * JSW pages that bring the pill navigation (scripts/pill-nav.js, loadPillNav). Its fields
+ * JSW pages that bring the pill navigation (blocks/jsw-nav/pill-nav.js, loadPillNav). Its fields
  * (logo text | logo link | button link + text), then its Nav Links; every Nav Link row starts
  * with its item type (jsw-nav-link) so md2jcr (the conversion to AEM content) creates it as that
  * item; the code reads and drops it. The links to sections of /jsw-phase-3 are written in full

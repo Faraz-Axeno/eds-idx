@@ -4,7 +4,7 @@
  * 956 x 556, 107px from the top: the car on its left 435px, the form on the right (36px in).
  */
 
-@import url('../../styles/pill-nav.css');
+@import url('../jsw-nav/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .reservation-form-wrapper {
@@ -545,6 +545,59 @@ main > .section > .reservation-form-wrapper {
 
     .submit {
       width: 100%;
+    }
+  }
+
+  /* the authored texts keep to their space whatever their length (with the character limits,
+     reservation-form.js): a text block ends in "…" after its most lines (--lines), a one-line
+     text (pricing label, badge, amount, button, fields) after its width, and a word longer than
+     its line breaks. Universal Editor's edit mode shows every text whole, to be edited */
+  :root:not(.adobe-ue-edit) & {
+    :is(.heading, .subheading, .pricing-note, .disclaimer, .status-title, .status-text) {
+      /* stylelint-disable-next-line value-no-vendor-prefix -- the line clamp needs it, every engine */
+      display: -webkit-box;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+      /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
+      -webkit-box-orient: vertical;
+      /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
+      -webkit-line-clamp: var(--lines);
+    }
+
+    .heading,
+    .status-title {
+      --lines: 2;
+    }
+
+    .subheading,
+    .status-text {
+      --lines: 4;
+    }
+
+    .pricing-note {
+      --lines: 5;
+    }
+
+    .disclaimer {
+      --lines: 6;
+    }
+
+    :is(.pricing-label, .pricing-badge, .pricing-amount, .submit, .input) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .pricing-label {
+      min-width: 0;
+    }
+
+    .pricing-badge {
+      max-width: 50%;
+    }
+
+    .submit {
+      max-width: 100%;
     }
   }
 

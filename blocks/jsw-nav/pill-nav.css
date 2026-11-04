@@ -1,5 +1,5 @@
 /*
- * The JSW pill navigation (scripts/pill-nav.js) and the JSW faces, for blocks that bring
+ * The JSW pill navigation (pill-nav.js, beside it) and the JSW faces, for blocks that bring
  * their own navigation (reservation-form, reservation-confirmation). Imported by their
  * stylesheets. Values from the "NEV / Hero", "Opt 2 / Reserve" and "Confirmed" frames:
  * 672 x 42, 26px from the top, 11px corners.
@@ -10,7 +10,7 @@
 @font-face {
   font-family: Michroma;
   font-display: swap;
-  src: url('../fonts/michroma.woff2') format('woff2');
+  src: url('../../fonts/michroma.woff2') format('woff2');
 }
 
 :root {

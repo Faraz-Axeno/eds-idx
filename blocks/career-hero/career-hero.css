@@ -6,7 +6,7 @@
  * brings the cards into view (no scroll effects).
  */
 
-@import url('../../styles/pill-nav.css');
+@import url('../jsw-nav/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .career-hero-wrapper {
