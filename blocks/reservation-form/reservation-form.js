@@ -40,7 +40,7 @@ import { moveInstrumentation } from '../../scripts/scripts.js';
 // is in neither the editor nor the page's content. Only the public Key ID: the Key Secret never
 // goes in the site's code (everything here is public)
 // TODO: Add actual Razorpay Public Key here
-const RAZORPAY_KEY = 'YOUR_RAZORPAY_KEY_HERE';
+const RAZORPAY_KEY = 'rzp_test_nA1ELMwJ9Sp76d';
 
 // the file types the block's media accept, by the asset's extension (published images keep
 // their file's: media_….jpg): an asset of another type is not shown, a console warning instead
