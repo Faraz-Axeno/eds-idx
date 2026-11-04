@@ -2,7 +2,7 @@
    in the frames (at full size, as the heading's stand-in, it is some 30% wider; any smaller and
    its letters, lower than New Science's, would look too small) */
 
-@import url('../../styles/pill-nav.css');
+@import url('../jsw-nav/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .open-roles-wrapper {

@@ -1,9 +1,9 @@
 /*
  * jsw-nav: on its own page (/jsw-nav) the JSW pill navigation as the JSW pages show it (styles:
- * styles/pill-nav.css), centred on a band of the slate blue it sits on in the frames.
+ * pill-nav.css), centred on a band of the slate blue it sits on in the frames.
  */
 
-@import url('../../styles/pill-nav.css');
+@import url('./pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .jsw-nav-wrapper {
@@ -44,7 +44,7 @@ main > .section > .jsw-nav-wrapper {
     transform: none;
   }
 
-  /* Nav Links over the limit (MAX_NAV_LINKS, scripts/pill-nav.js): never on the pages; here
+  /* Nav Links over the limit (MAX_NAV_LINKS, pill-nav.js): never on the pages; here
      hidden, also in the editor's Preview mode, and shown dimmed only while editing */
   .pill-nav-links > li.is-over-limit {
     display: none;
@@ -55,7 +55,7 @@ main > .section > .jsw-nav-wrapper {
     opacity: 0.45;
   }
 
-  /* phones: the pill navigation is not shown on the JSW pages (styles/pill-nav.css); here it
+  /* phones: the pill navigation is not shown on the JSW pages (pill-nav.css); here it
      is, so it can still be edited */
   @media (max-width: 599.98px) {
     .pill-nav {

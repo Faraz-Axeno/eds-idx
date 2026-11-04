@@ -1,7 +1,7 @@
 /*
  * The JSW pill navigation (as on /jsw-phase-3, "NEV / Hero") for blocks that bring their own:
  * logo mark + JSW MOTORS wordmark, a list of links, then the white button.
- * Styles: styles/pill-nav.css (imported by those blocks' stylesheets).
+ * Styles: pill-nav.css, beside it (imported by those blocks' stylesheets).
  * loadPillNav() builds it from the navigation authored once on /jsw-nav (its jsw-nav block), else
  * from the one on /jsw-phase-3.
  */
