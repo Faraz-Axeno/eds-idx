@@ -343,18 +343,6 @@ main > .section > .reservation-form-wrapper {
     line-height: 1.55;
   }
 
-  /* the disclaimer is a richtext field: in the editor its paragraphs, and its email a link, in
-     the small print's colour, underlined so it reads as a link */
-  .disclaimer p {
-    margin: 0;
-  }
-
-  .disclaimer a {
-    color: inherit;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-
   /* the form and the pending view in one place, so the card keeps its size in either state */
   .views {
     display: grid;

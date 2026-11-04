@@ -66,7 +66,9 @@ var CustomImportScript = (() => {
         group(document, [
           ["content_heading", el(document, "p", "RESERVE NOW")],
           ["content_subheading", el(document, "p", "Allocation opens December 2026. Cars are assigned in the order reservations are placed.")],
-          ["content_disclaimer", el(document, "p", "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice.")],
+          // a word joiner (\u2060, invisible) before the email's @: the upload (md2jcr) keeps the
+          // address as text, not a mailto: link; the block takes it out on the page
+          ["content_disclaimer", el(document, "p", "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy\u2060@jswmotors.com. Full Privacy Notice.")],
           ["content_pendingHeading", el(document, "p", "Processing your reservation")],
           ["content_pendingDescription", el(document, "p", "Please wait while we process your request.")]
         ]),

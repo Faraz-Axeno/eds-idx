@@ -119,12 +119,12 @@ const LIMITS = {
 const BLOCK = 'reservation-form';
 
 // the small print when its field is empty or holds only a link or address, no words (as an
-// email turned into a link on upload once left it: mailto:…): the model's default, its email a link
-const DISCLAIMER = {
-  before: 'JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at ',
-  email: 'privacy@jswmotors.com',
-  after: '. Full Privacy Notice.',
-};
+// email turned into a link on upload once left it: mailto:…): the model's default, all plain text
+const DISCLAIMER = 'JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice.';
+
+// a word joiner (invisible), put before an email's @ in imported content so the upload (md2jcr)
+// keeps the address as text rather than a mailto: link; taken out on the page
+const WORD_JOINER = /\u2060/g;
 
 // placeholders when the author has left them empty
 const PLACEHOLDERS = {
@@ -468,20 +468,14 @@ export default function decorate(block) {
   const body = el('div', 'body');
   const heading = retag(content.text('content_heading', 0), 'h1', 'heading');
   const subheading = retag(content.text('content_subheading', 1), 'p', 'subheading');
-  // the disclaimer, a richtext field (its email a link): published one paragraph; in Universal
-  // Editor the field's element around its paragraphs (then kept as a div)
-  const disclaimerField = content.text('content_disclaimer', 2);
-  const disclaimer = retag(disclaimerField, disclaimerField?.querySelector('p, ul, ol') ? 'div' : 'p', 'disclaimer');
+  // the disclaimer, a text field: plain text, its email written as text (no mailto: link); a link
+  // in content saved before is turned into its text, without mailto:
+  const disclaimer = retag(content.text('content_disclaimer', 2), 'p', 'disclaimer');
+  disclaimer.querySelectorAll('a').forEach((a) => a.replaceWith(a.textContent.replace(/^mailto:/i, '')));
+  disclaimer.normalize();
   // empty, or only a link or address (no words): the default small print instead
-  if (!/\s/.test(disclaimer.textContent.trim())) {
-    const paragraph = disclaimer.tagName === 'DIV' ? el('p') : disclaimer;
-    const email = el('a', '', { href: `mailto:${DISCLAIMER.email}` });
-    email.textContent = DISCLAIMER.email;
-    paragraph.replaceChildren(DISCLAIMER.before, email, DISCLAIMER.after);
-    if (paragraph !== disclaimer) disclaimer.replaceChildren(paragraph);
-  }
-  // its links are text links, not the site's buttons (a lone link gets the button decoration)
-  disclaimer.querySelectorAll('a').forEach((a) => a.classList.remove('button', 'primary', 'secondary'));
+  const smallPrint = disclaimer.textContent.replace(WORD_JOINER, '').trim();
+  disclaimer.textContent = /\s/.test(smallPrint) ? smallPrint : DISCLAIMER;
   limitTitle(heading, 'heading', editing);
   limitText(subheading, LIMITS.subheading, 'subheading', editing);
   limitText(disclaimer, LIMITS.disclaimer, 'disclaimer', editing);

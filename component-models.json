@@ -1906,12 +1906,15 @@
         }
       },
       {
-        "component": "richtext",
+        "component": "text",
         "valueType": "string",
         "name": "content_disclaimer",
         "label": "Disclaimer text",
         "description": "Small print - the text below the button. Max 300 characters.",
-        "value": "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice."
+        "value": "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice.",
+        "validation": {
+          "maxLength": 300
+        }
       },
       {
         "component": "text",
