@@ -8,7 +8,7 @@
  *             amount (₹, also what Razorpay charges), badge, note
  *   content — heading, subheading, disclaimer, pending title, pending description
  *   form    — form action URL, city options (a multi-value field: a list, or comma-separated
- *             text where multi-field rendering is off), Razorpay Key ID, name and description
+ *             text where multi-field rendering is off), name and description
  *             for the Razorpay window, button (link + text: the page after a successful
  *             payment), failure page link
  *   fields  — the placeholders of first name, last name, mobile, email and the city list
@@ -35,6 +35,12 @@
 import { loadPillNav } from '../jsw-nav/pill-nav.js';
 import { KEY_ID, loadRazorpay, payWithRazorpay } from './razorpay.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
+
+// the Razorpay public Key ID (rzp_test_… to test, rzp_live_… live): set here, not authored, so it
+// is in neither the editor nor the page's content. Only the public Key ID: the Key Secret never
+// goes in the site's code (everything here is public)
+// TODO: Add actual Razorpay Public Key here
+const RAZORPAY_KEY = 'YOUR_RAZORPAY_KEY_HERE';
 
 // the file types the block's media accept, by the asset's extension (published images keep
 // their file's: media_….jpg): an asset of another type is not shown, a console warning instead
@@ -411,17 +417,17 @@ export default function decorate(block) {
   const citiesField = named('form_cities') || formCell?.querySelector('ul, ol')
     || configTexts.find((p) => p !== actionField && !isKey(p) && p.textContent.includes(',')) || null;
   const buttonLink = config.link('form_button', 0);
-  // Razorpay: the Key ID (rzp_…), then the name and description of its window in model order
-  const keyField = named('form_razorpayKey') || configTexts.find(isKey) || null;
+  // a Key ID authored before it moved into this file (RAZORPAY_KEY), in content saved then: left
+  // out (not taken for the Razorpay name) and removed from the page
+  const oldKeyField = named('form_razorpayKey') || configTexts.find(isKey) || null;
+  oldKeyField?.remove();
+  // Razorpay: the name and description of its window, in model order
   const checkoutTexts = configTexts
-    .filter((p) => ![actionField, citiesField, keyField].includes(p));
+    .filter((p) => ![actionField, citiesField, oldKeyField].includes(p));
   const checkoutNameField = named('form_checkoutName') || checkoutTexts[0] || null;
   const checkoutDescriptionField = named('form_checkoutDescription')
     || checkoutTexts.find((p) => p !== checkoutNameField) || null;
   const failureLink = config.link('form_failure', 1);
-  const keyId = keyField?.textContent.trim() || '';
-  // published, a value that is not a Key ID (a pasted Key Secret?) is not kept in the page
-  if (!editing && keyField && !KEY_ID.test(keyId)) keyField.textContent = '';
   const checkoutName = limitString(checkoutNameField?.textContent.trim() || 'JSW Motors', LIMITS.checkoutName, 'Razorpay name', editing);
   const checkoutDescription = limitString(checkoutDescriptionField?.textContent.trim() || '', LIMITS.checkoutDescription, 'Razorpay description', editing);
   const failurePage = failureLink?.getAttribute('href') || '';
@@ -522,7 +528,7 @@ export default function decorate(block) {
   // the authored settings that are not shown (action URL, the button link itself, City Option
   // rows of the earlier model) stay in the block: in the editor they lie over the form
   const settings = el('div', 'settings', { 'aria-hidden': 'true' });
-  [actionField, buttonLink?.closest('p') || buttonLink, keyField, checkoutNameField,
+  [actionField, buttonLink?.closest('p') || buttonLink, checkoutNameField,
     checkoutDescriptionField, failureLink?.closest('p') || failureLink, ...cityRows]
     .filter((node) => node && node.isConnected).forEach((node) => settings.append(node));
   form.append(settings);
@@ -581,7 +587,7 @@ export default function decorate(block) {
   });
   // Razorpay's script fetched as soon as the visitor starts on the form, so its window opens
   // at once on the button (not with the page: it is not needed to show it)
-  if (!editing && KEY_ID.test(keyId)) {
+  if (!editing && KEY_ID.test(RAZORPAY_KEY)) {
     form.addEventListener('focusin', () => loadRazorpay().catch(() => {}), { once: true });
   }
 
@@ -610,9 +616,9 @@ export default function decorate(block) {
     // pending from here: behind Razorpay's window while the visitor pays, then until the
     // outcome's page opens
     pending(true);
-    if (!KEY_ID.test(keyId) || !paise) {
+    if (!KEY_ID.test(RAZORPAY_KEY) || !paise) {
       // eslint-disable-next-line no-console
-      console.error('reservation-form: the block needs a Razorpay Key ID (rzp_…) and an amount');
+      console.error('reservation-form: set the Razorpay Key ID (RAZORPAY_KEY, rzp_…) in reservation-form.js; the block also needs an amount');
       remember(PAYMENT_KEY, { status: 'failed', code: 'NOT_CONFIGURED' });
       if (!go(failurePage)) pending(false);
       return;
@@ -623,7 +629,7 @@ export default function decorate(block) {
     let outcome;
     try {
       outcome = await payWithRazorpay({
-        key: keyId,
+        key: RAZORPAY_KEY,
         amount: paise,
         currency: 'INR',
         name: checkoutName,
