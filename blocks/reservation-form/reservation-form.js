@@ -27,7 +27,8 @@
  *   paid      — the button link (confirmation page)
  *   failed    — the failure page link (also when Razorpay cannot be loaded or is not set up)
  *   closed    — back to the form (also when no page is set for the outcome)
- * In Universal Editor's edit mode the pending state is shown under the form, to be edited.
+ * The pending state stays hidden on load, in Universal Editor too (its title and description are
+ * in the block's properties; the editor's Preview mode and PROCEED show it).
  * The outcome is kept in sessionStorage (PAYMENT_KEY) for those pages. Test mode only needs the
  * public Key ID: no backend creates orders or verifies payments yet.
  */
@@ -262,22 +263,50 @@ const truncateTo32 = (text) => {
   return text.length > visualLimit ? `${text.substring(0, visualLimit).trim()}...` : text;
 };
 
-/**
- * a title or heading shown at most 32 characters (truncateTo32), in place, the whole wording as
- * its tooltip, a console warning for the author; in Universal Editor kept whole (warning only)
- * @param {Element} node the element
- * @param {string} field the field, for the warning
- * @param {boolean} [editing] in Universal Editor
- */
-function limitTitle(node, field, editing = false) {
-  const whole = node?.textContent || '';
-  if (whole.length <= TITLE_LIMIT) return;
-  warnLimit(field, whole.length, TITLE_LIMIT);
-  if (editing) return;
+/** a title cut at 32 characters (truncateTo32), in place, its whole wording as the tooltip */
+function cutTitle(node, whole) {
   node.title = whole.replace(/\s+/g, ' ').trim();
   // plain text: truncateTo32 itself; with elements (a filled-in {NAME}): the same cut, in place
   if (!node.children.length) node.textContent = truncateTo32(whole);
   else cutText(node, TITLE_LIMIT);
+}
+
+/**
+ * Universal Editor: a title (cut on the canvas, as on the page) shows whole while the author
+ * types in it (the editor makes it contenteditable), so the whole text is what the editor saves;
+ * cut again once the typing ends
+ */
+function keepWholeWhileEditing(node, whole) {
+  let text = whole;
+  let typing = false;
+  new MutationObserver(() => {
+    const now = node.isContentEditable;
+    if (now && !typing) {
+      typing = true;
+      node.textContent = text;
+      node.removeAttribute('title');
+    } else if (!now && typing) {
+      typing = false;
+      text = node.textContent;
+      if (text.length > TITLE_LIMIT) cutTitle(node, text);
+    }
+  }).observe(node, { attributes: true, attributeFilter: ['contenteditable'] });
+}
+
+/**
+ * a title or heading shown at most 32 characters (truncateTo32), on the page and in Universal
+ * Editor's canvas alike, the whole wording as its tooltip and a console warning for the author;
+ * in the editor it shows whole while typed in (keepWholeWhileEditing)
+ * @param {Element} node the element
+ * @param {string} field the field, for the warning
+ * @param {boolean} [editing] in Universal Editor: typing in it shows it whole
+ */
+function limitTitle(node, field, editing = false) {
+  const whole = node?.textContent || '';
+  if (editing) keepWholeWhileEditing(node, whole);
+  if (whole.length <= TITLE_LIMIT) return;
+  warnLimit(field, whole.length, TITLE_LIMIT);
+  cutTitle(node, whole);
 }
 
 function el(tag, className, attrs = {}) {
@@ -291,12 +320,14 @@ function el(tag, className, attrs = {}) {
  * a grouped cell's fields: in Universal Editor each names its field (data-aue-prop),
  * published they come in model order (pictures, text paragraphs and links each in order)
  */
-function fieldsOf(cell) {
+function fieldsOf(cell, { withLinks = false } = {}) {
   const named = (name) => cell?.querySelector(`[data-aue-prop="${name}"]`);
   const pictures = [...(cell?.querySelectorAll('picture') || [])];
   const links = [...(cell?.querySelectorAll('a') || [])];
+  // the text paragraphs; withLinks: a paragraph holding a link counts too (a text field with an
+  // email or URL in it), so the fields after it keep their places
   const texts = [...(cell?.querySelectorAll('p') || [])]
-    .filter((p) => !p.querySelector('picture, a') && p.textContent.trim());
+    .filter((p) => !p.querySelector(withLinks ? 'picture' : 'picture, a') && p.textContent.trim());
   return {
     picture: (name, i) => named(name)?.closest('picture') || pictures[i] || null,
     text: (name, i) => named(name) || texts[i] || null,
@@ -350,7 +381,8 @@ export default function decorate(block) {
   const [mediaCell, contentCell, formCell, fieldsCell] = [mediaRow, contentRow, formRow, fieldsRow]
     .map((row) => row?.querySelector(':scope > div') || row);
   const media = fieldsOf(mediaCell);
-  const content = fieldsOf(contentCell);
+  // the content group holds texts only: its disclaimer's email is a link
+  const content = fieldsOf(contentCell, { withLinks: true });
   const config = fieldsOf(formCell);
   const placeholderFields = fieldsOf(fieldsCell);
 
@@ -418,7 +450,12 @@ export default function decorate(block) {
   const body = el('div', 'body');
   const heading = retag(content.text('content_heading', 0), 'h1', 'heading');
   const subheading = retag(content.text('content_subheading', 1), 'p', 'subheading');
-  const disclaimer = retag(content.text('content_disclaimer', 2), 'p', 'disclaimer');
+  // the disclaimer, a richtext field (its email a link): published one paragraph; in Universal
+  // Editor the field's element around its paragraphs (then kept as a div)
+  const disclaimerField = content.text('content_disclaimer', 2);
+  const disclaimer = retag(disclaimerField, disclaimerField?.querySelector('p, ul, ol') ? 'div' : 'p', 'disclaimer');
+  // its links are text links, not the site's buttons (a lone link gets the button decoration)
+  disclaimer.querySelectorAll('a').forEach((a) => a.classList.remove('button', 'primary', 'secondary'));
   limitTitle(heading, 'heading', editing);
   limitText(subheading, LIMITS.subheading, 'subheading', editing);
   limitText(disclaimer, LIMITS.disclaimer, 'disclaimer', editing);
