@@ -2058,6 +2058,24 @@
         "validation": {
           "maxLength": 32
         }
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "fields_editorView",
+        "label": "Editor view",
+        "description": "Editor only: the form or the pending state here; the page starts on the form.",
+        "value": "form",
+        "options": [
+          {
+            "name": "Form",
+            "value": "form"
+          },
+          {
+            "name": "Pending state (edit its title and description)",
+            "value": "pending"
+          }
+        ]
       }
     ]
   }

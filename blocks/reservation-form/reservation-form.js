@@ -11,7 +11,10 @@
  *             text where multi-field rendering is off), name and description
  *             for the Razorpay window, button (link + text: the page after a successful
  *             payment), failure page link
- *   fields  — the placeholders of first name, last name, mobile, email and the city list
+ *   fields  — the placeholders of first name, last name, mobile, email and the city list, then
+ *             the editor view: Universal Editor only, the form (default) or the pending state on
+ *             the canvas, to see it and edit its title and description; the page starts on the
+ *             form whatever it is
  *   (rows after these are City Option items of the earlier model: used when the city options
  *   field is empty)
  * In Universal Editor each placeholder field's instrumentation is on its input (the city list
@@ -392,6 +395,13 @@ export default function decorate(block) {
   // the content group holds texts only: its disclaimer's email is a link
   const content = fieldsOf(contentCell, { withLinks: true });
   const config = fieldsOf(formCell);
+  // the editor view (after the placeholders in their group: taken out before they are read);
+  // published only a value, form or pending, which the page never uses
+  const viewField = fieldsCell?.querySelector('[data-aue-prop="fields_editorView"]')
+    || [...(fieldsCell?.querySelectorAll('p') || [])]
+      .filter((p) => /^(form|pending)$/.test(p.textContent.trim())).pop() || null;
+  const showPending = editing && viewField?.textContent.trim() === 'pending';
+  viewField?.remove();
   const placeholderFields = fieldsOf(fieldsCell);
 
   // the full-page landscape behind everything
@@ -763,6 +773,8 @@ export default function decorate(block) {
   loadPillNav().then((nav) => card.before(nav));
   block.replaceChildren(frame);
   if (editing) block.classList.add('editing');
+  // Universal Editor, the editor view on Pending state: the canvas shows the pending state
+  if (showPending) block.classList.add('is-pending');
   // the page scrolls freely: no eased wheel steps from section to section (scripts/delayed.js)
   document.body.dataset.nativeScroll = 'true';
 }
