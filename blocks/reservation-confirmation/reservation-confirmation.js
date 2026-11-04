@@ -11,8 +11,8 @@
  * as a span holding the token as authored (data-token="{NAME}"), filled in with the first name
  * and email the visitor typed in the reservation form (kept in sessionStorage across the payment
  * redirect: FIRST_NAME_KEY, EMAIL_KEY), read when the block loads, then cleared. Without them
- * (the page opened directly, or reloaded) the name is FALLBACK_NAME and a sentence with {email}
- * is left out.
+ * (the page opened directly, or reloaded) the name is FALLBACK_NAME and the email FALLBACK_EMAIL:
+ * the message is always shown whole.
  */
 
 import { loadPillNav } from '../jsw-nav/pill-nav.js';
@@ -69,8 +69,9 @@ const LIMITS = {
 const FIRST_NAME_KEY = 'reservationFirstName';
 const EMAIL_KEY = 'reservationEmail';
 
-// the name shown when none is kept
+// the name and email shown when none is kept
 const FALLBACK_NAME = 'Customer';
+const FALLBACK_EMAIL = 'your email';
 
 /** the visitor's first name and email from the reservation form (the fallback name, no email) */
 function readVisitor() {
@@ -166,22 +167,50 @@ const truncateTo32 = (text) => {
   return text.length > visualLimit ? `${text.substring(0, visualLimit).trim()}...` : text;
 };
 
-/**
- * a title or heading shown at most 32 characters (truncateTo32), in place, the whole wording as
- * its tooltip, a console warning for the author; in Universal Editor kept whole (warning only)
- * @param {Element} node the element
- * @param {string} field the field, for the warning
- * @param {boolean} [editing] in Universal Editor
- */
-function limitTitle(node, field, editing = false) {
-  const whole = node?.textContent || '';
-  if (whole.length <= TITLE_LIMIT) return;
-  warnLimit(field, whole.length, TITLE_LIMIT);
-  if (editing) return;
+/** a title cut at 32 characters (truncateTo32), in place, its whole wording as the tooltip */
+function cutTitle(node, whole) {
   node.title = whole.replace(/\s+/g, ' ').trim();
   // plain text: truncateTo32 itself; with elements (a filled-in {NAME}): the same cut, in place
   if (!node.children.length) node.textContent = truncateTo32(whole);
   else cutText(node, TITLE_LIMIT);
+}
+
+/**
+ * Universal Editor: a title (cut on the canvas, as on the page) shows whole while the author
+ * types in it (the editor makes it contenteditable), so the whole text is what the editor saves;
+ * cut again once the typing ends
+ */
+function keepWholeWhileEditing(node, whole) {
+  let text = whole;
+  let typing = false;
+  new MutationObserver(() => {
+    const now = node.isContentEditable;
+    if (now && !typing) {
+      typing = true;
+      node.textContent = text;
+      node.removeAttribute('title');
+    } else if (!now && typing) {
+      typing = false;
+      text = node.textContent;
+      if (text.length > TITLE_LIMIT) cutTitle(node, text);
+    }
+  }).observe(node, { attributes: true, attributeFilter: ['contenteditable'] });
+}
+
+/**
+ * a title or heading shown at most 32 characters (truncateTo32), on the page and in Universal
+ * Editor's canvas alike, the whole wording as its tooltip and a console warning for the author;
+ * in the editor it shows whole while typed in (keepWholeWhileEditing)
+ * @param {Element} node the element
+ * @param {string} field the field, for the warning
+ * @param {boolean} [editing] in Universal Editor: typing in it shows it whole
+ */
+function limitTitle(node, field, editing = false) {
+  const whole = node?.textContent || '';
+  if (editing) keepWholeWhileEditing(node, whole);
+  if (whole.length <= TITLE_LIMIT) return;
+  warnLimit(field, whole.length, TITLE_LIMIT);
+  cutTitle(node, whole);
 }
 
 function el(tag, className, attrs = {}) {
@@ -223,10 +252,12 @@ function withTokens(text, visitor) {
   text.replace(TOKEN, (token, key, at) => {
     frag.append(text.slice(last, at));
     const isEmail = key.toLowerCase() === 'email';
-    const span = el('span', isEmail
+    // the visitor's email highlighted (.email); without one the plain fallback
+    const span = el('span', isEmail && visitor.email
       ? 'token email'
       : 'token', { 'data-token': token });
-    span.textContent = isEmail ? visitor.email : visitor.name;
+    if (isEmail) span.textContent = visitor.email || FALLBACK_EMAIL;
+    else span.textContent = visitor.name;
     frag.append(span);
     last = at + token.length;
     return token;
@@ -235,12 +266,11 @@ function withTokens(text, visitor) {
   return frag;
 }
 
-/** the message, one sentence per line; a sentence with {email} is left out without an email */
+/** the message, one sentence per line, every sentence shown (the email or its fallback) */
 function writeMessage(node, visitor) {
   const sentences = node.textContent.match(/[^.!?]+[.!?]*(?=\s|$)/g) || [];
   node.replaceChildren();
   sentences.map((s) => s.trim()).filter(Boolean).forEach((sentence) => {
-    if (/\{email\}/i.test(sentence) && !visitor.email) return;
     // a space between the sentences, for the split layout where they run on as one paragraph
     if (node.childNodes.length) node.append(' ');
     const line = el('span', 'line');
@@ -315,12 +345,15 @@ export default function decorate(block) {
   const visitor = readVisitor();
   const rawSubheading = subheading.textContent;
   const rawMessage = message.textContent;
-  const fillSubheading = () => subheading
-    .replaceChildren(withTokens(subheading.textContent, visitor));
+  // the subheading filled in, then held to 32 characters (in the editor too: there its token
+  // guard, keepTokensWhileEditing, shows it whole as authored while typed in, then fills it again)
+  const fillSubheading = () => {
+    subheading.replaceChildren(withTokens(subheading.textContent, visitor));
+    limitTitle(subheading, 'subheading');
+  };
   fillSubheading();
   writeMessage(message, visitor);
   limitTitle(heading, 'main heading', editing);
-  limitTitle(subheading, 'subheading', editing);
   limitText(message, LIMITS.message, 'message', editing);
   if (editing) {
     keepTokensWhileEditing(subheading, rawSubheading, fillSubheading);

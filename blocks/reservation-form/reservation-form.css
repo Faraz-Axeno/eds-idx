@@ -343,6 +343,18 @@ main > .section > .reservation-form-wrapper {
     line-height: 1.55;
   }
 
+  /* the disclaimer is a richtext field: in the editor its paragraphs, and its email a link, in
+     the small print's colour, underlined so it reads as a link */
+  .disclaimer p {
+    margin: 0;
+  }
+
+  .disclaimer a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
   /* the form and the pending view in one place, so the card keeps its size in either state */
   .views {
     display: grid;
@@ -457,17 +469,6 @@ main > .section > .reservation-form-wrapper {
     overflow-wrap: anywhere;
   }
 
-  /* Universal Editor's edit mode: the pending state shown under the form, to be edited there */
-  html.adobe-ue-edit &.editing .pending-view {
-    display: flex;
-    grid-area: 2 / 1;
-    margin: calc(28 * var(--reservation-form-unit)) 0 0;
-    padding: calc(24 * var(--reservation-form-unit));
-    border-radius: calc(12 * var(--reservation-form-unit));
-    outline: 2px dashed #c4c4c4;
-    outline-offset: -2px;
-  }
-
   /* settings that are not shown (action URL, cities, the button link): published they are
      hidden; in Universal Editor they lie invisibly over the form, so picking one outlines it */
   .settings {
@@ -548,16 +549,28 @@ main > .section > .reservation-form-wrapper {
     }
   }
 
-  /* the authored texts keep to their space whatever their length (with the character limits,
-     reservation-form.js): a text block ends in "…" after its most lines (--lines), a one-line
-     text (pricing label, badge, amount, button, fields) after its width, and a word longer than
-     its line breaks. Universal Editor's edit mode shows every text whole, to be edited */
-  :root:not(.adobe-ue-edit) & {
+  /* the authored texts at most their box's width, unless the design sets its own (:where, in
+     the block's root: weaker than the design's rules) */
+  :where(.heading, .subheading, .pricing-note, .disclaimer, .status-title, .status-text) {
+    max-width: 100%;
+  }
+
+  /* the authored texts keep to their space whatever their length, in every mode, Universal
+     Editor's included (with the character limits, reservation-form.js): a string with no spaces
+     breaks wherever it must, a text block ends in "…" after its most lines (--lines), a one-line
+     text (pricing label, badge, amount, button, fields) after its width. A text being typed in
+     on the editor's canvas (contenteditable) shows whole, still wrapping */
+  :root & {
     :is(.heading, .subheading, .pricing-note, .disclaimer, .status-title, .status-text) {
+      overflow-wrap: anywhere;
+      /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- asked for */
+      word-break: break-word;
+    }
+
+    :is(.heading, .subheading, .pricing-note, .disclaimer, .status-title, .status-text):not(:is([contenteditable='true'], [contenteditable='plaintext-only'])) {
       /* stylelint-disable-next-line value-no-vendor-prefix -- the line clamp needs it, every engine */
       display: -webkit-box;
       overflow: hidden;
-      overflow-wrap: anywhere;
       /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
       -webkit-box-orient: vertical;
       /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
@@ -582,7 +595,7 @@ main > .section > .reservation-form-wrapper {
       --lines: 6;
     }
 
-    :is(.pricing-label, .pricing-badge, .pricing-amount, .submit, .input) {
+    :is(.pricing-label, .pricing-badge, .pricing-amount, .submit, .input):not(:is([contenteditable='true'], [contenteditable='plaintext-only'])) {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

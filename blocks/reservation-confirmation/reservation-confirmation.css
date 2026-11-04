@@ -329,16 +329,28 @@ main > .section > .reservation-confirmation-wrapper {
     }
   }
 
-  /* the authored texts keep to their space whatever their length (with the character limits,
-     reservation-confirmation.js): the subheading and message end in "…" after their most lines
-     (--lines), a word longer than its line breaks; CONFIRMED (one line by design) ends in "…"
-     at the card's width. Universal Editor's edit mode shows every text whole, to be edited */
-  :root:not(.adobe-ue-edit) & {
+  /* the authored texts at most their box's width, unless the design sets its own (:where, in
+     the block's root: weaker than the design's rules) */
+  :where(.subheading, .message) {
+    max-width: 100%;
+  }
+
+  /* the authored texts keep to their space whatever their length, in every mode, Universal
+     Editor's included (with the character limits, reservation-confirmation.js): a string with
+     no spaces breaks wherever it must, the subheading and message end in "…" after their most
+     lines (--lines); CONFIRMED (one line by design) ends in "…" at the card's width. A text being
+     typed in on the editor's canvas (contenteditable) shows whole, still wrapping */
+  :root & {
     :is(.subheading, .message) {
+      overflow-wrap: anywhere;
+      /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- asked for */
+      word-break: break-word;
+    }
+
+    :is(.subheading, .message):not(:is([contenteditable='true'], [contenteditable='plaintext-only'])) {
       /* stylelint-disable-next-line value-no-vendor-prefix -- the line clamp needs it, every engine */
       display: -webkit-box;
       overflow: hidden;
-      overflow-wrap: anywhere;
       /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
       -webkit-box-orient: vertical;
       /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
@@ -353,22 +365,16 @@ main > .section > .reservation-confirmation-wrapper {
       --lines: 8;
     }
 
-    /* CONFIRMED may run into the card's side padding (it does on the narrowest phones): its "…"
-       comes at the card's own edges */
-    &.layout-centered .heading {
-      max-width: calc(100% + 64 * var(--reservation-confirmation-unit));
+    /* CONFIRMED ends in "…" within the card's side padding; on phones, where CONFIRMED itself
+       runs into the padding, at the card's own edges */
+    &.layout-centered .heading:not(:is([contenteditable='true'], [contenteditable='plaintext-only'])) {
+      max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    @media (max-width: 899.98px) {
-      &.layout-centered .heading {
-        max-width: calc(100% + 48px);
-      }
-    }
-
     @media (max-width: 599.98px) {
-      &.layout-centered .heading {
+      &.layout-centered .heading:not(:is([contenteditable='true'], [contenteditable='plaintext-only'])) {
         max-width: calc(100% + 40px);
       }
     }

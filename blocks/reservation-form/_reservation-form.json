@@ -125,7 +125,7 @@
           }
         },
         {
-          "component": "text",
+          "component": "richtext",
           "valueType": "string",
           "name": "content_disclaimer",
           "label": "Disclaimer text",
