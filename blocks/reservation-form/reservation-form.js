@@ -115,6 +115,14 @@ const LIMITS = {
 // the block, as named in its console warnings
 const BLOCK = 'reservation-form';
 
+// the small print when its field is empty or holds only a link or address, no words (as an
+// email turned into a link on upload once left it: mailto:…): the model's default, its email a link
+const DISCLAIMER = {
+  before: 'JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at ',
+  email: 'privacy@jswmotors.com',
+  after: '. Full Privacy Notice.',
+};
+
 // placeholders when the author has left them empty
 const PLACEHOLDERS = {
   firstName: 'First Name*',
@@ -454,6 +462,14 @@ export default function decorate(block) {
   // Editor the field's element around its paragraphs (then kept as a div)
   const disclaimerField = content.text('content_disclaimer', 2);
   const disclaimer = retag(disclaimerField, disclaimerField?.querySelector('p, ul, ol') ? 'div' : 'p', 'disclaimer');
+  // empty, or only a link or address (no words): the default small print instead
+  if (!/\s/.test(disclaimer.textContent.trim())) {
+    const paragraph = disclaimer.tagName === 'DIV' ? el('p') : disclaimer;
+    const email = el('a', '', { href: `mailto:${DISCLAIMER.email}` });
+    email.textContent = DISCLAIMER.email;
+    paragraph.replaceChildren(DISCLAIMER.before, email, DISCLAIMER.after);
+    if (paragraph !== disclaimer) disclaimer.replaceChildren(paragraph);
+  }
   // its links are text links, not the site's buttons (a lone link gets the button decoration)
   disclaimer.querySelectorAll('a').forEach((a) => a.classList.remove('button', 'primary', 'secondary'));
   limitTitle(heading, 'heading', editing);
