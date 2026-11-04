@@ -8,8 +8,11 @@
  *   media   — background image, foreground image
  *   content — heading, subheading, message
  * Authors type {NAME} and {email} in the subheading and message. Each one is kept in the page
- * as a span holding the token as authored (data-token="{NAME}"), so other code can find and
- * replace it; for now it shows VISITOR_NAME / VISITOR_EMAIL below.
+ * as a span holding the token as authored (data-token="{NAME}"), filled in with the first name
+ * and email the visitor typed in the reservation form (kept in sessionStorage across the payment
+ * redirect: FIRST_NAME_KEY, EMAIL_KEY), read when the block loads, then cleared. Without them
+ * (the page opened directly, or reloaded) the name is FALLBACK_NAME and a sentence with {email}
+ * is left out.
  */
 
 import { loadPillNav } from '../jsw-nav/pill-nav.js';
@@ -63,9 +66,31 @@ const LIMITS = {
   message: 200,
 };
 
-// the visitor shown on the page, as in the Figma, until the real name and email are provided
-const VISITOR_NAME = 'Sanjay';
-const VISITOR_EMAIL = 'sanjay@email.com';
+// where the reservation form keeps the visitor's first name and email (sessionStorage)
+const FIRST_NAME_KEY = 'reservationFirstName';
+const EMAIL_KEY = 'reservationEmail';
+
+// the name shown when none is kept
+const FALLBACK_NAME = 'Customer';
+
+/** the visitor's first name and email from the reservation form (the fallback name, no email) */
+function readVisitor() {
+  let name = '';
+  let email = '';
+  try {
+    name = (sessionStorage.getItem(FIRST_NAME_KEY) || '').trim();
+    email = (sessionStorage.getItem(EMAIL_KEY) || '').trim();
+  } catch (error) { /* storage unavailable: the fallbacks */ }
+  return { name: name || FALLBACK_NAME, email };
+}
+
+/** the stored first name and email cleared once shown, so a later visit shows none stale */
+function forgetVisitor() {
+  try {
+    sessionStorage.removeItem(FIRST_NAME_KEY);
+    sessionStorage.removeItem(EMAIL_KEY);
+  } catch (error) { /* storage unavailable */ }
+}
 
 const LAYOUTS = ['layout-centered', 'layout-split'];
 
@@ -156,7 +181,7 @@ function retag(node, tag, className) {
 }
 
 /** text with each {NAME} / {email} as a span keeping the authored token (data-token) */
-function withTokens(text) {
+function withTokens(text, visitor) {
   const frag = document.createDocumentFragment();
   let last = 0;
   text.replace(TOKEN, (token, key, at) => {
@@ -165,7 +190,7 @@ function withTokens(text) {
     const span = el('span', isEmail
       ? 'token email'
       : 'token', { 'data-token': token });
-    span.textContent = isEmail ? VISITOR_EMAIL : VISITOR_NAME;
+    span.textContent = isEmail ? visitor.email : visitor.name;
     frag.append(span);
     last = at + token.length;
     return token;
@@ -175,15 +200,15 @@ function withTokens(text) {
 }
 
 /** the message, one sentence per line; a sentence with {email} is left out without an email */
-function writeMessage(node) {
+function writeMessage(node, visitor) {
   const sentences = node.textContent.match(/[^.!?]+[.!?]*(?=\s|$)/g) || [];
   node.replaceChildren();
   sentences.map((s) => s.trim()).filter(Boolean).forEach((sentence) => {
-    if (/\{email\}/i.test(sentence) && !VISITOR_EMAIL) return;
+    if (/\{email\}/i.test(sentence) && !visitor.email) return;
     // a space between the sentences, for the split layout where they run on as one paragraph
     if (node.childNodes.length) node.append(' ');
     const line = el('span', 'line');
-    line.append(withTokens(sentence));
+    line.append(withTokens(sentence, visitor));
     node.append(line);
   });
 }
@@ -250,18 +275,20 @@ export default function decorate(block) {
   const subheading = retag(content.text('content_subheading', 1), 'p', 'subheading');
   const message = retag(content.text('content_message', 2), 'p', 'message');
 
-  // the tokens filled in, published and in the editor alike
+  // the tokens filled in with the visitor's name and email, published and in the editor alike
+  const visitor = readVisitor();
   const rawSubheading = subheading.textContent;
   const rawMessage = message.textContent;
-  const fillSubheading = () => subheading.replaceChildren(withTokens(subheading.textContent));
+  const fillSubheading = () => subheading
+    .replaceChildren(withTokens(subheading.textContent, visitor));
   fillSubheading();
-  writeMessage(message);
+  writeMessage(message, visitor);
   limitText(heading, LIMITS.heading, 'main heading', editing);
   limitText(subheading, LIMITS.subheading, 'subheading', editing);
   limitText(message, LIMITS.message, 'message', editing);
   if (editing) {
     keepTokensWhileEditing(subheading, rawSubheading, fillSubheading);
-    keepTokensWhileEditing(message, rawMessage, () => writeMessage(message));
+    keepTokensWhileEditing(message, rawMessage, () => writeMessage(message, visitor));
   }
   details.append(subheading, message);
 
@@ -273,6 +300,8 @@ export default function decorate(block) {
   block.classList.remove(...LAYOUTS);
   block.classList.add(layout);
   if (editing) block.classList.add('editing');
+  // shown: the stored details cleared (published only; the editor never uses them up)
+  else forgetVisitor();
   // the page scrolls freely: no eased wheel steps from section to section (scripts/delayed.js)
   document.body.dataset.nativeScroll = 'true';
 }
