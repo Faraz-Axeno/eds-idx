@@ -339,9 +339,13 @@ function fieldsOf(cell, { withLinks = false } = {}) {
   // email or URL in it), so the fields after it keep their places
   const texts = [...(cell?.querySelectorAll('p') || [])]
     .filter((p) => !p.querySelector(withLinks ? 'picture' : 'picture, a') && p.textContent.trim());
+  // Universal Editor names each field it renders (data-aue-prop): there a field is found by its
+  // name only, never by its place (a field it does not render, e.g. one saved as a bare link,
+  // must not take the next field's element and its instrumentation)
+  const byName = Boolean(cell?.querySelector('[data-aue-prop]'));
   return {
     picture: (name, i) => named(name)?.closest('picture') || pictures[i] || null,
-    text: (name, i) => named(name) || texts[i] || null,
+    text: (name, i) => named(name) || (byName ? null : texts[i]) || null,
     link: (name, i) => {
       const a = named(name);
       return (a?.tagName === 'A' ? a : a?.querySelector('a')) || links[i] || null;
@@ -476,6 +480,14 @@ export default function decorate(block) {
   // empty, or only a link or address (no words): the default small print instead
   const smallPrint = disclaimer.textContent.replace(WORD_JOINER, '').trim();
   disclaimer.textContent = /\s/.test(smallPrint) ? smallPrint : DISCLAIMER;
+  // Universal Editor: the disclaimer always its field (in the content tree, selectable, typed in
+  // on the canvas), even where the editor rendered none for it (its value saved as a bare
+  // mailto: link): the field's instrumentation set on it, the block its resource
+  if (editing && !disclaimer.dataset.aueProp) {
+    disclaimer.dataset.aueProp = 'content_disclaimer';
+    disclaimer.dataset.aueType = 'text';
+    disclaimer.dataset.aueLabel = 'Disclaimer text';
+  }
   limitTitle(heading, 'heading', editing);
   limitText(subheading, LIMITS.subheading, 'subheading', editing);
   limitText(disclaimer, LIMITS.disclaimer, 'disclaimer', editing);
