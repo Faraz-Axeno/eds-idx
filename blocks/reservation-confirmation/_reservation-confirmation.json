@@ -81,7 +81,7 @@
           "name": "content_heading",
           "label": "Main heading",
           "value": "CONFIRMED",
-          "description": "Title - the big heading on the card. Max 64 characters.",
+          "description": "Title - the big heading on the card. Max 64 characters; 32 shown.",
           "validation": {
             "maxLength": 64
           }
@@ -91,7 +91,7 @@
           "valueType": "string",
           "name": "content_subheading",
           "label": "Personalized subheading",
-          "description": "Title - type {NAME} with braces for the name. Max 64 characters.",
+          "description": "Title - {NAME} for the name. Max 64 characters; 32 shown.",
           "value": "YOU’RE IN, {NAME}.",
           "validation": {
             "maxLength": 64
