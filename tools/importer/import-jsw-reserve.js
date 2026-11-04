@@ -86,7 +86,6 @@ export default {
           return list;
         })()],
         // a made-up test Key ID: the local test page only (authors enter theirs in the editor)
-        ['form_razorpayKey', el(document, 'p', 'rzp_test_LOCALPREVIEW000')],
         ['form_checkoutName', el(document, 'p', 'JSW Motors')],
         ['form_checkoutDescription', el(document, 'p', 'Vehicle reservation')],
         ['form_button', link(document, '/jsw-confirmed', 'PROCEED')],

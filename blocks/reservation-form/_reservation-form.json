@@ -182,17 +182,6 @@
         {
           "component": "text",
           "valueType": "string",
-          "name": "form_razorpayKey",
-          "label": "Razorpay Key ID",
-          "value": "",
-          "description": "Public Key ID (rzp_test_…/rzp_live_…), never the Key Secret. Max 40 characters.",
-          "validation": {
-            "maxLength": 40
-          }
-        },
-        {
-          "component": "text",
-          "valueType": "string",
           "name": "form_checkoutName",
           "label": "Razorpay: name shown",
           "value": "JSW Motors",
