@@ -57,12 +57,11 @@ function acceptedPicture(picture, allowed, field, block) {
 // the block, as named in its console warnings
 const BLOCK = 'reservation-confirmation';
 
-// the most characters each text shows, as the fields' maxLength (_reservation-confirmation.json),
-// counted as shown (the name and email filled in): a longer text is cut with "..." on the page
-// and named in a console warning; in the editor it stays whole (limitText below)
+// the most characters the message shows, as its field's maxLength (_reservation-confirmation.json),
+// counted as shown (the email filled in): a longer text is cut with "..." on the page and named
+// in a console warning; in the editor it stays whole (limitText below). The heading and
+// subheading (fields of 64) and the visitor's first name show 32 (limitTitle, truncateTo32)
 const LIMITS = {
-  heading: 64,
-  subheading: 64,
   message: 200,
 };
 
@@ -81,7 +80,9 @@ function readVisitor() {
     name = (sessionStorage.getItem(FIRST_NAME_KEY) || '').trim();
     email = (sessionStorage.getItem(EMAIL_KEY) || '').trim();
   } catch (error) { /* storage unavailable: the fallbacks */ }
-  return { name: name || FALLBACK_NAME, email };
+  // the first name at most 32 characters (truncateTo32, below)
+  // eslint-disable-next-line no-use-before-define
+  return { name: truncateTo32(name) || FALLBACK_NAME, email };
 }
 
 /** the stored first name and email cleared once shown, so a later visit shows none stale */
@@ -104,25 +105,14 @@ function warnLimit(field, length, limit) {
 }
 
 /**
- * an element's text within its limit (LIMITS), in place: its elements (e.g. a filled-in {NAME})
- * are kept up to the cut, the rest removed; the whole wording becomes the element's tooltip. In
- * Universal Editor kept whole (cutting it there could save the cut text), with the warning only
- * @param {Element} node the element
- * @param {number} limit its most characters
- * @param {string} field the field, for the warning
- * @param {boolean} [editing] in Universal Editor
- * @returns {boolean} whether the text was over its limit
+ * an element's text cut after `keep` characters, then "...", in place: its elements (e.g. a
+ * filled-in {NAME}) are kept up to the cut, the rest removed
  */
-function limitText(node, limit, field, editing = false) {
-  const whole = node?.textContent || '';
-  if (whole.length <= limit) return false;
-  warnLimit(field, whole.length, limit);
-  if (editing) return true;
-  node.title = whole.replace(/\s+/g, ' ').trim();
+function cutText(node, keep) {
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
   const texts = [];
   while (walker.nextNode()) texts.push(walker.currentNode);
-  let left = Math.max(0, limit - 3);
+  let left = Math.max(0, keep);
   let cut = false;
   const emptied = new Set();
   texts.forEach((text) => {
@@ -145,7 +135,53 @@ function limitText(node, limit, field, editing = false) {
       empty = parent;
     }
   });
+}
+
+/**
+ * an element's text within its limit (LIMITS), in place: its elements (e.g. a filled-in {NAME})
+ * are kept up to the cut, the rest removed; the whole wording becomes the element's tooltip. In
+ * Universal Editor kept whole (cutting it there could save the cut text), with the warning only
+ * @param {Element} node the element
+ * @param {number} limit its most characters
+ * @param {string} field the field, for the warning
+ * @param {boolean} [editing] in Universal Editor
+ * @returns {boolean} whether the text was over its limit
+ */
+function limitText(node, limit, field, editing = false) {
+  const whole = node?.textContent || '';
+  if (whole.length <= limit) return false;
+  warnLimit(field, whole.length, limit);
+  if (editing) return true;
+  node.title = whole.replace(/\s+/g, ' ').trim();
+  cutText(node, limit - 3);
   return true;
+}
+
+// titles, headings and the visitor's name show at most 32 characters on the page (the lead
+// developer's rule; their fields allow 64): a longer one shows its first 32, then "..."
+const TITLE_LIMIT = 32;
+const truncateTo32 = (text) => {
+  if (!text) return '';
+  const visualLimit = TITLE_LIMIT;
+  return text.length > visualLimit ? `${text.substring(0, visualLimit).trim()}...` : text;
+};
+
+/**
+ * a title or heading shown at most 32 characters (truncateTo32), in place, the whole wording as
+ * its tooltip, a console warning for the author; in Universal Editor kept whole (warning only)
+ * @param {Element} node the element
+ * @param {string} field the field, for the warning
+ * @param {boolean} [editing] in Universal Editor
+ */
+function limitTitle(node, field, editing = false) {
+  const whole = node?.textContent || '';
+  if (whole.length <= TITLE_LIMIT) return;
+  warnLimit(field, whole.length, TITLE_LIMIT);
+  if (editing) return;
+  node.title = whole.replace(/\s+/g, ' ').trim();
+  // plain text: truncateTo32 itself; with elements (a filled-in {NAME}): the same cut, in place
+  if (!node.children.length) node.textContent = truncateTo32(whole);
+  else cutText(node, TITLE_LIMIT);
 }
 
 function el(tag, className, attrs = {}) {
@@ -283,8 +319,8 @@ export default function decorate(block) {
     .replaceChildren(withTokens(subheading.textContent, visitor));
   fillSubheading();
   writeMessage(message, visitor);
-  limitText(heading, LIMITS.heading, 'main heading', editing);
-  limitText(subheading, LIMITS.subheading, 'subheading', editing);
+  limitTitle(heading, 'main heading', editing);
+  limitTitle(subheading, 'subheading', editing);
   limitText(message, LIMITS.message, 'message', editing);
   if (editing) {
     keepTokensWhileEditing(subheading, rawSubheading, fillSubheading);

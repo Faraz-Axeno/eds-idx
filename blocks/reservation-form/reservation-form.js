@@ -95,15 +95,14 @@ const PENDING = {
 // the most characters each authored text shows, as the fields' maxLength (_reservation-form.json):
 // a longer text, saved before a limit or imported, is cut with "..." on the page and named in a
 // console warning; in the editor it stays whole (limitText, limitString below). The amount
-// is not cut (a cut number would be a wrong price): it keeps to one line (reservation-form.css)
+// is not cut (a cut number would be a wrong price): it keeps to one line (reservation-form.css).
+// The heading and pending title (fields of 64) show 32 (limitTitle below)
 const LIMITS = {
-  heading: 64,
   subheading: 200,
   disclaimer: 300,
   priceLabel: 32,
   priceBadge: 16,
   priceNote: 200,
-  pendingTitle: 64,
   pendingDescription: 200,
   buttonText: 24,
   placeholder: 32,
@@ -202,25 +201,14 @@ function limitString(text, limit, field, editing = false) {
 }
 
 /**
- * an element's text within its limit (LIMITS), in place: its elements (e.g. a filled-in {NAME})
- * are kept up to the cut, the rest removed; the whole wording becomes the element's tooltip. In
- * Universal Editor kept whole (cutting it there could save the cut text), with the warning only
- * @param {Element} node the element
- * @param {number} limit its most characters
- * @param {string} field the field, for the warning
- * @param {boolean} [editing] in Universal Editor
- * @returns {boolean} whether the text was over its limit
+ * an element's text cut after `keep` characters, then "...", in place: its elements (e.g. a
+ * filled-in {NAME}) are kept up to the cut, the rest removed
  */
-function limitText(node, limit, field, editing = false) {
-  const whole = node?.textContent || '';
-  if (whole.length <= limit) return false;
-  warnLimit(field, whole.length, limit);
-  if (editing) return true;
-  node.title = whole.replace(/\s+/g, ' ').trim();
+function cutText(node, keep) {
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
   const texts = [];
   while (walker.nextNode()) texts.push(walker.currentNode);
-  let left = Math.max(0, limit - 3);
+  let left = Math.max(0, keep);
   let cut = false;
   const emptied = new Set();
   texts.forEach((text) => {
@@ -243,7 +231,53 @@ function limitText(node, limit, field, editing = false) {
       empty = parent;
     }
   });
+}
+
+/**
+ * an element's text within its limit (LIMITS), in place: its elements (e.g. a filled-in {NAME})
+ * are kept up to the cut, the rest removed; the whole wording becomes the element's tooltip. In
+ * Universal Editor kept whole (cutting it there could save the cut text), with the warning only
+ * @param {Element} node the element
+ * @param {number} limit its most characters
+ * @param {string} field the field, for the warning
+ * @param {boolean} [editing] in Universal Editor
+ * @returns {boolean} whether the text was over its limit
+ */
+function limitText(node, limit, field, editing = false) {
+  const whole = node?.textContent || '';
+  if (whole.length <= limit) return false;
+  warnLimit(field, whole.length, limit);
+  if (editing) return true;
+  node.title = whole.replace(/\s+/g, ' ').trim();
+  cutText(node, limit - 3);
   return true;
+}
+
+// titles, headings and the visitor's name show at most 32 characters on the page (the lead
+// developer's rule; their fields allow 64): a longer one shows its first 32, then "..."
+const TITLE_LIMIT = 32;
+const truncateTo32 = (text) => {
+  if (!text) return '';
+  const visualLimit = TITLE_LIMIT;
+  return text.length > visualLimit ? `${text.substring(0, visualLimit).trim()}...` : text;
+};
+
+/**
+ * a title or heading shown at most 32 characters (truncateTo32), in place, the whole wording as
+ * its tooltip, a console warning for the author; in Universal Editor kept whole (warning only)
+ * @param {Element} node the element
+ * @param {string} field the field, for the warning
+ * @param {boolean} [editing] in Universal Editor
+ */
+function limitTitle(node, field, editing = false) {
+  const whole = node?.textContent || '';
+  if (whole.length <= TITLE_LIMIT) return;
+  warnLimit(field, whole.length, TITLE_LIMIT);
+  if (editing) return;
+  node.title = whole.replace(/\s+/g, ' ').trim();
+  // plain text: truncateTo32 itself; with elements (a filled-in {NAME}): the same cut, in place
+  if (!node.children.length) node.textContent = truncateTo32(whole);
+  else cutText(node, TITLE_LIMIT);
 }
 
 function el(tag, className, attrs = {}) {
@@ -385,7 +419,7 @@ export default function decorate(block) {
   const heading = retag(content.text('content_heading', 0), 'h1', 'heading');
   const subheading = retag(content.text('content_subheading', 1), 'p', 'subheading');
   const disclaimer = retag(content.text('content_disclaimer', 2), 'p', 'disclaimer');
-  limitText(heading, LIMITS.heading, 'heading', editing);
+  limitTitle(heading, 'heading', editing);
   limitText(subheading, LIMITS.subheading, 'subheading', editing);
   limitText(disclaimer, LIMITS.disclaimer, 'disclaimer', editing);
 
@@ -398,11 +432,10 @@ export default function decorate(block) {
   const statusTitle = retag(content.text('content_pendingHeading', 3), 'h2', 'status-title');
   const statusText = retag(content.text('content_pendingDescription', 4), 'p', 'status-text');
   statusTitle.setAttribute('tabindex', '-1');
-  [[statusTitle, 'title', 'pendingTitle'], [statusText, 'description', 'pendingDescription']]
-    .forEach(([node, key, limit]) => {
-      if (!node.textContent.trim()) node.textContent = PENDING[key];
-      else limitText(node, LIMITS[limit], `pending ${key}`, editing);
-    });
+  if (!statusTitle.textContent.trim()) statusTitle.textContent = PENDING.title;
+  else limitTitle(statusTitle, 'pending title', editing);
+  if (!statusText.textContent.trim()) statusText.textContent = PENDING.description;
+  else limitText(statusText, LIMITS.pendingDescription, 'pending description', editing);
   pendingView.append(spinner, statusTitle, statusText);
 
   // the form; the authored button link is where it leads, the action URL is kept for later
