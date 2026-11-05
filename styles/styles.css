@@ -1,10 +1,8 @@
 @import url('brand.css');
 
-/* New Science (Adobe Fonts / Typekit web project): replace PROJECT-ID with the web project's id
-   from fonts.adobe.com > Web Projects and delete the comment markers around the next line.
-   Commented out until then, so no browser requests a placeholder address. */
-
-/* @import url('https://use.typekit.net/PROJECT-ID.css'); */
+/* New Science: the team's Adobe Fonts web project (https://use.typekit.net/qil0qom.css), loaded by
+   the blocks that use it (reservation-form.js), not here, so other pages keep their fonts; its
+   families are named below (--font-new-science, --font-new-science-extended) */
 
 /*
  * Copyright 2020 Adobe. All rights reserved.
@@ -36,6 +34,13 @@
   --font-brand-text: brand-text, 'Helvetica Neue', arial, sans-serif;
   --font-footer-text: var(--font-brand-text);
   --font-footer-display: footer-display, michroma, 'Helvetica Neue', arial, sans-serif;
+
+  /* New Science (Adobe Fonts kit, above): two families, each with its own Regular (400) and Medium
+     (500) font files, so each style is one explicitly: New Science Regular / Medium, and New
+     Science Extended Regular / Medium (its own wider cut, not a stretched Regular); a character
+     not in the kit (₹, outside its default character set) from Inter, the site's */
+  --font-new-science: new-science, inter, 'Helvetica Neue', arial, sans-serif;
+  --font-new-science-extended: new-science-extended, brand-text, inter, 'Helvetica Neue', arial, sans-serif;
 
   /* body sizes */
   --body-font-size-m: 22px;

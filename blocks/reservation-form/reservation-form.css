@@ -139,41 +139,59 @@ main > .section > .reservation-form-wrapper {
     min-height: calc(24 * var(--reservation-form-unit));
   }
 
+  /* the typography, Figma's: New Science in its four styles, each its own font file (the Adobe
+     Fonts kit, reservation-form.js; --font-new-science… in styles/styles.css): Regular (400) and
+     Medium (500) of New Science, Regular (400) and Medium (500) of New Science Extended */
+
+  /* RESERVATION AMOUNT: Medium, 10px */
   .pricing-label {
     color: #a9a9a9;
+    font-family: var(--font-new-science);
     font-size: calc(10 * var(--reservation-form-unit));
+    font-weight: 500;
+    line-height: 1;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
+  /* REFUNDABLE: Medium, 10px, its text centred in its box */
   .pricing-badge {
     flex: none;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
     height: calc(24 * var(--reservation-form-unit));
     padding: 0 calc(10 * var(--reservation-form-unit));
     border: 1px solid rgb(255 255 255 / 55%);
     border-radius: calc(6 * var(--reservation-form-unit));
-    font-size: calc(9 * var(--reservation-form-unit));
-    line-height: calc(calc(24 * var(--reservation-form-unit)) - 2px);
-    letter-spacing: 0.06em;
+    font-family: var(--font-new-science);
+    font-size: calc(10 * var(--reservation-form-unit));
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
+  /* ₹10,000: Regular Extended, 36px */
   .pricing-amount {
     margin-top: calc(2 * var(--reservation-form-unit));
-    font-family: var(--pill-font-display);
+    font-family: var(--font-new-science-extended);
     font-size: calc(36 * var(--reservation-form-unit));
-    font-weight: 300;
-    line-height: calc(40 * var(--reservation-form-unit));
-    letter-spacing: -0.01em;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0;
     white-space: nowrap;
   }
 
+  /* the note under the amount: Regular, 12px */
   .pricing p.pricing-note {
     margin-top: calc(10 * var(--reservation-form-unit));
     color: #9b9b9b;
-    font-size: calc(11 * var(--reservation-form-unit));
-    line-height: calc(17 * var(--reservation-form-unit));
+    font-family: var(--font-new-science);
+    font-size: calc(12 * var(--reservation-form-unit));
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0;
   }
 
   .body {
@@ -183,21 +201,26 @@ main > .section > .reservation-form-wrapper {
     padding: calc(40 * var(--reservation-form-unit)) calc(36 * var(--reservation-form-unit)) calc(36 * var(--reservation-form-unit));
   }
 
+  /* RESERVE NOW: Medium Extended, 24px */
   .heading {
     margin: 0 0 calc(10 * var(--reservation-form-unit));
-    font-family: var(--pill-font-display);
-    font-size: calc(26 * var(--reservation-form-unit));
-    font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: 0.01em;
+    font-family: var(--font-new-science-extended);
+    font-size: calc(24 * var(--reservation-form-unit));
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
   }
 
+  /* Allocation opens…: Medium, 14px */
   .subheading {
     margin: 0 0 calc(20 * var(--reservation-form-unit));
     color: #666;
-    font-size: calc(13.5 * var(--reservation-form-unit));
+    font-family: var(--font-new-science);
+    font-size: calc(14 * var(--reservation-form-unit));
+    font-weight: 500;
     line-height: 1.45;
+    letter-spacing: 0;
   }
 
   .fields {
@@ -229,9 +252,13 @@ main > .section > .reservation-form-wrapper {
     border-radius: calc(6 * var(--reservation-form-unit));
     color: #111;
     background-color: #f2f2f2;
-    font-family: inherit;
+
+    /* the placeholders, the city list and +91: Medium, 12px */
+    font-family: var(--font-new-science);
     font-size: calc(12 * var(--reservation-form-unit));
-    line-height: calc(calc(46 * var(--reservation-form-unit)) - 2px);
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0;
     transition: border-color 0.2s ease;
   }
 
@@ -318,9 +345,13 @@ main > .section > .reservation-form-wrapper {
     border-radius: calc(6 * var(--reservation-form-unit));
     color: #fff;
     background-color: #000;
-    font-family: inherit;
+
+    /* PROCEED: Medium, 12px */
+    font-family: var(--font-new-science);
     font-size: calc(12 * var(--reservation-form-unit));
-    letter-spacing: 0.02em;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -335,12 +366,16 @@ main > .section > .reservation-form-wrapper {
     outline-offset: 3px;
   }
 
+  /* the legal disclaimer: Regular, 10px */
   .disclaimer {
     max-width: calc(420 * var(--reservation-form-unit));
     margin: calc(22 * var(--reservation-form-unit)) 0 0;
     color: #707070;
-    font-size: calc(9 * var(--reservation-form-unit));
-    line-height: 1.55;
+    font-family: var(--font-new-science);
+    font-size: calc(10 * var(--reservation-form-unit));
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
   }
 
   /* the form and the pending view in one place, so the card keeps its size in either state */
@@ -497,6 +532,18 @@ main > .section > .reservation-form-wrapper {
     }
   }
 
+  /* under 768px: the amount and RESERVE NOW scaled down (36 to 30px, 24 to 20px), so they keep
+     to the card's width */
+  @media (max-width: 767.98px) {
+    .pricing-amount {
+      font-size: 30px;
+    }
+
+    .heading {
+      font-size: 20px;
+    }
+  }
+
   @media (max-width: 599.98px) {
     .frame {
       padding: 16px 12px;
@@ -509,15 +556,6 @@ main > .section > .reservation-form-wrapper {
     .pricing {
       margin: 0 8px 8px;
       padding: 16px;
-    }
-
-    .pricing-amount {
-      font-size: 32px;
-      line-height: 38px;
-    }
-
-    .heading {
-      font-size: 22px;
     }
 
     .subheading {
