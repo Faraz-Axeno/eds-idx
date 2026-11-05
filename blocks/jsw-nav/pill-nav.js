@@ -6,6 +6,8 @@
  * from the one on /jsw-phase-3.
  */
 
+import { moveInstrumentation } from '../../scripts/scripts.js';
+
 // "JSW MOTORS" as in the Figma navbar, letter by letter on its 9-unit cap grid
 const WORDMARK = '<svg viewBox="2 0 166 9" focusable="false" aria-hidden="true" fill="currentColor">'
   + '<path d="M11 0H16V9H2V7.1H13.6V1.9H11Z"/>'
@@ -29,10 +31,10 @@ const MARK_OPEN = 'M10.7988 37.2981C11.3538 36.5238 12.1784 35.4477 13.1745 35.3
   + 'M55.4917 22.8307C55.0034 23.4676 53.5927 24.6466 52.9707 25.3014L52.8925 25.1896C52.7575 25.2076 52.1892 25.6956 52.1505 25.8427C52.1924 25.9106 52.1943 25.9041 52.2685 25.9373C52.0495 26.0879 51.7537 26.3793 51.543 26.5667C51.135 26.9336 50.718 27.291 50.293 27.6385C48.7068 28.9289 47.0727 30.1591 45.3938 31.3265C39.987 35.0307 34.2357 38.2056 28.22 40.8072C26.0694 41.735 23.8628 42.5929 21.6526 43.3639C21.4235 43.4439 21.1936 43.5352 20.967 43.6224C21.6953 43.8034 22.3661 44.0369 23.0731 44.2841C23.5567 44.4351 24.0756 44.5317 24.5548 44.6975C25.1154 44.8912 25.6611 44.9773 26.2328 45.1087C28.1066 45.5424 30.0039 45.8671 31.9153 46.0814C32.3336 46.1245 32.8011 46.135 33.2281 46.1629C34.3075 46.2436 35.389 46.2932 36.4712 46.3124C39.2865 46.35 42.0989 46.127 44.8732 45.6463C51.8087 44.5122 58.8916 42.0358 64.0316 37.0548C66.0714 35.0938 67.539 32.6147 68.2775 29.8831C69.7363 24.4675 67.3475 19.4788 63.2793 15.9141C62.972 15.6448 62.5959 15.3742 62.3168 15.0841L62.2867 15.0523C62.0735 15.4265 61.2938 16.3522 60.9966 16.715C59.9472 18.0169 58.8568 19.2853 57.7274 20.5183C57.2575 21.0328 56.3913 21.8632 55.9949 22.346C55.9655 22.2715 55.9471 22.2373 55.9616 22.1546L55.933 22.1437C55.8305 22.2299 55.7259 22.324 55.6426 22.4283C55.4396 22.6825 55.1959 22.8636 54.9758 23.1041C55.2075 22.9454 55.2607 22.8333 55.4917 22.8307Z';
 const MARK_SLIVER = 'M66.6532 12.5293C68.6927 14.4192 70.2916 16.2876 71.5825 18.7695C71.7498 19.0911 71.9213 19.4188 72.0672 19.7506C72.1661 19.9757 72.2301 20.1945 72.3387 20.4171C72.1831 20.5626 72.3322 20.5448 72.2222 20.5879L72.1581 20.5272C72.1092 20.5589 72.1172 20.5441 72.0893 20.589C71.8421 20.1434 71.6658 19.6745 71.4431 19.2223C70.2145 16.724 68.4512 14.6262 66.4219 12.7571C66.5348 12.7815 66.5547 12.7893 66.668 12.7826C66.7086 12.7046 66.6735 12.6336 66.6532 12.5293Z';
 const LOGO_MARK = '<svg viewBox="0.17 1.47 73.86 50.21" focusable="false" aria-hidden="true" fill="currentColor">'
-  + '<mask id="pill-nav-mark-ring" maskUnits="userSpaceOnUse" x="-5" y="-5" width="90" height="70">'
+  + '<mask id="nav-mark-ring" maskUnits="userSpaceOnUse" x="-5" y="-5" width="90" height="70">'
   + `<rect x="-5" y="-5" width="90" height="70" fill="#fff"/><path d="${MARK_OPEN}" fill="#000"/></mask>`
   + `<path d="${MARK_SILHOUETTE}${MARK_OPEN}" fill-rule="evenodd"/>`
-  + `<path d="${MARK_OPEN}" fill="none" stroke="currentColor" stroke-width="8" stroke-linejoin="round" mask="url(#pill-nav-mark-ring)"/>`
+  + `<path d="${MARK_OPEN}" fill="none" stroke="currentColor" stroke-width="8" stroke-linejoin="round" mask="url(#nav-mark-ring)"/>`
   + `<path d="${MARK_SLIVER}" fill="none" stroke="currentColor"/>`
   + '</svg>';
 
@@ -42,6 +44,15 @@ function plain(a) {
   a.closest('p')?.classList.remove('button-container', 'button-wrapper');
   return a;
 }
+
+/** an authored link holding only its address (a link field without a text) */
+const isBareLink = (a) => {
+  const text = a.textContent.trim();
+  return !text || text === a.getAttribute('href') || /^(\/|#|https?:|mailto:|tel:)/.test(text);
+};
+
+/** a navigation link to show: authored with both its target and its text */
+const isNavLink = (a) => Boolean(a?.getAttribute('href')) && !isBareLink(a);
 
 /**
  * builds the pill navigation from authored parts, moved in with their editor instrumentation:
@@ -56,7 +67,7 @@ export default function buildPillNav({ brand, links = [], cta } = {}) {
   nav.className = 'pill-nav';
   nav.setAttribute('aria-label', 'Main');
   const inner = document.createElement('div');
-  inner.className = 'pill-nav-inner';
+  inner.className = 'nav-bar';
   nav.append(inner);
 
   // the logo: home is the page the links point to (e.g. /jsw-phase-3), else the site root
@@ -67,38 +78,47 @@ export default function buildPillNav({ brand, links = [], cta } = {}) {
     if (firstLink) homePath = new URL(firstLink.href, window.location.href).pathname || '/';
   } catch (e) { /* keep the root */ }
   const home = document.createElement('a');
-  home.className = 'pill-nav-brand';
+  home.className = 'nav-home';
   home.href = homePath;
   home.setAttribute('aria-label', `${name} home`);
   const mark = document.createElement('span');
-  mark.className = 'pill-nav-mark';
+  mark.className = 'nav-mark';
   mark.setAttribute('aria-hidden', 'true');
   mark.innerHTML = LOGO_MARK;
   const label = document.createElement('span');
-  label.className = 'pill-nav-brand-text';
+  label.className = 'nav-brand-text';
   if (name.toUpperCase() === 'JSW MOTORS') {
-    label.classList.add('pill-nav-wordmark');
+    label.classList.add('nav-wordmark');
     label.innerHTML = WORDMARK;
   } else label.textContent = name;
   home.append(mark, label);
   const brandWrap = brand || document.createElement('p');
   brandWrap.replaceChildren(home);
-  brandWrap.classList.add('pill-nav-brand-wrap');
+  brandWrap.classList.add('nav-logo');
   inner.append(brandWrap);
 
+  // the links authored with both their target and text, the empty ones left out
   const list = document.createElement('ul');
-  list.className = 'pill-nav-links';
-  links.filter(Boolean).forEach((a) => {
+  list.className = 'nav-list';
+  links.filter(isNavLink).forEach((a) => {
     const li = document.createElement('li');
-    li.append(plain(a));
+    li.className = 'nav-item';
+    // Universal Editor: a link field's instrumentation, where it is on the paragraph around the
+    // link, on its item (on the link itself it moves in with it)
+    const holder = a.parentElement;
+    if (holder?.tagName === 'P' && holder.dataset.aueProp && !a.dataset.aueProp) {
+      moveInstrumentation(holder, li);
+    }
+    plain(a).classList.add('nav-link');
+    li.append(a);
     list.append(li);
   });
   if (list.children.length) inner.append(list);
 
   if (cta) {
     const wrap = document.createElement('p');
-    wrap.className = 'pill-nav-cta-wrap';
-    plain(cta).classList.add('pill-nav-cta');
+    wrap.className = 'nav-cta-wrap';
+    plain(cta).classList.add('nav-cta');
     wrap.append(cta);
     inner.append(wrap);
   }
@@ -123,13 +143,13 @@ function sourcePage() {
 // pill navigation (authored there once); while it is not there, the Phase 3 hero's (above)
 const NAV_PAGE = '/jsw-nav';
 
-// the links shown in the pill (the jsw-nav block's Nav Links): more do not fit beside the logo
-// and the button; the editor shows the others dimmed (blocks/jsw-nav)
-export const MAX_NAV_LINKS = 2;
+// the links shown in the pill: the jsw-nav block's Link 1-4 (each optional; then any Nav Link
+// items saved before); the editor shows any more dimmed (blocks/jsw-nav)
+export const MAX_NAV_LINKS = 4;
 
 // the most characters the pill has room for (the model's limits, _jsw-nav.json): a longer text,
 // if saved anyway, is cut there with "…" (its whole wording as a tooltip)
-export const NAV_TEXT_LIMITS = { linkText: 11, ctaText: 17 };
+export const NAV_TEXT_LIMITS = { linkText: 12, ctaText: 17 };
 
 /** an element's text cut to its limit with "…", its whole text a tooltip */
 export function capNavText(node, limit) {
@@ -149,19 +169,16 @@ function pageCandidates(path) {
   return [...new Set(candidates.filter(Boolean))];
 }
 
-/** an authored link holding only its address (a link field without a text) */
-const isBareLink = (a) => {
-  const text = a.textContent.trim();
-  return !text || text === a.getAttribute('href') || /^(\/|#|https?:|mailto:|tel:)/.test(text);
-};
-
 /**
  * the parts of a jsw-nav block, from its rows as authored (_jsw-nav.json): its fields, the logo
- * text (brand), the logo link (homeLink) and the button (cta + text), then its Nav Links (link +
- * text). The Nav Links are told by their type (the editor's model, or the type cell of imported
- * content, dropped here); published pages mark none: there the fields are the first three rows.
+ * text (brand), the logo link (homeLink) and the button (cta + text), then its links: the Link
+ * 1-4 group (one row, each link with its text, the empty ones not rendered) and any Nav Link
+ * items saved before (a row each; told by their type: the editor's model, or the type cell of
+ * imported content, dropped here). Published pages mark none: there the fields are the first
+ * three rows and every link after them is a navigation link, in order.
  * @param {Element} block the jsw-nav block
- * @returns {{brand: Element, home: Element, cta: Element, links: {row: Element, link: Element}[]}}
+ * @returns {{brand: Element, home: Element, cta: Element,
+ *   links: {row: Element, link: Element, item: boolean}[]}} item: its row a Nav Link item
  */
 export function readNavBlock(block) {
   const rows = [...block.children].map((row) => {
@@ -171,9 +188,9 @@ export function readNavBlock(block) {
     if (typed) first.remove();
     return { row, link: typed || row.dataset.aueModel === 'jsw-nav-link' };
   });
-  const marked = rows.some(({ link }) => link);
-  const fieldRows = marked ? rows.filter(({ link }) => !link) : rows.slice(0, 3);
-  const linkRows = marked ? rows.filter(({ link }) => link) : rows.slice(3);
+  // the field rows: the first three that are not Nav Link items; the rest hold the links
+  const fieldRows = rows.filter(({ link }) => !link).slice(0, 3);
+  const linkRows = rows.filter((r) => !fieldRows.includes(r));
 
   let brand = null;
   let home = null;
@@ -186,8 +203,10 @@ export function readNavBlock(block) {
     else if (!cta) cta = a;
     else if (!home) home = a;
   });
-  const links = linkRows.map(({ row }) => ({ row, link: row.querySelector('a') }))
-    .filter(({ link }) => link);
+  // every link of those rows authored with its target and text, in order
+  const links = linkRows.flatMap(({ row, link: item }) => [...row.querySelectorAll('a')]
+    .map((a) => ({ row, link: a, item })))
+    .filter(({ link }) => isNavLink(link));
   return {
     brand, home, cta, links,
   };
@@ -236,7 +255,7 @@ export async function loadPillNav() {
     shown.forEach((a) => capNavText(a, NAV_TEXT_LIMITS.linkText));
     capNavText(cta, NAV_TEXT_LIMITS.ctaText);
     const nav = buildPillNav({ brand, links: shown, cta });
-    const logo = nav.querySelector('.pill-nav-brand');
+    const logo = nav.querySelector('.nav-home');
     if (home && logo) logo.setAttribute('href', home.getAttribute('href'));
     return nav;
   }

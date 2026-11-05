@@ -2,7 +2,8 @@
  * The JSW pill navigation (pill-nav.js, beside it) and the JSW faces, for blocks that bring
  * their own navigation (reservation-form, reservation-confirmation). Imported by their
  * stylesheets. Values from the "NEV / Hero", "Opt 2 / Reserve" and "Confirmed" frames:
- * 672 x 42, 26px from the top, 11px corners.
+ * 672 x 42, 26px from the top, 11px corners. Every rule nested in its root, .pill-nav (the
+ * <nav>, which sits in each of those blocks), its inner classes unprefixed.
  */
 
 /* the display face: New Science (Adobe Fonts, once its web project is added in
@@ -25,132 +26,164 @@
   z-index: 3;
   width: min(672px, calc(100% - 24px));
   transform: translateX(-50%);
-}
 
-/* the pill: over the blue landscape it reads slate (#54697c): black at 42% */
-.pill-nav .pill-nav-inner {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  gap: 34px;
-  height: 42px;
-  padding: 0 6px 0 12px;
-  border-radius: 11px;
-  color: #fff;
-  background-color: rgb(0 0 0 / 42%);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-}
+  /* the pill: over the blue landscape it reads slate (#54697c): black at 42% */
+  .nav-bar {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 34px;
+    height: 42px;
+    padding: 0 6px 0 12px;
+    border-radius: 11px;
+    color: #fff;
+    background-color: rgb(0 0 0 / 42%);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
 
-.pill-nav p {
-  margin: 0;
-}
+  & p {
+    margin: 0;
+  }
 
-.pill-nav .pill-nav-brand-wrap {
-  display: flex;
-  margin-right: auto;
-}
+  .nav-logo {
+    display: flex;
+    margin-right: auto;
+  }
 
-.pill-nav a:any-link {
-  color: inherit;
-  text-decoration: none;
-}
+  & a:any-link {
+    color: inherit;
+    text-decoration: none;
+  }
 
-.pill-nav .pill-nav-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 11px;
-}
+  .nav-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+  }
 
-.pill-nav .pill-nav-mark {
-  display: block;
-  flex: none;
-  width: 28px;
-  height: 18px;
-}
+  .nav-mark {
+    display: block;
+    flex: none;
+    width: 28px;
+    height: 18px;
+  }
 
-.pill-nav .pill-nav-mark svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
+  .nav-mark svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
 
-.pill-nav .pill-nav-brand-text {
-  font-family: var(--pill-font-display);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  white-space: nowrap;
-}
+  .nav-brand-text {
+    font-family: var(--pill-font-display);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+  }
 
-.pill-nav .pill-nav-wordmark svg {
-  display: block;
-  width: auto;
-  height: 6px;
-}
+  .nav-wordmark svg {
+    display: block;
+    width: auto;
+    height: 6px;
+  }
 
-.pill-nav .pill-nav-links {
-  display: none;
-  gap: 22px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
+  /* the links: 1 to 4 (each optional, pill-nav.js), on one line; each as wide as its text, and
+     when 3 or 4 do not fit beside the logo and the button, they share the room left, each
+     shrinking alike and ending in "…" */
+  .nav-list {
+    display: none;
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    gap: 22px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    white-space: nowrap;
+  }
 
-/* the links and the button in Figma's New Science (--font-new-science, styles/styles.css: its
-   Medium and Regular files, from the Adobe Fonts kit where the page loads it; else Inter) */
+  /* each link's item as wide as its text */
+  .nav-item {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
 
-/* NEV TECH, NEWSROOM: Medium, 12px */
-.pill-nav .pill-nav-links a {
-  font-family: var(--font-new-science);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
+  /* 3 or 4 links: the gaps tighter, more room for the texts; where they still do not fit, the
+     items share the room left, each shrinking alike, its text ending in "…" (in the link's own
+     face and size; its line 21.6px tall, as the page's 16px x 1.35 makes it). 1 or 2 links
+     always fit (12 characters at most each) and keep their items as they are */
+  .nav-bar:has(.nav-item:nth-child(3)) {
+    gap: 24px;
+  }
 
-.pill-nav .pill-nav-links a:hover {
-  opacity: 0.7;
-}
+  .nav-list:has(.nav-item:nth-child(3)) {
+    gap: 16px;
 
-.pill-nav a.pill-nav-cta:any-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  min-width: 142px;
-  height: 32px;
-  padding: 0 14px;
-  border-radius: 6px;
-  color: #111;
-  background-color: #fff;
+    .nav-item {
+      overflow: hidden;
+      font-family: var(--font-new-science);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.8;
+      letter-spacing: -0.01em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
 
-  /* REGISTER INTEREST: Regular, 10px */
-  font-family: var(--font-new-science);
-  font-size: 10px;
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  text-align: center;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
+  /* the links and the button in Figma's New Science (--font-new-science, styles/styles.css: its
+     Medium and Regular files, from the Adobe Fonts kit where the page loads it; else Inter) */
 
-/* phones: no navigation, as on /jsw-phase-3 */
-@media (max-width: 599.98px) {
-  .pill-nav {
+  /* NEV TECH, NEWSROOM: Medium, 12px */
+  .nav-link {
+    font-family: var(--font-new-science);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .nav-link:hover {
+    opacity: 0.7;
+  }
+
+  & a.nav-cta:any-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 142px;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 6px;
+    color: #111;
+    background-color: #fff;
+
+    /* REGISTER INTEREST: Regular, 10px */
+    font-family: var(--font-new-science);
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* phones: no navigation, as on /jsw-phase-3 */
+  @media (max-width: 599.98px) {
     display: none;
   }
-}
 
-@media (min-width: 600px) {
-  .pill-nav {
+  @media (min-width: 600px) {
     top: 26px;
-  }
 
-  .pill-nav .pill-nav-links {
-    display: flex;
+    .nav-list {
+      display: flex;
+    }
   }
 }
