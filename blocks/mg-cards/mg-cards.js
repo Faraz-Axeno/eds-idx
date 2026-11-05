@@ -177,7 +177,7 @@ export default function decorate(block) {
     if (!slides.length) return;
     current = Math.max(0, Math.min(index, slides.length - 1));
     block.dataset.activeSlide = current;
-    stage.style.setProperty('--mg-cards-index', current);
+    stage.style.setProperty('--cards-index', current);
     slides.forEach((card, i) => {
       const isActive = i === current;
       card.dataset.active = isActive ? 'true' : 'false';
@@ -259,10 +259,10 @@ export default function decorate(block) {
       onStart: stop,
       onMove: (dx) => {
         const atEdge = (current === 0 && dx > 0) || (current === slides.length - 1 && dx < 0);
-        stage.style.setProperty('--mg-drag-x', `${atEdge ? dx * 0.35 : dx}px`);
+        stage.style.setProperty('--drag-x', `${atEdge ? dx * 0.35 : dx}px`);
       },
       onEnd: (dx, velocity) => {
-        stage.style.removeProperty('--mg-drag-x');
+        stage.style.removeProperty('--drag-x');
         if (Math.abs(dx) > viewport.clientWidth * 0.15 || Math.abs(velocity) > 0.45) {
           go(current + (dx < 0 ? 1 : -1));
         } else {

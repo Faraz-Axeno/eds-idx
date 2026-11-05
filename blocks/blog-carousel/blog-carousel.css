@@ -12,14 +12,14 @@
   align-items: center;
   justify-content: center;
   gap: 18px;
-  min-height: var(--mg-panel-height, 100svh);
+  min-height: var(--panel-height, 100svh);
   padding: 72px 16px 32px;
   isolation: isolate;
 
   /* above the previous section, which the rising card overlaps at first (blog-carousel.js) */
   z-index: 6;
-  color: var(--jsw-white, #fff);
-  background-color: var(--jsw-black, #050505);
+  color: var(--white, #fff);
+  background-color: var(--black, #050505);
 }
 
 /* blurred background photo (already out of focus in the design) */
@@ -72,7 +72,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background-color: var(--jsw-white, #fff);
+  background-color: var(--white, #fff);
   pointer-events: none;
   transition: opacity 0.8s ease;
 }
@@ -90,9 +90,9 @@
   min-height: min(508px, 72vh);
   min-height: min(508px, 72svh);
   padding: 16px 13px 13px;
-  border: 1px solid var(--jsw-glass-border, rgb(255 255 255 / 12%));
+  border: 1px solid var(--glass-border, rgb(255 255 255 / 12%));
   border-radius: 12px;
-  background-color: var(--jsw-glass, rgb(58 58 58 / 38%));
+  background-color: var(--glass, rgb(58 58 58 / 38%));
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
@@ -110,7 +110,7 @@
 .blog-carousel .blog-carousel-heading {
   flex: 1;
   color: rgb(255 255 255 / 55%);
-  font-family: var(--jsw-font-display);
+  font-family: var(--page-font-display);
   font-size: 12px;
   letter-spacing: 0.12em;
   text-align: center;
@@ -147,7 +147,7 @@
 .blog-carousel .blog-carousel-category {
   margin: 0 12px 20px;
   color: rgb(255 255 255 / 55%);
-  font-family: var(--jsw-font-mono);
+  font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -155,7 +155,7 @@
 
 .blog-carousel .blog-carousel-title {
   margin: 0 12px 20px;
-  font-family: var(--jsw-font-display);
+  font-family: var(--page-font-display);
   font-size: clamp(17px, 1.5vw, 20px);
   font-weight: 400;
   line-height: 1.2;
@@ -164,7 +164,7 @@
 
 .blog-carousel .blog-carousel-summary {
   margin: 0 12px 24px;
-  color: var(--jsw-text-muted-light, rgb(255 255 255 / 70%));
+  color: var(--text-muted-light, rgb(255 255 255 / 70%));
   font-size: 12.5px;
   line-height: 1.5;
 }
@@ -182,12 +182,12 @@
   height: 42px;
   padding: 0 6px 0 14px;
   border-radius: 8px;
-  color: var(--jsw-white, #fff);
+  color: var(--white, #fff);
   background-color: rgb(20 20 20 / 70%);
-  font-family: var(--jsw-font-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.08em;
-  transition: background-color 0.3s var(--jsw-ease);
+  transition: background-color 0.3s var(--ease);
 }
 
 .blog-carousel a.blog-carousel-read:hover {
@@ -199,7 +199,7 @@
   width: 30px;
   height: 30px;
   border-radius: 6px;
-  background-color: var(--jsw-ink, #0d0d0d);
+  background-color: var(--ink, #0d0d0d);
 }
 
 /* arrow ↗ */
@@ -250,11 +250,11 @@
   cursor: pointer;
   color: rgb(255 255 255 / 60%);
   background: none;
-  transition: color 0.3s var(--jsw-ease);
+  transition: color 0.3s var(--ease);
 }
 
 .blog-carousel .blog-carousel-header button:hover {
-  color: var(--jsw-white, #fff);
+  color: var(--white, #fff);
 }
 
 .blog-carousel .blog-carousel-header button::before {

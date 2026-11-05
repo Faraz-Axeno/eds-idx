@@ -15,10 +15,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 36px;
-  padding: 40px var(--jsw-edge, 20px) 120px;
-  border-radius: 0 0 var(--jsw-radius-card, 24px) var(--jsw-radius-card, 24px);
-  color: var(--jsw-white, #fff);
-  background: linear-gradient(180deg, var(--jsw-black, #050505) 0%, #050505 28%, #06363b 62%, #0c7d88 88%, #12a0ab 100%);
+  padding: 40px var(--edge, 20px) 120px;
+  border-radius: 0 0 var(--radius-card, 24px) var(--radius-card, 24px);
+  color: var(--white, #fff);
+  background: linear-gradient(180deg, var(--black, #050505) 0%, #050505 28%, #06363b 62%, #0c7d88 88%, #12a0ab 100%);
 }
 
 .brand-footer p {
@@ -41,7 +41,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 6px;
-  font-family: var(--jsw-font-display);
+  font-family: var(--page-font-display);
   font-size: 13px;
   letter-spacing: 0.2em;
 }
@@ -53,14 +53,14 @@
 
 .brand-footer .brand-footer-legal {
   margin-top: 22px;
-  font-family: var(--jsw-font-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.08em;
 }
 
 .brand-footer .brand-footer-legal a:hover,
 .brand-footer .brand-footer-list a:hover {
-  color: var(--jsw-white, #fff);
+  color: var(--white, #fff);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -73,9 +73,9 @@
   height: 38px;
   padding: 0 18px;
   border-radius: 8px;
-  color: var(--jsw-text-dark, #111);
-  background-color: var(--jsw-white, #fff);
-  font-family: var(--jsw-font-mono);
+  color: var(--text-dark, #111);
+  background-color: var(--white, #fff);
+  font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.06em;
   white-space: nowrap;
@@ -99,7 +99,7 @@
 
 .brand-footer .brand-footer-heading {
   margin-bottom: 10px;
-  font-family: var(--jsw-font-display);
+  font-family: var(--page-font-display);
   font-size: 12px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -123,7 +123,7 @@
   .brand-footer {
     align-content: end;
     gap: 0;
-    min-height: var(--mg-panel-height, 100svh);
+    min-height: var(--panel-height, 100svh);
 
     /* the gaps follow the screen height (frame values at 815px tall), so short phones fit */
     padding: min(120px, 14.7vh) 24px 34px;
@@ -197,7 +197,7 @@
   .brand-footer {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: start;
-    padding: 28px var(--jsw-edge) 150px;
+    padding: 28px var(--edge) 150px;
   }
 
   .brand-footer .brand-footer-cta {

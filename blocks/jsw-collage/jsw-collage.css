@@ -5,19 +5,19 @@
  */
 
 .jsw-collage {
-  --jsw-card-w: min(12vw, 22svh);
+  --card-w: min(12vw, 22svh);
 
   position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 32px;
-  min-height: var(--jsw-panel-height, calc(100svh - 16px));
-  padding: 96px var(--jsw-edge, 20px) 32px;
+  min-height: var(--page-panel-height, calc(100svh - 16px));
+  padding: 96px var(--edge, 20px) 32px;
   overflow: hidden;
-  border-radius: var(--jsw-radius-card, 24px);
-  color: var(--jsw-text-dark, #111);
-  background-color: var(--jsw-white, #fff);
+  border-radius: var(--radius-card, 24px);
+  color: var(--text-dark, #111);
+  background-color: var(--white, #fff);
 }
 
 .jsw-collage .jsw-collage-text {
@@ -30,7 +30,7 @@
 
 .jsw-collage .jsw-collage-title {
   margin-bottom: 18px;
-  font-family: var(--jsw-font-display);
+  font-family: var(--page-font-display);
   font-size: clamp(19px, 2vw, 30px);
   font-weight: 400;
   line-height: 1.18;
@@ -53,7 +53,7 @@
 .jsw-collage .jsw-collage-card {
   overflow: hidden;
   border-radius: 10px;
-  background-color: var(--jsw-ink, #0d0d0d);
+  background-color: var(--ink, #0d0d0d);
   aspect-ratio: 111 / 143;
 }
 
@@ -84,7 +84,7 @@
 @media (width >= 900px) {
   .jsw-collage {
     display: block;
-    height: var(--jsw-panel-height, calc(100svh - 16px));
+    height: var(--page-panel-height, calc(100svh - 16px));
     padding: 0;
   }
 
@@ -103,7 +103,7 @@
 
   .jsw-collage .jsw-collage-card {
     position: absolute;
-    width: var(--jsw-card-w);
+    width: var(--card-w);
   }
 
   .jsw-collage .jsw-collage-card[data-slot='extra'] {
@@ -144,6 +144,6 @@
 
 @media (width >= 900px) and (prefers-reduced-motion: no-preference) {
   .jsw-collage .jsw-collage-card {
-    animation: jsw-collage-float 5.5s ease-in-out calc(var(--jsw-i, 0) * -1.3s) infinite alternate;
+    animation: jsw-collage-float 5.5s ease-in-out calc(var(--item-index, 0) * -1.3s) infinite alternate;
   }
 }

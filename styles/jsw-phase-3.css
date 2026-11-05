@@ -11,30 +11,30 @@
 }
 
 body.jsw-phase-3 {
-  --jsw-black: #050505;
-  --jsw-ink: #0d0d0d;
-  --jsw-white: #fff;
-  --jsw-text-dark: #111;
-  --jsw-text-muted-dark: #5c5c5c;
-  --jsw-text-muted-light: rgb(255 255 255 / 70%);
-  --jsw-pill-light: rgb(140 140 140 / 78%);
-  --jsw-pill-dark: rgb(16 16 16 / 72%);
-  --jsw-glass: rgb(58 58 58 / 38%);
-  --jsw-glass-border: rgb(255 255 255 / 12%);
-  --jsw-teal: #0e8f9b;
-  --jsw-font-display: michroma, sequel, 'Helvetica Neue', arial, sans-serif;
-  --jsw-font-body: inter, 'Helvetica Neue', arial, sans-serif;
-  --jsw-font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
-  --jsw-radius-card: 24px;
-  --jsw-radius-control: 6px;
-  --jsw-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --jsw-edge: 20px;
-  --jsw-panel-inset: 8px;
-  --jsw-panel-height: calc(var(--mg-panel-height, 100svh) - 2 * var(--jsw-panel-inset));
+  --black: #050505;
+  --ink: #0d0d0d;
+  --white: #fff;
+  --text-dark: #111;
+  --text-muted-dark: #5c5c5c;
+  --text-muted-light: rgb(255 255 255 / 70%);
+  --pill-light: rgb(140 140 140 / 78%);
+  --pill-dark: rgb(16 16 16 / 72%);
+  --glass: rgb(58 58 58 / 38%);
+  --glass-border: rgb(255 255 255 / 12%);
+  --teal: #0e8f9b;
+  --page-font-display: michroma, sequel, 'Helvetica Neue', arial, sans-serif;
+  --page-font-body: inter, 'Helvetica Neue', arial, sans-serif;
+  --font-mono: 'Roboto Mono', 'SFMono-Regular', menlo, consolas, monospace;
+  --radius-card: 24px;
+  --radius-control: 6px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --edge: 20px;
+  --panel-inset: 8px;
+  --page-panel-height: calc(var(--panel-height, 100svh) - 2 * var(--panel-inset));
 
-  background-color: var(--jsw-black);
-  color: var(--jsw-white);
-  font-family: var(--jsw-font-body);
+  background-color: var(--black);
+  color: var(--white);
+  font-family: var(--page-font-body);
 }
 
 /* touch screens: scripts/delayed.js moves the page one stop per vertical swipe, so the
@@ -57,7 +57,7 @@ html.gsap-scrolling {
    without end, so there a panel is at most 1000px tall; panel snapping is off (the editor
    scrolls to what is selected) */
 body.jsw-phase-3:has(main [data-aue-resource]) {
-  --mg-panel-height: min(100svh, 1000px);
+  --panel-height: min(100svh, 1000px);
 }
 
 html.panels-ready:has(body.jsw-phase-3 main > .section[data-aue-resource]) {
@@ -67,12 +67,12 @@ html.panels-ready:has(body.jsw-phase-3 main > .section[data-aue-resource]) {
 /* browsers without small-viewport units (svh): panels one classic viewport tall */
 @supports not (height: 1svh) {
   body.jsw-phase-3 {
-    --mg-panel-height: 100vh;
+    --panel-height: 100vh;
   }
 }
 
 /* very short or very large landscape screens (e.g. browser zoom far in or out): the parts
-   sized in fixed pixels scale by --jsw-fit (immersive-hero.js), so they keep their place beside
+   sized in fixed pixels scale by --fit (immersive-hero.js), so they keep their place beside
    the videos, images and cards that scale with the screen; 1 (no change) on ordinary screens */
 body.jsw-phase-3 > .immersive-hero-nav,
 body.jsw-phase-3 > .immersive-hero-scroll,
@@ -81,7 +81,7 @@ body.jsw-phase-3 .hotspot-showcase :is(.hotspot-showcase-heading, .hotspot-showc
 body.jsw-phase-3 .parallax-collage :is(.parallax-collage-title, .sticky-text-layer .content p),
 body.jsw-phase-3 .blog-carousel .blog-carousel-card,
 body.jsw-phase-3 .brand-footer {
-  zoom: var(--jsw-fit, 1);
+  zoom: var(--fit, 1);
 }
 
 /* the page brings its own navigation (immersive-hero) and footer (brand-footer) */
@@ -91,7 +91,7 @@ body.jsw-phase-3 > footer {
 }
 
 body.jsw-phase-3 main > .section {
-  background-color: var(--jsw-black);
+  background-color: var(--black);
 }
 
 /* page metadata table: removed by the delivery service, but still rendered by the local dev server */
@@ -101,7 +101,7 @@ body.jsw-phase-3 main .metadata-wrapper {
 
 /* light panels are rounded cards inset on the dark page */
 body.jsw-phase-3 main > .section[data-jsw-theme='light'] {
-  padding: var(--jsw-panel-inset);
+  padding: var(--panel-inset);
 }
 
 /* except the parallax collage (section 3): full screen, exactly as on /jsw-nev-collage */
@@ -119,12 +119,12 @@ body.jsw-phase-3 main a:any-link {
 }
 
 body.jsw-phase-3 main :is(a, button):focus-visible {
-  outline: 2px solid var(--jsw-teal);
+  outline: 2px solid var(--teal);
   outline-offset: 3px;
 }
 
 @media (min-width: 900px) {
   body.jsw-phase-3 {
-    --jsw-edge: 5.4vw;
+    --edge: 5.4vw;
   }
 }

@@ -22,8 +22,12 @@ main > .section > .reservation-form-wrapper {
      height, smaller on shorter screens (at least 0.6px). Tablets and phones keep 1px units */
   --reservation-form-unit: 1px;
 
+  /* the page's panel height, the block's own: a screen tall (at most 1000px in Universal Editor,
+     below) */
+  --panel-height: 100svh;
+
   box-sizing: border-box;
-  min-height: var(--mg-panel-height, 100svh);
+  min-height: var(--panel-height);
   padding: 8px;
   color: #111;
   background-color: #050505;
@@ -31,7 +35,7 @@ main > .section > .reservation-form-wrapper {
 
   @supports (height: 1svh) and (width: clamp(1px, 1px, 1px)) {
     @media (min-width: 900px) {
-      --reservation-form-unit: clamp(0.6px, calc((var(--mg-panel-height, 100svh) - 146px) / 556), 1px);
+      --reservation-form-unit: clamp(0.6px, calc((var(--panel-height) - 146px) / 556), 1px);
     }
   }
 
@@ -49,7 +53,7 @@ main > .section > .reservation-form-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: calc(var(--mg-panel-height, 100svh) - 16px);
+    min-height: calc(var(--panel-height) - 16px);
     padding: 90px 24px 40px;
     overflow: hidden;
     border-radius: 24px;
@@ -661,8 +665,12 @@ main > .section > .reservation-form-wrapper {
   /* Universal Editor (its markup carries data-aue-resource; never on the published page): the
      editor's canvas can grow to fit the page, and a page one screen tall would then grow it
      without end, so there the page is at most 1000px tall (as on /jsw-phase-3) */
-  body:has(&[data-aue-resource]) {
-    --mg-panel-height: min(100svh, 1000px);
+  &[data-aue-resource] {
+    --panel-height: min(100svh, 1000px);
+  }
+
+  main > .section:has(> .reservation-form-wrapper > &[data-aue-resource]) {
+    min-height: min(100svh, 1000px);
   }
 }
 

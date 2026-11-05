@@ -12,18 +12,18 @@
 }
 
 .jsw-navbar-nav {
-  --jsw-navbar-bg: #a2a2a2;
-  --jsw-navbar-text: #fff;
-  --jsw-navbar-cta-bg: #fff;
-  --jsw-navbar-cta-text: #111;
-  --jsw-navbar-width: 666px;
-  --jsw-navbar-height: 42px;
+  --navbar-bg: #a2a2a2;
+  --navbar-text: #fff;
+  --navbar-cta-bg: #fff;
+  --navbar-cta-text: #111;
+  --navbar-width: 666px;
+  --navbar-height: 42px;
 
   position: fixed;
   top: 24px;
   left: 50%;
   z-index: 1000;
-  width: min(var(--jsw-navbar-width), calc(100% - 24px));
+  width: min(var(--navbar-width), calc(100% - 24px));
   transform: translateX(-50%);
 }
 
@@ -32,11 +32,11 @@
   display: flex;
   align-items: center;
   gap: 33px;
-  height: var(--jsw-navbar-height);
+  height: var(--navbar-height);
   padding: 0 5px 0 13px;
   border-radius: 10px;
-  color: var(--jsw-navbar-text);
-  background-color: var(--jsw-navbar-bg);
+  color: var(--navbar-text);
+  background-color: var(--navbar-bg);
 }
 
 .jsw-navbar-nav a:any-link {
@@ -123,8 +123,8 @@
   height: 31px;
   padding: 0 12px;
   border-radius: 6px;
-  color: var(--jsw-navbar-cta-text);
-  background-color: var(--jsw-navbar-cta-bg);
+  color: var(--navbar-cta-text);
+  background-color: var(--navbar-cta-bg);
   font-family: 'Roboto Mono', sfmono-regular, menlo, consolas, monospace;
   font-size: 10px;
   letter-spacing: 0.02em;
@@ -183,7 +183,7 @@
     margin-right: 8px;
     padding: 0;
     border: 0;
-    color: var(--jsw-navbar-text);
+    color: var(--navbar-text);
     background: none;
     cursor: pointer;
   }
@@ -225,7 +225,7 @@
     flex-direction: column;
     padding: 6px 12px 12px;
     border-radius: 10px;
-    background-color: var(--jsw-navbar-bg);
+    background-color: var(--navbar-bg);
     box-shadow: 0 12px 30px rgb(0 0 0 / 18%);
     visibility: hidden;
     opacity: 0;

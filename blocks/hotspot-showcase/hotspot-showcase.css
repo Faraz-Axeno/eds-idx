@@ -9,10 +9,10 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  min-height: var(--jsw-panel-height, calc(100svh - 16px));
+  min-height: var(--page-panel-height, calc(100svh - 16px));
   overflow: hidden;
-  border-radius: var(--jsw-radius-card, 24px);
-  color: var(--jsw-text-dark, #111);
+  border-radius: var(--radius-card, 24px);
+  color: var(--text-dark, #111);
   background: linear-gradient(100deg, #fff 0%, #fff 40%, #dadada 100%);
 }
 
@@ -22,12 +22,12 @@
 
 .hotspot-showcase .hotspot-showcase-heading {
   order: 1;
-  padding: 92px var(--jsw-edge, 20px) 24px;
+  padding: 92px var(--edge, 20px) 24px;
 }
 
 .hotspot-showcase .hotspot-showcase-title {
   max-width: 16em; /* "A NEW WAY TO MOVE" / "POWERED BY TECH" */
-  font-family: var(--jsw-font-display);
+  font-family: var(--page-font-display);
   font-size: clamp(19px, 2.2vw, 36px);
   font-weight: 400;
   line-height: 1.16;
@@ -37,20 +37,20 @@
 
 .hotspot-showcase .hotspot-showcase-detail {
   order: 3;
-  padding: 24px var(--jsw-edge, 20px) 32px;
+  padding: 24px var(--edge, 20px) 32px;
 }
 
 .hotspot-showcase .hotspot-showcase-counter {
   margin-bottom: 10px;
-  color: var(--jsw-text-muted-dark, #5c5c5c);
-  font-family: var(--jsw-font-mono);
+  color: var(--text-muted-dark, #5c5c5c);
+  font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.12em;
 }
 
 .hotspot-showcase .hotspot-showcase-item-title {
   margin-bottom: 12px;
-  font-family: var(--jsw-font-display);
+  font-family: var(--page-font-display);
   font-size: clamp(15px, 1.3vw, 19px);
   font-weight: 400;
   line-height: 1.3;
@@ -58,7 +58,7 @@
 
 .hotspot-showcase .hotspot-showcase-text p {
   max-width: 430px;
-  color: var(--jsw-text-muted-dark, #5c5c5c);
+  color: var(--text-muted-dark, #5c5c5c);
   font-size: 13.5px;
   line-height: 1.55;
 }
@@ -95,8 +95,8 @@
   border: 0;
   border-radius: 8px;
   cursor: pointer;
-  background-color: var(--jsw-ink, #0d0d0d);
-  transition: transform 0.5s var(--jsw-ease);
+  background-color: var(--ink, #0d0d0d);
+  transition: transform 0.5s var(--ease);
 }
 
 .hotspot-showcase .hotspot-showcase-thumb picture,
@@ -109,7 +109,7 @@
 .hotspot-showcase .hotspot-showcase-thumb img {
   object-fit: cover;
   filter: grayscale(1) brightness(0.78);
-  transition: filter 0.5s var(--jsw-ease);
+  transition: filter 0.5s var(--ease);
 }
 
 .hotspot-showcase .hotspot-showcase-thumb:hover img {
@@ -147,7 +147,7 @@
    thumbnails stay on the screen (and can be tapped) instead of running past its bottom */
 @media (min-width: 600px) and (max-width: 899.98px) and (orientation: portrait) {
   .hotspot-showcase {
-    height: var(--jsw-panel-height, calc(100vh - 16px));
+    height: var(--page-panel-height, calc(100vh - 16px));
   }
 
   .hotspot-showcase .hotspot-showcase-stage {
@@ -169,14 +169,14 @@
   justify-content: center;
   opacity: 0;
   transform: translateY(100%);
-  transition: transform 0.9s var(--jsw-ease), opacity 0.9s var(--jsw-ease);
+  transition: transform 0.9s var(--ease), opacity 0.9s var(--ease);
 }
 
 .hotspot-showcase .hotspot-showcase-panel.is-active {
   z-index: 1;
   opacity: 1;
   transform: none;
-  transition: transform 0.9s var(--jsw-ease);
+  transition: transform 0.9s var(--ease);
 }
 
 /* the figure has the image's own ratio, so hotspot percentages stay on the artwork */
@@ -232,12 +232,12 @@
   border: 1px solid rgb(255 255 255 / 16%);
   border-radius: 8px;
   cursor: pointer;
-  color: var(--jsw-white, #fff);
+  color: var(--white, #fff);
   background-color: rgb(24 24 24 / 58%);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   transform: translate(-50%, -50%);
-  transition: background-color 0.3s var(--jsw-ease);
+  transition: background-color 0.3s var(--ease);
 }
 
 .hotspot-showcase .hotspot-showcase-spot::before,
@@ -250,7 +250,7 @@
   height: 1.5px;
   background-color: currentcolor;
   transform: translate(-50%, -50%);
-  transition: transform 0.3s var(--jsw-ease);
+  transition: transform 0.3s var(--ease);
 }
 
 .hotspot-showcase .hotspot-showcase-spot::after {
@@ -318,7 +318,7 @@
   padding: 16px;
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 12px;
-  color: var(--jsw-white, #fff);
+  color: var(--white, #fff);
   background-color: rgb(12 12 12 / 44%);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   backdrop-filter: blur(14px) saturate(1.2);
@@ -358,7 +358,7 @@
 .hotspot-showcase .hotspot-showcase-tooltip-title {
   margin-bottom: 22px;
   padding-right: 20px;
-  font-family: var(--jsw-font-mono);
+  font-family: var(--font-mono);
   font-size: 14px;
   line-height: 18px;
   text-transform: uppercase;
@@ -414,7 +414,7 @@
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
-    height: var(--jsw-panel-height, calc(100svh - 16px));
+    height: var(--page-panel-height, calc(100svh - 16px));
   }
 
   .hotspot-showcase .hotspot-showcase-copy {
@@ -427,23 +427,23 @@
   }
 
   .hotspot-showcase .hotspot-showcase-heading {
-    padding: 0 24px 0 var(--jsw-edge);
+    padding: 0 24px 0 var(--edge);
     padding-top: max(108px, 17vh);
     padding-top: max(108px, 17svh);
   }
 
   .hotspot-showcase .hotspot-showcase-detail {
-    padding: 0 24px 0 var(--jsw-edge);
+    padding: 0 24px 0 var(--edge);
   }
 
   /* Universal Editor: its canvas can grow to fit the page, so these gaps follow the capped
      panel height (styles/jsw-phase-3.css) rather than the screen */
   .hotspot-showcase.hotspot-showcase-editing .hotspot-showcase-copy {
-    padding-bottom: calc(0.07 * var(--mg-panel-height, 100svh));
+    padding-bottom: calc(0.07 * var(--panel-height, 100svh));
   }
 
   .hotspot-showcase.hotspot-showcase-editing .hotspot-showcase-heading {
-    padding-top: max(108px, calc(0.17 * var(--mg-panel-height, 100svh)));
+    padding-top: max(108px, calc(0.17 * var(--panel-height, 100svh)));
   }
 
   /* the stage covers the whole card, so each image can sit where its frame has it: partly
