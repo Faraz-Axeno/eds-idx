@@ -279,7 +279,25 @@ main > .section > .reservation-form-wrapper {
 
   /* a field breaking its rule is outlined until it is corrected (reservation-form.js) */
   .input.is-invalid {
-    border-color: #d64545;
+    border-color: #ff3b30;
+    background-color: #fff0f0;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  /* a field marked: its placeholder (and the city list's empty choice) red too */
+  .input.is-invalid::placeholder {
+    color: #ff3b30;
+    opacity: 0.8;
+  }
+
+  .select select.is-invalid:not(.is-chosen) {
+    color: rgb(255 59 48 / 80%);
+  }
+
+  /* a marked field being typed in: its red edge, and a soft red ring */
+  .input.is-invalid:focus {
+    border-color: #ff3b30;
+    box-shadow: 0 0 0 2px rgb(255 59 48 / 20%);
   }
 
   /* a field and, under it, its error message: in the gap below the field, so nothing moves */
