@@ -97,11 +97,17 @@
   list-style: none;
 }
 
-/* the links and the button in the Figma navbar's regular sans, on every page (Inter, the site's) */
+/* the links and the button in Figma's New Science (--font-new-science, styles/styles.css: its
+   Medium and Regular files, from the Adobe Fonts kit where the page loads it; else Inter) */
+
+/* NEV TECH, NEWSROOM: Medium, 12px */
 .pill-nav .pill-nav-links a {
-  font-family: inter, 'Helvetica Neue', arial, sans-serif;
+  font-family: var(--font-new-science);
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -120,10 +126,15 @@
   border-radius: 6px;
   color: #111;
   background-color: #fff;
-  font-family: inter, 'Helvetica Neue', arial, sans-serif;
+
+  /* REGISTER INTEREST: Regular, 10px */
+  font-family: var(--font-new-science);
   font-size: 10px;
   font-weight: 400;
-  letter-spacing: 0.02em;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
