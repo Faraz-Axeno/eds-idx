@@ -44,14 +44,15 @@ main > .section > .jsw-nav-wrapper {
     transform: none;
   }
 
-  /* Nav Links over the limit (MAX_NAV_LINKS, pill-nav.js): never on the pages; here
-     hidden, also in the editor's Preview mode, and shown dimmed only while editing */
-  .pill-nav-links > li.is-over-limit {
+  /* links over the limit (MAX_NAV_LINKS, pill-nav.js: Nav Link items saved before, after Link
+     1-4): never on the pages; here hidden, also in the editor's Preview mode, and shown dimmed
+     only while editing */
+  .nav-list > .nav-item.is-over-limit {
     display: none;
   }
 
-  html.adobe-ue-edit & .pill-nav-links > li.is-over-limit {
-    display: list-item;
+  html.adobe-ue-edit & .nav-list > .nav-item.is-over-limit {
+    display: block;
     opacity: 0.45;
   }
 

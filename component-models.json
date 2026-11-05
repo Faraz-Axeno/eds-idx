@@ -1076,11 +1076,79 @@
         "valueType": "string",
         "name": "ctaText",
         "label": "Button text",
-        "description": "At most 17 characters; only the first 2 Nav Links are shown in the bar.",
+        "description": "Max 17 characters.",
         "value": "REGISTER INTEREST",
         "required": true,
         "validation": {
           "maxLength": 17
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "links_link1",
+        "label": "Link 1 target",
+        "description": "Optional: a page, a section (/jsw-phase-3#nev-tech) or a URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "links_link1Text",
+        "label": "Link 1 text",
+        "description": "Optional, max 12 characters; shown only with its target.",
+        "validation": {
+          "maxLength": 12
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "links_link2",
+        "label": "Link 2 target",
+        "description": "Optional: a page, a section (/jsw-phase-3#nev-tech) or a URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "links_link2Text",
+        "label": "Link 2 text",
+        "description": "Optional, max 12 characters; shown only with its target.",
+        "validation": {
+          "maxLength": 12
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "links_link3",
+        "label": "Link 3 target",
+        "description": "Optional: a page, a section (/jsw-phase-3#nev-tech) or a URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "links_link3Text",
+        "label": "Link 3 text",
+        "description": "Optional, max 12 characters; shown only with its target.",
+        "validation": {
+          "maxLength": 12
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "links_link4",
+        "label": "Link 4 target",
+        "description": "Optional: a page, a section (/jsw-phase-3#nev-tech) or a URL."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "links_link4Text",
+        "label": "Link 4 text",
+        "description": "Optional, max 12 characters; shown only with its target.",
+        "validation": {
+          "maxLength": 12
         }
       }
     ]
@@ -1093,7 +1161,7 @@
         "valueType": "string",
         "name": "link",
         "label": "Link URL",
-        "description": "A page, a section (/jsw-phase-3#nev-tech) or a URL; only 2 are shown.",
+        "description": "Earlier Nav Link: use the block's Link 1-4 fields instead.",
         "required": true
       },
       {
@@ -1101,11 +1169,11 @@
         "valueType": "string",
         "name": "linkText",
         "label": "Link text",
-        "description": "At most 11 characters (about 8 on tablets under 700px wide).",
+        "description": "Max 12 characters.",
         "value": "",
         "required": true,
         "validation": {
-          "maxLength": 11
+          "maxLength": 12
         }
       }
     ]

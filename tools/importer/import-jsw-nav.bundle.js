@@ -49,10 +49,8 @@ var CustomImportScript = (() => {
         [hinted(document, "brand", [el(document, "p", "JSW MOTORS")])],
         [hinted(document, "homeLink", [link(document, "/jsw-phase-3", "/jsw-phase-3")])],
         [hinted(document, "cta", [link(document, "/jsw-phase-3#register-interest", "REGISTER INTEREST")])],
-        ...LINKS.map(([text, href]) => [
-          document.createTextNode("jsw-nav-link"),
-          hinted(document, "link", [link(document, href, text)])
-        ])
+        // Link 1-4, in one cell: each link with its text (links_linkN + links_linkNText)
+        [LINKS.slice(0, 4).map(([text, href], i) => hinted(document, `links_link${i + 1}`, [link(document, href, text)]))]
       ];
       const main = document.createElement("div");
       main.append(WebImporter.Blocks.createBlock(document, { name: "jsw-nav", cells }));

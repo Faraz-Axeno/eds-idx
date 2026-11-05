@@ -3,10 +3,11 @@
  * page that brings the pill navigation (pill-nav.js, in this block, loadPillNav: it reads this
  * block from that page). Here, on its own page, it shows that navigation as it will look.
  * Rows (model, _jsw-nav.json; read by readNavBlock):
- *   logo text | logo link | button link + text
- *   then its Nav Links (link + text): the first MAX_NAV_LINKS in the pill, the others only in
- *   the editor, dimmed (so authors can find and remove them); texts longer than the pill has
- *   room for (NAV_TEXT_LIMITS) cut with "…"
+ *   logo text | logo link | button link + text | Link 1-4 (each a target + text, all optional:
+ *   only those with both are shown)
+ *   then any Nav Link items saved before: shown after them, the first MAX_NAV_LINKS in the pill,
+ *   the others only in the editor, dimmed (so authors can find and remove them); texts longer
+ *   than the pill has room for (NAV_TEXT_LIMITS) cut with "…"
  */
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
@@ -30,14 +31,15 @@ export default function decorate(block) {
     capNavText(cta, NAV_TEXT_LIMITS.ctaText);
   }
   const nav = buildPillNav({ brand, links: shown.map(({ link }) => link), cta });
-  const logo = nav.querySelector('.pill-nav-brand');
+  const logo = nav.querySelector('.nav-home');
   if (home && logo) logo.setAttribute('href', home.getAttribute('href'));
 
-  // each Nav Link's editor instrumentation on its place in the pill
-  const items = [...nav.querySelectorAll('.pill-nav-links > li')];
-  shown.forEach(({ row }, i) => {
+  // each Nav Link item's editor instrumentation on its place in the pill (a Link 1-4 field's
+  // moves in with it, buildPillNav)
+  const items = [...nav.querySelectorAll('.nav-list > .nav-item')];
+  shown.forEach(({ row, item }, i) => {
     if (!items[i]) return;
-    moveInstrumentation(row, items[i]);
+    if (item) moveInstrumentation(row, items[i]);
     if (i >= MAX_NAV_LINKS) {
       items[i].classList.add('is-over-limit');
       items[i].title = `Not shown on the pages: only the first ${MAX_NAV_LINKS} links are.`;
