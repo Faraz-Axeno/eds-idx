@@ -18,6 +18,22 @@
 import { loadPillNav } from '../jsw-nav/pill-nav.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
+// the New Science fonts (the team's Adobe Fonts web project: --font-new-science… in styles.css),
+// loaded with the block, once, not blocking the page: until they arrive the fallbacks show
+const FONT_KIT = 'https://use.typekit.net/qil0qom.css';
+
+function loadFontKit() {
+  if (document.querySelector(`link[href="${FONT_KIT}"]`)) return;
+  const preconnect = document.createElement('link');
+  preconnect.rel = 'preconnect';
+  preconnect.href = 'https://use.typekit.net';
+  preconnect.crossOrigin = '';
+  const kit = document.createElement('link');
+  kit.rel = 'stylesheet';
+  kit.href = FONT_KIT;
+  document.head.append(preconnect, kit);
+}
+
 // the file types the block's media accept, by the asset's extension (published images keep
 // their file's: media_….jpg): an asset of another type is not shown, a console warning instead
 const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png']; // general images: backgrounds, photos
@@ -305,6 +321,7 @@ function keepTokensWhileEditing(node, authored, fill) {
  * @param {Element} block The block element
  */
 export default function decorate(block) {
+  loadFontKit();
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const rows = [...block.children];
   // the layout row: the first of three rows, or one holding just a layout value

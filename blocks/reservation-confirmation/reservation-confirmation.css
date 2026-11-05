@@ -99,17 +99,26 @@ main > .section > .reservation-confirmation-wrapper {
     object-position: 50% 50%;
   }
 
+  /* the typography, Figma's: New Science in its explicit styles, each its own font file (the
+     Adobe Fonts kit, reservation-confirmation.js; --font-new-science… in styles/styles.css) */
+
+  /* YOU'RE IN, NAME / SORRY, NAME: Medium Extended, 24px (sizes per layout below) */
   .subheading {
-    font-family: var(--pill-font-display);
-    font-weight: 400;
+    font-family: var(--font-new-science-extended);
+    font-weight: 500;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
   }
 
+  /* the message (We'll message you…): Medium, 14px */
   .message {
     margin: 0;
     color: #8c8c8c;
-    font-size: calc(13 * var(--reservation-confirmation-unit));
-    line-height: calc(19 * var(--reservation-confirmation-unit));
+    font-family: var(--font-new-science);
+    font-size: calc(14 * var(--reservation-confirmation-unit));
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: 0;
   }
 
   .email {
@@ -146,7 +155,8 @@ main > .section > .reservation-confirmation-wrapper {
     transform-origin: 29% 45%;
   }
 
-  /* CONFIRMED: thin, wide, a silver gradient from light at the top to grey at the foot */
+  /* CONFIRMED / FAILED: Regular Extended, 86px, a silver gradient from light at the top to grey
+     at the foot */
   &.layout-centered .heading {
     margin: 0;
     color: #d9d9d9;
@@ -155,25 +165,28 @@ main > .section > .reservation-confirmation-wrapper {
     /* stylelint-disable-next-line property-no-vendor-prefix -- Safari and older Samsung Internet */
     -webkit-background-clip: text;
     background-clip: text;
-    font-family: var(--pill-font-display);
-    font-size: calc(84 * var(--reservation-confirmation-unit));
-    font-weight: 300;
-    line-height: 1.1;
-    letter-spacing: -0.01em;
+    font-family: var(--font-new-science-extended);
+    font-size: calc(86 * var(--reservation-confirmation-unit));
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.05em;
     text-transform: uppercase;
     white-space: nowrap;
     -webkit-text-fill-color: transparent;
   }
 
+  /* the text under CONFIRMED at least the message's width in the frame (376px, its two sentences
+     a line each; the clamped message does not widen it itself), at most the card's */
   &.layout-centered .details {
     position: relative;
+    min-width: min(100%, calc(376 * var(--reservation-confirmation-unit)));
     margin-top: auto;
   }
 
   &.layout-centered .subheading {
     margin: 0 0 calc(18 * var(--reservation-confirmation-unit));
-    font-size: calc(22 * var(--reservation-confirmation-unit));
-    line-height: 1.2;
+    font-size: calc(24 * var(--reservation-confirmation-unit));
+    line-height: 1.35;
   }
 
   &.layout-centered .line {
@@ -199,6 +212,19 @@ main > .section > .reservation-confirmation-wrapper {
       height: auto;
       aspect-ratio: 16 / 9;
       transform: translateX(-50%);
+    }
+  }
+
+  /* under 768px: CONFIRMED / FAILED keep scaling with the screen's width (from 8.8vw, about 67px,
+     down to 40px), the subheading a little smaller (20px), so nothing reaches past the card */
+  @media (max-width: 767.98px) {
+    &.layout-centered .heading {
+      font-size: max(40px, 8.8vw);
+    }
+
+    &.layout-centered .subheading,
+    &.layout-split .subheading {
+      font-size: 20px;
     }
   }
 
@@ -269,8 +295,8 @@ main > .section > .reservation-confirmation-wrapper {
 
   &.layout-split .subheading {
     margin: 0 0 calc(16 * var(--reservation-confirmation-unit));
-    font-size: calc(22 * var(--reservation-confirmation-unit));
-    line-height: 1.25;
+    font-size: calc(24 * var(--reservation-confirmation-unit));
+    line-height: 1.35;
   }
 
   &.layout-split .message {
