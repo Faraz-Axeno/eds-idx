@@ -18,16 +18,16 @@
 
 :root {
   /* colors */
-  --background-color: var(--mg-color-white);
-  --light-color: var(--mg-color-white);
-  --dark-color: var(--mg-color-dark);
-  --text-color: var(--mg-color-black);
+  --background-color: var(--color-white);
+  --light-color: var(--color-white);
+  --dark-color: var(--color-dark);
+  --text-color: var(--color-black);
   --link-color: currentcolor;
   --link-hover-color: currentcolor;
 
   /* fonts */
-  --body-font-family: var(--mg-font-body);
-  --heading-font-family: var(--mg-font-display);
+  --body-font-family: var(--font-body);
+  --heading-font-family: var(--font-display);
 
   /* the JSW faces (styles/fonts.css), with their fallbacks: the text face (the Phase 5 blocks,
      the footer) and the footer's Phase 3 layout display face */
@@ -56,7 +56,7 @@
   --heading-font-size-xs: 22px;
 
   /* nav height */
-  --nav-height: var(--mg-nav-height);
+  --nav-height: var(--site-nav-height);
 }
 
 /* fallback fonts */
@@ -95,9 +95,9 @@ body {
   background-color: var(--background-color);
   color: var(--text-color);
   font-family: var(--body-font-family);
-  font-size: var(--mg-font-size-body);
-  letter-spacing: var(--mg-letter-spacing);
-  line-height: var(--mg-line-height-body);
+  font-size: var(--font-size-body);
+  letter-spacing: var(--letter-spacing);
+  line-height: var(--line-height-body);
 }
 
 body.appear {
@@ -127,8 +127,8 @@ h6 {
   margin-top: 0.8em;
   margin-bottom: 0.25em;
   font-family: var(--heading-font-family);
-  font-weight: var(--mg-font-weight-bold);
-  line-height: var(--mg-line-height-heading);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-heading);
   scroll-margin: 40px;
 }
 
@@ -304,16 +304,16 @@ main .button-container {
 }
 
 main a.button:any-link {
-  min-height: var(--mg-button-height);
-  border: var(--mg-button-border);
+  min-height: var(--button-height);
+  border: var(--button-border);
   border-radius: 0;
-  padding: var(--mg-button-padding);
+  padding: var(--button-padding);
   background: none;
   color: inherit;
-  font-family: var(--mg-font-label);
-  font-size: var(--mg-font-size-label);
-  font-weight: var(--mg-font-weight-regular);
-  letter-spacing: var(--mg-letter-spacing);
+  font-family: var(--font-label);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--letter-spacing);
   text-decoration: none;
   text-transform: uppercase;
 }
@@ -325,7 +325,7 @@ main a.button:any-link:focus-visible {
 }
 
 main .section.light a.button:any-link {
-  border-color: var(--mg-color-black);
+  border-color: var(--color-black);
 }
 
 a:focus-visible,
@@ -379,7 +379,7 @@ html.panels-ready.gsap-scrolling:has(main > .section) {
 main > .section {
   box-sizing: border-box;
   position: relative;
-  min-height: var(--mg-panel-height);
+  min-height: var(--panel-height);
   margin: 0;
   padding: 0;
   scroll-snap-align: start;
@@ -394,7 +394,7 @@ main > .section > div {
 
 main > .section > .default-content-wrapper {
   max-width: 1200px;
-  padding: 0 var(--mg-space-edge);
+  padding: 0 var(--space-edge);
 }
 
 /* the fixed section indicator's host is not a panel */
@@ -422,7 +422,7 @@ main .section.highlight {
 
 main .section.dark {
   background-color: var(--dark-color);
-  color: var(--mg-color-white);
+  color: var(--color-white);
 }
 
 @media (prefers-reduced-motion: no-preference) {

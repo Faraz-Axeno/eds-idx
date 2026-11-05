@@ -8,11 +8,11 @@ main > .section.mg-timeline-container {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  min-height: var(--mg-panel-height, 100svh);
+  min-height: var(--panel-height, 100svh);
   padding-top: var(--nav-height, 64px);
   overflow: hidden;
-  background-color: var(--mg-color-white);
-  color: var(--mg-color-black);
+  background-color: var(--color-white);
+  color: var(--color-black);
 }
 
 /* auto margins from the global `.section > div` rule disable flex stretching */
@@ -30,7 +30,7 @@ main > .section > .mg-timeline-wrapper {
 main > .section.mg-timeline-container .default-content-wrapper {
   box-sizing: border-box;
   max-width: none;
-  padding: 0 var(--mg-space-edge);
+  padding: 0 var(--space-edge);
 }
 
 main > .section.mg-timeline-container .default-content-wrapper > ol,
@@ -46,42 +46,42 @@ main > .section.mg-timeline-container .default-content-wrapper > ol > li,
 main > .section.mg-timeline-container .default-content-wrapper > ul > li {
   margin: 0;
   padding: 12px 20px;
-  border-bottom: 1px solid var(--mg-color-black);
-  font-family: var(--mg-font-body);
-  font-size: var(--mg-font-size-caption);
-  font-weight: var(--mg-font-weight-regular);
+  border-bottom: 1px solid var(--color-black);
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
   line-height: 16px;
-  letter-spacing: var(--mg-letter-spacing);
+  letter-spacing: var(--letter-spacing);
   text-align: center;
-  color: var(--mg-color-ink);
+  color: var(--color-ink);
   cursor: pointer;
 }
 
 main > .section.mg-timeline-container .default-content-wrapper > h2 {
   margin: 24px 0 0;
-  font-family: var(--mg-font-display);
-  font-size: var(--mg-font-size-heading);
-  font-weight: var(--mg-font-weight-bold);
+  font-family: var(--font-display);
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-bold);
   line-height: 1.122;
-  letter-spacing: var(--mg-letter-spacing);
+  letter-spacing: var(--letter-spacing);
   text-align: left;
-  color: var(--mg-color-black);
+  color: var(--color-black);
 }
 
 /* ---------- block ---------- */
 .mg-timeline {
-  --mg-timeline-progress: 0;
-  --mg-timeline-count: 1;
-  --mg-timeline-edge: var(--mg-space-edge, 16px);
-  --mg-timeline-card: 140px;
-  --mg-timeline-card-active: min(260px, 68vw);
-  --mg-timeline-card-pad: 10px;
-  --mg-timeline-gap: 24px;
-  --mg-timeline-year-offset: 54px;
-  --mg-timeline-slide-max: 300px;
-  --mg-timeline-tick-gap: 350px;
-  --mg-timeline-transition: var(--mg-transition-duration, 600ms);
-  --mg-timeline-ease: var(--mg-transition-ease, ease);
+  --timeline-progress: 0;
+  --timeline-count: 1;
+  --timeline-edge: var(--space-edge, 16px);
+  --timeline-card: 140px;
+  --timeline-card-active: min(260px, 68vw);
+  --timeline-card-pad: 10px;
+  --timeline-gap: 24px;
+  --timeline-year-offset: 54px;
+  --timeline-slide-max: 300px;
+  --timeline-tick-gap: 350px;
+  --timeline-transition: var(--transition-duration, 600ms);
+  --timeline-ease: var(--transition-ease, ease);
 
   position: relative;
   display: grid;
@@ -92,9 +92,9 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
   row-gap: 16px;
   width: 100%;
   margin-top: 16px;
-  font-family: var(--mg-font-body);
-  letter-spacing: var(--mg-letter-spacing);
-  color: var(--mg-color-black);
+  font-family: var(--font-body);
+  letter-spacing: var(--letter-spacing);
+  color: var(--color-black);
 }
 
 /* ---------- ruler under the cards (source .timeline-scales: ticks only, no year labels) ---------- */
@@ -104,7 +104,7 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
   display: none;
   min-width: 0;
   height: 35px;
-  margin: 0 var(--mg-timeline-edge);
+  margin: 0 var(--timeline-edge);
   overflow: clip visible;
 }
 
@@ -113,21 +113,21 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
   position: absolute;
   bottom: 0;
   left: 50%;
-  width: calc(var(--mg-timeline-tick-gap) * var(--mg-timeline-count) * 3);
+  width: calc(var(--timeline-tick-gap) * var(--timeline-count) * 3);
   height: 100%;
 
   /* minor ticks: 1px #a9a9a9, 10px tall, 20 between majors */
-  background: linear-gradient(to right, var(--mg-color-grey-300) 1px, transparent 1px)
-    left bottom / calc(var(--mg-timeline-tick-gap) / 21) 10px repeat-x;
-  transform: translateX(calc(var(--mg-timeline-ruler-index, 0) * var(--mg-timeline-tick-gap) * -1));
-  transition: transform var(--mg-timeline-transition) var(--mg-timeline-ease);
+  background: linear-gradient(to right, var(--color-grey-300) 1px, transparent 1px)
+    left bottom / calc(var(--timeline-tick-gap) / 21) 10px repeat-x;
+  transform: translateX(calc(var(--timeline-ruler-index, 0) * var(--timeline-tick-gap) * -1));
+  transition: transform var(--timeline-transition) var(--timeline-ease);
 }
 
 /* major tick per milestone: 1px #a9a9a9, 25px; clickable (21px hit area) */
 .mg-timeline .mg-timeline-tick {
   position: absolute;
   bottom: 0;
-  left: calc(var(--mg-timeline-tick-index) * var(--mg-timeline-tick-gap) - 10px);
+  left: calc(var(--timeline-tick-index) * var(--timeline-tick-gap) - 10px);
   width: 21px;
   height: 100%;
   margin: 0;
@@ -144,19 +144,19 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
   left: 10px;
   width: 1px;
   height: 25px;
-  background-color: var(--mg-color-grey-300);
-  transition: height var(--mg-timeline-transition) var(--mg-timeline-ease),
-    background-color var(--mg-timeline-transition) var(--mg-timeline-ease);
+  background-color: var(--color-grey-300);
+  transition: height var(--timeline-transition) var(--timeline-ease),
+    background-color var(--timeline-transition) var(--timeline-ease);
 }
 
 /* active milestone: tall dark marker (source: 40px, rgb(11 10 6)) */
 .mg-timeline .mg-timeline-tick[data-active='true']::after {
   height: 40px;
-  background-color: var(--mg-color-night, #0b0906);
+  background-color: var(--color-night, #0b0906);
 }
 
 .mg-timeline .mg-timeline-tick:focus-visible {
-  outline: 1px solid var(--mg-color-black);
+  outline: 1px solid var(--color-black);
   outline-offset: -1px;
 }
 
@@ -175,7 +175,7 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
   grid-area: viewport;
   position: relative;
   min-width: 0;
-  margin: 0 var(--mg-timeline-edge);
+  margin: 0 var(--timeline-edge);
   overflow: hidden;
   touch-action: pan-y;
   user-select: none;
@@ -186,7 +186,7 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
 }
 
 .mg-timeline .mg-timeline-viewport:focus-visible {
-  outline: 2px solid var(--mg-color-black);
+  outline: 2px solid var(--color-black);
   outline-offset: 2px;
 }
 
@@ -194,12 +194,12 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: var(--mg-timeline-gap);
+  gap: var(--timeline-gap);
   margin: 0;
   padding: 0;
   list-style: none;
   cursor: grab;
-  transition: transform var(--mg-timeline-transition) var(--mg-timeline-ease);
+  transition: transform var(--timeline-transition) var(--timeline-ease);
 }
 
 .mg-timeline .mg-timeline-viewport[data-dragging='true'] .mg-timeline-slides {
@@ -212,11 +212,11 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto;
-  flex: 0 0 var(--mg-timeline-card);
-  width: var(--mg-timeline-card);
+  flex: 0 0 var(--timeline-card);
+  width: var(--timeline-card);
   margin: 0;
-  max-height: var(--mg-timeline-slide-max);
-  padding: var(--mg-timeline-card-pad);
+  max-height: var(--timeline-slide-max);
+  padding: var(--timeline-card-pad);
 
   /* source drag cursor (hotspot 55 30), `grab` fallback */
   cursor: url('drag.svg') 55 30, grab;
@@ -231,21 +231,21 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
 
 .mg-timeline .mg-timeline-slide[data-active='true'] {
   z-index: 1;
-  flex-basis: var(--mg-timeline-card-active);
-  width: var(--mg-timeline-card-active);
+  flex-basis: var(--timeline-card-active);
+  width: var(--timeline-card-active);
 }
 
 /* year label sits right-aligned just above the image */
 .mg-timeline .mg-timeline-slide-year {
   grid-area: 1 / 1;
-  margin: var(--mg-timeline-year-offset) 2px 4px 0;
-  font-family: var(--mg-font-display);
+  margin: var(--timeline-year-offset) 2px 4px 0;
+  font-family: var(--font-display);
   font-size: 16.2px;
-  font-weight: var(--mg-font-weight-regular);
+  font-weight: var(--font-weight-regular);
   line-height: 16.2px;
-  letter-spacing: var(--mg-letter-spacing);
+  letter-spacing: var(--letter-spacing);
   text-align: right;
-  color: var(--mg-color-black);
+  color: var(--color-black);
 }
 
 .mg-timeline .mg-timeline-slide[data-active='true'] .mg-timeline-slide-year {
@@ -281,16 +281,16 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
   cursor: pointer;
   font-size: 10.8px;
   line-height: 13px;
-  color: var(--mg-color-white);
+  color: var(--color-white);
 }
 
 .mg-timeline .mg-timeline-slide-title {
   margin: 0;
-  font-family: var(--mg-font-body);
+  font-family: var(--font-body);
   font-size: inherit;
-  font-weight: var(--mg-font-weight-regular);
+  font-weight: var(--font-weight-regular);
   line-height: inherit;
-  letter-spacing: var(--mg-letter-spacing);
+  letter-spacing: var(--letter-spacing);
   color: inherit;
 }
 
@@ -330,10 +330,10 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
 
 @media (width >= 600px) {
   .mg-timeline {
-    --mg-timeline-card: 200px;
-    --mg-timeline-card-active: 340px;
-    --mg-timeline-year-offset: 66px;
-    --mg-timeline-slide-max: 380px;
+    --timeline-card: 200px;
+    --timeline-card-active: 340px;
+    --timeline-year-offset: 66px;
+    --timeline-slide-max: 380px;
   }
 }
 
@@ -350,11 +350,11 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
      band above the slides = 8vh, slide box = 46vh (414px @900px tall), ruler 40px below.
      Card widths / year offset scale with the box (430px / 250px / 98px @900px tall). */
   .mg-timeline {
-    --mg-timeline-box: 46svh;
-    --mg-timeline-card-active: calc(var(--mg-timeline-box) * 1.04);
-    --mg-timeline-card: calc(var(--mg-timeline-box) * 0.604);
-    --mg-timeline-year-offset: calc(var(--mg-timeline-box) * 0.237);
-    --mg-timeline-slide-max: calc(var(--mg-timeline-box) - 2 * var(--mg-timeline-card-pad));
+    --timeline-box: 46svh;
+    --timeline-card-active: calc(var(--timeline-box) * 1.04);
+    --timeline-card: calc(var(--timeline-box) * 0.604);
+    --timeline-year-offset: calc(var(--timeline-box) * 0.237);
+    --timeline-slide-max: calc(var(--timeline-box) - 2 * var(--timeline-card-pad));
 
     row-gap: 40px;
     margin-top: 8svh;
@@ -362,7 +362,7 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
 
   /* the slide band keeps its full height so the ruler sits at the same place as the source */
   .mg-timeline .mg-timeline-viewport {
-    height: var(--mg-timeline-box);
+    height: var(--timeline-box);
   }
 
   /* source active image starts 46px below the card top */
@@ -383,7 +383,7 @@ main > .section.mg-timeline-container .default-content-wrapper > h2 {
    tightens only the band above the slides (5vh, e.g. 31px @625px tall) */
 @media (width >= 900px) and (height < 820px) {
   .mg-timeline {
-    --mg-timeline-box: 44svh;
+    --timeline-box: 44svh;
 
     margin-top: 5svh;
   }

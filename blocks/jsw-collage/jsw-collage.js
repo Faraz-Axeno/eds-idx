@@ -27,7 +27,7 @@ export default function decorate(block) {
   imageRows.forEach((row, i) => {
     row.className = 'jsw-collage-card';
     row.dataset.slot = i < SLOTS ? i + 1 : 'extra';
-    row.style.setProperty('--jsw-i', i);
+    row.style.setProperty('--item-index', i);
     row.querySelector('img')?.setAttribute('loading', 'lazy');
     cards.append(row);
   });

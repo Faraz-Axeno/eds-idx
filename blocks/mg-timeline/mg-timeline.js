@@ -132,7 +132,7 @@ export default function decorate(block) {
       tick.dataset.targetSlide = i;
       tick.dataset.year = item.year;
       tick.dataset.active = 'false';
-      tick.style.setProperty('--mg-timeline-tick-index', copy * items.length + i);
+      tick.style.setProperty('--timeline-tick-index', copy * items.length + i);
       const label = document.createElement('span');
       label.className = 'mg-timeline-tick-label';
       label.textContent = `${item.year}${item.title ? `: ${item.title}` : ''}`;
@@ -190,7 +190,7 @@ export default function decorate(block) {
 
   block.replaceChildren(viewport, bar, status);
   block.dataset.slideCount = slides.length;
-  block.style.setProperty('--mg-timeline-count', Math.max(slides.length, 1));
+  block.style.setProperty('--timeline-count', Math.max(slides.length, 1));
   if (slides.length < 2) block.dataset.single = 'true';
 
   let current = 0;
@@ -208,7 +208,7 @@ export default function decorate(block) {
     if (!slides.length) return;
     current = Math.max(0, Math.min(index, slides.length - 1));
     block.dataset.activeSlide = current;
-    block.style.setProperty('--mg-timeline-progress', slides.length > 1 ? current / (slides.length - 1) : 1);
+    block.style.setProperty('--timeline-progress', slides.length > 1 ? current / (slides.length - 1) : 1);
     slides.forEach((slide, i) => {
       const isActive = i === current;
       slide.dataset.active = isActive ? 'true' : 'false';
@@ -225,7 +225,7 @@ export default function decorate(block) {
       else btn.removeAttribute('aria-current');
     });
     // centre the active (middle-copy) tick under the ruler
-    block.style.setProperty('--mg-timeline-ruler-index', slides.length + current);
+    block.style.setProperty('--timeline-ruler-index', slides.length + current);
     position();
     if (announce) status.textContent = `${items[current].year}${items[current].title ? `: ${items[current].title}` : ''}`;
   };

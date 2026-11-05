@@ -699,7 +699,7 @@ main > .section > .open-roles-wrapper {
      and a section a screen tall (styles/styles.css) would then grow it without end; there a screen
      counts as at most 1000px, set on the section holding the block only */
   main > .section:has(> .open-roles-wrapper > &[data-aue-resource]) {
-    --mg-panel-height: min(100svh, 1000px);
+    --panel-height: min(100svh, 1000px);
   }
 
   /* every text keeps to its space, ending in "…" when it runs out of it (the whole text as a

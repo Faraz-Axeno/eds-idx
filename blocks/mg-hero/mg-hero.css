@@ -12,9 +12,9 @@ main > .section > .mg-hero-wrapper {
   min-height: 100svh;
   overflow: hidden;
   box-sizing: border-box;
-  color: var(--mg-color-white, #fff);
-  letter-spacing: var(--mg-letter-spacing, 0.16px);
-  background-color: var(--mg-color-dark, #111);
+  color: var(--color-white, #fff);
+  letter-spacing: var(--letter-spacing, 0.16px);
+  background-color: var(--color-dark, #111);
 }
 
 /* media layer: picture covers the whole block */
@@ -72,12 +72,12 @@ main > .section > .mg-hero-wrapper {
 .mg-hero .mg-hero-title {
   margin: 0;
   padding: 0;
-  font-family: var(--mg-font-display, sequel, 'Helvetica Neue', arial, sans-serif);
+  font-family: var(--font-display, sequel, 'Helvetica Neue', arial, sans-serif);
   font-size: 24.9px;
-  font-weight: var(--mg-font-weight-bold, 700);
+  font-weight: var(--font-weight-bold, 700);
   line-height: 32px;
-  letter-spacing: var(--mg-letter-spacing, 0.16px);
-  color: var(--mg-color-white, #fff);
+  letter-spacing: var(--letter-spacing, 0.16px);
+  color: var(--color-white, #fff);
   list-style: none;
 }
 
@@ -105,12 +105,12 @@ main > .section > .mg-hero-wrapper {
   justify-content: space-between;
   gap: 24px;
   box-sizing: border-box;
-  height: var(--mg-button-height, 50px);
+  height: var(--button-height, 50px);
   margin: 0;
-  padding: var(--mg-button-padding, 8px 20px);
-  border: var(--mg-button-border, 1px solid #f4f0ee);
+  padding: var(--button-padding, 8px 20px);
+  border: var(--button-border, 1px solid #f4f0ee);
   border-radius: 0;
-  color: var(--mg-color-white, #fff);
+  color: var(--color-white, #fff);
   text-decoration: none;
   background: transparent;
 }
@@ -122,11 +122,11 @@ main > .section > .mg-hero-wrapper {
 
 .mg-hero .mg-hero-cta-label {
   display: inline-block;
-  font-family: var(--mg-font-label, roboto, 'Helvetica Neue', arial, sans-serif);
-  font-size: var(--mg-font-size-label, 14px);
-  font-weight: var(--mg-font-weight-regular, 400);
+  font-family: var(--font-label, roboto, 'Helvetica Neue', arial, sans-serif);
+  font-size: var(--font-size-label, 14px);
+  font-weight: var(--font-weight-regular, 400);
   line-height: 32px;
-  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  letter-spacing: var(--letter-spacing, 0.16px);
   white-space: nowrap;
 }
 
@@ -184,14 +184,14 @@ main > .section > .mg-hero-wrapper {
   /* source asks for "Dienstag", which never loads, so browsers show their default serif */
   font-family: dienstag, 'Times New Roman', times, serif;
   font-size: 13px;
-  font-weight: var(--mg-font-weight-bold, 700);
+  font-weight: var(--font-weight-bold, 700);
   line-height: normal;
-  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  letter-spacing: var(--letter-spacing, 0.16px);
   text-align: start;
   text-decoration: none;
   white-space: nowrap;
-  color: var(--mg-color-white, #fff);
-  background-color: var(--mg-pill-bg, #828282);
+  color: var(--color-white, #fff);
+  background-color: var(--pill-bg, #828282);
   box-shadow: 0 4px 12px 0 rgb(0 0 0 / 20%);
 }
 
@@ -200,7 +200,7 @@ main > .section > .mg-hero-wrapper {
 }
 
 .mg-hero-pills .mg-hero-pill:nth-child(2) a.mg-hero-pill-link:any-link {
-  background-color: var(--mg-color-grey-600, #5f5f5f);
+  background-color: var(--color-grey-600, #5f5f5f);
 }
 
 .mg-hero-pills .mg-hero-pill-close {
@@ -214,14 +214,14 @@ main > .section > .mg-hero-wrapper {
   padding: 0;
   border: 0;
   border-radius: 50%;
-  font-family: var(--mg-font-body, inter, 'Helvetica Neue', arial, sans-serif);
+  font-family: var(--font-body, inter, 'Helvetica Neue', arial, sans-serif);
   font-size: 10px;
   font-weight: 800;
   line-height: 20px;
   text-align: center;
   cursor: pointer;
-  color: var(--mg-color-white, #fff);
-  background-color: var(--mg-color-black, #000);
+  color: var(--color-white, #fff);
+  background-color: var(--color-black, #000);
 }
 
 .mg-hero-pills .mg-hero-pill-close::before {
@@ -250,8 +250,8 @@ main > .section > .mg-hero-wrapper {
   }
 
   .mg-hero-pills a.mg-hero-pill-link:any-link {
-    padding: var(--mg-pill-padding, 12px 24px);
-    font-size: var(--mg-font-size-body, 16px);
+    padding: var(--pill-padding, 12px 24px);
+    font-size: var(--font-size-body, 16px);
   }
 }
 

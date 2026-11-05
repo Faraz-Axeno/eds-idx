@@ -9,25 +9,25 @@ main > .section > .mg-vehicles-wrapper {
 }
 
 .mg-vehicles {
-  --mg-vehicles-index: 0;
-  --mg-vehicles-count: 1;
-  --mg-vehicles-edge: 36px;
-  --mg-vehicles-panel: 288px;
-  --mg-vehicles-controls-bottom: calc(var(--mg-vehicles-panel) + 30px);
-  --mg-vehicles-transition: var(--mg-transition-duration, 600ms) var(--mg-transition-ease, ease);
+  --vehicles-index: 0;
+  --vehicles-count: 1;
+  --vehicles-edge: 36px;
+  --vehicles-panel: 288px;
+  --vehicles-controls-bottom: calc(var(--vehicles-panel) + 30px);
+  --vehicles-transition: var(--transition-duration, 600ms) var(--transition-ease, ease);
 
   position: relative;
   isolation: isolate;
   min-height: 100vh;
-  min-height: var(--mg-panel-height, 100svh);
+  min-height: var(--panel-height, 100svh);
   overflow: hidden;
-  color: var(--mg-color-white);
-  background-color: var(--mg-color-white);
+  color: var(--color-white);
+  background-color: var(--color-white);
 }
 
 /* theme images: day visible by default, night cross-fades in */
 .mg-vehicles [data-theme-image] {
-  transition: opacity var(--mg-vehicles-transition);
+  transition: opacity var(--vehicles-transition);
 }
 
 .mg-vehicles [data-theme-image='night'] {
@@ -47,7 +47,7 @@ main > .section > .mg-vehicles-wrapper {
 /* background layer (sits above the white mobile panel area) */
 .mg-vehicles .mg-vehicles-backgrounds {
   position: absolute;
-  inset: 0 0 var(--mg-vehicles-panel);
+  inset: 0 0 var(--vehicles-panel);
   z-index: -1;
 }
 
@@ -103,7 +103,7 @@ main > .section > .mg-vehicles-wrapper {
 /* source (Swiper, loop): 300ms ease, always in the arrow's direction */
 .mg-vehicles .mg-vehicles-slide-media {
   position: absolute;
-  inset: 0 0 var(--mg-vehicles-panel);
+  inset: 0 0 var(--vehicles-panel);
   transition: transform 300ms ease;
 }
 
@@ -120,10 +120,10 @@ main > .section > .mg-vehicles-wrapper {
   flex-direction: column;
   align-items: flex-start;
   box-sizing: border-box;
-  min-height: var(--mg-vehicles-panel);
+  min-height: var(--vehicles-panel);
   padding: 36px 32px;
-  color: var(--mg-color-black);
-  background-color: var(--mg-color-white);
+  color: var(--color-black);
+  background-color: var(--color-white);
   transition: opacity 0.8s cubic-bezier(0.39, 0.575, 0.565, 1) 300ms;
 }
 
@@ -135,11 +135,11 @@ main > .section > .mg-vehicles-wrapper {
 
 .mg-vehicles .mg-vehicles-slide-title {
   margin: 0;
-  font-family: var(--mg-font-display);
+  font-family: var(--font-display);
   font-size: clamp(30px, 15px + 0.1vh + 2vw, 50px);
-  font-weight: var(--mg-font-weight-bold);
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
-  letter-spacing: var(--mg-letter-spacing);
+  letter-spacing: var(--letter-spacing);
   color: inherit;
 }
 
@@ -148,10 +148,10 @@ main > .section > .mg-vehicles-wrapper {
   max-width: 100%;
   margin: 16px 0 0;
   overflow: hidden;
-  font-family: var(--mg-font-body);
-  font-size: var(--mg-font-size-body);
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
   line-height: 24px;
-  letter-spacing: var(--mg-letter-spacing);
+  letter-spacing: var(--letter-spacing);
   text-align: left;
   opacity: 0.5;
   -webkit-line-clamp: 2;
@@ -180,13 +180,13 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link {
   padding: 8px 20px;
   border: 0;
   border-radius: 0;
-  color: var(--mg-color-white);
-  background-color: var(--mg-color-black);
-  font-family: var(--mg-font-label);
-  font-size: var(--mg-font-size-label);
-  font-weight: var(--mg-font-weight-regular);
+  color: var(--color-white);
+  background-color: var(--color-black);
+  font-family: var(--font-label);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-regular);
   line-height: 32px;
-  letter-spacing: var(--mg-letter-spacing);
+  letter-spacing: var(--letter-spacing);
   text-decoration: none;
   text-transform: uppercase;
 }
@@ -211,7 +211,7 @@ main .mg-vehicles .mg-vehicles-slide-actions a.mg-vehicles-link:any-link::after 
 
 /* source has no hover change on either CTA; keep a visible focus ring */
 main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
-  outline: 2px solid var(--mg-color-black);
+  outline: 2px solid var(--color-black);
   outline-offset: 2px;
 }
 
@@ -236,8 +236,8 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
   border-radius: 100%;
   cursor: pointer;
   pointer-events: auto;
-  color: var(--mg-color-white);
-  background-color: var(--mg-arrow-bg);
+  color: var(--color-white);
+  background-color: var(--arrow-bg);
   /* stylelint-disable-next-line property-no-vendor-prefix -- Safari < 18 */
   -webkit-backdrop-filter: blur(44px);
   backdrop-filter: blur(44px);
@@ -245,12 +245,12 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
 }
 
 .mg-vehicles .mg-vehicles-nav .mg-vehicles-prev {
-  left: var(--mg-vehicles-edge);
+  left: var(--vehicles-edge);
   transform: translateY(-50%) rotate(180deg);
 }
 
 .mg-vehicles .mg-vehicles-nav .mg-vehicles-next {
-  right: var(--mg-vehicles-edge);
+  right: var(--vehicles-edge);
 }
 
 .mg-vehicles .mg-vehicles-nav button::before {
@@ -261,7 +261,7 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
 }
 
 .mg-vehicles .mg-vehicles-nav button:focus-visible {
-  outline: 2px solid var(--mg-color-white);
+  outline: 2px solid var(--color-white);
   outline-offset: 2px;
 }
 
@@ -270,7 +270,7 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
   position: absolute;
   left: 28px;
   right: 28px;
-  bottom: var(--mg-vehicles-controls-bottom);
+  bottom: var(--vehicles-controls-bottom);
   z-index: 2;
   display: flex;
   align-items: flex-end;
@@ -289,7 +289,7 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
   cursor: pointer;
   pointer-events: auto;
   background: url('./icon-theme-day.svg') center / contain no-repeat;
-  transition: background-image var(--mg-vehicles-transition);
+  transition: background-image var(--vehicles-transition);
 }
 
 .mg-vehicles .mg-vehicles-theme-toggle[aria-pressed='true'] {
@@ -297,7 +297,7 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
 }
 
 .mg-vehicles .mg-vehicles-theme-toggle:focus-visible {
-  outline: 2px solid var(--mg-color-white);
+  outline: 2px solid var(--color-white);
   outline-offset: 2px;
 }
 
@@ -335,17 +335,17 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
 }
 
 .mg-vehicles .mg-vehicles-progress-segment:focus-visible {
-  outline: 2px solid var(--mg-color-white);
+  outline: 2px solid var(--color-white);
   outline-offset: 4px;
 }
 
 .mg-vehicles .mg-vehicles-progress-bar {
   position: absolute;
   inset: 0 auto 0 0;
-  width: calc(100% / var(--mg-vehicles-count));
-  background-color: var(--mg-color-white);
-  transform: translateX(calc(var(--mg-vehicles-index) * 100%));
-  transition: transform var(--mg-vehicles-transition);
+  width: calc(100% / var(--vehicles-count));
+  background-color: var(--color-white);
+  transform: translateX(calc(var(--vehicles-index) * 100%));
+  transition: transform var(--vehicles-transition);
 }
 
 .mg-vehicles .mg-vehicles-status {
@@ -359,17 +359,17 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
 
 @media (width >= 900px) {
   .mg-vehicles {
-    --mg-vehicles-panel: 0px;
-    --mg-vehicles-controls-bottom: 30px;
+    --vehicles-panel: 0px;
+    --vehicles-controls-bottom: 30px;
 
-    background-color: var(--mg-color-dark);
+    background-color: var(--color-dark);
   }
 
   .mg-vehicles .mg-vehicles-slide-content {
-    inset: auto auto 110px var(--mg-vehicles-edge);
+    inset: auto auto 110px var(--vehicles-edge);
     min-height: 0;
     padding: 0;
-    color: var(--mg-color-white);
+    color: var(--color-white);
     background-color: transparent;
   }
 
@@ -388,7 +388,7 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
 
   main .mg-vehicles .mg-vehicles-slide-actions a:any-link {
     width: 320px;
-    border: var(--mg-button-border);
+    border: var(--button-border);
     color: inherit;
     background-color: transparent;
   }
@@ -401,7 +401,7 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
   }
 
   main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
-    outline-color: var(--mg-color-white);
+    outline-color: var(--color-white);
   }
 
   .mg-vehicles .mg-vehicles-nav {
@@ -409,8 +409,8 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
   }
 
   .mg-vehicles .mg-vehicles-controls {
-    left: var(--mg-vehicles-edge);
-    right: var(--mg-vehicles-edge);
+    left: var(--vehicles-edge);
+    right: var(--vehicles-edge);
     height: 41px;
   }
 
@@ -427,7 +427,7 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
 
 @media (width >= 1440px) {
   .mg-vehicles {
-    --mg-vehicles-controls-bottom: 66px;
+    --vehicles-controls-bottom: 66px;
   }
 
   .mg-vehicles .mg-vehicles-slide-content {
@@ -443,8 +443,8 @@ main .mg-vehicles .mg-vehicles-slide-actions a:any-link:focus-visible {
   }
 
   .mg-vehicles .mg-vehicles-nav button {
-    width: var(--mg-arrow-size);
-    height: var(--mg-arrow-size);
+    width: var(--arrow-size);
+    height: var(--arrow-size);
   }
 }
 
