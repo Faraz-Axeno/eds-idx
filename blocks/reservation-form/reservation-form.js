@@ -20,6 +20,8 @@
  * In Universal Editor each placeholder field's instrumentation is on its input (the city list
  * placeholder on the select, the city options on the select's box), so picking the field in
  * the content tree outlines that input.
+ * Every field is required: one focused and then left empty is marked at once (.is-invalid, with
+ * its message), and cleared as soon as something is typed in it or a city is chosen.
  * The button checks and cleans every field (RULES below; a field that fails gets .is-invalid
  * until it is corrected), builds the payload from the cleaned values (HTML tags stripped),
  * announces it (a "reservation:submit" event on the block, for a later backend), keeps the first
@@ -663,17 +665,39 @@ export default function decorate(block) {
     const result = RULES[key](field.value, context);
     const { error } = result;
     field.classList.toggle('is-invalid', Boolean(error));
+    // failing because it is empty (.is-empty): the warning goes as soon as anything is typed
+    field.classList.toggle('is-empty', Boolean(error) && !String(field.value).trim());
     if (error) field.setAttribute('aria-invalid', 'true');
     else field.removeAttribute('aria-invalid');
     errors.get(field).textContent = error;
     return result;
   };
+  // a field's warning taken away
+  const clear = (field) => {
+    field.classList.remove('is-invalid', 'is-empty');
+    field.removeAttribute('aria-invalid');
+    errors.get(field).textContent = '';
+  };
   Object.entries(fields).forEach(([key, field]) => {
+    // every field required (the browser's own checks stay off: the form is novalidate)
+    field.required = true;
     const recheck = () => {
+      // left empty, then typed in (or a city chosen): the warning goes at once; the other rules
+      // wait for PROCEED
+      if (field.classList.contains('is-empty')) {
+        if (String(field.value).trim()) clear(field);
+        return;
+      }
       if (field.classList.contains('is-invalid')) check(key);
     };
     field.addEventListener('input', recheck);
     field.addEventListener('change', recheck);
+    // focused, then left empty: marked at once, with its message (e.g. "Enter your first name.");
+    // not while authoring in Universal Editor's edit mode
+    field.addEventListener('blur', () => {
+      if (editing && !document.documentElement.classList.contains('adobe-ue-preview')) return;
+      if (!String(field.value).trim()) check(key);
+    });
   });
 
   // to a page (the confirmation or failure page); false when none is set
