@@ -46,6 +46,22 @@ import { moveInstrumentation } from '../../scripts/scripts.js';
 // TODO: Add actual Razorpay Public Key here
 const RAZORPAY_KEY = 'YOUR_RAZORPAY_KEY_HERE';
 
+// the New Science fonts (the team's Adobe Fonts web project: --font-new-science… in styles.css),
+// loaded with the block, once, not blocking the page: until they arrive the fallbacks show
+const FONT_KIT = 'https://use.typekit.net/qil0qom.css';
+
+function loadFontKit() {
+  if (document.querySelector(`link[href="${FONT_KIT}"]`)) return;
+  const preconnect = document.createElement('link');
+  preconnect.rel = 'preconnect';
+  preconnect.href = 'https://use.typekit.net';
+  preconnect.crossOrigin = '';
+  const kit = document.createElement('link');
+  kit.rel = 'stylesheet';
+  kit.href = FONT_KIT;
+  document.head.append(preconnect, kit);
+}
+
 // the file types the block's media accept, by the asset's extension (published images keep
 // their file's: media_….jpg): an asset of another type is not shown, a console warning instead
 const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png']; // general images: backgrounds, photos
@@ -391,6 +407,7 @@ function input(name, placeholder, attrs = {}) {
  * @param {Element} block The block element
  */
 export default function decorate(block) {
+  loadFontKit();
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const [mediaRow, contentRow, formRow, fieldsRow, ...cityRows] = [...block.children];
   const [mediaCell, contentCell, formCell, fieldsCell] = [mediaRow, contentRow, formRow, fieldsRow]
