@@ -1,7 +1,8 @@
 /*
  * The JSW pill navigation (as on /jsw-phase-3, "NEV / Hero") for blocks that bring their own:
- * logo mark + JSW MOTORS wordmark, a list of links, then the white button.
- * Styles: pill-nav.css, beside it (imported by those blocks' stylesheets).
+ * logo mark + JSW MOTORS wordmark, a list of links, then the white button. On phones the pill
+ * holds the logo and the button (its first word), beside it a menu toggle that opens the links
+ * (addMenu). Styles: pill-nav.css, beside it (imported by those blocks' stylesheets).
  * loadPillNav() builds it from the navigation authored once on /jsw-nav (its jsw-nav block), else
  * from the one on /jsw-phase-3.
  */
@@ -53,6 +54,80 @@ const isBareLink = (a) => {
 
 /** a navigation link to show: authored with both its target and its text */
 const isNavLink = (a) => Boolean(a?.getAttribute('href')) && !isBareLink(a);
+
+// phones: the links behind the menu toggle (pill-nav.css, the same breakpoint)
+const PHONE = window.matchMedia('(max-width: 599.98px)');
+
+// the menus built on the page, for their lists' ids
+let menuCount = 0;
+
+/**
+ * phones: the button shows its first word only, the rest (.nav-cta-rest) shown in the open menu
+ * and on wider screens; its whole text stays its name for screen readers. Not in Universal
+ * Editor's markup (an instrumented button), where it is edited as authored
+ * @param {Element} cta the button link
+ */
+function shortenCta(cta) {
+  if (cta.dataset.aueProp || cta.children.length) return;
+  const words = cta.textContent.trim().split(/\s+/);
+  if (words.length < 2) return;
+  const rest = document.createElement('span');
+  rest.className = 'nav-cta-rest';
+  rest.textContent = ` ${words.slice(1).join(' ')}`;
+  if (!cta.hasAttribute('aria-label')) cta.setAttribute('aria-label', words.join(' '));
+  cta.replaceChildren(words[0], rest);
+}
+
+/**
+ * phones: the menu toggle beside the pill; open, the pill becomes the menu (its links, then the
+ * button) over the page, the toggle a close button. Closed by the toggle, Escape (the focus back
+ * on the toggle), the focus leaving the navigation, or the screen growing past phone width.
+ * While it is open the page behind it stands still: wheel and touch scrolling are cancelled
+ * unless they scroll the open menu (iOS Safari scrolls through overflow: hidden by touch)
+ * @param {Element} nav the <nav>
+ * @param {Element} bar the pill
+ * @param {Element} list its links
+ */
+function addMenu(nav, bar, list) {
+  menuCount += 1;
+  list.id = `nav-menu-${menuCount}`;
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'nav-toggle';
+  toggle.setAttribute('aria-controls', list.id);
+  toggle.innerHTML = '<span class="nav-toggle-icon" aria-hidden="true"></span>';
+
+  const holdPage = (e) => {
+    if (bar.contains(e.target) && bar.scrollHeight > bar.clientHeight) return;
+    if (e.cancelable) e.preventDefault();
+  };
+  const listen = (on, handlers) => handlers.forEach(([target, type, fn, options]) => (on
+    ? target.addEventListener(type, fn, options) : target.removeEventListener(type, fn, options)));
+  let handlers = [];
+  const setOpen = (open) => {
+    nav.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+    listen(open, handlers);
+  };
+  handlers = [
+    [window, 'keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      toggle.focus();
+    }],
+    [nav, 'focusout', (e) => { if (!nav.contains(e.relatedTarget)) setOpen(false); }],
+    [window, 'wheel', holdPage, { capture: true, passive: false }],
+    [window, 'touchmove', holdPage, { capture: true, passive: false }],
+  ];
+  toggle.addEventListener('click', () => setOpen(!nav.classList.contains('is-open')));
+  PHONE.addEventListener?.('change', () => {
+    if (!PHONE.matches && nav.classList.contains('is-open')) setOpen(false);
+  });
+  setOpen(false);
+  // after the pill: on phones the row reads [ pill ] [ toggle ]
+  nav.append(toggle);
+}
 
 /**
  * builds the pill navigation from authored parts, moved in with their editor instrumentation:
@@ -119,9 +194,12 @@ export default function buildPillNav({ brand, links = [], cta } = {}) {
     const wrap = document.createElement('p');
     wrap.className = 'nav-cta-wrap';
     plain(cta).classList.add('nav-cta');
+    shortenCta(cta);
     wrap.append(cta);
     inner.append(wrap);
   }
+  // phones: the links behind the menu toggle
+  if (list.children.length) addMenu(nav, inner, list);
   return nav;
 }
 
