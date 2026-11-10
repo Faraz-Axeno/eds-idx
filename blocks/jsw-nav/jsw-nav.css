@@ -55,12 +55,4 @@ main > .section > .jsw-nav-wrapper {
     display: block;
     opacity: 0.45;
   }
-
-  /* phones: the pill navigation is not shown on the JSW pages (pill-nav.css); here it
-     is, so it can still be edited */
-  @media (max-width: 599.98px) {
-    .pill-nav {
-      display: block;
-    }
-  }
 }

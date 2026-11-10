@@ -15,11 +15,29 @@ import buildPillNav, {
   readNavBlock, capNavText, MAX_NAV_LINKS, NAV_TEXT_LIMITS,
 } from './pill-nav.js';
 
+// the New Science fonts of the navigation's links and button (the team's Adobe Fonts web project:
+// --font-new-science in styles.css), loaded with the block on its own page, once, not blocking the
+// page: until they arrive the fallback shows
+const FONT_KIT = 'https://use.typekit.net/qil0qom.css';
+
+function loadFontKit() {
+  if (document.querySelector(`link[href="${FONT_KIT}"]`)) return;
+  const preconnect = document.createElement('link');
+  preconnect.rel = 'preconnect';
+  preconnect.href = 'https://use.typekit.net';
+  preconnect.crossOrigin = '';
+  const kit = document.createElement('link');
+  kit.rel = 'stylesheet';
+  kit.href = FONT_KIT;
+  document.head.append(preconnect, kit);
+}
+
 /**
  * loads and decorates the block
  * @param {Element} block The block element
  */
 export default function decorate(block) {
+  loadFontKit();
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const {
     brand, home, cta, links,
