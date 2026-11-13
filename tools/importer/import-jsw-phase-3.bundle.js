@@ -209,7 +209,7 @@ var CustomImportScript = (() => {
         [hinted(document, "explore", [
           p("EXPLORE"),
           list(document, [
-            ["/jsw-phase-3", "Home"],
+            ["/jsw/jsw-phase-3", "Home"],
             ["#newsroom", "Newsroom"],
             ["#nev-tech", "NEV"],
             ["#register-interest", "Contact Us"]
@@ -232,7 +232,7 @@ var CustomImportScript = (() => {
       }));
       return [{
         element: main,
-        path: "/jsw-phase-3",
+        path: "/jsw/jsw-phase-3",
         report: { title: "jsw-phase-3", blocks: blocks.length }
       }];
     }

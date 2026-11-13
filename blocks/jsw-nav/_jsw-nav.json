@@ -53,7 +53,10 @@
           "valueType": "string",
           "name": "homeLink",
           "label": "Logo link",
-          "description": "Where the logo leads, e.g. the JSW home page."
+          "description": "Where the logo leads, e.g. the JSW home page.",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "aem-content",
@@ -61,7 +64,10 @@
           "name": "cta",
           "label": "Button link",
           "description": "Where the white button leads.",
-          "required": true
+          "required": true,
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -80,7 +86,10 @@
           "valueType": "string",
           "name": "links_link1",
           "label": "Link 1 target",
-          "description": "Optional: a page, a section (/jsw-phase-3#nev-tech) or a URL."
+          "description": "Optional: a page, a section (/jsw/jsw-phase-3#nev-tech) or a URL.",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -97,7 +106,10 @@
           "valueType": "string",
           "name": "links_link2",
           "label": "Link 2 target",
-          "description": "Optional: a page, a section (/jsw-phase-3#nev-tech) or a URL."
+          "description": "Optional: a page, a section (/jsw/jsw-phase-3#nev-tech) or a URL.",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -114,7 +126,10 @@
           "valueType": "string",
           "name": "links_link3",
           "label": "Link 3 target",
-          "description": "Optional: a page, a section (/jsw-phase-3#nev-tech) or a URL."
+          "description": "Optional: a page, a section (/jsw/jsw-phase-3#nev-tech) or a URL.",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -131,7 +146,10 @@
           "valueType": "string",
           "name": "links_link4",
           "label": "Link 4 target",
-          "description": "Optional: a page, a section (/jsw-phase-3#nev-tech) or a URL."
+          "description": "Optional: a page, a section (/jsw/jsw-phase-3#nev-tech) or a URL.",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -154,7 +172,10 @@
           "name": "link",
           "label": "Link URL",
           "description": "Earlier Nav Link: use the block's Link 1-4 fields instead.",
-          "required": true
+          "required": true,
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",

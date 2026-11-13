@@ -3,8 +3,9 @@
  * logo mark + JSW MOTORS wordmark, a list of links, then the white button. On phones the pill
  * holds the logo and the button (its first word), beside it a menu toggle that opens the links
  * (addMenu). Styles: pill-nav.css, beside it (imported by those blocks' stylesheets).
- * loadPillNav() builds it from the navigation authored once on /jsw-nav (its jsw-nav block), else
- * from the one on /jsw-phase-3.
+ * loadPillNav() builds it from the navigation authored once on /jsw/jsw-nav (its jsw-nav block),
+ * else from the one on /jsw/jsw-phase-3 (each at its earlier root address, /jsw-nav and
+ * /jsw-phase-3, while the pages are not yet moved into the /jsw/ folder).
  */
 
 import { moveInstrumentation } from '../../scripts/scripts.js';
@@ -203,23 +204,27 @@ export default function buildPillNav({ brand, links = [], cta } = {}) {
   return nav;
 }
 
-// the page whose hero navigation is the JSW navigation of every JSW page (authored there once)
-const NAV_SOURCE_PAGE = '/jsw-phase-3';
+// the page whose hero navigation is the JSW navigation of every JSW page (authored there once):
+// in the /jsw/ folder, else at its earlier root address (the page not moved yet)
+const NAV_SOURCE_PAGES = ['/jsw/jsw-phase-3', '/jsw-phase-3'];
 
 // shown when that page cannot be read
 const FALLBACK_NAV = '<p>JSW MOTORS</p><ul><li><a href="#nev-tech">NEV TECH</a></li>'
   + '<li><a href="#newsroom">NEWSROOM</a></li></ul><p><a href="#register-interest">REGISTER INTEREST</a></p>';
 
-/** the source page's address here: on the AEM author pages live at /content/{site}/….html */
-function sourcePage() {
-  const root = window.location.pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0];
-  return root ? { page: `${root}${NAV_SOURCE_PAGE}.html`, plain: `${root}${NAV_SOURCE_PAGE}.plain.html` }
-    : { page: NAV_SOURCE_PAGE, plain: `${NAV_SOURCE_PAGE}.plain.html` };
+/** a source page's address here: on the AEM author pages live at /content/{site}/….html */
+function sourcePage(path) {
+  const { pathname } = window.location;
+  // only an author page (….html): in the local preview /content/jsw/… is a folder, not a site
+  const root = pathname.endsWith('.html') ? pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0] : null;
+  return root ? { page: `${root}${path}.html`, plain: `${root}${path}.plain.html` }
+    : { page: path, plain: `${path}.plain.html` };
 }
 
 // the JSW navigation page: its jsw-nav block is the navigation of every JSW page that brings the
-// pill navigation (authored there once); while it is not there, the Phase 3 hero's (above)
-const NAV_PAGE = '/jsw-nav';
+// pill navigation (authored there once); in the /jsw/ folder, else at its earlier root address
+// (the page not moved yet); while neither is there, the Phase 3 hero's (above)
+const NAV_PAGES = ['/jsw/jsw-nav', '/jsw-nav'];
 
 // the links shown in the pill: the jsw-nav block's Link 1-4 (each optional; then any Nav Link
 // items saved before); the editor shows any more dimmed (blocks/jsw-nav)
@@ -240,7 +245,8 @@ export function capNavText(node, limit) {
 /** a page's addresses, this one's first: AEM author /content/{site}/…, preview /content/…, root */
 function pageCandidates(path) {
   const { pathname } = window.location;
-  const siteRoot = pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0];
+  // only an author page (….html): in the local preview /content/jsw/… is a folder, not a site
+  const siteRoot = pathname.endsWith('.html') ? pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0] : null;
   const candidates = pathname.startsWith('/content/')
     ? [siteRoot && `${siteRoot}${path}`, `/content${path}`, path]
     : [path, `/content${path}`];
@@ -293,7 +299,7 @@ export function readNavBlock(block) {
 /** the navigation page's jsw-nav block, as authored (null when it is not there) */
 async function fetchNavBlock() {
   // eslint-disable-next-line no-restricted-syntax
-  for (const url of pageCandidates(NAV_PAGE)) {
+  for (const url of [...new Set(NAV_PAGES.flatMap(pageCandidates))]) {
     try {
       // eslint-disable-next-line no-await-in-loop
       const resp = await fetch(`${url}.plain.html`);
@@ -316,10 +322,10 @@ function stripInstrumentation(root) {
 }
 
 /**
- * the JSW navigation: as authored on /jsw-nav (its jsw-nav block); while that page is not there,
- * as on /jsw-phase-3 (the navigation fields of its immersive-hero block: logo text, links,
- * button), links to a section of that page (#nev-tech) made to open it there; the fallback if
- * neither can be read.
+ * the JSW navigation: as authored on /jsw/jsw-nav (its jsw-nav block; /jsw-nav before the move);
+ * while that page is not there, as on /jsw/jsw-phase-3 (/jsw-phase-3 before the move: the
+ * navigation fields of its immersive-hero block: logo text, links, button), links to a section of
+ * that page (#nev-tech) made to open it there; the fallback if neither can be read.
  * @returns {Promise<Element>} the <nav>
  */
 export async function loadPillNav() {
@@ -338,19 +344,29 @@ export async function loadPillNav() {
     return nav;
   }
 
-  const { page, plain: plainUrl } = sourcePage();
+  // the source page, in the /jsw/ folder first, then at its earlier root address
+  let { page } = sourcePage(NAV_SOURCE_PAGES[0]);
   const cell = document.createElement('div');
-  try {
-    const resp = await fetch(plainUrl);
-    if (!resp.ok) throw new Error(resp.status);
-    const doc = new DOMParser().parseFromString(await resp.text(), 'text/html');
-    const navCell = [...doc.querySelectorAll('.immersive-hero > div > div')]
-      .find((c) => c.querySelector('ul a'));
-    if (!navCell) throw new Error('no navigation');
-    cell.append(...navCell.childNodes);
-  } catch (e) {
-    cell.innerHTML = FALLBACK_NAV;
+  let found = false;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const path of NAV_SOURCE_PAGES) {
+    const source = sourcePage(path);
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const resp = await fetch(source.plain);
+      if (!resp.ok) throw new Error(resp.status);
+      // eslint-disable-next-line no-await-in-loop
+      const doc = new DOMParser().parseFromString(await resp.text(), 'text/html');
+      const navCell = [...doc.querySelectorAll('.immersive-hero > div > div')]
+        .find((c) => c.querySelector('ul a'));
+      if (!navCell) throw new Error('no navigation');
+      cell.append(...navCell.childNodes);
+      ({ page } = source);
+      found = true;
+      break;
+    } catch (e) { /* the next address */ }
   }
+  if (!found) cell.innerHTML = FALLBACK_NAV;
   // it belongs to the other page: no editor instrumentation of it here
   stripInstrumentation(cell);
   cell.querySelectorAll('a[href^="#"]').forEach((a) => a.setAttribute('href', `${page}${a.getAttribute('href')}`));

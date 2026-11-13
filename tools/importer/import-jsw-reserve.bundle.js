@@ -81,8 +81,8 @@ var CustomImportScript = (() => {
           // a made-up test Key ID: the local test page only (authors enter theirs in the editor)
           ["form_checkoutName", el(document, "p", "JSW Motors")],
           ["form_checkoutDescription", el(document, "p", "Vehicle reservation")],
-          ["form_button", link(document, "/jsw-confirmed", "PROCEED")],
-          ["form_failure", link(document, "/jsw-payment-failed", "/jsw-payment-failed")]
+          ["form_button", link(document, "/jsw/jsw-confirmed", "PROCEED")],
+          ["form_failure", link(document, "/jsw/jsw-payment-failed", "/jsw/jsw-payment-failed")]
         ]),
         group(document, [
           ["fields_firstNamePlaceholder", el(document, "p", "First Name*")],
@@ -94,7 +94,7 @@ var CustomImportScript = (() => {
       ];
       const main = document.createElement("div");
       main.append(WebImporter.Blocks.createBlock(document, { name: "reservation-form", cells }));
-      return [{ element: main, path: "/jsw-reserve", report: { title: "jsw-reserve" } }];
+      return [{ element: main, path: "/jsw/jsw-reserve", report: { title: "jsw-reserve" } }];
     }
   };
   return __toCommonJS(import_jsw_reserve_exports);

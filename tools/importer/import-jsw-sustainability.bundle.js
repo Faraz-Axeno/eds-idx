@@ -69,7 +69,7 @@ var CustomImportScript = (() => {
       );
       return [{
         element: main,
-        path: "/jsw-sustainability",
+        path: "/jsw/jsw-sustainability",
         report: { title: "jsw-sustainability", cards: CARDS.length }
       }];
     }
