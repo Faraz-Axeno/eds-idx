@@ -206,7 +206,10 @@
           "valueType": "string",
           "name": "form_button",
           "label": "Button link",
-          "description": "The page opened after a successful payment (the confirmation page)."
+          "description": "The page opened after a successful payment (the confirmation page).",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -224,7 +227,10 @@
           "valueType": "string",
           "name": "form_failure",
           "label": "Failure page link",
-          "description": "The page opened when the payment fails."
+          "description": "The page opened when the payment fails.",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",

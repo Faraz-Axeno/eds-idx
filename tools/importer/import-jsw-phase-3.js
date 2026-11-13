@@ -2,17 +2,17 @@
 /* global WebImporter */
 
 /**
- * JSW Motors NEV Experience page (/jsw-phase-3).
+ * JSW Motors NEV Experience page (/jsw/jsw-phase-3).
  * There is no source site: the page is authored from the design frames
  * (NEV / Hero, Tech 1-3, Collage, Blog, Footer), so the fetched document is ignored and
- * the content is built here. Images are the design photos in content/images/jsw/;
+ * the content is built here. Images are the design photos in content/jsw/images/jsw/;
  * art that was not supplied (charger, bridge, spring, phone app) uses the closest photo
  * as a placeholder with an alt text describing what is actually shown.
  *
  * Sections, in order (one block each):
  *   1. immersive-hero    image | navigation (logo text, links, button) | headline | description + button
  *   2. hotspot-showcase  heading, then one item per powertrain: media (thumbnail + image) | title | description | hotspots
- *   3. parallax-collage  text, then image | position rows (same as /jsw-nev-collage)
+ *   3. parallax-collage  text, then image | position rows (same as /jsw/jsw-nev-collage)
  *   4. blog-carousel     background | heading, then one item per post: image | category | title | summary + link
  *   5. brand-footer      brand | cta | connect | explore
  */
@@ -135,7 +135,7 @@ function techShowcase(document) {
   return WebImporter.Blocks.createBlock(document, { name: 'hotspot-showcase', cells });
 }
 
-// section 3: the same parallax-collage as /jsw-nev-collage ("NEV / Collage" + "NEV / Sustainable"):
+// section 3: the same parallax-collage as /jsw/jsw-nev-collage ("NEV / Collage" + "NEV / Sustainable"):
 // [file, alt, place] in the order of the design: first screen, then second screen
 const COLLAGE = [
   ['engine-black.jpg', 'Electrified engine with carbon intake pipes', 'center-engine'],
@@ -226,7 +226,7 @@ function footer(document) {
       [hinted(document, 'explore', [
         p('EXPLORE'),
         list(document, [
-          ['/jsw-phase-3', 'Home'],
+          ['/jsw/jsw-phase-3', 'Home'],
           ['#newsroom', 'Newsroom'],
           ['#nev-tech', 'NEV'],
           ['#register-interest', 'Contact Us'],
@@ -251,7 +251,7 @@ export default {
 
     return [{
       element: main,
-      path: '/jsw-phase-3',
+      path: '/jsw/jsw-phase-3',
       report: { title: 'jsw-phase-3', blocks: blocks.length },
     }];
   },

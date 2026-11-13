@@ -383,15 +383,19 @@ function retag(node, tag, className) {
 
 /**
  * the button link as it works where the page is open: on the AEM author pages live at
- * /content/{site}/….html, so a site path (/jsw-confirmed) gets the site root and .html there;
- * on aem.page / aem.live the link is used as authored
+ * /content/{site}/….html, so a site path (/jsw/jsw-confirmed) gets the site root and .html there;
+ * in the local preview at /content/… (no .html); on aem.page / aem.live it is used as authored
  */
 function authorUrl(href) {
-  const root = window.location.pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0];
-  if (!root || !href.startsWith('/') || href.startsWith('//')) return href;
+  const { pathname } = window.location;
+  if (!pathname.startsWith('/content/') || !href.startsWith('/') || href.startsWith('//')) return href;
+  // an author page ends in .html; in the local preview /content/jsw/… is a folder, not a site
+  const author = pathname.endsWith('.html');
+  const root = author ? pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0] : '/content';
+  if (!root) return href;
   const [, path, rest] = href.match(/^([^?#]*)(.*)$/);
   const full = path.startsWith('/content/') ? path : `${root}${path}`;
-  return /\.[a-z0-9]+$/i.test(full) ? `${full}${rest}` : `${full}.html${rest}`;
+  return !author || /\.[a-z0-9]+$/i.test(full) ? `${full}${rest}` : `${full}.html${rest}`;
 }
 
 /**

@@ -2,7 +2,7 @@
 /* global WebImporter */
 
 /**
- * JSW footer page (/jsw-footer), from the "Desktop Footer" design frame (no source site: the
+ * JSW footer page (/jsw/jsw-footer), from the "Desktop Footer" design frame (no source site: the
  * fetched document is ignored): one jsw-footer block, the footer of the JSW pages (scripts.js
  * loads this page as their footer, instead of the site's). Its two cells: media (layout,
  * background) | brand (logo, copyright, button, privacy policy, social heading); then its items:
@@ -47,15 +47,15 @@ function image(document, src, alt) {
 // the navigation columns and their links (the design's)
 const COLUMNS = [
   ['TECHNOLOGY', [
-    ['NEVs', '/jsw-phase-3#nev-tech'],
-    ['Pillars', '/jsw-phase-3#pillars'],
-    ['Benefits', '/jsw-phase-3#benefits'],
+    ['NEVs', '/jsw/jsw-phase-3#nev-tech'],
+    ['Pillars', '/jsw/jsw-phase-3#pillars'],
+    ['Benefits', '/jsw/jsw-phase-3#benefits'],
   ]],
   ['EXPLORE', [
-    ['About', '/jsw-phase-3'],
-    ['Newsroom', '/jsw-phase-3#newsroom'],
-    ['Careers', '/jsw-phase-5'],
-    ['Contact Us', '/jsw-phase-3#register-interest'],
+    ['About', '/jsw/jsw-phase-3'],
+    ['Newsroom', '/jsw/jsw-phase-3#newsroom'],
+    ['Careers', '/jsw/jsw-phase-5'],
+    ['Contact Us', '/jsw/jsw-phase-3#register-interest'],
   ]],
 ];
 
@@ -83,7 +83,7 @@ export default {
       [group(document, [
         ['brand_logo', image(document, 'jsw-motors-wordmark.svg', 'JSW Motors')],
         ['brand_copyright', el(document, 'p', '© 2026 JSW Motors  Mumbai, India')],
-        ['brand_ctaButton', link(document, '/jsw-phase-3#register-interest', 'REGISTER INTEREST')],
+        ['brand_ctaButton', link(document, '/jsw/jsw-phase-3#register-interest', 'REGISTER INTEREST')],
         ['brand_privacyPolicy', link(document, '#privacy-policy', 'PRIVACY POLICY')],
         ['brand_socialHeading', el(document, 'p', 'CONNECT')],
       ])],
@@ -102,6 +102,6 @@ export default {
 
     const main = document.createElement('div');
     main.append(WebImporter.Blocks.createBlock(document, { name: 'jsw-footer', cells }));
-    return [{ element: main, path: '/jsw-footer', report: { title: 'jsw-footer' } }];
+    return [{ element: main, path: '/jsw/jsw-footer', report: { title: 'jsw-footer' } }];
   },
 };

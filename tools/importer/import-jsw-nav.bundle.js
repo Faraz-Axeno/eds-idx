@@ -40,21 +40,21 @@ var CustomImportScript = (() => {
     return el(document, "p", a);
   }
   var LINKS = [
-    ["NEV TECH", "/jsw-phase-3#nev-tech"],
-    ["NEWSROOM", "/jsw-phase-3#newsroom"]
+    ["NEV TECH", "/jsw/jsw-phase-3#nev-tech"],
+    ["NEWSROOM", "/jsw/jsw-phase-3#newsroom"]
   ];
   var import_jsw_nav_default = {
     transform: ({ document }) => {
       const cells = [
         [hinted(document, "brand", [el(document, "p", "JSW MOTORS")])],
-        [hinted(document, "homeLink", [link(document, "/jsw-phase-3", "/jsw-phase-3")])],
-        [hinted(document, "cta", [link(document, "/jsw-phase-3#register-interest", "REGISTER INTEREST")])],
+        [hinted(document, "homeLink", [link(document, "/jsw/jsw-phase-3", "/jsw/jsw-phase-3")])],
+        [hinted(document, "cta", [link(document, "/jsw/jsw-phase-3#register-interest", "REGISTER INTEREST")])],
         // Link 1-4, in one cell: each link with its text (links_linkN + links_linkNText)
         [LINKS.slice(0, 4).map(([text, href], i) => hinted(document, `links_link${i + 1}`, [link(document, href, text)]))]
       ];
       const main = document.createElement("div");
       main.append(WebImporter.Blocks.createBlock(document, { name: "jsw-nav", cells }));
-      return [{ element: main, path: "/jsw-nav", report: { title: "jsw-nav" } }];
+      return [{ element: main, path: "/jsw/jsw-nav", report: { title: "jsw-nav" } }];
     }
   };
   return __toCommonJS(import_jsw_nav_exports);
