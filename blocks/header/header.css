@@ -12,12 +12,12 @@ body.header-menu-open {
 
 header .header {
   --header-ease: cubic-bezier(0.57, 0, 0.42, 1);
-  --header-ink: var(--mg-color-black, #000);
-  --header-stroke: var(--mg-color-black, #000);
-  --header-divider: var(--mg-color-grey-200, #d9d9d9);
+  --header-ink: var(--color-black, #000);
+  --header-stroke: var(--color-black, #000);
+  --header-divider: var(--color-grey-200, #d9d9d9);
 
-  font-family: var(--mg-font-body);
-  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  font-family: var(--font-body);
+  letter-spacing: var(--letter-spacing, 0.16px);
 }
 
 header .header ul {
@@ -44,7 +44,7 @@ header .header button {
 
 /* ---------- bar: centred logo + hamburger (transparent overlay) ---------- */
 header .header .header-bar {
-  --header-ink: var(--header-bar-ink, var(--mg-color-black, #000));
+  --header-ink: var(--header-bar-ink, var(--color-black, #000));
 
   position: fixed;
   inset: 0 0 auto;
@@ -122,8 +122,8 @@ header .header .header-stroke-bottom {
 
 /* themes (section metadata "header") */
 header .header[data-theme='light'] {
-  --header-stroke: var(--mg-color-white, #fff);
-  --header-bar-ink: var(--mg-color-white, #fff);
+  --header-stroke: var(--color-white, #fff);
+  --header-bar-ink: var(--color-white, #fff);
 }
 
 header .header[data-theme='dark'] .header-logo-dark,
@@ -142,8 +142,8 @@ header .header[data-theme='hidden']:not(.is-open) .header-bar {
 
 /* open: strokes morph to a cross */
 header .header.is-open {
-  --header-stroke: var(--mg-color-black, #000);
-  --header-bar-ink: var(--mg-color-black, #000);
+  --header-stroke: var(--color-black, #000);
+  --header-bar-ink: var(--color-black, #000);
 }
 
 header .header.is-open .header-stroke {
@@ -177,7 +177,7 @@ header .header .header-tool-icon {
 
 header .header .header-tool-label,
 header .header .header-link-label {
-  font-family: var(--mg-font-label);
+  font-family: var(--font-label);
   font-size: 14px;
   font-weight: 400;
   line-height: 32px;
@@ -266,7 +266,7 @@ header .header .header-menu {
   box-sizing: border-box;
   overflow: hidden;
   padding-top: 100px;
-  background-color: var(--mg-color-white, #fff);
+  background-color: var(--color-white, #fff);
   color: var(--header-ink);
   opacity: 0;
   visibility: hidden;
@@ -297,7 +297,7 @@ header .header .header-tab {
   justify-content: space-between;
   width: 100%;
   color: var(--header-ink);
-  font-family: var(--mg-font-body);
+  font-family: var(--font-body);
   font-size: 18px;
   font-weight: 400;
   line-height: 16px;
@@ -313,7 +313,7 @@ header .header .header-tabpanel[hidden] {
   display: block;
   box-sizing: border-box;
   overflow-y: auto;
-  background-color: var(--mg-color-white, #fff);
+  background-color: var(--color-white, #fff);
   opacity: 0;
   visibility: hidden;
   transform: translateX(100%);
@@ -344,7 +344,7 @@ header .header .header-back {
 
 header .header .header-tabpanel-title {
   margin: 0;
-  font-family: var(--mg-font-body);
+  font-family: var(--font-body);
   font-size: 20px;
   font-weight: 700;
   line-height: 24px;
@@ -423,17 +423,17 @@ header .header .header-category-title {
   align-items: center;
   gap: 12px;
   color: var(--header-ink);
-  font-family: var(--mg-font-display);
+  font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
   line-height: 22px;
-  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  letter-spacing: var(--letter-spacing, 0.16px);
 }
 
 header .header .header-category-subtitle {
   margin-top: 8px;
   color: var(--header-ink);
-  font-family: var(--mg-font-body);
+  font-family: var(--font-body);
   font-size: 14px;
   line-height: 24px;
   opacity: 0.5;
@@ -660,7 +660,7 @@ header .header .header-detail-links li:first-child .header-detail-link {
 
   header .header .header-detail-title {
     display: block;
-    font-family: var(--mg-font-display);
+    font-family: var(--font-display);
     font-size: 30px;
     font-weight: 700;
     font-variation-settings: 'wght' 312;

@@ -20,11 +20,11 @@ main > .section > .mg-section-nav-wrapper {
 }
 
 .mg-section-nav {
-  --mg-section-nav-color: var(--mg-color-grey-200, #d9d9d9);
-  --mg-section-nav-segment-width: 3px;
-  --mg-section-nav-segment-height: 29px;
-  --mg-section-nav-segment-gap: 3px;
-  --mg-section-nav-idle-opacity: 0.3;
+  --section-nav-color: var(--color-grey-200, #d9d9d9);
+  --section-nav-segment-width: 3px;
+  --section-nav-segment-height: 29px;
+  --section-nav-segment-gap: 3px;
+  --section-nav-idle-opacity: 0.3;
 
   position: static;
   height: 0;
@@ -36,13 +36,13 @@ main > .section > .mg-section-nav-wrapper {
   right: 35px;
   bottom: 38px;
   z-index: 4;
-  color: var(--mg-section-nav-color);
+  color: var(--section-nav-color);
 }
 
 .mg-section-nav .mg-section-nav-segments {
   display: flex;
   flex-direction: column;
-  gap: var(--mg-section-nav-segment-gap);
+  gap: var(--section-nav-segment-gap);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -59,8 +59,8 @@ main > .section > .mg-section-nav-wrapper {
 .mg-section-nav .mg-section-nav-button {
   position: relative;
   display: block;
-  width: var(--mg-section-nav-segment-width);
-  height: var(--mg-section-nav-segment-height);
+  width: var(--section-nav-segment-width);
+  height: var(--section-nav-segment-height);
   margin: 0;
   padding: 0;
   border: 0;
@@ -68,7 +68,7 @@ main > .section > .mg-section-nav-wrapper {
   cursor: pointer;
   color: inherit;
   background-color: currentcolor;
-  opacity: var(--mg-section-nav-idle-opacity);
+  opacity: var(--section-nav-idle-opacity);
 }
 
 /* invisible, wider hit area for pointer users */

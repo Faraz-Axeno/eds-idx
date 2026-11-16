@@ -5,9 +5,9 @@ main > .section > .mg-cards-wrapper {
 }
 
 .mg-cards {
-  --mg-cards-edge: var(--mg-space-edge, 16px);
-  --mg-cards-arrow-size: var(--mg-arrow-size, 56px);
-  --mg-cards-speed: 300ms;
+  --cards-edge: var(--space-edge, 16px);
+  --cards-arrow-size: var(--arrow-size, 56px);
+  --cards-speed: 300ms;
 
   position: relative;
   isolation: isolate;
@@ -51,8 +51,8 @@ main > .section > .mg-cards-wrapper {
   margin: 0;
   padding: 0;
   list-style: none;
-  transform: translateX(calc(var(--mg-cards-index, 0) * -100% + var(--mg-drag-x, 0px)));
-  transition: transform var(--mg-cards-speed) ease;
+  transform: translateX(calc(var(--cards-index, 0) * -100% + var(--drag-x, 0px)));
+  transition: transform var(--cards-speed) ease;
 }
 
 .mg-cards .mg-cards-viewport[data-dragging='true'] .mg-cards-slides {
@@ -110,7 +110,7 @@ main > .section > .mg-cards-wrapper {
 
 .mg-cards .mg-cards-card-body {
   position: absolute;
-  inset: auto 0 calc(var(--mg-cards-markers-bottom, 32px) + 24px);
+  inset: auto 0 calc(var(--cards-markers-bottom, 32px) + 24px);
   text-align: center;
 }
 
@@ -121,31 +121,31 @@ main > .section > .mg-cards-wrapper {
 
 .mg-cards .mg-cards-nav button {
   position: absolute;
-  top: calc(50% - (var(--mg-cards-arrow-size) / 2));
+  top: calc(50% - (var(--cards-arrow-size) / 2));
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--mg-cards-arrow-size);
-  height: var(--mg-cards-arrow-size);
+  width: var(--cards-arrow-size);
+  height: var(--cards-arrow-size);
   margin: 0;
   padding: 0;
   border: 1px solid rgb(255 255 255 / 0%);
   border-radius: 100%;
   cursor: pointer;
-  color: var(--mg-color-white, #fff);
-  background-color: var(--mg-arrow-bg, #828282);
+  color: var(--color-white, #fff);
+  background-color: var(--arrow-bg, #828282);
   /* stylelint-disable-next-line property-no-vendor-prefix -- Safari < 18 */
   -webkit-backdrop-filter: blur(44px);
   backdrop-filter: blur(44px);
 }
 
 .mg-cards .mg-cards-nav .mg-cards-prev {
-  left: var(--mg-cards-edge);
+  left: var(--cards-edge);
 }
 
 .mg-cards .mg-cards-nav .mg-cards-next {
-  right: var(--mg-cards-edge);
+  right: var(--cards-edge);
 }
 
 .mg-cards .mg-cards-nav svg {
@@ -167,7 +167,7 @@ main > .section > .mg-cards-wrapper {
 .mg-cards .mg-cards-markers {
   position: absolute;
   left: 50%;
-  bottom: var(--mg-cards-markers-bottom, 32px);
+  bottom: var(--cards-markers-bottom, 32px);
   z-index: 2;
   display: flex;
   gap: 6px;
@@ -190,16 +190,16 @@ main > .section > .mg-cards-wrapper {
   border: 0;
   border-radius: 0;
   cursor: pointer;
-  background-color: var(--mg-color-frost, rgb(217 217 217 / 30%));
+  background-color: var(--color-frost, rgb(217 217 217 / 30%));
 }
 
 .mg-cards .mg-cards-marker button[data-active='true'] {
-  background-color: var(--mg-color-grey-200, #d9d9d9);
+  background-color: var(--color-grey-200, #d9d9d9);
 }
 
 .mg-cards .mg-cards-nav button:focus-visible,
 .mg-cards .mg-cards-marker button:focus-visible {
-  outline: 2px solid var(--mg-color-dark, #111);
+  outline: 2px solid var(--color-dark, #111);
   outline-offset: 2px;
 }
 
@@ -210,7 +210,7 @@ main > .section > .mg-cards-wrapper {
 
 @media (width >= 900px) {
   .mg-cards {
-    --mg-cards-edge: 36px;
+    --cards-edge: 36px;
   }
 }
 

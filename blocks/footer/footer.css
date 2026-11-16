@@ -1,14 +1,14 @@
 /* MG Select footer — measured from https://www.mgselect.co.in/ (desktop 1440px) */
 footer {
-  --footer-muted: var(--mg-color-grey-500, #787879);
-  --footer-light: var(--mg-color-sand-100, #f4f0ee);
+  --footer-muted: var(--color-grey-500, #787879);
+  --footer-light: var(--color-sand-100, #f4f0ee);
   --footer-input-bg: #252525;
   --footer-error: #f00;
 
-  background-color: var(--mg-color-footer, #111);
-  color: var(--mg-color-white, #fff);
-  font-family: var(--mg-font-body);
-  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  background-color: var(--color-footer, #111);
+  color: var(--color-white, #fff);
+  font-family: var(--font-body);
+  letter-spacing: var(--letter-spacing, 0.16px);
 }
 
 footer .footer .footer-inner {
@@ -70,12 +70,12 @@ footer .footer .footer-newsletter {
 footer .footer .footer-newsletter-title {
   margin: 0 0 20px;
   color: var(--footer-muted);
-  font-family: var(--mg-font-display);
+  font-family: var(--font-display);
   font-size: 24px;
   font-weight: 700;
   font-variation-settings: 'wght' 312;
   line-height: 26px;
-  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  letter-spacing: var(--letter-spacing, 0.16px);
 }
 
 footer .footer .footer-newsletter-row {
@@ -94,7 +94,7 @@ footer .footer .footer-newsletter-input {
   padding: 0 0 0 20px;
   background-color: var(--footer-input-bg);
   color: var(--footer-light);
-  font-family: var(--mg-font-label);
+  font-family: var(--font-label);
   font-size: 16px;
   letter-spacing: normal;
   outline-offset: 0;
@@ -117,11 +117,11 @@ footer .footer .footer-newsletter-submit {
   border-radius: 0;
   padding: 8px 20px;
   background: transparent;
-  color: var(--mg-color-white, #fff);
-  font-family: var(--mg-font-label);
+  color: var(--color-white, #fff);
+  font-family: var(--font-label);
   font-size: 14px;
   line-height: 32px;
-  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  letter-spacing: var(--letter-spacing, 0.16px);
   cursor: pointer;
 }
 
@@ -150,7 +150,7 @@ footer .footer .footer-newsletter-error {
   top: 98px;
   left: 0;
   color: var(--footer-error);
-  font-family: var(--mg-font-body);
+  font-family: var(--font-body);
   font-size: 12px;
   line-height: 20px;
 }
@@ -174,8 +174,8 @@ footer .footer .footer-newsletter-checkbox {
 }
 
 footer .footer .footer-newsletter-label {
-  color: var(--mg-color-white, #fff);
-  font-family: var(--mg-font-body);
+  color: var(--color-white, #fff);
+  font-family: var(--font-body);
   font-size: 14px;
   line-height: 20px;
 }
@@ -193,12 +193,12 @@ footer .footer .footer-links {
 footer .footer .footer-links-title {
   margin: 0 0 24px;
   color: var(--footer-muted);
-  font-family: var(--mg-font-body);
+  font-family: var(--font-body);
   font-size: 18px;
   font-weight: 400;
   font-variation-settings: 'wght' 312;
   line-height: normal;
-  letter-spacing: var(--mg-letter-spacing, 0.16px);
+  letter-spacing: var(--letter-spacing, 0.16px);
 }
 
 footer .footer .footer-links-toggle {
@@ -226,7 +226,7 @@ footer .footer .footer-links-icon {
   width: 32px;
   height: 32px;
   padding: 8px;
-  color: var(--mg-color-white, #fff);
+  color: var(--color-white, #fff);
 }
 
 footer .footer .footer-links-toggle[aria-expanded='true'] .footer-links-icon-plus,
@@ -246,7 +246,7 @@ footer .footer .footer-links-list a:any-link {
   display: block;
   margin-bottom: 16px;
   color: var(--footer-muted);
-  font-family: var(--mg-font-label);
+  font-family: var(--font-label);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
@@ -258,8 +258,8 @@ footer .footer .footer-divider {
   order: 3;
   height: 2px;
   margin: 20px 0;
-  border-top: 1px solid var(--mg-color-white, #fff);
-  border-bottom: 1px solid var(--mg-color-white, #fff);
+  border-top: 1px solid var(--color-white, #fff);
+  border-bottom: 1px solid var(--color-white, #fff);
   opacity: 0.1;
 }
 
@@ -288,7 +288,7 @@ footer .footer .footer-legal-list a:any-link {
   display: block;
   height: 20px;
   color: var(--footer-muted);
-  font-family: var(--mg-font-label);
+  font-family: var(--font-label);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;

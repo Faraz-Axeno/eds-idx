@@ -2,13 +2,13 @@
 /* global WebImporter */
 
 /**
- * JSW reservation confirmation page (/jsw-confirmed), from the "Confirmed 1280x720" design
+ * JSW reservation confirmation page (/jsw/jsw-confirmed), from the "Confirmed 1280x720" design
  * frame (no source site: the fetched document is ignored). One block,
  * reservation-confirmation, as rows: layoutVariant | media | content; the JSW Navbar
  * block before it.
  * {NAME} and {email} are filled in by the block.
- * A URL with "split" makes /jsw-confirmed-split, the split layout ("Confirmed opt3"); one with
- * "failed" makes /jsw-payment-failed, the payment failure page (the centered layout for now).
+ * A URL with "split" makes /jsw/jsw-confirmed-split, the split layout ("Confirmed opt3"); one with
+ * "failed" makes /jsw/jsw-payment-failed, the payment failure page (the centered layout for now).
  */
 
 const IMG = 'images/jsw';
@@ -47,7 +47,7 @@ function group(document, fields) {
 
 function navbar(document) {
   const list = el(document, 'ul');
-  [['/jsw-phase-3#nev-tech', 'NEV TECH'], ['/jsw-phase-3#newsroom', 'NEWSROOM']].forEach(([href, text]) => {
+  [['/jsw/jsw-phase-3#nev-tech', 'NEV TECH'], ['/jsw/jsw-phase-3#newsroom', 'NEWSROOM']].forEach(([href, text]) => {
     const a = el(document, 'a', text);
     a.href = href;
     list.append(el(document, 'li', a));
@@ -55,9 +55,9 @@ function navbar(document) {
   return WebImporter.Blocks.createBlock(document, {
     name: 'jsw-navbar',
     cells: [
-      [hinted(document, 'brand', [link(document, '/jsw-phase-3', 'JSW MOTORS')])],
+      [hinted(document, 'brand', [link(document, '/jsw/jsw-phase-3', 'JSW MOTORS')])],
       [hinted(document, 'links', [list])],
-      [hinted(document, 'cta', [link(document, '/jsw-reserve', 'REGISTER INTEREST')])],
+      [hinted(document, 'cta', [link(document, '/jsw/jsw-reserve', 'REGISTER INTEREST')])],
     ],
   });
 }
@@ -86,7 +86,7 @@ export default {
     const main = document.createElement('div');
     main.append(WebImporter.Blocks.createBlock(document, { name: 'reservation-confirmation', cells }));
 
-    const path = (failed && '/jsw-payment-failed') || (split && '/jsw-confirmed-split') || '/jsw-confirmed';
+    const path = (failed && '/jsw/jsw-payment-failed') || (split && '/jsw/jsw-confirmed-split') || '/jsw/jsw-confirmed';
     return [{ element: main, path, report: { title: 'jsw-confirmed', split, failed } }];
   },
 };

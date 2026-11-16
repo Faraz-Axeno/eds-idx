@@ -2,12 +2,12 @@
 /* global WebImporter */
 
 /**
- * JSW Sustainability collage page (/jsw-sustainability).
+ * JSW Sustainability collage page (/jsw/jsw-sustainability).
  * No source site: the page is authored from the "NEV / Collage" and "NEV / Sustainable"
  * design frames, so the fetched document is ignored. One section, one block:
  *   jsw-sustainability  engine | text, then one item per card (top-left, top-right,
  *                       middle-left, middle-right, bottom-left, bottom-right)
- * Images are the session photos in content/images/jsw/. The phone-app and Jetour-sign
+ * Images are the session photos in content/jsw/images/jsw/. The phone-app and Jetour-sign
  * art was not supplied, so those slots use the closest photo with an honest alt text.
  */
 
@@ -64,7 +64,7 @@ export default {
 
     return [{
       element: main,
-      path: '/jsw-sustainability',
+      path: '/jsw/jsw-sustainability',
       report: { title: 'jsw-sustainability', cards: CARDS.length },
     }];
   },

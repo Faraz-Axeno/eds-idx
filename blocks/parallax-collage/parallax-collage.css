@@ -41,8 +41,8 @@ main .parallax-collage {
   --pc-radius: 16px;
 
   /* one design pixel: 1px at the 1280x720 frame, scaled down on smaller viewports (and up
-     with the page's fixed-size parts on very large ones, --jsw-fit: immersive-hero.js) */
-  --pc-u: min(calc(1px * var(--jsw-fit, 1)), 0.1389svh, 0.0781vw);
+     with the page's fixed-size parts on very large ones, --fit: immersive-hero.js) */
+  --pc-u: min(calc(1px * var(--fit, 1)), 0.1389svh, 0.0781vw);
 
   /* first scroll: the images hold still while the engine shrinks to the top
      (parallax-collage.js sets --pc-m-progress 0 -> 1 over --pc-m-hold vh) */
@@ -78,8 +78,8 @@ main .parallax-collage .sticky-text-layer .content {
   /* never wider than the gap between the inner cards (13.1% in, 162 design px wide, as on
      both screens), so on short, wide screens (e.g. zoomed in) the text wraps instead of
      running under them; 600px wherever there is room (more with the text on very large
-     screens, --jsw-fit) */
-  max-width: min(calc(600px * var(--jsw-fit, 1)), calc(73.8% - 324 * var(--pc-u) - 32px));
+     screens, --fit) */
+  max-width: min(calc(600px * var(--fit, 1)), calc(73.8% - 324 * var(--pc-u) - 32px));
   text-align: center;
 }
 
@@ -124,7 +124,7 @@ main .parallax-collage .scrolling-images-layer {
 /* browsers without small-viewport units (svh): the same values in vh */
 @supports not (height: 1svh) {
   main .parallax-collage {
-    --pc-u: min(calc(1px * var(--jsw-fit, 1)), 0.1389vh, 0.0781vw);
+    --pc-u: min(calc(1px * var(--fit, 1)), 0.1389vh, 0.0781vw);
   }
 
   main .parallax-collage .scrolling-images-layer {

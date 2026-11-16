@@ -177,7 +177,10 @@
           "name": "brand_ctaButton",
           "label": "CTA button link",
           "description": "Where the white button leads: a page, or #section on one.",
-          "required": true
+          "required": true,
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -196,7 +199,10 @@
           "valueType": "string",
           "name": "brand_privacyPolicy",
           "label": "Privacy policy link",
-          "required": true
+          "required": true,
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -243,7 +249,10 @@
           "valueType": "string",
           "name": "links_link1",
           "label": "Link 1 URL",
-          "description": "Page, #section or full URL. Needs its text too, or it is hidden."
+          "description": "Page, #section or full URL. Needs its text too, or it is hidden.",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -260,7 +269,10 @@
           "valueType": "string",
           "name": "links_link2",
           "label": "Link 2 URL",
-          "description": "Page, #section or full URL. Needs its text too, or it is hidden."
+          "description": "Page, #section or full URL. Needs its text too, or it is hidden.",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -277,7 +289,10 @@
           "valueType": "string",
           "name": "links_link3",
           "label": "Link 3 URL",
-          "description": "Page, #section or full URL. Needs its text too, or it is hidden."
+          "description": "Page, #section or full URL. Needs its text too, or it is hidden.",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",
@@ -294,7 +309,10 @@
           "valueType": "string",
           "name": "links_link4",
           "label": "Link 4 URL",
-          "description": "Page, #section or full URL. Needs its text too, or it is hidden."
+          "description": "Page, #section or full URL. Needs its text too, or it is hidden.",
+          "validation": {
+            "rootPath": "/content/eds-idx/jsw"
+          }
         },
         {
           "component": "text",

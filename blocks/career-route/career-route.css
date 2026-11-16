@@ -4,7 +4,7 @@
  * the end, four compact frosted-glass step cards side by side, 8px apart. A static section.
  */
 
-@import url('../../styles/pill-nav.css');
+@import url('../jsw-nav/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .career-route-wrapper {

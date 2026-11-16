@@ -2,13 +2,13 @@
 /* global WebImporter */
 
 /**
- * JSW Phase 5 page (/jsw-phase-5), from the "Phase 5 / Hero" and "Phase 5 / Open Roles" design
+ * JSW Phase 5 page (/jsw/jsw-phase-5), from the "Phase 5 / Hero" and "Phase 5 / Open Roles" design
  * frames (no source site: the fetched document is ignored). Top to bottom:
  *   1. career-hero: its fields, then its three Stat Cards;
  *   2. open-roles: its fields (content | search), then its items: the Job Roles, the Filter
  *      Dropdowns and the Gallery Images;
  *   3. career-route: its fields, then its four Route Steps.
- * The JSW footer (/jsw-footer) is not part of the page: scripts.js loads it as the page's footer.
+ * The JSW footer (/jsw/jsw-footer) is not part of the page: scripts.js loads it as the page's footer.
  * The Filter Dropdown and Gallery Image rows start with their item type (open-roles-filter,
  * open-roles-image) so md2jcr (the conversion to AEM content) creates them as those items; rows
  * without one are Job Roles, the block's first item type.
@@ -124,7 +124,7 @@ export default {
           ['meta_location', el(document, 'p', location)],
           ['meta_tags', el(document, 'p', experience)],
         ]),
-        hinted(document, 'button', [link(document, '/jsw-reserve', 'APPLY NOW')]),
+        hinted(document, 'button', [link(document, '/jsw/jsw-reserve', 'APPLY NOW')]),
       ]),
       // the Filter Dropdowns: their options a multi-value field, written in AEM's multi-value
       // notation ([a,b], a comma within an entry as \,), which md2jcr keeps as separate entries
@@ -184,6 +184,6 @@ export default {
     const main = document.createElement('div');
     // top to bottom: the hero, the open roles, then the route in
     main.append(hero, document.createElement('hr'), WebImporter.Blocks.createBlock(document, { name: 'open-roles', cells }), document.createElement('hr'), route);
-    return [{ element: main, path: '/jsw-phase-5', report: { title: 'jsw-phase-5', roles: ROLES.length } }];
+    return [{ element: main, path: '/jsw/jsw-phase-5', report: { title: 'jsw-phase-5', roles: ROLES.length } }];
   },
 };

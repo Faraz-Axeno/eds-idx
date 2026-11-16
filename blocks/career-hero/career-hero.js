@@ -11,9 +11,44 @@
  *   Stat Cards (items)       — subtitle | stat value | description: the first MAX_CARDS shown
  */
 
-import { loadPillNav } from '../../scripts/pill-nav.js';
-import { IMAGE_EXTENSIONS, acceptedPicture } from '../../scripts/media-types.js';
+import { loadPillNav } from '../jsw-nav/pill-nav.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
+
+// the file types the block's media accept, by the asset's extension (published images keep
+// their file's: media_….jpg): an asset of another type is not shown, a console warning instead
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png']; // general images: backgrounds, photos
+
+/** an asset's file extension, from its URL's path ('' when it has none) */
+function extensionOf(url) {
+  try {
+    const name = new URL(url, window.location.href).pathname.split('/').pop();
+    return name.includes('.') ? name.split('.').pop().toLowerCase() : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+/**
+ * whether an asset's file type is accepted for its field; if not, a warning (it is not shown)
+ * @param {string} url the asset
+ * @param {string[]} allowed the field's extensions (IMAGE_EXTENSIONS…)
+ * @param {string} field the field, for the warning (e.g. 'background image')
+ * @param {string} block the block, for the warning
+ */
+function acceptedType(url, allowed, field, block) {
+  const ext = extensionOf(url);
+  if (allowed.includes(ext)) return true;
+  // eslint-disable-next-line no-console
+  console.warn(`${block}: the ${field} ${url} is not shown: its file type (${ext ? `.${ext}` : 'none'}) is not .${allowed.join(', .')}`);
+  return false;
+}
+
+/** a picture whose image is of an accepted file type for its field, else null (not shown) */
+function acceptedPicture(picture, allowed, field, block) {
+  const src = picture?.querySelector('img')?.getAttribute('src');
+  if (!picture || !src) return picture || null;
+  return acceptedType(src, allowed, field, block) ? picture : null;
+}
 
 // the stat cards shown: those after them are left out of the page (the editor shows them
 // dimmed, so they can be edited or removed)

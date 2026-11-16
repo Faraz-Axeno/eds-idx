@@ -2,10 +2,10 @@
 /* global WebImporter */
 
 /**
- * JSW reservation page (/jsw-reserve), from the "Opt 2 / Reserve 1280x720" design frame
+ * JSW reservation page (/jsw/jsw-reserve), from the "Opt 2 / Reserve 1280x720" design frame
  * (no source site: the fetched document is ignored). One block, reservation-form, its four
  * field groups as rows: media | content | form (with the city options list) | fields;
- * the JSW Navbar block before it. Its button opens /jsw-confirmed.
+ * the JSW Navbar block before it. Its button opens /jsw/jsw-confirmed.
  */
 
 const IMG = 'images/jsw';
@@ -46,7 +46,7 @@ function group(document, fields) {
 
 function navbar(document) {
   const list = el(document, 'ul');
-  [['/jsw-phase-3#nev-tech', 'NEV TECH'], ['/jsw-phase-3#newsroom', 'NEWSROOM']].forEach(([href, text]) => {
+  [['/jsw/jsw-phase-3#nev-tech', 'NEV TECH'], ['/jsw/jsw-phase-3#newsroom', 'NEWSROOM']].forEach(([href, text]) => {
     const a = el(document, 'a', text);
     a.href = href;
     list.append(el(document, 'li', a));
@@ -54,9 +54,9 @@ function navbar(document) {
   return WebImporter.Blocks.createBlock(document, {
     name: 'jsw-navbar',
     cells: [
-      [hinted(document, 'brand', [link(document, '/jsw-phase-3', 'JSW MOTORS')])],
+      [hinted(document, 'brand', [link(document, '/jsw/jsw-phase-3', 'JSW MOTORS')])],
       [hinted(document, 'links', [list])],
-      [hinted(document, 'cta', [link(document, '/jsw-reserve', 'REGISTER INTEREST')])],
+      [hinted(document, 'cta', [link(document, '/jsw/jsw-reserve', 'REGISTER INTEREST')])],
     ],
   });
 }
@@ -75,7 +75,11 @@ export default {
       group(document, [
         ['content_heading', el(document, 'p', 'RESERVE NOW')],
         ['content_subheading', el(document, 'p', 'Allocation opens December 2026. Cars are assigned in the order reservations are placed.')],
-        ['content_disclaimer', el(document, 'p', 'JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice.')],
+        // a word joiner (\u2060, invisible) before the email's @: the upload (md2jcr) keeps the
+        // address as text, not a mailto: link; the block takes it out on the page
+        ['content_disclaimer', el(document, 'p', 'JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy\u2060@jswmotors.com. Full Privacy Notice.')],
+        ['content_pendingHeading', el(document, 'p', 'Processing your reservation')],
+        ['content_pendingDescription', el(document, 'p', 'Please wait while we process your request.')],
       ]),
       group(document, [
         ['form_cities', (() => {
@@ -84,11 +88,10 @@ export default {
           return list;
         })()],
         // a made-up test Key ID: the local test page only (authors enter theirs in the editor)
-        ['form_razorpayKey', el(document, 'p', 'rzp_test_LOCALPREVIEW000')],
         ['form_checkoutName', el(document, 'p', 'JSW Motors')],
         ['form_checkoutDescription', el(document, 'p', 'Vehicle reservation')],
-        ['form_button', link(document, '/jsw-confirmed', 'PROCEED')],
-        ['form_failure', link(document, '/jsw-payment-failed', '/jsw-payment-failed')],
+        ['form_button', link(document, '/jsw/jsw-confirmed', 'PROCEED')],
+        ['form_failure', link(document, '/jsw/jsw-payment-failed', '/jsw/jsw-payment-failed')],
       ]),
       group(document, [
         ['fields_firstNamePlaceholder', el(document, 'p', 'First Name*')],
@@ -102,6 +105,6 @@ export default {
     const main = document.createElement('div');
     main.append(WebImporter.Blocks.createBlock(document, { name: 'reservation-form', cells }));
 
-    return [{ element: main, path: '/jsw-reserve', report: { title: 'jsw-reserve' } }];
+    return [{ element: main, path: '/jsw/jsw-reserve', report: { title: 'jsw-reserve' } }];
   },
 };

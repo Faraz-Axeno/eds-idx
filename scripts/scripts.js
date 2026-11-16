@@ -411,25 +411,28 @@ const STANDALONE_PAGES = [
   { block: 'parallax-collage', bodyClass: 'jsw-nev-collage' },
   { block: 'reservation-form', bodyClass: 'reservation-page' },
   { block: 'reservation-confirmation', bodyClass: 'reservation-page' },
-  { block: 'open-roles', bodyClass: 'careers-page', footer: '/jsw-footer' },
+  { block: 'open-roles', bodyClass: 'careers-page', footer: ['/jsw/jsw-footer', '/jsw-footer'] },
   { block: 'jsw-footer', bodyClass: 'footer-page' },
   { block: 'jsw-nav', bodyClass: 'nav-page' },
 ];
 
 /**
- * Loads a JSW footer page (e.g. /jsw-footer) into the page's <footer>, as a fragment: its
+ * Loads a JSW footer page (e.g. /jsw/jsw-footer) into the page's <footer>, as a fragment: its
  * address here first (on the AEM author pages live at /content/{site}/…, in the local preview at
  * /content/…, on aem.page / aem.live at the root), the others if it is not found there.
  * @param {Element} footer the <footer> element
- * @param {string} path the footer page, from the site root
+ * @param {string|string[]} paths the footer page from the site root (the first found is used)
  */
-async function loadPageFooter(footer, path) {
+async function loadPageFooter(footer, paths) {
   if (!footer) return;
   const { pathname } = window.location;
-  const siteRoot = pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0];
-  const candidates = pathname.startsWith('/content/')
+  // only an author page (….html): in the local preview /content/jsw/… is a folder, not a site
+  const siteRoot = pathname.endsWith('.html') ? pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0] : null;
+  // each path (the footer page in the /jsw/ folder, then its earlier root address) at each of
+  // this page's address forms
+  const candidates = [paths].flat().flatMap((path) => (pathname.startsWith('/content/')
     ? [siteRoot && `${siteRoot}${path}`, `/content${path}`, path]
-    : [path, `/content${path}`];
+    : [path, `/content${path}`]));
   // eslint-disable-next-line import/no-cycle
   const { loadFragment } = await import('../blocks/fragment/fragment.js');
   // eslint-disable-next-line no-restricted-syntax

@@ -115,9 +115,7 @@
   },
   {
     "id": "jsw-nav",
-    "components": [
-      "jsw-nav-link"
-    ]
+    "components": []
   },
   {
     "id": "jsw-sustainability",

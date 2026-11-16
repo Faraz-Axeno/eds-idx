@@ -77,14 +77,14 @@ var CustomImportScript = (() => {
       const navbar = WebImporter.Blocks.createBlock(document, {
         name: "jsw-navbar",
         cells: [
-          [hinted(document, "brand", [el(document, "p", a("/jsw-phase-3", "JSW MOTORS"))])],
+          [hinted(document, "brand", [el(document, "p", a("/jsw/jsw-phase-3", "JSW MOTORS"))])],
           [hinted(document, "links", [el(
             document,
             "ul",
-            el(document, "li", a("/jsw-phase-3#nev-tech", "NEV TECH")),
-            el(document, "li", a("/jsw-phase-3#newsroom", "NEWSROOM"))
+            el(document, "li", a("/jsw/jsw-phase-3#nev-tech", "NEV TECH")),
+            el(document, "li", a("/jsw/jsw-phase-3#newsroom", "NEWSROOM"))
           )])],
-          [hinted(document, "cta", [el(document, "p", a("/jsw-phase-3#register-interest", "REGISTER INTEREST"))])]
+          [hinted(document, "cta", [el(document, "p", a("/jsw/jsw-phase-3#register-interest", "REGISTER INTEREST"))])]
         ]
       });
       const main = document.createElement("div");
@@ -99,7 +99,7 @@ var CustomImportScript = (() => {
       );
       return [{
         element: main,
-        path: "/jsw-nev-collage",
+        path: "/jsw/jsw-nev-collage",
         report: { title: "jsw-nev-collage", images: IMAGES.length }
       }];
     }

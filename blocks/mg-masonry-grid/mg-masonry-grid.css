@@ -7,32 +7,32 @@
  */
 
 main > .section.mg-masonry-grid-container {
-  --mg-masonry-ease: cubic-bezier(0.57, 0, 0.14, 1);
-  --mg-masonry-reveal: 1.4s var(--mg-masonry-ease);
+  --masonry-ease: cubic-bezier(0.57, 0, 0.14, 1);
+  --masonry-reveal: 1.4s var(--masonry-ease);
 
   display: flex;
   flex-direction: column;
   height: 100vh;
-  height: var(--mg-panel-height, 100svh);
+  height: var(--panel-height, 100svh);
   padding-bottom: 6.43svh;
   overflow: hidden;
 }
 
 /* image strip */
 .mg-masonry-grid {
-  --mg-masonry-gap: 9.5px;
-  --mg-masonry-height: 21.63svh;
-  --mg-masonry-tile-vh: 24; /* nominal tile width in svh, stretched by JS to fit whole gaps */
-  --mg-masonry-duration: calc(var(--mg-masonry-count, 10) * 3s); /* 3s per tile */
+  --masonry-gap: 9.5px;
+  --masonry-height: 21.63svh;
+  --masonry-tile-vh: 24; /* nominal tile width in svh, stretched by JS to fit whole gaps */
+  --masonry-duration: calc(var(--masonry-count, 10) * 3s); /* 3s per tile */
 
-  height: var(--mg-masonry-height);
+  height: var(--masonry-height);
   overflow: hidden;
 }
 
 .mg-masonry-grid .mg-masonry-grid-items {
   display: flex;
   align-items: flex-end;
-  gap: var(--mg-masonry-gap);
+  gap: var(--masonry-gap);
   height: 100%;
   margin: 0;
   padding: 0;
@@ -42,11 +42,11 @@ main > .section.mg-masonry-grid-container {
 /* equal-width tiles; the image keeps its own ratio (16:9 short, 4:3 tall) on the bottom edge */
 .mg-masonry-grid .mg-masonry-grid-item {
   flex: none;
-  width: var(--mg-masonry-tile, calc(var(--mg-masonry-tile-vh) * 1svh));
+  width: var(--masonry-tile, calc(var(--masonry-tile-vh) * 1svh));
   height: 100%;
   margin: 0;
   transform: translateY(100%);
-  transition: transform var(--mg-masonry-reveal);
+  transition: transform var(--masonry-reveal);
 }
 
 .mg-masonry-grid .mg-masonry-grid-item picture {
@@ -67,13 +67,13 @@ main > .section.mg-masonry-grid-container {
 /* continuous strip: shift by exactly one set (N tiles + N gaps), then loop */
 @keyframes mg-masonry-marquee {
   to {
-    transform: translateX(calc((var(--mg-masonry-tile, 0px) + var(--mg-masonry-gap)) * var(--mg-masonry-count, 0) * -1));
+    transform: translateX(calc((var(--masonry-tile, 0px) + var(--masonry-gap)) * var(--masonry-count, 0) * -1));
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .mg-masonry-grid[data-marquee='true'] .mg-masonry-grid-items {
-    animation: mg-masonry-marquee var(--mg-masonry-duration) linear infinite;
+    animation: mg-masonry-marquee var(--masonry-duration) linear infinite;
   }
 }
 
@@ -88,8 +88,8 @@ main > .section.mg-masonry-grid-container > .default-content-wrapper {
   min-height: 0;
   margin: 0;
   padding: 0;
-  color: var(--mg-color-black);
-  font-family: var(--mg-font-body);
+  color: var(--color-black);
+  font-family: var(--font-body);
   text-align: center;
 }
 
@@ -111,14 +111,14 @@ main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting {
   padding-top: 36px;
   opacity: 0;
   transform: translateY(-100%);
-  transition: opacity var(--mg-masonry-reveal), transform var(--mg-masonry-reveal);
+  transition: opacity var(--masonry-reveal), transform var(--masonry-reveal);
 }
 
 main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting > p {
   margin: 0;
-  font-family: var(--mg-font-display);
+  font-family: var(--font-display);
   font-size: 24px;
-  font-weight: var(--mg-font-weight-regular);
+  font-weight: var(--font-weight-regular);
   font-variation-settings: 'wght' 312;
   line-height: 26px;
 }
@@ -147,20 +147,20 @@ main > .section.mg-masonry-grid-container .mg-masonry-grid-heading {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity var(--mg-masonry-reveal), transform var(--mg-masonry-reveal);
+  transition: opacity var(--masonry-reveal), transform var(--masonry-reveal);
 }
 
 main > .section.mg-masonry-grid-container .mg-masonry-grid-heading > :is(h1, h2, h3) {
   width: 90%;
   margin: 0;
-  color: var(--mg-color-black);
-  font-family: var(--mg-font-display);
+  color: var(--color-black);
+  font-family: var(--font-display);
   font-size: 24px;
-  font-weight: var(--mg-font-weight-bold);
+  font-weight: var(--font-weight-bold);
   font-variation-settings: 'wght' 312;
   line-height: 26px;
   opacity: 0;
-  transition: opacity var(--mg-masonry-reveal);
+  transition: opacity var(--masonry-reveal);
 }
 
 main > .section.mg-masonry-grid-container .mg-masonry-grid-text {
@@ -172,22 +172,22 @@ main > .section.mg-masonry-grid-container .mg-masonry-grid-text {
   padding: 0 16px;
   opacity: 0;
   transform: translateY(40svh);
-  transition: opacity var(--mg-masonry-reveal), transform var(--mg-masonry-reveal);
+  transition: opacity var(--masonry-reveal), transform var(--masonry-reveal);
   pointer-events: none;
 }
 
 main > .section.mg-masonry-grid-container .mg-masonry-grid-text > p {
   margin: 0;
-  color: var(--mg-color-ink);
-  font-size: var(--mg-font-size-body);
-  font-weight: var(--mg-font-weight-regular);
+  color: var(--color-ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
   font-variation-settings: 'wght' 500;
   letter-spacing: -0.02em;
   line-height: 20px;
 }
 
 main > .section.mg-masonry-grid-container .mg-masonry-grid-text > p:first-child {
-  color: var(--mg-color-black);
+  color: var(--color-black);
   letter-spacing: normal;
 }
 
@@ -221,7 +221,7 @@ main > .section.mg-masonry-grid-container[data-masonry-step='text'] .mg-masonry-
 /* Universal Editor: everything visible and in flow */
 main > .section.mg-masonry-grid-container[data-masonry-step='static'] {
   height: auto;
-  min-height: var(--mg-panel-height, 100svh);
+  min-height: var(--panel-height, 100svh);
 }
 
 main > .section.mg-masonry-grid-container[data-masonry-step='static'] :is(.mg-masonry-grid-greeting, .mg-masonry-grid-heading, .mg-masonry-grid-heading > *, .mg-masonry-grid-text, .mg-masonry-grid-item) {
@@ -258,7 +258,7 @@ main > .section.mg-masonry-grid-container[data-masonry-step='static'] .mg-masonr
 
 @media (width >= 768px) {
   .mg-masonry-grid {
-    --mg-masonry-gap: 16px;
+    --masonry-gap: 16px;
   }
 
   main > .section.mg-masonry-grid-container .mg-masonry-grid-heading > :is(h1, h2, h3) {
@@ -273,8 +273,8 @@ main > .section.mg-masonry-grid-container[data-masonry-step='static'] .mg-masonr
   }
 
   .mg-masonry-grid {
-    --mg-masonry-height: 35.64svh;
-    --mg-masonry-tile-vh: 39.71;
+    --masonry-height: 35.64svh;
+    --masonry-tile-vh: 39.71;
   }
 
   main > .section.mg-masonry-grid-container .mg-masonry-grid-greeting {
@@ -324,6 +324,6 @@ main > .section.mg-masonry-grid-container[data-masonry-step='static'] .mg-masonr
 
 @media (width >= 1440px) {
   .mg-masonry-grid {
-    --mg-masonry-gap: 19px;
+    --masonry-gap: 19px;
   }
 }

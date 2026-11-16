@@ -7,7 +7,7 @@
  *                     left-aligned and vertically centred on the right half
  */
 
-@import url('../../styles/pill-nav.css');
+@import url('../jsw-nav/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .reservation-confirmation-wrapper {
@@ -25,8 +25,12 @@ main > .section > .reservation-confirmation-wrapper {
      height, smaller on shorter screens (at least 0.6px). Tablets and phones keep 1px units */
   --reservation-confirmation-unit: 1px;
 
+  /* the page's panel height, the block's own: a screen tall (at most 1000px in Universal Editor,
+     below) */
+  --panel-height: 100svh;
+
   box-sizing: border-box;
-  min-height: var(--mg-panel-height, 100svh);
+  min-height: var(--panel-height);
   padding: 8px;
   color: #fff;
   background-color: #050505;
@@ -34,8 +38,15 @@ main > .section > .reservation-confirmation-wrapper {
 
   @supports (height: 1svh) and (width: clamp(1px, 1px, 1px)) {
     @media (min-width: 900px) {
-      --reservation-confirmation-unit: clamp(0.6px, calc((var(--mg-panel-height, 100svh) - 146px) / 556), 1px);
+      --reservation-confirmation-unit: clamp(0.6px, calc((var(--panel-height) - 146px) / 556), 1px);
     }
+  }
+
+  /* the page holding the block scrolls freely: no snapping to its sections (styles/styles.css);
+     scroll snapping can only be set on the page itself, so this one rule sits above the block,
+     keyed on the block being on the page */
+  html.panels-ready:has(&) {
+    scroll-snap-type: none;
   }
 
   .frame {
@@ -45,7 +56,7 @@ main > .section > .reservation-confirmation-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: calc(var(--mg-panel-height, 100svh) - 16px);
+    min-height: calc(var(--panel-height) - 16px);
     padding: 90px 24px 40px;
     overflow: hidden;
     border-radius: 24px;
@@ -92,17 +103,26 @@ main > .section > .reservation-confirmation-wrapper {
     object-position: 50% 50%;
   }
 
+  /* the typography, Figma's: New Science in its explicit styles, each its own font file (the
+     Adobe Fonts kit, reservation-confirmation.js; --font-new-science… in styles/styles.css) */
+
+  /* YOU'RE IN, NAME / SORRY, NAME: Medium Extended, 24px (sizes per layout below) */
   .subheading {
-    font-family: var(--pill-font-display);
-    font-weight: 400;
+    font-family: var(--font-new-science-extended);
+    font-weight: 500;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
   }
 
+  /* the message (We'll message you…): Medium, 14px */
   .message {
     margin: 0;
     color: #8c8c8c;
-    font-size: calc(13 * var(--reservation-confirmation-unit));
-    line-height: calc(19 * var(--reservation-confirmation-unit));
+    font-family: var(--font-new-science);
+    font-size: calc(14 * var(--reservation-confirmation-unit));
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: 0;
   }
 
   .email {
@@ -139,7 +159,8 @@ main > .section > .reservation-confirmation-wrapper {
     transform-origin: 29% 45%;
   }
 
-  /* CONFIRMED: thin, wide, a silver gradient from light at the top to grey at the foot */
+  /* CONFIRMED / FAILED: Regular Extended, 86px, a silver gradient from light at the top to grey
+     at the foot */
   &.layout-centered .heading {
     margin: 0;
     color: #d9d9d9;
@@ -148,25 +169,28 @@ main > .section > .reservation-confirmation-wrapper {
     /* stylelint-disable-next-line property-no-vendor-prefix -- Safari and older Samsung Internet */
     -webkit-background-clip: text;
     background-clip: text;
-    font-family: var(--pill-font-display);
-    font-size: calc(84 * var(--reservation-confirmation-unit));
-    font-weight: 300;
-    line-height: 1.1;
-    letter-spacing: -0.01em;
+    font-family: var(--font-new-science-extended);
+    font-size: calc(86 * var(--reservation-confirmation-unit));
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.05em;
     text-transform: uppercase;
     white-space: nowrap;
     -webkit-text-fill-color: transparent;
   }
 
+  /* the text under CONFIRMED at least the message's width in the frame (376px, its two sentences
+     a line each; the clamped message does not widen it itself), at most the card's */
   &.layout-centered .details {
     position: relative;
+    min-width: min(100%, calc(376 * var(--reservation-confirmation-unit)));
     margin-top: auto;
   }
 
   &.layout-centered .subheading {
     margin: 0 0 calc(18 * var(--reservation-confirmation-unit));
-    font-size: calc(22 * var(--reservation-confirmation-unit));
-    line-height: 1.2;
+    font-size: calc(24 * var(--reservation-confirmation-unit));
+    line-height: 1.35;
   }
 
   &.layout-centered .line {
@@ -195,6 +219,19 @@ main > .section > .reservation-confirmation-wrapper {
     }
   }
 
+  /* under 768px: CONFIRMED / FAILED keep scaling with the screen's width (from 8.8vw, about 67px,
+     down to 40px), the subheading a little smaller (20px), so nothing reaches past the card */
+  @media (max-width: 767.98px) {
+    &.layout-centered .heading {
+      font-size: max(40px, 8.8vw);
+    }
+
+    &.layout-centered .subheading,
+    &.layout-split .subheading {
+      font-size: 20px;
+    }
+  }
+
   /* phones: a taller card, the car centred behind the text */
   @media (max-width: 599.98px) {
     .frame {
@@ -202,7 +239,7 @@ main > .section > .reservation-confirmation-wrapper {
     }
 
     &.layout-centered .card {
-      min-height: calc(var(--mg-panel-height, 100svh) - 48px);
+      min-height: calc(var(--panel-height) - 48px);
       padding: 56px 20px 48px;
     }
 
@@ -262,8 +299,8 @@ main > .section > .reservation-confirmation-wrapper {
 
   &.layout-split .subheading {
     margin: 0 0 calc(16 * var(--reservation-confirmation-unit));
-    font-size: calc(22 * var(--reservation-confirmation-unit));
-    line-height: 1.25;
+    font-size: calc(24 * var(--reservation-confirmation-unit));
+    line-height: 1.35;
   }
 
   &.layout-split .message {
@@ -306,7 +343,7 @@ main > .section > .reservation-confirmation-wrapper {
 
   @media (max-width: 599.98px) {
     &.layout-split .card {
-      min-height: calc(var(--mg-panel-height, 100svh) - 48px);
+      min-height: calc(var(--panel-height) - 48px);
     }
 
     &.layout-split .visual {
@@ -322,10 +359,65 @@ main > .section > .reservation-confirmation-wrapper {
     }
   }
 
+  /* the authored texts at most their box's width, unless the design sets its own (:where, in
+     the block's root: weaker than the design's rules) */
+  :where(.subheading, .message) {
+    max-width: 100%;
+  }
+
+  /* the authored texts keep to their space whatever their length, in every mode, Universal
+     Editor's included (with the character limits, reservation-confirmation.js): a string with
+     no spaces breaks wherever it must, the subheading and message end in "…" after their most
+     lines (--lines); CONFIRMED (one line by design) ends in "…" at the card's width. A text being
+     typed in on the editor's canvas (contenteditable) shows whole, still wrapping */
+  :root & {
+    :is(.subheading, .message) {
+      overflow-wrap: anywhere;
+      /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- asked for */
+      word-break: break-word;
+    }
+
+    :is(.subheading, .message):not(:is([contenteditable='true'], [contenteditable='plaintext-only'])) {
+      /* stylelint-disable-next-line value-no-vendor-prefix -- the line clamp needs it, every engine */
+      display: -webkit-box;
+      overflow: hidden;
+      /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
+      -webkit-box-orient: vertical;
+      /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
+      -webkit-line-clamp: var(--lines);
+    }
+
+    .subheading {
+      --lines: 3;
+    }
+
+    .message {
+      --lines: 8;
+    }
+
+    /* CONFIRMED ends in "…" within the card's side padding; on phones, where CONFIRMED itself
+       runs into the padding, at the card's own edges */
+    &.layout-centered .heading:not(:is([contenteditable='true'], [contenteditable='plaintext-only'])) {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 599.98px) {
+      &.layout-centered .heading:not(:is([contenteditable='true'], [contenteditable='plaintext-only'])) {
+        max-width: calc(100% + 40px);
+      }
+    }
+  }
+
   /* Universal Editor (its markup carries data-aue-resource; never on the published page): the
      editor's canvas can grow to fit the page, and a page one screen tall would then grow it
      without end, so there the page is at most 1000px tall (as on /jsw-phase-3) */
-  body:has(&[data-aue-resource]) {
-    --mg-panel-height: min(100svh, 1000px);
+  &[data-aue-resource] {
+    --panel-height: min(100svh, 1000px);
+  }
+
+  main > .section:has(> .reservation-confirmation-wrapper > &[data-aue-resource]) {
+    min-height: min(100svh, 1000px);
   }
 }

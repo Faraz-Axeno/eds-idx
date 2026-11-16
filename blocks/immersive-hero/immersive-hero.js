@@ -272,7 +272,7 @@ function buildScrollIndicator() {
 }
 
 /**
- * --jsw-fit on <html>: how much the page's fixed-size parts (navigation, copy, hotspots,
+ * --fit on <html>: how much the page's fixed-size parts (navigation, copy, hotspots,
  * cards, footer) scale with very short or very large landscape screens, e.g. a browser zoomed
  * far in or out, so they keep their place beside the parts that scale with the screen
  * (videos, images). 1 on ordinary screens and on every portrait one.
@@ -286,7 +286,7 @@ function trackFit() {
       const grow = Math.min(h / 1200, w / 2133);
       fit = grow > 1 ? grow : Math.min(1, h / 640, w / 1000);
     }
-    document.documentElement.style.setProperty('--jsw-fit', fit.toFixed(3));
+    document.documentElement.style.setProperty('--fit', fit.toFixed(3));
   };
   window.addEventListener('resize', update);
   update();
@@ -305,8 +305,8 @@ function trackPage(indicator) {
     document.body.dataset.jswTheme = under?.dataset.jswTheme || 'dark';
     // a section may tint the pill, e.g. blog-carousel in its active post's colour
     const tone = under?.dataset.jswNavTone;
-    if (tone) document.body.style.setProperty('--jsw-nav-tone', tone);
-    else document.body.style.removeProperty('--jsw-nav-tone');
+    if (tone) document.body.style.setProperty('--nav-tone', tone);
+    else document.body.style.removeProperty('--nav-tone');
     document.body.toggleAttribute('data-jsw-nav-toned', Boolean(tone));
     if (indicator) {
       // shown on the hero (section 1) only: it steps aside once the page moves on from it.

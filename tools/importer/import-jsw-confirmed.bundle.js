@@ -64,7 +64,7 @@ var CustomImportScript = (() => {
       ];
       const main = document.createElement("div");
       main.append(WebImporter.Blocks.createBlock(document, { name: "reservation-confirmation", cells }));
-      const path = failed && "/jsw-payment-failed" || split && "/jsw-confirmed-split" || "/jsw-confirmed";
+      const path = failed && "/jsw/jsw-payment-failed" || split && "/jsw/jsw-confirmed-split" || "/jsw/jsw-confirmed";
       return [{ element: main, path, report: { title: "jsw-confirmed", split, failed } }];
     }
   };

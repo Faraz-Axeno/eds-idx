@@ -111,7 +111,7 @@ var CustomImportScript = (() => {
             ["meta_location", el(document, "p", location)],
             ["meta_tags", el(document, "p", experience)]
           ]),
-          hinted(document, "button", [link(document, "/jsw-reserve", "APPLY NOW")])
+          hinted(document, "button", [link(document, "/jsw/jsw-reserve", "APPLY NOW")])
         ]),
         // the Filter Dropdowns: their options a multi-value field, written in AEM's multi-value
         // notation ([a,b], a comma within an entry as \,), which md2jcr keeps as separate entries
@@ -165,7 +165,7 @@ var CustomImportScript = (() => {
       });
       const main = document.createElement("div");
       main.append(hero, document.createElement("hr"), WebImporter.Blocks.createBlock(document, { name: "open-roles", cells }), document.createElement("hr"), route);
-      return [{ element: main, path: "/jsw-phase-5", report: { title: "jsw-phase-5", roles: ROLES.length } }];
+      return [{ element: main, path: "/jsw/jsw-phase-5", report: { title: "jsw-phase-5", roles: ROLES.length } }];
     }
   };
   return __toCommonJS(import_jsw_phase_5_exports);

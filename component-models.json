@@ -963,7 +963,10 @@
         "name": "brand_ctaButton",
         "label": "CTA button link",
         "description": "Where the white button leads: a page, or #section on one.",
-        "required": true
+        "required": true,
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "text",
@@ -982,7 +985,10 @@
         "valueType": "string",
         "name": "brand_privacyPolicy",
         "label": "Privacy policy link",
-        "required": true
+        "required": true,
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "text",
@@ -1029,7 +1035,10 @@
         "valueType": "string",
         "name": "links_link1",
         "label": "Link 1 URL",
-        "description": "Page, #section or full URL. Needs its text too, or it is hidden."
+        "description": "Page, #section or full URL. Needs its text too, or it is hidden.",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "text",
@@ -1046,7 +1055,10 @@
         "valueType": "string",
         "name": "links_link2",
         "label": "Link 2 URL",
-        "description": "Page, #section or full URL. Needs its text too, or it is hidden."
+        "description": "Page, #section or full URL. Needs its text too, or it is hidden.",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "text",
@@ -1063,7 +1075,10 @@
         "valueType": "string",
         "name": "links_link3",
         "label": "Link 3 URL",
-        "description": "Page, #section or full URL. Needs its text too, or it is hidden."
+        "description": "Page, #section or full URL. Needs its text too, or it is hidden.",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "text",
@@ -1080,7 +1095,10 @@
         "valueType": "string",
         "name": "links_link4",
         "label": "Link 4 URL",
-        "description": "Page, #section or full URL. Needs its text too, or it is hidden."
+        "description": "Page, #section or full URL. Needs its text too, or it is hidden.",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "text",
@@ -1147,7 +1165,10 @@
         "valueType": "string",
         "name": "homeLink",
         "label": "Logo link",
-        "description": "Where the logo leads, e.g. the JSW home page."
+        "description": "Where the logo leads, e.g. the JSW home page.",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "aem-content",
@@ -1155,18 +1176,101 @@
         "name": "cta",
         "label": "Button link",
         "description": "Where the white button leads.",
-        "required": true
+        "required": true,
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "ctaText",
         "label": "Button text",
-        "description": "At most 17 characters; only the first 2 Nav Links are shown in the bar.",
+        "description": "Max 17 characters.",
         "value": "REGISTER INTEREST",
         "required": true,
         "validation": {
           "maxLength": 17
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "links_link1",
+        "label": "Link 1 target",
+        "description": "Optional: a page, a section (/jsw/jsw-phase-3#nev-tech) or a URL.",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "links_link1Text",
+        "label": "Link 1 text",
+        "description": "Optional, max 12 characters; shown only with its target.",
+        "validation": {
+          "maxLength": 12
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "links_link2",
+        "label": "Link 2 target",
+        "description": "Optional: a page, a section (/jsw/jsw-phase-3#nev-tech) or a URL.",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "links_link2Text",
+        "label": "Link 2 text",
+        "description": "Optional, max 12 characters; shown only with its target.",
+        "validation": {
+          "maxLength": 12
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "links_link3",
+        "label": "Link 3 target",
+        "description": "Optional: a page, a section (/jsw/jsw-phase-3#nev-tech) or a URL.",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "links_link3Text",
+        "label": "Link 3 text",
+        "description": "Optional, max 12 characters; shown only with its target.",
+        "validation": {
+          "maxLength": 12
+        }
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "links_link4",
+        "label": "Link 4 target",
+        "description": "Optional: a page, a section (/jsw/jsw-phase-3#nev-tech) or a URL.",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "links_link4Text",
+        "label": "Link 4 text",
+        "description": "Optional, max 12 characters; shown only with its target.",
+        "validation": {
+          "maxLength": 12
         }
       }
     ]
@@ -1179,19 +1283,22 @@
         "valueType": "string",
         "name": "link",
         "label": "Link URL",
-        "description": "A page, a section (/jsw-phase-3#nev-tech) or a URL; only 2 are shown.",
-        "required": true
+        "description": "Earlier Nav Link: use the block's Link 1-4 fields instead.",
+        "required": true,
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "linkText",
         "label": "Link text",
-        "description": "At most 11 characters (about 8 on tablets under 700px wide).",
+        "description": "Max 12 characters.",
         "value": "",
         "required": true,
         "validation": {
-          "maxLength": 11
+          "maxLength": 12
         }
       }
     ]
@@ -1824,7 +1931,11 @@
         "valueType": "string",
         "name": "media_backgroundAlt",
         "label": "Background image alt",
-        "value": ""
+        "value": "",
+        "description": "Describes the background for screen readers. Max 125 characters.",
+        "validation": {
+          "maxLength": 125
+        }
       },
       {
         "component": "reference",
@@ -1839,30 +1950,44 @@
         "valueType": "string",
         "name": "media_foregroundAlt",
         "label": "Foreground image alt",
-        "value": ""
+        "value": "",
+        "description": "Describes the car for screen readers. Max 125 characters.",
+        "validation": {
+          "maxLength": 125
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "content_heading",
         "label": "Main heading",
-        "value": "CONFIRMED"
+        "value": "CONFIRMED",
+        "description": "Title - the big heading on the card. Max 64 characters; 32 shown.",
+        "validation": {
+          "maxLength": 64
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "content_subheading",
         "label": "Personalized subheading",
-        "description": "Type {NAME} (braces included) where the visitor's name goes.",
-        "value": "YOU’RE IN, {NAME}."
+        "description": "Title - {NAME} for the name. Max 64 characters; 32 shown.",
+        "value": "YOU’RE IN, {NAME}.",
+        "validation": {
+          "maxLength": 64
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "content_message",
         "label": "Confirmation message",
-        "description": "One line per sentence; type {email} (braces included) for the email.",
-        "value": "We’ll message you when allocation opens. Your receipt is on its way to {email}."
+        "description": "Description - a line per sentence; {email} for the email. Max 200 characters.",
+        "value": "We’ll message you when allocation opens. Your receipt is on its way to {email}.",
+        "validation": {
+          "maxLength": 200
+        }
       }
     ]
   },
@@ -1882,7 +2007,11 @@
         "valueType": "string",
         "name": "media_backgroundAlt",
         "label": "Background image alt",
-        "value": ""
+        "value": "",
+        "description": "Describes the background for screen readers. Max 125 characters.",
+        "validation": {
+          "maxLength": 125
+        }
       },
       {
         "component": "reference",
@@ -1897,14 +2026,22 @@
         "valueType": "string",
         "name": "media_foregroundAlt",
         "label": "Foreground image alt",
-        "value": ""
+        "value": "",
+        "description": "Describes the car for screen readers. Max 125 characters.",
+        "validation": {
+          "maxLength": 125
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "media_priceLabel",
         "label": "Pricing: label",
-        "value": "RESERVATION AMOUNT"
+        "value": "RESERVATION AMOUNT",
+        "description": "Label - the small line above the amount. Max 32 characters.",
+        "validation": {
+          "maxLength": 32
+        }
       },
       {
         "component": "text",
@@ -1912,7 +2049,10 @@
         "name": "media_priceAmount",
         "label": "Pricing: amount (₹)",
         "value": "10000",
-        "description": "Amount in rupees (e.g. 10000), shown as ₹10,000 and charged via Razorpay."
+        "description": "Rupees (e.g. 10000), shown as ₹10,000 and charged. Max 12 characters.",
+        "validation": {
+          "maxLength": 12
+        }
       },
       {
         "component": "text",
@@ -1920,60 +2060,98 @@
         "name": "media_priceBadge",
         "label": "Pricing: badge",
         "value": "REFUNDABLE",
-        "description": "The small tag beside the label; leave empty for none."
+        "description": "Badge - the tag beside the label; empty for none. Max 16 characters.",
+        "validation": {
+          "maxLength": 16
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "media_priceNote",
         "label": "Pricing: note",
-        "value": "Total payable today. Refundable until you confirm your order. You’ll complete payment securely with our payment partner."
+        "value": "Total payable today. Refundable until you confirm your order. You’ll complete payment securely with our payment partner.",
+        "description": "Description - the text under the amount. Max 200 characters.",
+        "validation": {
+          "maxLength": 200
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "content_heading",
         "label": "Heading",
-        "value": "RESERVE NOW"
+        "value": "RESERVE NOW",
+        "description": "Title - the heading above the form. Max 64 characters; 32 shown.",
+        "validation": {
+          "maxLength": 64
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "content_subheading",
         "label": "Subheading",
-        "value": "Allocation opens December 2026. Cars are assigned in the order reservations are placed."
+        "value": "Allocation opens December 2026. Cars are assigned in the order reservations are placed.",
+        "description": "Description - the text under the heading. Max 200 characters.",
+        "validation": {
+          "maxLength": 200
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "content_disclaimer",
         "label": "Disclaimer text",
-        "description": "The small print below the button.",
-        "value": "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice."
+        "description": "Small print - the text below the button. Max 300 characters.",
+        "value": "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice.",
+        "validation": {
+          "maxLength": 300
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_pendingHeading",
+        "label": "Pending title",
+        "description": "Title - shown with the spinner. Max 64 characters; 32 shown.",
+        "value": "Processing your reservation",
+        "validation": {
+          "maxLength": 64
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_pendingDescription",
+        "label": "Pending description",
+        "description": "Description - the line under the pending title. Max 200 characters.",
+        "value": "Please wait while we process your request.",
+        "validation": {
+          "maxLength": 200
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "form_action",
         "label": "Form action URL",
-        "description": "Where the form data is sent; not used yet (the button uses Button link).",
-        "value": ""
+        "description": "Where the form data is sent; not used yet. Max 500 characters.",
+        "value": "",
+        "validation": {
+          "maxLength": 500
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "form_cities",
         "label": "City options",
-        "description": "The Select City choices: click Add for each city.",
-        "multi": true
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "form_razorpayKey",
-        "label": "Razorpay Key ID",
-        "value": "",
-        "description": "Public Key ID only (rzp_test_… or rzp_live_…); never the Key Secret."
+        "description": "The Select City choices: Add one per city. Max 40 characters each.",
+        "multi": true,
+        "validation": {
+          "maxLength": 40
+        }
       },
       {
         "component": "text",
@@ -1981,7 +2159,10 @@
         "name": "form_checkoutName",
         "label": "Razorpay: name shown",
         "value": "JSW Motors",
-        "description": "The name at the top of the Razorpay payment window."
+        "description": "Title - the name in the Razorpay window. Max 64 characters.",
+        "validation": {
+          "maxLength": 64
+        }
       },
       {
         "component": "text",
@@ -1989,56 +2170,85 @@
         "name": "form_checkoutDescription",
         "label": "Razorpay: description",
         "value": "Vehicle reservation",
-        "description": "The line under the name in the Razorpay payment window."
+        "description": "Description - the line under it in Razorpay. Max 200 characters.",
+        "validation": {
+          "maxLength": 200
+        }
       },
       {
         "component": "aem-content",
         "valueType": "string",
         "name": "form_button",
         "label": "Button link",
-        "description": "The page opened after a successful payment (the confirmation page)."
+        "description": "The page opened after a successful payment (the confirmation page).",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "form_buttonText",
         "label": "Button text",
-        "value": "PROCEED"
+        "value": "PROCEED",
+        "description": "Button label. Max 24 characters.",
+        "validation": {
+          "maxLength": 24
+        }
       },
       {
         "component": "aem-content",
         "valueType": "string",
         "name": "form_failure",
         "label": "Failure page link",
-        "description": "The page opened when the payment fails."
+        "description": "The page opened when the payment fails.",
+        "validation": {
+          "rootPath": "/content/eds-idx/jsw"
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "fields_firstNamePlaceholder",
         "label": "First name placeholder",
-        "value": "First Name*"
+        "value": "First Name*",
+        "description": "Placeholder of the first name field. Max 32 characters.",
+        "validation": {
+          "maxLength": 32
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "fields_lastNamePlaceholder",
         "label": "Last name placeholder",
-        "value": "Last Name*"
+        "value": "Last Name*",
+        "description": "Placeholder of the last name field. Max 32 characters.",
+        "validation": {
+          "maxLength": 32
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "fields_mobilePlaceholder",
         "label": "Mobile number placeholder",
-        "value": "Mobile Number*"
+        "value": "Mobile Number*",
+        "description": "Placeholder of the mobile field. Max 32 characters.",
+        "validation": {
+          "maxLength": 32
+        }
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "fields_emailPlaceholder",
         "label": "Email placeholder",
-        "value": "Email Address"
+        "value": "Email Address",
+        "description": "Placeholder of the email field. Max 32 characters.",
+        "validation": {
+          "maxLength": 32
+        }
       },
       {
         "component": "text",
@@ -2046,7 +2256,28 @@
         "name": "fields_cityPlaceholder",
         "label": "City dropdown placeholder",
         "value": "Select City",
-        "description": "The first, empty choice of the city list."
+        "description": "The first, empty choice of the city list. Max 32 characters.",
+        "validation": {
+          "maxLength": 32
+        }
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "fields_editorView",
+        "label": "Editor view",
+        "description": "Editor only: the form or the pending state here; the page starts on the form.",
+        "value": "form",
+        "options": [
+          {
+            "name": "Form",
+            "value": "form"
+          },
+          {
+            "name": "Pending state (edit its title and description)",
+            "value": "pending"
+          }
+        ]
       }
     ]
   }

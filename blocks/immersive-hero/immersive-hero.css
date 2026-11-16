@@ -6,10 +6,10 @@
 
 .immersive-hero {
   position: relative;
-  height: var(--mg-panel-height, 100svh);
+  height: var(--panel-height, 100svh);
   overflow: hidden;
-  color: var(--jsw-white, #fff);
-  background-color: var(--jsw-black, #050505);
+  color: var(--white, #fff);
+  background-color: var(--black, #050505);
 }
 
 /* centre visual: soft, blurred light behind an ambient glow
@@ -43,7 +43,7 @@
 /* Universal Editor: its canvas can grow to fit the page, so the offset follows the capped
    panel height (styles/jsw-phase-3.css) rather than the screen */
 .immersive-hero.immersive-hero-editing .immersive-hero-visual picture {
-  margin-top: calc(0.06 * var(--mg-panel-height, 100svh));
+  margin-top: calc(0.06 * var(--panel-height, 100svh));
 }
 
 .immersive-hero .immersive-hero-visual img {
@@ -124,13 +124,13 @@
     'desc action' auto / minmax(0, 1fr) auto;
   gap: 24px;
   height: 100%;
-  padding: 112px var(--jsw-edge, 20px) 40px;
+  padding: 112px var(--edge, 20px) 40px;
 }
 
 .immersive-hero .immersive-hero-title {
   grid-area: title;
   max-width: 18.6em; /* "NEW ENERGY FOR YOU" / "BUILT FOR BEYOND" */
-  font-family: var(--jsw-font-display);
+  font-family: var(--page-font-display);
   font-size: clamp(24px, 3.3vw, 60px);
   font-weight: 400;
   line-height: 1.12;
@@ -155,7 +155,7 @@
 /* desktop: the button sits nearer the edge than the copy, 47px in at 1280 (3.67vw) */
 @media (min-width: 900px) {
   .immersive-hero .immersive-hero-action {
-    margin-right: calc(3.67vw - var(--jsw-edge, 20px));
+    margin-right: calc(3.67vw - var(--edge, 20px));
   }
 }
 
@@ -170,13 +170,13 @@
   height: 52px;
   padding: 0 26px 0 24px;
   border-radius: 8px;
-  color: var(--jsw-text-dark, #111);
-  background-color: var(--jsw-white, #fff);
-  font-family: var(--jsw-font-mono);
+  color: var(--text-dark, #111);
+  background-color: var(--white, #fff);
+  font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0;
   text-transform: uppercase;
-  transition: background-color 0.3s var(--jsw-ease);
+  transition: background-color 0.3s var(--ease);
 }
 
 .immersive-hero a.immersive-hero-cta:hover {
@@ -226,13 +226,13 @@
   padding: 0 6px 0 12px;
   border: 1px solid transparent; /* no outline in the frames, on dark or light panels */
   border-radius: 11px;
-  color: var(--jsw-white, #fff);
+  color: var(--white, #fff);
 
-  /* --jsw-nav-tone: the colour of the section underneath, when it sets one (immersive-hero.js) */
-  background-color: var(--jsw-nav-tone, var(--jsw-pill-dark));
+  /* --nav-tone: the colour of the section underneath, when it sets one (immersive-hero.js) */
+  background-color: var(--nav-tone, var(--pill-dark));
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  transition: background-color 0.4s var(--jsw-ease), border-color 0.4s var(--jsw-ease);
+  transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease);
 }
 
 /* while tinted by the section underneath (the blog posts), the colour glides with that
@@ -240,11 +240,11 @@
 .jsw-phase-3[data-jsw-nav-toned] .immersive-hero-nav .immersive-hero-nav-inner {
   transition:
     background-color 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955),
-    border-color 0.4s var(--jsw-ease);
+    border-color 0.4s var(--ease);
 }
 
 .jsw-phase-3[data-jsw-theme='light'] .immersive-hero-nav .immersive-hero-nav-inner {
-  background-color: var(--jsw-pill-light);
+  background-color: var(--pill-light);
 }
 
 .jsw-phase-3 .immersive-hero-nav p {
@@ -269,7 +269,7 @@
 }
 
 .jsw-phase-3 .immersive-hero-nav .immersive-hero-nav-brand-text {
-  font-family: var(--jsw-font-display);
+  font-family: var(--page-font-display);
   font-size: 10px;
   letter-spacing: 0.12em;
   white-space: nowrap;
@@ -326,9 +326,9 @@
   height: 28px;
   padding: 0 14px;
   border-radius: 6px;
-  color: var(--jsw-text-dark, #111);
-  background-color: var(--jsw-white, #fff);
-  font-family: var(--jsw-font-mono);
+  color: var(--text-dark, #111);
+  background-color: var(--white, #fff);
+  font-family: var(--font-mono);
   font-size: 9px; /* "REGISTER INTEREST": 100px wide on a 142 x 28 button */
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -349,11 +349,11 @@
   border: 0;
   border-radius: 10px;
   cursor: pointer;
-  color: var(--jsw-white, #fff);
+  color: var(--white, #fff);
   background: none;
   font: inherit;
   transform: translateY(-50%);
-  transition: color 0.4s var(--jsw-ease), opacity 0.4s var(--jsw-ease);
+  transition: color 0.4s var(--ease), opacity 0.4s var(--ease);
 }
 
 .jsw-phase-3 .immersive-hero-scroll.is-hidden {
@@ -362,7 +362,7 @@
 }
 
 .jsw-phase-3 .immersive-hero-scroll:focus-visible {
-  outline: 2px solid var(--jsw-teal);
+  outline: 2px solid var(--teal);
   outline-offset: 3px;
 }
 
@@ -378,11 +378,11 @@
   background-color: rgb(12 12 12 / 88%);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  font-family: var(--jsw-font-mono);
+  font-family: var(--font-mono);
   font-size: 12.5px;
   line-height: 1;
   letter-spacing: 0.05em;
-  transition: background-color 0.3s var(--jsw-ease);
+  transition: background-color 0.3s var(--ease);
 }
 
 .jsw-phase-3 .immersive-hero-scroll-mouse {
@@ -393,7 +393,7 @@
 }
 
 .jsw-phase-3[data-jsw-theme='light'] .immersive-hero-scroll {
-  color: var(--jsw-text-dark, #111);
+  color: var(--text-dark, #111);
 }
 
 .jsw-phase-3[data-jsw-theme='light'] .immersive-hero-scroll-label {

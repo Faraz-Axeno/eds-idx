@@ -2,12 +2,12 @@
 /* global WebImporter */
 
 /**
- * JSW NEV collage page (/jsw-nev-collage).
+ * JSW NEV collage page (/jsw/jsw-nev-collage).
  * No source site: authored from the "NEV / Collage" and "NEV / Sustainable" frames, so the
  * fetched document is ignored. Two sections:
  *   1. jsw-navbar        brand link | links list | CTA link (fixed pill navigation)
  *   2. parallax-collage  heading + subtitle, then image | modifier rows
- * Side images were cropped from the design screenshots (content/images/jsw/).
+ * Side images were cropped from the design screenshots (content/jsw/images/jsw/).
  */
 
 const IMG = 'images/jsw';
@@ -73,11 +73,11 @@ export default {
     const navbar = WebImporter.Blocks.createBlock(document, {
       name: 'jsw-navbar',
       cells: [
-        [hinted(document, 'brand', [el(document, 'p', a('/jsw-phase-3', 'JSW MOTORS'))])],
+        [hinted(document, 'brand', [el(document, 'p', a('/jsw/jsw-phase-3', 'JSW MOTORS'))])],
         [hinted(document, 'links', [el(document, 'ul',
-          el(document, 'li', a('/jsw-phase-3#nev-tech', 'NEV TECH')),
-          el(document, 'li', a('/jsw-phase-3#newsroom', 'NEWSROOM')))])],
-        [hinted(document, 'cta', [el(document, 'p', a('/jsw-phase-3#register-interest', 'REGISTER INTEREST'))])],
+          el(document, 'li', a('/jsw/jsw-phase-3#nev-tech', 'NEV TECH')),
+          el(document, 'li', a('/jsw/jsw-phase-3#newsroom', 'NEWSROOM')))])],
+        [hinted(document, 'cta', [el(document, 'p', a('/jsw/jsw-phase-3#register-interest', 'REGISTER INTEREST'))])],
       ],
     });
 
@@ -95,7 +95,7 @@ export default {
 
     return [{
       element: main,
-      path: '/jsw-nev-collage',
+      path: '/jsw/jsw-nev-collage',
       report: { title: 'jsw-nev-collage', images: IMAGES.length },
     }];
   },

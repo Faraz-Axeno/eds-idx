@@ -4,7 +4,7 @@
  * 956 x 556, 107px from the top: the car on its left 435px, the form on the right (36px in).
  */
 
-@import url('../../styles/pill-nav.css');
+@import url('../jsw-nav/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .reservation-form-wrapper {
@@ -22,8 +22,12 @@ main > .section > .reservation-form-wrapper {
      height, smaller on shorter screens (at least 0.6px). Tablets and phones keep 1px units */
   --reservation-form-unit: 1px;
 
+  /* the page's panel height, the block's own: a screen tall (at most 1000px in Universal Editor,
+     below) */
+  --panel-height: 100svh;
+
   box-sizing: border-box;
-  min-height: var(--mg-panel-height, 100svh);
+  min-height: var(--panel-height);
   padding: 8px;
   color: #111;
   background-color: #050505;
@@ -31,8 +35,15 @@ main > .section > .reservation-form-wrapper {
 
   @supports (height: 1svh) and (width: clamp(1px, 1px, 1px)) {
     @media (min-width: 900px) {
-      --reservation-form-unit: clamp(0.6px, calc((var(--mg-panel-height, 100svh) - 146px) / 556), 1px);
+      --reservation-form-unit: clamp(0.6px, calc((var(--panel-height) - 146px) / 556), 1px);
     }
+  }
+
+  /* the page holding the block scrolls freely: no snapping to its sections (styles/styles.css);
+     scroll snapping can only be set on the page itself, so this one rule sits above the block,
+     keyed on the block being on the page */
+  html.panels-ready:has(&) {
+    scroll-snap-type: none;
   }
 
   .frame {
@@ -42,7 +53,7 @@ main > .section > .reservation-form-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: calc(var(--mg-panel-height, 100svh) - 16px);
+    min-height: calc(var(--panel-height) - 16px);
     padding: 90px 24px 40px;
     overflow: hidden;
     border-radius: 24px;
@@ -132,41 +143,59 @@ main > .section > .reservation-form-wrapper {
     min-height: calc(24 * var(--reservation-form-unit));
   }
 
+  /* the typography, Figma's: New Science in its four styles, each its own font file (the Adobe
+     Fonts kit, reservation-form.js; --font-new-science… in styles/styles.css): Regular (400) and
+     Medium (500) of New Science, Regular (400) and Medium (500) of New Science Extended */
+
+  /* RESERVATION AMOUNT: Medium, 10px */
   .pricing-label {
     color: #a9a9a9;
+    font-family: var(--font-new-science);
     font-size: calc(10 * var(--reservation-form-unit));
+    font-weight: 500;
+    line-height: 1;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
+  /* REFUNDABLE: Medium, 10px, its text centred in its box */
   .pricing-badge {
     flex: none;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
     height: calc(24 * var(--reservation-form-unit));
     padding: 0 calc(10 * var(--reservation-form-unit));
     border: 1px solid rgb(255 255 255 / 55%);
     border-radius: calc(6 * var(--reservation-form-unit));
-    font-size: calc(9 * var(--reservation-form-unit));
-    line-height: calc(calc(24 * var(--reservation-form-unit)) - 2px);
-    letter-spacing: 0.06em;
+    font-family: var(--font-new-science);
+    font-size: calc(10 * var(--reservation-form-unit));
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
+  /* ₹10,000: Regular Extended, 36px */
   .pricing-amount {
     margin-top: calc(2 * var(--reservation-form-unit));
-    font-family: var(--pill-font-display);
+    font-family: var(--font-new-science-extended);
     font-size: calc(36 * var(--reservation-form-unit));
-    font-weight: 300;
-    line-height: calc(40 * var(--reservation-form-unit));
-    letter-spacing: -0.01em;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0;
     white-space: nowrap;
   }
 
+  /* the note under the amount: Regular, 12px */
   .pricing p.pricing-note {
     margin-top: calc(10 * var(--reservation-form-unit));
     color: #9b9b9b;
-    font-size: calc(11 * var(--reservation-form-unit));
-    line-height: calc(17 * var(--reservation-form-unit));
+    font-family: var(--font-new-science);
+    font-size: calc(12 * var(--reservation-form-unit));
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0;
   }
 
   .body {
@@ -176,21 +205,26 @@ main > .section > .reservation-form-wrapper {
     padding: calc(40 * var(--reservation-form-unit)) calc(36 * var(--reservation-form-unit)) calc(36 * var(--reservation-form-unit));
   }
 
+  /* RESERVE NOW: Medium Extended, 24px */
   .heading {
     margin: 0 0 calc(10 * var(--reservation-form-unit));
-    font-family: var(--pill-font-display);
-    font-size: calc(26 * var(--reservation-form-unit));
-    font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: 0.01em;
+    font-family: var(--font-new-science-extended);
+    font-size: calc(24 * var(--reservation-form-unit));
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
   }
 
+  /* Allocation opens…: Medium, 14px */
   .subheading {
     margin: 0 0 calc(20 * var(--reservation-form-unit));
     color: #666;
-    font-size: calc(13.5 * var(--reservation-form-unit));
+    font-family: var(--font-new-science);
+    font-size: calc(14 * var(--reservation-form-unit));
+    font-weight: 500;
     line-height: 1.45;
+    letter-spacing: 0;
   }
 
   .fields {
@@ -222,9 +256,13 @@ main > .section > .reservation-form-wrapper {
     border-radius: calc(6 * var(--reservation-form-unit));
     color: #111;
     background-color: #f2f2f2;
-    font-family: inherit;
+
+    /* the placeholders, the city list and +91: Medium, 12px */
+    font-family: var(--font-new-science);
     font-size: calc(12 * var(--reservation-form-unit));
-    line-height: calc(calc(46 * var(--reservation-form-unit)) - 2px);
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0;
     transition: border-color 0.2s ease;
   }
 
@@ -245,7 +283,25 @@ main > .section > .reservation-form-wrapper {
 
   /* a field breaking its rule is outlined until it is corrected (reservation-form.js) */
   .input.is-invalid {
-    border-color: #d64545;
+    border-color: #ff3b30;
+    background-color: #fff0f0;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  /* a field marked: its placeholder (and the city list's empty choice) red too */
+  .input.is-invalid::placeholder {
+    color: #ff3b30;
+    opacity: 0.8;
+  }
+
+  .select select.is-invalid:not(.is-chosen) {
+    color: rgb(255 59 48 / 80%);
+  }
+
+  /* a marked field being typed in: its red edge, and a soft red ring */
+  .input.is-invalid:focus {
+    border-color: #ff3b30;
+    box-shadow: 0 0 0 2px rgb(255 59 48 / 20%);
   }
 
   /* a field and, under it, its error message: in the gap below the field, so nothing moves */
@@ -311,9 +367,13 @@ main > .section > .reservation-form-wrapper {
     border-radius: calc(6 * var(--reservation-form-unit));
     color: #fff;
     background-color: #000;
-    font-family: inherit;
+
+    /* PROCEED: Medium, 12px */
+    font-family: var(--font-new-science);
     font-size: calc(12 * var(--reservation-form-unit));
-    letter-spacing: 0.02em;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -328,12 +388,130 @@ main > .section > .reservation-form-wrapper {
     outline-offset: 3px;
   }
 
+  /* the legal disclaimer: Regular, 10px */
   .disclaimer {
     max-width: calc(420 * var(--reservation-form-unit));
     margin: calc(22 * var(--reservation-form-unit)) 0 0;
     color: #707070;
-    font-size: calc(9 * var(--reservation-form-unit));
-    line-height: 1.55;
+    font-family: var(--font-new-science);
+    font-size: calc(10 * var(--reservation-form-unit));
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  /* the form and the pending view in one place, so the card keeps its size in either state */
+  .views {
+    display: grid;
+  }
+
+  .views > .fields {
+    grid-area: 1 / 1;
+  }
+
+  /* the pending state (.is-pending, reservation-form.js): from the payment's start until the
+     outcome's page opens, the form (hidden, keeping its place) gives way to the spinner and the
+     status texts, centred on the card as in the "Processing your reservation" frame */
+  .pending-view {
+    box-sizing: border-box;
+    display: none;
+    grid-area: 1 / 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0 calc(24 * var(--reservation-form-unit));
+    text-align: center;
+  }
+
+  &.is-pending .fields {
+    visibility: hidden;
+  }
+
+  &.is-pending .pending-view {
+    display: flex;
+  }
+
+  /* the spinner: an 80px ring, a gradient from black through silver to blue, with its own glow
+     (a blurred copy of the ring), turning */
+  .spinner {
+    position: relative;
+    flex: none;
+    width: calc(80 * var(--reservation-form-unit));
+    height: calc(80 * var(--reservation-form-unit));
+    margin: 0 0 calc(22 * var(--reservation-form-unit));
+    isolation: isolate;
+    border-radius: 50%;
+    box-shadow: 0 0 calc(26 * var(--reservation-form-unit)) calc(4 * var(--reservation-form-unit)) rgb(64 104 255 / 30%);
+    animation: reservation-spinner-turn 1.2s linear infinite;
+  }
+
+  .spinner::before,
+  .glow::before {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-image: conic-gradient(#101014 0deg, #2a2a2e 20deg, #cfcfd4 40deg, #f7f7f9 60deg, #bdbdc2 85deg, #3a3a40 110deg, #0d0d12 135deg, #1f3ad8 162deg, #2d55ff 200deg, #2448f0 250deg, #1a33c2 290deg, #0f1a5a 325deg, #0b0b12 350deg, #101014 360deg);
+    content: '';
+    -webkit-mask-image: radial-gradient(farthest-side, transparent calc(100% - var(--ring) - 0.5px), #000 calc(100% - var(--ring)));
+    mask-image: radial-gradient(farthest-side, transparent calc(100% - var(--ring) - 0.5px), #000 calc(100% - var(--ring)));
+  }
+
+  .spinner::before {
+    --ring: calc(5 * var(--reservation-form-unit));
+  }
+
+  /* the ring's centre white, the glow showing mostly around it */
+  .spinner::after {
+    position: absolute;
+    inset: calc(5 * var(--reservation-form-unit));
+    border-radius: 50%;
+    background-image: radial-gradient(closest-side, #fff 62%, rgb(255 255 255 / 0%));
+    content: '';
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.85;
+    filter: blur(calc(12 * var(--reservation-form-unit)));
+  }
+
+  .glow::before {
+    --ring: calc(11 * var(--reservation-form-unit));
+  }
+
+  /* fewer motions asked for: the ring turns slowly */
+  @media (prefers-reduced-motion: reduce) {
+    .spinner {
+      animation-duration: 4s;
+    }
+  }
+
+  .status-title {
+    max-width: 100%;
+    margin: 0;
+    color: #111;
+    font-family: inherit;
+    font-size: calc(21 * var(--reservation-form-unit));
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+
+  /* focused (by the script) only so screen readers announce it: no focus ring */
+  .status-title:focus {
+    outline: none;
+  }
+
+  .status-text {
+    max-width: calc(380 * var(--reservation-form-unit));
+    margin: calc(6 * var(--reservation-form-unit)) 0 0;
+    color: #5c5c5c;
+    font-size: calc(14 * var(--reservation-form-unit));
+    line-height: 1.45;
+    overflow-wrap: anywhere;
   }
 
   /* settings that are not shown (action URL, cities, the button link): published they are
@@ -376,6 +554,18 @@ main > .section > .reservation-form-wrapper {
     }
   }
 
+  /* under 768px: the amount and RESERVE NOW scaled down (36 to 30px, 24 to 20px), so they keep
+     to the card's width */
+  @media (max-width: 767.98px) {
+    .pricing-amount {
+      font-size: 30px;
+    }
+
+    .heading {
+      font-size: 20px;
+    }
+  }
+
   @media (max-width: 599.98px) {
     .frame {
       padding: 16px 12px;
@@ -388,15 +578,6 @@ main > .section > .reservation-form-wrapper {
     .pricing {
       margin: 0 8px 8px;
       padding: 16px;
-    }
-
-    .pricing-amount {
-      font-size: 32px;
-      line-height: 38px;
-    }
-
-    .heading {
-      font-size: 22px;
     }
 
     .subheading {
@@ -416,10 +597,86 @@ main > .section > .reservation-form-wrapper {
     }
   }
 
+  /* the authored texts at most their box's width, unless the design sets its own (:where, in
+     the block's root: weaker than the design's rules) */
+  :where(.heading, .subheading, .pricing-note, .disclaimer, .status-title, .status-text) {
+    max-width: 100%;
+  }
+
+  /* the authored texts keep to their space whatever their length, in every mode, Universal
+     Editor's included (with the character limits, reservation-form.js): a string with no spaces
+     breaks wherever it must, a text block ends in "…" after its most lines (--lines), a one-line
+     text (pricing label, badge, amount, button, fields) after its width. A text being typed in
+     on the editor's canvas (contenteditable) shows whole, still wrapping */
+  :root & {
+    :is(.heading, .subheading, .pricing-note, .disclaimer, .status-title, .status-text) {
+      overflow-wrap: anywhere;
+      /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- asked for */
+      word-break: break-word;
+    }
+
+    :is(.heading, .subheading, .pricing-note, .disclaimer, .status-title, .status-text):not(:is([contenteditable='true'], [contenteditable='plaintext-only'])) {
+      /* stylelint-disable-next-line value-no-vendor-prefix -- the line clamp needs it, every engine */
+      display: -webkit-box;
+      overflow: hidden;
+      /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
+      -webkit-box-orient: vertical;
+      /* stylelint-disable-next-line property-no-vendor-prefix -- as above */
+      -webkit-line-clamp: var(--lines);
+    }
+
+    .heading,
+    .status-title {
+      --lines: 2;
+    }
+
+    .subheading,
+    .status-text {
+      --lines: 4;
+    }
+
+    .pricing-note {
+      --lines: 5;
+    }
+
+    .disclaimer {
+      --lines: 6;
+    }
+
+    :is(.pricing-label, .pricing-badge, .pricing-amount, .submit, .input):not(:is([contenteditable='true'], [contenteditable='plaintext-only'])) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .pricing-label {
+      min-width: 0;
+    }
+
+    .pricing-badge {
+      max-width: 50%;
+    }
+
+    .submit {
+      max-width: 100%;
+    }
+  }
+
   /* Universal Editor (its markup carries data-aue-resource; never on the published page): the
      editor's canvas can grow to fit the page, and a page one screen tall would then grow it
      without end, so there the page is at most 1000px tall (as on /jsw-phase-3) */
-  body:has(&[data-aue-resource]) {
-    --mg-panel-height: min(100svh, 1000px);
+  &[data-aue-resource] {
+    --panel-height: min(100svh, 1000px);
+  }
+
+  main > .section:has(> .reservation-form-wrapper > &[data-aue-resource]) {
+    min-height: min(100svh, 1000px);
+  }
+}
+
+/* the pending state's spinner turning (keyframes cannot sit inside the block's rule) */
+@keyframes reservation-spinner-turn {
+  to {
+    transform: rotate(1turn);
   }
 }

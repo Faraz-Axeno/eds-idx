@@ -6,39 +6,143 @@
  * Rows (field groups of the model, _reservation-form.json):
  *   media   — background image, foreground image; the pricing panel over the car: label,
  *             amount (₹, also what Razorpay charges), badge, note
- *   content — heading, subheading, disclaimer
+ *   content — heading, subheading, disclaimer, pending title, pending description
  *   form    — form action URL, city options (a multi-value field: a list, or comma-separated
- *             text where multi-field rendering is off), Razorpay Key ID, name and description
+ *             text where multi-field rendering is off), name and description
  *             for the Razorpay window, button (link + text: the page after a successful
  *             payment), failure page link
- *   fields  — the placeholders of first name, last name, mobile, email and the city list
+ *   fields  — the placeholders of first name, last name, mobile, email and the city list, then
+ *             the editor view: Universal Editor only, the form (default) or the pending state on
+ *             the canvas, to see it and edit its title and description; the page starts on the
+ *             form whatever it is
  *   (rows after these are City Option items of the earlier model: used when the city options
  *   field is empty)
  * In Universal Editor each placeholder field's instrumentation is on its input (the city list
  * placeholder on the select, the city options on the select's box), so picking the field in
  * the content tree outlines that input.
+ * Every field is required: one focused and then left empty is marked at once (.is-invalid, with
+ * its message), and cleared as soon as something is typed in it or a city is chosen.
  * The button checks and cleans every field (RULES below; a field that fails gets .is-invalid
  * until it is corrected), builds the payload from the cleaned values (HTML tags stripped),
  * announces it (a "reservation:submit" event on the block, for a later backend), keeps the first
- * name and email in sessionStorage, then takes the payment in Razorpay's window
- * (scripts/razorpay.js), which shows its loading, verification and error steps itself:
+ * name and email in sessionStorage (FIRST_NAME_KEY, EMAIL_KEY: the confirmation and failure
+ * pages show them), then shows the pending state (the form gives its place to
+ * a spinner and the pending title and description) and takes the payment in Razorpay's window
+ * (razorpay.js, in this block), which shows its loading, verification and error steps itself:
  *   paid      — the button link (confirmation page)
  *   failed    — the failure page link (also when Razorpay cannot be loaded or is not set up)
- *   closed    — back to the form
+ *   closed    — back to the form (also when no page is set for the outcome)
+ * The pending state stays hidden on load, in Universal Editor too (its title and description are
+ * in the block's properties; the editor's Preview mode and PROCEED show it).
  * The outcome is kept in sessionStorage (PAYMENT_KEY) for those pages. Test mode only needs the
  * public Key ID: no backend creates orders or verifies payments yet.
  */
 
-import { loadPillNav } from '../../scripts/pill-nav.js';
-import { IMAGE_EXTENSIONS, acceptedPicture } from '../../scripts/media-types.js';
-import { KEY_ID, loadRazorpay, payWithRazorpay } from '../../scripts/razorpay.js';
+import { loadPillNav } from '../jsw-nav/pill-nav.js';
+import { KEY_ID, loadRazorpay, payWithRazorpay } from './razorpay.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
-// where the visitor's first name and email are kept for the confirmation page
-const RESERVATION_KEY = 'reservation-details';
+// the Razorpay public Key ID (rzp_test_… to test, rzp_live_… live): set here, not authored, so it
+// is in neither the editor nor the page's content. Only the public Key ID: the Key Secret never
+// goes in the site's code (everything here is public)
+// TODO: Add actual Razorpay Public Key here
+const RAZORPAY_KEY = 'rzp_test_nA1ELMwJ9Sp76d';
+
+// the New Science fonts (the team's Adobe Fonts web project: --font-new-science… in styles.css),
+// loaded with the block, once, not blocking the page: until they arrive the fallbacks show
+const FONT_KIT = 'https://use.typekit.net/qil0qom.css';
+
+function loadFontKit() {
+  if (document.querySelector(`link[href="${FONT_KIT}"]`)) return;
+  const preconnect = document.createElement('link');
+  preconnect.rel = 'preconnect';
+  preconnect.href = 'https://use.typekit.net';
+  preconnect.crossOrigin = '';
+  const kit = document.createElement('link');
+  kit.rel = 'stylesheet';
+  kit.href = FONT_KIT;
+  document.head.append(preconnect, kit);
+}
+
+// the file types the block's media accept, by the asset's extension (published images keep
+// their file's: media_….jpg): an asset of another type is not shown, a console warning instead
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png']; // general images: backgrounds, photos
+
+/** an asset's file extension, from its URL's path ('' when it has none) */
+function extensionOf(url) {
+  try {
+    const name = new URL(url, window.location.href).pathname.split('/').pop();
+    return name.includes('.') ? name.split('.').pop().toLowerCase() : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+/**
+ * whether an asset's file type is accepted for its field; if not, a warning (it is not shown)
+ * @param {string} url the asset
+ * @param {string[]} allowed the field's extensions (IMAGE_EXTENSIONS…)
+ * @param {string} field the field, for the warning (e.g. 'background image')
+ * @param {string} block the block, for the warning
+ */
+function acceptedType(url, allowed, field, block) {
+  const ext = extensionOf(url);
+  if (allowed.includes(ext)) return true;
+  // eslint-disable-next-line no-console
+  console.warn(`${block}: the ${field} ${url} is not shown: its file type (${ext ? `.${ext}` : 'none'}) is not .${allowed.join(', .')}`);
+  return false;
+}
+
+/** a picture whose image is of an accepted file type for its field, else null (not shown) */
+function acceptedPicture(picture, allowed, field, block) {
+  const src = picture?.querySelector('img')?.getAttribute('src');
+  if (!picture || !src) return picture || null;
+  return acceptedType(src, allowed, field, block) ? picture : null;
+}
+
+// where the visitor's first name and email are kept (sessionStorage) for the confirmation and
+// failure pages (the reservation-confirmation block reads, then clears them)
+const FIRST_NAME_KEY = 'reservationFirstName';
+const EMAIL_KEY = 'reservationEmail';
 
 // where the payment's outcome is kept: { status, paymentId } or { status, code, description, … }
 const PAYMENT_KEY = 'reservation-payment';
+
+// the pending state's texts when the author has left them empty
+const PENDING = {
+  title: 'Processing your reservation',
+  description: 'Please wait while we process your request.',
+};
+
+// the most characters each authored text shows, as the fields' maxLength (_reservation-form.json):
+// a longer text, saved before a limit or imported, is cut with "..." on the page and named in a
+// console warning; in the editor it stays whole (limitText, limitString below). The amount
+// is not cut (a cut number would be a wrong price): it keeps to one line (reservation-form.css).
+// The heading and pending title (fields of 64) show 32 (limitTitle below)
+const LIMITS = {
+  subheading: 200,
+  disclaimer: 300,
+  priceLabel: 32,
+  priceBadge: 16,
+  priceNote: 200,
+  pendingDescription: 200,
+  buttonText: 24,
+  placeholder: 32,
+  city: 40,
+  checkoutName: 64,
+  checkoutDescription: 200,
+};
+
+// the block, as named in its console warnings
+const BLOCK = 'reservation-form';
+
+// the small print when its field is empty or holds only a link or address, no words (as an
+// email turned into a link on upload once left it: mailto:…): the model's default, all plain text
+const DISCLAIMER = 'JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice.';
+
+// a word joiner (invisible), put before an email's @ in imported content so the upload (md2jcr)
+// keeps the address as text rather than a mailto: link; taken out on the page
+const WORD_JOINER = /\u2060/g;
 
 // placeholders when the author has left them empty
 const PLACEHOLDERS = {
@@ -101,6 +205,139 @@ const RULES = {
 // ids of the error messages under the fields
 let errorCount = 0;
 
+/** a console warning for the author: a text over its limit (cut on the page, whole in editor) */
+function warnLimit(field, length, limit) {
+  // eslint-disable-next-line no-console
+  console.warn(`${BLOCK}: the ${field} is ${length} characters, over its ${limit}: it is cut with "..." on the page`);
+}
+
+/** a text at most `limit` characters, cut with "..." when longer */
+const truncate = (text, limit) => (text.length > limit
+  ? `${text.slice(0, Math.max(0, limit - 3)).trimEnd()}...` : text);
+
+/**
+ * a text value (a placeholder, an option, a setting) within its limit (LIMITS); in Universal
+ * Editor kept whole, with the warning only
+ * @param {string} text the authored text
+ * @param {number} limit its most characters
+ * @param {string} field the field, for the warning (e.g. 'button text')
+ * @param {boolean} [editing] in Universal Editor
+ */
+function limitString(text, limit, field, editing = false) {
+  const value = String(text ?? '');
+  if (value.length <= limit) return value;
+  warnLimit(field, value.length, limit);
+  return editing ? value : truncate(value, limit);
+}
+
+/**
+ * an element's text cut after `keep` characters, then "...", in place: its elements (e.g. a
+ * filled-in {NAME}) are kept up to the cut, the rest removed
+ */
+function cutText(node, keep) {
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+  const texts = [];
+  while (walker.nextNode()) texts.push(walker.currentNode);
+  let left = Math.max(0, keep);
+  let cut = false;
+  const emptied = new Set();
+  texts.forEach((text) => {
+    if (cut) {
+      emptied.add(text.parentElement);
+      text.remove();
+    } else if (text.data.length <= left) {
+      left -= text.data.length;
+    } else {
+      text.data = `${text.data.slice(0, left).trimEnd()}...`;
+      cut = true;
+    }
+  });
+  // the elements the cut left empty (e.g. a {NAME} after it), up to the node itself
+  emptied.forEach((start) => {
+    let empty = start;
+    while (empty && empty !== node && !empty.hasChildNodes()) {
+      const parent = empty.parentElement;
+      empty.remove();
+      empty = parent;
+    }
+  });
+}
+
+/**
+ * an element's text within its limit (LIMITS), in place: its elements (e.g. a filled-in {NAME})
+ * are kept up to the cut, the rest removed; the whole wording becomes the element's tooltip. In
+ * Universal Editor kept whole (cutting it there could save the cut text), with the warning only
+ * @param {Element} node the element
+ * @param {number} limit its most characters
+ * @param {string} field the field, for the warning
+ * @param {boolean} [editing] in Universal Editor
+ * @returns {boolean} whether the text was over its limit
+ */
+function limitText(node, limit, field, editing = false) {
+  const whole = node?.textContent || '';
+  if (whole.length <= limit) return false;
+  warnLimit(field, whole.length, limit);
+  if (editing) return true;
+  node.title = whole.replace(/\s+/g, ' ').trim();
+  cutText(node, limit - 3);
+  return true;
+}
+
+// titles, headings and the visitor's name show at most 32 characters on the page (the lead
+// developer's rule; their fields allow 64): a longer one shows its first 32, then "..."
+const TITLE_LIMIT = 32;
+const truncateTo32 = (text) => {
+  if (!text) return '';
+  const visualLimit = TITLE_LIMIT;
+  return text.length > visualLimit ? `${text.substring(0, visualLimit).trim()}...` : text;
+};
+
+/** a title cut at 32 characters (truncateTo32), in place, its whole wording as the tooltip */
+function cutTitle(node, whole) {
+  node.title = whole.replace(/\s+/g, ' ').trim();
+  // plain text: truncateTo32 itself; with elements (a filled-in {NAME}): the same cut, in place
+  if (!node.children.length) node.textContent = truncateTo32(whole);
+  else cutText(node, TITLE_LIMIT);
+}
+
+/**
+ * Universal Editor: a title (cut on the canvas, as on the page) shows whole while the author
+ * types in it (the editor makes it contenteditable), so the whole text is what the editor saves;
+ * cut again once the typing ends
+ */
+function keepWholeWhileEditing(node, whole) {
+  let text = whole;
+  let typing = false;
+  new MutationObserver(() => {
+    const now = node.isContentEditable;
+    if (now && !typing) {
+      typing = true;
+      node.textContent = text;
+      node.removeAttribute('title');
+    } else if (!now && typing) {
+      typing = false;
+      text = node.textContent;
+      if (text.length > TITLE_LIMIT) cutTitle(node, text);
+    }
+  }).observe(node, { attributes: true, attributeFilter: ['contenteditable'] });
+}
+
+/**
+ * a title or heading shown at most 32 characters (truncateTo32), on the page and in Universal
+ * Editor's canvas alike, the whole wording as its tooltip and a console warning for the author;
+ * in the editor it shows whole while typed in (keepWholeWhileEditing)
+ * @param {Element} node the element
+ * @param {string} field the field, for the warning
+ * @param {boolean} [editing] in Universal Editor: typing in it shows it whole
+ */
+function limitTitle(node, field, editing = false) {
+  const whole = node?.textContent || '';
+  if (editing) keepWholeWhileEditing(node, whole);
+  if (whole.length <= TITLE_LIMIT) return;
+  warnLimit(field, whole.length, TITLE_LIMIT);
+  cutTitle(node, whole);
+}
+
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -112,15 +349,21 @@ function el(tag, className, attrs = {}) {
  * a grouped cell's fields: in Universal Editor each names its field (data-aue-prop),
  * published they come in model order (pictures, text paragraphs and links each in order)
  */
-function fieldsOf(cell) {
+function fieldsOf(cell, { withLinks = false } = {}) {
   const named = (name) => cell?.querySelector(`[data-aue-prop="${name}"]`);
   const pictures = [...(cell?.querySelectorAll('picture') || [])];
   const links = [...(cell?.querySelectorAll('a') || [])];
+  // the text paragraphs; withLinks: a paragraph holding a link counts too (a text field with an
+  // email or URL in it), so the fields after it keep their places
   const texts = [...(cell?.querySelectorAll('p') || [])]
-    .filter((p) => !p.querySelector('picture, a') && p.textContent.trim());
+    .filter((p) => !p.querySelector(withLinks ? 'picture' : 'picture, a') && p.textContent.trim());
+  // Universal Editor names each field it renders (data-aue-prop): there a field is found by its
+  // name only, never by its place (a field it does not render, e.g. one saved as a bare link,
+  // must not take the next field's element and its instrumentation)
+  const byName = Boolean(cell?.querySelector('[data-aue-prop]'));
   return {
     picture: (name, i) => named(name)?.closest('picture') || pictures[i] || null,
-    text: (name, i) => named(name) || texts[i] || null,
+    text: (name, i) => named(name) || (byName ? null : texts[i]) || null,
     link: (name, i) => {
       const a = named(name);
       return (a?.tagName === 'A' ? a : a?.querySelector('a')) || links[i] || null;
@@ -140,15 +383,19 @@ function retag(node, tag, className) {
 
 /**
  * the button link as it works where the page is open: on the AEM author pages live at
- * /content/{site}/….html, so a site path (/jsw-confirmed) gets the site root and .html there;
- * on aem.page / aem.live the link is used as authored
+ * /content/{site}/….html, so a site path (/jsw/jsw-confirmed) gets the site root and .html there;
+ * in the local preview at /content/… (no .html); on aem.page / aem.live it is used as authored
  */
 function authorUrl(href) {
-  const root = window.location.pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0];
-  if (!root || !href.startsWith('/') || href.startsWith('//')) return href;
+  const { pathname } = window.location;
+  if (!pathname.startsWith('/content/') || !href.startsWith('/') || href.startsWith('//')) return href;
+  // an author page ends in .html; in the local preview /content/jsw/… is a folder, not a site
+  const author = pathname.endsWith('.html');
+  const root = author ? pathname.match(/^\/content\/[^/]+(?=\/)/)?.[0] : '/content';
+  if (!root) return href;
   const [, path, rest] = href.match(/^([^?#]*)(.*)$/);
   const full = path.startsWith('/content/') ? path : `${root}${path}`;
-  return /\.[a-z0-9]+$/i.test(full) ? `${full}${rest}` : `${full}.html${rest}`;
+  return !author || /\.[a-z0-9]+$/i.test(full) ? `${full}${rest}` : `${full}.html${rest}`;
 }
 
 /**
@@ -166,13 +413,22 @@ function input(name, placeholder, attrs = {}) {
  * @param {Element} block The block element
  */
 export default function decorate(block) {
+  loadFontKit();
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const [mediaRow, contentRow, formRow, fieldsRow, ...cityRows] = [...block.children];
   const [mediaCell, contentCell, formCell, fieldsCell] = [mediaRow, contentRow, formRow, fieldsRow]
     .map((row) => row?.querySelector(':scope > div') || row);
   const media = fieldsOf(mediaCell);
-  const content = fieldsOf(contentCell);
+  // the content group holds texts only: its disclaimer's email is a link
+  const content = fieldsOf(contentCell, { withLinks: true });
   const config = fieldsOf(formCell);
+  // the editor view (after the placeholders in their group: taken out before they are read);
+  // published only a value, form or pending, which the page never uses
+  const viewField = fieldsCell?.querySelector('[data-aue-prop="fields_editorView"]')
+    || [...(fieldsCell?.querySelectorAll('p') || [])]
+      .filter((p) => /^(form|pending)$/.test(p.textContent.trim())).pop() || null;
+  const showPending = editing && viewField?.textContent.trim() === 'pending';
+  viewField?.remove();
   const placeholderFields = fieldsOf(fieldsCell);
 
   // the full-page landscape behind everything
@@ -213,21 +469,66 @@ export default function decorate(block) {
   if (labelField || amountField || badgeField || noteField) {
     const pricing = el('div', 'pricing');
     const top = el('div', 'pricing-top');
-    if (labelField) top.append(retag(labelField, 'p', 'pricing-label'));
-    if (badgeField) top.append(retag(badgeField, 'p', 'pricing-badge'));
+    if (labelField) {
+      const label = retag(labelField, 'p', 'pricing-label');
+      limitText(label, LIMITS.priceLabel, 'pricing label', editing);
+      top.append(label);
+    }
+    if (badgeField) {
+      const badge = retag(badgeField, 'p', 'pricing-badge');
+      limitText(badge, LIMITS.priceBadge, 'pricing badge', editing);
+      top.append(badge);
+    }
     if (top.children.length) pricing.append(top);
     if (amountField) {
       const amount = retag(amountField, 'p', 'pricing-amount');
       if (rupees) amount.textContent = `₹${rupees.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
       pricing.append(amount);
     }
-    if (noteField) pricing.append(retag(noteField, 'p', 'pricing-note'));
+    if (noteField) {
+      const note = retag(noteField, 'p', 'pricing-note');
+      limitText(note, LIMITS.priceNote, 'pricing note', editing);
+      pricing.append(note);
+    }
     visual.append(pricing);
   }
   const body = el('div', 'body');
   const heading = retag(content.text('content_heading', 0), 'h1', 'heading');
   const subheading = retag(content.text('content_subheading', 1), 'p', 'subheading');
+  // the disclaimer, a text field: plain text, its email written as text (no mailto: link); a link
+  // in content saved before is turned into its text, without mailto:
   const disclaimer = retag(content.text('content_disclaimer', 2), 'p', 'disclaimer');
+  disclaimer.querySelectorAll('a').forEach((a) => a.replaceWith(a.textContent.replace(/^mailto:/i, '')));
+  disclaimer.normalize();
+  // empty, or only a link or address (no words): the default small print instead
+  const smallPrint = disclaimer.textContent.replace(WORD_JOINER, '').trim();
+  disclaimer.textContent = /\s/.test(smallPrint) ? smallPrint : DISCLAIMER;
+  // Universal Editor: the disclaimer always its field (in the content tree, selectable, typed in
+  // on the canvas), even where the editor rendered none for it (its value saved as a bare
+  // mailto: link): the field's instrumentation set on it, the block its resource
+  if (editing && !disclaimer.dataset.aueProp) {
+    disclaimer.dataset.aueProp = 'content_disclaimer';
+    disclaimer.dataset.aueType = 'text';
+    disclaimer.dataset.aueLabel = 'Disclaimer text';
+  }
+  limitTitle(heading, 'heading', editing);
+  limitText(subheading, LIMITS.subheading, 'subheading', editing);
+  limitText(disclaimer, LIMITS.disclaimer, 'disclaimer', editing);
+
+  // the pending state, shown from the payment's start until the visitor is taken to its
+  // outcome's page: the spinner, then the pending title and description (after the disclaimer
+  // in the content group); a role="status" region, its title focused when it is shown
+  const pendingView = el('div', 'pending-view', { role: 'status' });
+  const spinner = el('div', 'spinner', { 'aria-hidden': 'true' });
+  spinner.append(el('span', 'glow'));
+  const statusTitle = retag(content.text('content_pendingHeading', 3), 'h2', 'status-title');
+  const statusText = retag(content.text('content_pendingDescription', 4), 'p', 'status-text');
+  statusTitle.setAttribute('tabindex', '-1');
+  if (!statusTitle.textContent.trim()) statusTitle.textContent = PENDING.title;
+  else limitTitle(statusTitle, 'pending title', editing);
+  if (!statusText.textContent.trim()) statusText.textContent = PENDING.description;
+  else limitText(statusText, LIMITS.pendingDescription, 'pending description', editing);
+  pendingView.append(spinner, statusTitle, statusText);
 
   // the form; the authored button link is where it leads, the action URL is kept for later
   // published the action URL and comma-separated city options are told apart by their text
@@ -241,19 +542,19 @@ export default function decorate(block) {
   const citiesField = named('form_cities') || formCell?.querySelector('ul, ol')
     || configTexts.find((p) => p !== actionField && !isKey(p) && p.textContent.includes(',')) || null;
   const buttonLink = config.link('form_button', 0);
-  // Razorpay: the Key ID (rzp_…), then the name and description of its window in model order
-  const keyField = named('form_razorpayKey') || configTexts.find(isKey) || null;
+  // a Key ID authored before it moved into this file (RAZORPAY_KEY), in content saved then: left
+  // out (not taken for the Razorpay name) and removed from the page
+  const oldKeyField = named('form_razorpayKey') || configTexts.find(isKey) || null;
+  oldKeyField?.remove();
+  // Razorpay: the name and description of its window, in model order
   const checkoutTexts = configTexts
-    .filter((p) => ![actionField, citiesField, keyField].includes(p));
+    .filter((p) => ![actionField, citiesField, oldKeyField].includes(p));
   const checkoutNameField = named('form_checkoutName') || checkoutTexts[0] || null;
   const checkoutDescriptionField = named('form_checkoutDescription')
     || checkoutTexts.find((p) => p !== checkoutNameField) || null;
   const failureLink = config.link('form_failure', 1);
-  const keyId = keyField?.textContent.trim() || '';
-  // published, a value that is not a Key ID (a pasted Key Secret?) is not kept in the page
-  if (!editing && keyField && !KEY_ID.test(keyId)) keyField.textContent = '';
-  const checkoutName = checkoutNameField?.textContent.trim() || 'JSW Motors';
-  const checkoutDescription = checkoutDescriptionField?.textContent.trim() || '';
+  const checkoutName = limitString(checkoutNameField?.textContent.trim() || 'JSW Motors', LIMITS.checkoutName, 'Razorpay name', editing);
+  const checkoutDescription = limitString(checkoutDescriptionField?.textContent.trim() || '', LIMITS.checkoutDescription, 'Razorpay description', editing);
   const failurePage = failureLink?.getAttribute('href') || '';
   // the browser's own form checks are off: the fields are checked by RULES only
   const form = el('form', 'fields', { novalidate: '' });
@@ -264,7 +565,7 @@ export default function decorate(block) {
   const placeholderNodes = ['firstName', 'lastName', 'mobile', 'email', 'city']
     .map((key, i) => [key, placeholderFields.text(`fields_${key}Placeholder`, i)]);
   const placeholderText = Object.fromEntries(placeholderNodes
-    .map(([key, node]) => [key, node?.textContent.trim() || PLACEHOLDERS[key]]));
+    .map(([key, node]) => [key, limitString(node?.textContent.trim() || PLACEHOLDERS[key], LIMITS.placeholder, `${key} placeholder`, editing)]));
 
   // each field with the line below it where its error message shows (empty until then)
   const errors = new Map();
@@ -316,7 +617,8 @@ export default function decorate(block) {
   const rowCities = cityRows.map((row) => row.textContent.trim()).filter(Boolean);
   // each word starting with a capital letter, whatever the author typed (navi mumbai: Navi Mumbai)
   const capitalised = (name) => name.replace(/(^|\s)(\S)/g, (m, space, letter) => space + letter.toUpperCase());
-  const cityNames = (cities.length ? cities : rowCities).map(capitalised);
+  const cityNames = (cities.length ? cities : rowCities).map(capitalised)
+    .map((name) => limitString(name, LIMITS.city, 'city option', editing));
   cityNames
     .forEach((name) => {
       const option = el('option', '', { value: name });
@@ -328,7 +630,7 @@ export default function decorate(block) {
   withError(city, cityWrap);
 
   const submit = el('button', 'submit', { type: 'submit' });
-  submit.textContent = buttonLink?.textContent.trim() || 'PROCEED';
+  submit.textContent = limitString(buttonLink?.textContent.trim() || 'PROCEED', LIMITS.buttonText, 'button text', editing);
   const destination = buttonLink?.getAttribute('href') || '';
   if (buttonLink) moveInstrumentation(buttonLink, submit);
   form.append(names, phone, withError(email), cityWrap, submit);
@@ -351,7 +653,7 @@ export default function decorate(block) {
   // the authored settings that are not shown (action URL, the button link itself, City Option
   // rows of the earlier model) stay in the block: in the editor they lie over the form
   const settings = el('div', 'settings', { 'aria-hidden': 'true' });
-  [actionField, buttonLink?.closest('p') || buttonLink, keyField, checkoutNameField,
+  [actionField, buttonLink?.closest('p') || buttonLink, checkoutNameField,
     checkoutDescriptionField, failureLink?.closest('p') || failureLink, ...cityRows]
     .filter((node) => node && node.isConnected).forEach((node) => settings.append(node));
   form.append(settings);
@@ -367,21 +669,46 @@ export default function decorate(block) {
     const result = RULES[key](field.value, context);
     const { error } = result;
     field.classList.toggle('is-invalid', Boolean(error));
+    // failing because it is empty (.is-empty): the warning goes as soon as anything is typed
+    field.classList.toggle('is-empty', Boolean(error) && !String(field.value).trim());
     if (error) field.setAttribute('aria-invalid', 'true');
     else field.removeAttribute('aria-invalid');
     errors.get(field).textContent = error;
     return result;
   };
+  // a field's warning taken away
+  const clear = (field) => {
+    field.classList.remove('is-invalid', 'is-empty');
+    field.removeAttribute('aria-invalid');
+    errors.get(field).textContent = '';
+  };
   Object.entries(fields).forEach(([key, field]) => {
+    // every field required (the browser's own checks stay off: the form is novalidate)
+    field.required = true;
     const recheck = () => {
+      // left empty, then typed in (or a city chosen): the warning goes at once; the other rules
+      // wait for PROCEED
+      if (field.classList.contains('is-empty')) {
+        if (String(field.value).trim()) clear(field);
+        return;
+      }
       if (field.classList.contains('is-invalid')) check(key);
     };
     field.addEventListener('input', recheck);
     field.addEventListener('change', recheck);
+    // focused, then left empty: marked at once, with its message (e.g. "Enter your first name.");
+    // not while authoring in Universal Editor's edit mode
+    field.addEventListener('blur', () => {
+      if (editing && !document.documentElement.classList.contains('adobe-ue-preview')) return;
+      if (!String(field.value).trim()) check(key);
+    });
   });
 
+  // to a page (the confirmation or failure page); false when none is set
   const go = (href) => {
-    if (href) window.location.href = authorUrl(href);
+    if (!href) return false;
+    window.location.href = authorUrl(href);
+    return true;
   };
   const remember = (key, value) => {
     try {
@@ -393,9 +720,21 @@ export default function decorate(block) {
     if (on) submit.setAttribute('aria-busy', 'true');
     else submit.removeAttribute('aria-busy');
   };
+  // the pending state (.is-pending): the form keeps its place, hidden, with the spinner and the
+  // status texts over it; its title is focused, so screen readers announce it
+  const pending = (on) => {
+    block.classList.toggle('is-pending', on);
+    busy(on);
+    if (on) statusTitle.focus({ preventScroll: true });
+  };
+  // back from the outcome's page, the browser may show this page as it was left (its
+  // back/forward cache): the form again, not the pending state
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted && block.classList.contains('is-pending')) pending(false);
+  });
   // Razorpay's script fetched as soon as the visitor starts on the form, so its window opens
   // at once on the button (not with the page: it is not needed to show it)
-  if (!editing && KEY_ID.test(keyId)) {
+  if (!editing && KEY_ID.test(RAZORPAY_KEY)) {
     form.addEventListener('focusin', () => loadRazorpay().catch(() => {}), { once: true });
   }
 
@@ -415,21 +754,29 @@ export default function decorate(block) {
     const payload = Object.fromEntries(Object.entries(results)
       .map(([key, { value }]) => [key, stripTags(value)]));
     block.dispatchEvent(new CustomEvent('reservation:submit', { detail: payload, bubbles: true }));
-    remember(RESERVATION_KEY, { firstName: payload.firstName, email: payload.email });
+    // the visitor's first name and email (cleaned), for the outcome's page across the redirect
+    try {
+      sessionStorage.setItem(FIRST_NAME_KEY, payload.firstName);
+      sessionStorage.setItem(EMAIL_KEY, payload.email);
+    } catch (error) { /* private browsing: the outcome's page shows its fallback */ }
 
-    if (!KEY_ID.test(keyId) || !paise) {
+    // pending from here: behind Razorpay's window while the visitor pays, then until the
+    // outcome's page opens
+    pending(true);
+    if (!KEY_ID.test(RAZORPAY_KEY) || !paise) {
       // eslint-disable-next-line no-console
-      console.error('reservation-form: the block needs a Razorpay Key ID (rzp_…) and an amount');
+      console.error('reservation-form: set the Razorpay Key ID (RAZORPAY_KEY, rzp_…) in reservation-form.js; the block also needs an amount');
       remember(PAYMENT_KEY, { status: 'failed', code: 'NOT_CONFIGURED' });
-      go(failurePage);
+      if (!go(failurePage)) pending(false);
       return;
     }
 
-    busy(true);
+    // Razorpay's final response: paid (its handler), failed (payment.failed), closed without
+    // paying (ondismiss), or its window not opening within 15s (a failure), razorpay.js
     let outcome;
     try {
       outcome = await payWithRazorpay({
-        key: keyId,
+        key: RAZORPAY_KEY,
         amount: paise,
         currency: 'INR',
         name: checkoutName,
@@ -448,10 +795,10 @@ export default function decorate(block) {
       outcome = { status: 'failed', error: { code: 'CHECKOUT_UNAVAILABLE', description: error.message } };
     }
 
+    // paid: the confirmation page (the button link); failed: the failure page
     if (outcome.status === 'success') {
       remember(PAYMENT_KEY, { status: 'success', paymentId: outcome.response.razorpay_payment_id });
-      go(destination);
-      return;
+      if (go(destination)) return;
     }
     if (outcome.status === 'failed') {
       const {
@@ -460,20 +807,25 @@ export default function decorate(block) {
       remember(PAYMENT_KEY, {
         status: 'failed', code, description, reason, step, source,
       });
-      if (failurePage) {
-        go(failurePage);
-        return;
-      }
+      if (go(failurePage)) return;
     }
-    // closed without paying (or no failure page set): back to the form
-    busy(false);
+    // closed without paying (or no page set for the outcome): back to the form
+    pending(false);
+    submit.focus();
   });
 
-  body.append(heading, subheading, form, disclaimer);
+  // the form and the pending view in one place (.views), so the card keeps its size
+  const views = el('div', 'views');
+  views.append(form, pendingView);
+  body.append(heading, subheading, views, disclaimer);
   card.append(visual, body);
   frame.append(card);
   // the JSW navigation over the landscape, once read from /jsw-phase-3
   loadPillNav().then((nav) => card.before(nav));
   block.replaceChildren(frame);
   if (editing) block.classList.add('editing');
+  // Universal Editor, the editor view on Pending state: the canvas shows the pending state
+  if (showPending) block.classList.add('is-pending');
+  // the page scrolls freely: no eased wheel steps from section to section (scripts/delayed.js)
+  document.body.dataset.nativeScroll = 'true';
 }

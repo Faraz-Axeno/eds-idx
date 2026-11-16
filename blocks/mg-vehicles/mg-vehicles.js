@@ -212,7 +212,7 @@ export default function decorate(block) {
   status.setAttribute('aria-atomic', 'true');
 
   block.replaceChildren(backgrounds, viewport, nav, controls, status);
-  block.style.setProperty('--mg-vehicles-count', Math.max(slides.length, 1));
+  block.style.setProperty('--vehicles-count', Math.max(slides.length, 1));
   if (slides.length < 2) block.dataset.single = 'true';
 
   let current = 0;
@@ -220,7 +220,7 @@ export default function decorate(block) {
     if (!slides.length) return;
     current = (index + slides.length) % slides.length;
     block.dataset.activeSlide = current;
-    block.style.setProperty('--mg-vehicles-index', current);
+    block.style.setProperty('--vehicles-index', current);
     slides.forEach((slide, i) => {
       const isActive = i === current;
       slide.dataset.active = isActive ? 'true' : 'false';

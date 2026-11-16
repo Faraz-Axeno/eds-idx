@@ -6,7 +6,7 @@
  * brings the cards into view (no scroll effects).
  */
 
-@import url('../../styles/pill-nav.css');
+@import url('../jsw-nav/pill-nav.css');
 
 /* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .career-hero-wrapper {
@@ -231,7 +231,7 @@ main > .section > .career-hero-wrapper {
   }
 
   main > .section:has(> .career-hero-wrapper > &[data-aue-resource]) {
-    --mg-panel-height: min(100svh, 1000px);
+    --panel-height: min(100svh, 1000px);
   }
 
   /* tablets and phones: the cards one above the other, the scroll label under the heading */

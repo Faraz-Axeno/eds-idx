@@ -66,7 +66,11 @@ var CustomImportScript = (() => {
         group(document, [
           ["content_heading", el(document, "p", "RESERVE NOW")],
           ["content_subheading", el(document, "p", "Allocation opens December 2026. Cars are assigned in the order reservations are placed.")],
-          ["content_disclaimer", el(document, "p", "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy@jswmotors.com. Full Privacy Notice.")]
+          // a word joiner (\u2060, invisible) before the email's @: the upload (md2jcr) keeps the
+          // address as text, not a mailto: link; the block takes it out on the page
+          ["content_disclaimer", el(document, "p", "JSW Motors processes this data only for the purpose above, under the DPDP Act, 2023. Consent is optional and you can withdraw it or request erasure anytime at privacy\u2060@jswmotors.com. Full Privacy Notice.")],
+          ["content_pendingHeading", el(document, "p", "Processing your reservation")],
+          ["content_pendingDescription", el(document, "p", "Please wait while we process your request.")]
         ]),
         group(document, [
           ["form_cities", (() => {
@@ -75,11 +79,10 @@ var CustomImportScript = (() => {
             return list;
           })()],
           // a made-up test Key ID: the local test page only (authors enter theirs in the editor)
-          ["form_razorpayKey", el(document, "p", "rzp_test_LOCALPREVIEW000")],
           ["form_checkoutName", el(document, "p", "JSW Motors")],
           ["form_checkoutDescription", el(document, "p", "Vehicle reservation")],
-          ["form_button", link(document, "/jsw-confirmed", "PROCEED")],
-          ["form_failure", link(document, "/jsw-payment-failed", "/jsw-payment-failed")]
+          ["form_button", link(document, "/jsw/jsw-confirmed", "PROCEED")],
+          ["form_failure", link(document, "/jsw/jsw-payment-failed", "/jsw/jsw-payment-failed")]
         ]),
         group(document, [
           ["fields_firstNamePlaceholder", el(document, "p", "First Name*")],
@@ -91,7 +94,7 @@ var CustomImportScript = (() => {
       ];
       const main = document.createElement("div");
       main.append(WebImporter.Blocks.createBlock(document, { name: "reservation-form", cells }));
-      return [{ element: main, path: "/jsw-reserve", report: { title: "jsw-reserve" } }];
+      return [{ element: main, path: "/jsw/jsw-reserve", report: { title: "jsw-reserve" } }];
     }
   };
   return __toCommonJS(import_jsw_reserve_exports);

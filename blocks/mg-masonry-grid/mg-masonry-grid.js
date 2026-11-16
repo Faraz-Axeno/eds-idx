@@ -22,12 +22,12 @@ function stripInstrumentation(el) {
  */
 function sizeTiles(block) {
   const styles = getComputedStyle(block);
-  const nominal = (parseFloat(styles.getPropertyValue('--mg-masonry-tile-vh')) * window.innerHeight) / 100;
-  const gap = parseFloat(styles.getPropertyValue('--mg-masonry-gap')) || 0;
+  const nominal = (parseFloat(styles.getPropertyValue('--masonry-tile-vh')) * window.innerHeight) / 100;
+  const gap = parseFloat(styles.getPropertyValue('--masonry-gap')) || 0;
   const width = block.clientWidth;
   if (!(nominal > 0 && width > 0)) return;
   const perView = width / nominal;
-  block.style.setProperty('--mg-masonry-tile', `${(width - gap * (perView - 1)) / perView}px`);
+  block.style.setProperty('--masonry-tile', `${(width - gap * (perView - 1)) / perView}px`);
 }
 
 /**
@@ -200,7 +200,7 @@ export default function decorate(block) {
   });
 
   block.dataset.count = index;
-  block.style.setProperty('--mg-masonry-count', index);
+  block.style.setProperty('--masonry-count', index);
   block.replaceChildren(list);
 
   // Continuous strip like the source: duplicate the set once so the loop is seamless.
