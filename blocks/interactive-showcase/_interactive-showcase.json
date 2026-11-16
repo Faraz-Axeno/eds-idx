@@ -40,7 +40,7 @@
           "component": "text",
           "valueType": "string",
           "name": "title",
-          "label": "Title",
+          "label": "Main heading",
           "value": "",
           "description": "Up to 40 characters, so the title fits the card on every screen.",
           "validation": {
@@ -115,7 +115,7 @@
           "name": "hotspots",
           "label": "Hotspots (+ points)",
           "value": "",
-          "description": "Up to 6 bullets, one per + point, written as: x, y | TITLE | description. You can drag the + points to any position in preview mode. A maximum of 6 hotspots is allowed."
+          "description": "One bullet per + (max 6): x, y | TITLE | text; x, y in % from bottom-left."
         }
       ]
     }

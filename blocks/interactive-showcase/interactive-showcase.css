@@ -19,11 +19,11 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-text-muted-dark: var(--color-gray-70, #4d4d4d);
   --interactive-showcase-text-counter: var(--color-gray-60, #666);
 
-  /* every text in the block is New Science, the project's own text font: its --text-font-family
-     (with its metric-matched fallback) where the project defines one, else New Science itself;
-     the main title is New Science Extended. The Adobe Fonts kit is loaded by head.html */
-  --interactive-showcase-font: var(--text-font-family, new-science, 'Helvetica Neue', arial, sans-serif);
-  --interactive-showcase-font-display: var(--font-family-display, new-science-extended, var(--interactive-showcase-font));
+  /* every text in the block is New Science, the main title New Science Extended: the site's
+     global variables (styles/styles.css). The Adobe Fonts kit is loaded by
+     interactive-showcase.js */
+  --interactive-showcase-font: var(--font-new-science);
+  --interactive-showcase-font-display: var(--font-new-science-extended);
   --interactive-showcase-font-body: var(--interactive-showcase-font);
   --interactive-showcase-radius-card: 24px;
   --interactive-showcase-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -124,8 +124,11 @@ main > .section > .interactive-showcase-wrapper {
     text-transform: uppercase;
   }
 
+  /* Figma's 416px text box, a few px wider: New Science renders its lines 1-4px wider in the
+     browser than in Figma, and they break as in the frame ("…with a petrol engine" / "…engine
+     and motor" / "work the same axle.") only with that room */
   .description p {
-    max-width: 416px;
+    max-width: 424px;
     color: var(--interactive-showcase-text-muted-dark, #4d4d4d);
     font-size: 13px;
     line-height: 1.5;

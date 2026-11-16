@@ -34,6 +34,25 @@ const MAX_CHARS = {
 };
 let instance = 0;
 
+// the Adobe Fonts kit with New Science and New Science Extended (the faces the global variables
+// --font-new-science / --font-new-science-extended name, styles/styles.css)
+const FONT_KIT = 'https://use.typekit.net/qil0qom.css';
+
+function loadFontKit() {
+  if (document.querySelector(`link[href="${FONT_KIT}"]`)) return;
+  const preconnect = document.createElement('link');
+  preconnect.rel = 'preconnect';
+  preconnect.href = 'https://use.typekit.net';
+  preconnect.crossOrigin = '';
+  const kit = document.createElement('link');
+  kit.rel = 'stylesheet';
+  kit.href = FONT_KIT;
+  document.head.append(preconnect, kit);
+}
+
+// a tooltip opened by hovering its + closes this long (ms) after the pointer leaves both
+const HOVER_CLOSE_DELAY = 200;
+
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -373,6 +392,7 @@ function displayCopy(node) {
  * @param {Element} block The block element
  */
 export default function decorate(block) {
+  loadFontKit();
   instance += 1;
   const id = `interactive-showcase-${instance}`;
   const section = block.closest('.section');
@@ -458,6 +478,9 @@ export default function decorate(block) {
   tooltip.append(tipTitle, tipText, tipClose);
 
   let openSpot = null;
+  // the open tooltip was clicked open (stays), not only hovered (closes as the pointer leaves)
+  let pinned = false;
+  let hoverTimer = 0;
   /**
    * where a tooltip may go: the part of the card on screen, 8px in from its edges, and - where
    * the copy column sits beside the image (desktop) - clear of its heading, text and thumbnails
@@ -638,6 +661,17 @@ export default function decorate(block) {
     tooltip.classList.add('is-opening');
   };
 
+  // a tooltip opened by hovering closes once the pointer has left both its + and the tooltip
+  const hoverClose = () => {
+    if (!openSpot || pinned) return;
+    clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(() => {
+      if (openSpot && !pinned) closeTooltip({ animate: true });
+    }, HOVER_CLOSE_DELAY);
+  };
+  tooltip.addEventListener('pointerenter', () => clearTimeout(hoverTimer));
+  tooltip.addEventListener('pointerleave', hoverClose);
+
   const items = itemRows.map((row, i) => {
     const cells = [...row.children];
     const mediaCell = cells.find((c) => c.querySelector('picture')) || cells[0];
@@ -684,11 +718,26 @@ export default function decorate(block) {
       });
       btn.style.setProperty('--interactive-showcase-x', `${spot.x}%`);
       btn.style.setProperty('--interactive-showcase-y', `${spot.y}%`);
+      // a click opens the tooltip and keeps it open (clicked again, it closes); a mouse over
+      // the + opens it too, until the pointer leaves the + and the tooltip (hoverClose)
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (openSpot === btn) closeTooltip({ animate: true });
-        else openTooltip(btn, spot);
+        clearTimeout(hoverTimer);
+        if (openSpot === btn && pinned) closeTooltip({ animate: true });
+        else if (openSpot === btn) pinned = true;
+        else {
+          openTooltip(btn, spot);
+          pinned = true;
+        }
       });
+      btn.addEventListener('pointerenter', (e) => {
+        if (e.pointerType !== 'mouse' || btn.classList.contains('is-dragging')) return;
+        clearTimeout(hoverTimer);
+        if (openSpot === btn) return;
+        openTooltip(btn, spot);
+        pinned = false;
+      });
+      btn.addEventListener('pointerleave', hoverClose);
       figure.append(btn);
       return { btn, spot };
     });
