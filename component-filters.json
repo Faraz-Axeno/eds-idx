@@ -91,6 +91,16 @@
     "components": []
   },
   {
+    "id": "interactive-showcase",
+    "components": [
+      "interactive-showcase-item"
+    ]
+  },
+  {
+    "id": "interactive-showcase-full",
+    "components": []
+  },
+  {
     "id": "jsw-collage",
     "components": [
       "jsw-collage-item"
