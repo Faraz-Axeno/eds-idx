@@ -1214,6 +1214,21 @@ main > .section > .interactive-showcase-wrapper {
     display: none;
   }
 
+  /* the "JSW navigation" option (with-nav, interactive-showcase.js): the JSW navbar 26px from
+     the top of the screen (18px into the inset card), as on the other JSW pages */
+  @media (min-width: 600px) {
+    &.with-nav .pill-nav {
+      top: 18px;
+    }
+  }
+
+  /* phones: the navbar (pill-nav.css places it 44px down) clear of the heading below it */
+  @media (max-width: 599.98px) {
+    &.with-nav .heading {
+      padding-top: 112px;
+    }
+  }
+
   /* Universal Editor: items after the 3rd are not shown, and texts over their character limit
      are shortened; these notes say so (interactive-showcase.js) */
   .limit-note {

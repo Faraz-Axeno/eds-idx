@@ -15,6 +15,8 @@
  * it from here into its centre card on scroll.
  */
 
+import { loadCSS } from '../../scripts/aem.js';
+
 // at most this many + points per powertrain (the client's limit): further bullets are ignored
 const MAX_HOTSPOTS = 6;
 // at most this many items (thumbnails): further items are not shown
@@ -899,6 +901,17 @@ export default function decorate(block) {
     refitSpots?.();
     if (openSpot) placeTooltip();
   });
+
+  // the block's "JSW navigation" option (with-nav): the JSW navbar, as authored on the jsw-nav
+  // page, at the top of the card (the page has no site header: scripts.js STANDALONE_PAGES);
+  // its code and styles load only when the option is on
+  if (block.classList.contains('with-nav')) {
+    loadCSS(`${window.hlx?.codeBasePath || ''}/blocks/jsw-nav/pill-nav.css`);
+    import('../jsw-nav/pill-nav.js')
+      .then(({ loadPillNav }) => loadPillNav())
+      .then((nav) => block.prepend(nav))
+      .catch(() => {});
+  }
 
   // Universal Editor only: drag / nudge the + points and save their x, y (hotspot-editor.js)
   if (block.classList.contains('editing') && items.length) {
