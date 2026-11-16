@@ -47,6 +47,18 @@
             "maxLength": 40,
             "customErrorMsg": "Keep the title to 40 characters at most."
           }
+        },
+        {
+          "component": "multiselect",
+          "name": "classes",
+          "label": "Options",
+          "description": "JSW navigation: the JSW navbar (from the jsw-nav page) on the card.",
+          "options": [
+            {
+              "name": "JSW navigation",
+              "value": "with-nav"
+            }
+          ]
         }
       ]
     },

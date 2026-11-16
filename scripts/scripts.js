@@ -402,6 +402,8 @@ export function decorateMain(main) {
  *   /jsw-phase-5        open-roles                      -> careers-page, the JSW footer
  *   /jsw-footer         jsw-footer (the JSW footer)     -> footer-page
  *   /jsw-nav            jsw-nav (the JSW navigation)    -> nav-page
+ *   /jsw/nev-tech       interactive-showcase            -> showcase-page (no header or footer;
+ *                       the block's "JSW navigation" option adds the JSW navbar)
  * An entry with a footer gets that page as its footer (loadPageFooter) instead of the site's.
  * Every other page is unaffected.
  */
@@ -414,6 +416,7 @@ const STANDALONE_PAGES = [
   { block: 'open-roles', bodyClass: 'careers-page', footer: ['/jsw/jsw-footer', '/jsw-footer'] },
   { block: 'jsw-footer', bodyClass: 'footer-page' },
   { block: 'jsw-nav', bodyClass: 'nav-page' },
+  { block: 'interactive-showcase', bodyClass: 'showcase-page' },
 ];
 
 /**
