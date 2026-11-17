@@ -1,24 +1,10 @@
-/*
- * collage: values from the "05 Events" frames, 1280 x 720 (collage.js plays them on scroll):
- * 1 Engine - the showcase's engine alone on the light card; 2 Collage - the 280 x 360 centre
- * engine card at 500, 180 and four images around it on a white card; 3 Statement - the heading
- * and text in a 734px column in the centre. Everything in the frame is in Figma px: the frame
- * is scaled to the card (--collage-u, collage.js). Pinned with the interactive-showcase block
- * in the same section (.collage-pinned): both stick to the top of the screen while the section
- * scrolls through the collage's room.
- */
-
-/* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
 main > .section > .collage-wrapper {
   max-width: none;
   padding: 0;
   margin: 0;
 }
 
-/* the showcase and the collage in one section (collage.js adds .collage-pinned): the showcase
-   holds on the screen and the collage's wrapper lies over it (pulled up by the showcase's one
-   screen), above everything in it; it lets clicks through to the showcase below (only images
-   and text in it) */
+/* showcase and collage in one section: the showcase sticks while the collage plays over it */
 main > .section.collage-pinned > .interactive-showcase-wrapper {
   position: sticky;
   top: 0;
@@ -32,10 +18,7 @@ main > .section.collage-pinned > .collage-wrapper {
   pointer-events: none;
 }
 
-/* the block, as Adobe's guide (Develop a block with CSS and JS) scopes it: .block.collage, every
-   rule nested inside it */
 .block.collage {
-  /* one screen (the showcase's height); at most 1000px in Universal Editor, below */
   --collage-screen: 100vh;
   --collage-heading-color: #111;
   --collage-text-color: #8a8a8a;
@@ -46,24 +29,17 @@ main > .section.collage-pinned > .collage-wrapper {
     --collage-screen: 100svh;
   }
 
-  /* the page holding the pinned section scrolls freely through its room: no snapping to its
-     sections (styles/styles.css); scroll snapping can only be set on the page itself, so this
-     one rule sits above the block, keyed on the block being pinned on the page */
   :root.panels-ready:has(.collage-pinned &) {
     scroll-snap-type: none;
   }
 
-  /* the screen the frames play on: it holds while the block scrolls through its room */
   .stage {
     position: sticky;
     top: 0;
     box-sizing: border-box;
     height: var(--collage-screen);
-    padding: 8px;
   }
 
-  /* the Figma wrapper frame: 1280 x 720, 20px corners (inset 8px on the screen, as the
-     showcase's card) */
   .card {
     position: relative;
     height: 100%;
@@ -71,7 +47,6 @@ main > .section.collage-pinned > .collage-wrapper {
     border-radius: 20px;
   }
 
-  /* "1 Engine": the light card (the showcase's), over the showcase; "2 Collage": white */
   .veil,
   .paper {
     position: absolute;
@@ -89,7 +64,7 @@ main > .section.collage-pinned > .collage-wrapper {
     background-color: #fff;
   }
 
-  /* the 1280 x 720 frame, centred and scaled to the card (--collage-u: its design-pixel size) */
+  /* the 1280x720 Figma frame, scaled to the card (--collage-u, set by collage.js) */
   .frame {
     position: absolute;
     top: 50%;
@@ -99,7 +74,6 @@ main > .section.collage-pinned > .collage-wrapper {
     transform: translate(-50%, -50%) scale(var(--collage-u, 1));
   }
 
-  /* Sequence 1's engine on its way into the centre card (collage.js places it) */
   .flight {
     position: absolute;
     z-index: 3;
@@ -115,7 +89,6 @@ main > .section.collage-pinned > .collage-wrapper {
     }
   }
 
-  /* "2 Collage": each image at its Figma box, 16px corners */
   .item {
     position: absolute;
     margin: 0;
@@ -135,20 +108,45 @@ main > .section.collage-pinned > .collage-wrapper {
     }
   }
 
+  /* Figma's 196x252 layers rotated -90deg about (98px, 98px), so they cover 252x196 from their
+     top/left; the photo inside is turned back upright */
+  .bottom-left,
+  .top-right {
+    width: 196px;
+    height: 252px;
+    transform: rotate(-90deg);
+    transform-origin: 98px 98px;
+
+    picture {
+      position: absolute;
+      top: 28px;
+      left: -28px;
+      width: 252px;
+      height: 196px;
+      transform: rotate(90deg);
+    }
+  }
+
+  .bottom-left {
+    top: 344px;
+    left: 236px;
+  }
+
+  .top-right {
+    top: 180px;
+    left: 792px;
+  }
+
   .center-engine {
     top: 180px;
     left: 500px;
     width: 280px;
     height: 360px;
 
-    /* the engine fills more of the card and sits lower, as in the frame (as parallax-collage
-       frames the same photo) */
     picture img {
       transform: translate(12%, 10%) scale(1.22);
     }
 
-    /* the showcase's selected engine (collage.js, inheritSelection): placed in the card as the
-       flight lands it, on the flight's black, in place of the card's own picture */
     .landed {
       position: absolute;
       display: none;
@@ -176,22 +174,6 @@ main > .section.collage-pinned > .collage-wrapper {
     height: 152px;
   }
 
-  /* the two wide images: Figma's 196 x 252 layers turned -90deg, so 252 x 196 on the frame
-     (their photos upright, as the frame shows them) */
-  .bottom-left {
-    top: 344px;
-    left: 236px;
-    width: 252px;
-    height: 196px;
-  }
-
-  .top-right {
-    top: 180px;
-    left: 792px;
-    width: 252px;
-    height: 196px;
-  }
-
   .bottom-right {
     top: 388px;
     left: 792px;
@@ -199,9 +181,6 @@ main > .section.collage-pinned > .collage-wrapper {
     height: 152px;
   }
 
-  /* "3 Statement": the heading (629px wide) over the text (734px wide), each centred, 36px
-     apart, in the centre of the frame (281.5 down, 273 in); the widths are the frame's (scaled
-     with it), never narrower than the screen allows to read */
   .statement {
     position: absolute;
     inset: 0;
@@ -220,7 +199,6 @@ main > .section.collage-pinned > .collage-wrapper {
       margin: 0;
     }
 
-    /* New Science Medium Extended 30px / 120%, 1%, uppercase, centred, 629px wide */
     .title {
       width: max(calc(629px * var(--collage-u, 1)), min(100%, 340px));
       color: var(--collage-heading-color);
@@ -233,7 +211,6 @@ main > .section.collage-pinned > .collage-wrapper {
       text-transform: uppercase;
     }
 
-    /* New Science Medium 18px / 140%, 0, centred, 734px wide */
     p {
       width: max(calc(734px * var(--collage-u, 1)), min(100%, 340px));
       color: var(--collage-text-color);
@@ -246,7 +223,6 @@ main > .section.collage-pinned > .collage-wrapper {
     }
   }
 
-  /* the scroll room the frames play through: one screen per sequence (collage.js) */
   .room {
     display: none;
     height: calc(2 * var(--collage-screen));
@@ -256,8 +232,6 @@ main > .section.collage-pinned > .collage-wrapper {
     display: block;
   }
 
-  /* nothing moving (Universal Editor, reduced motion, no GSAP): the collage, then the
-     statement under it, each a screen of its own */
   &.static {
     .stage {
       position: relative;
@@ -265,7 +239,7 @@ main > .section.collage-pinned > .collage-wrapper {
     }
 
     .card {
-      height: calc(2 * (var(--collage-screen) - 16px));
+      height: calc(2 * var(--collage-screen));
     }
 
     .veil {
@@ -281,9 +255,49 @@ main > .section.collage-pinned > .collage-wrapper {
     }
   }
 
-  /* Universal Editor (collage.js adds .editing; never on the published page): the editor's
-     canvas can grow to fit the page, and a page one screen tall would then grow it without end,
-     so there a screen is at most 1000px tall */
+  /* the statement at its Figma box (734x157 at 273, 281.5); phones keep it centred, readable */
+  @media (min-width: 900px) and (orientation: landscape) {
+    .statement {
+      inset: auto;
+      top: calc(50% + (281.5px - 360px) * var(--collage-u, 1));
+      left: calc(50% + (273px - 640px) * var(--collage-u, 1));
+      width: calc(734px * var(--collage-u, 1));
+      height: calc(157px * var(--collage-u, 1));
+      justify-content: flex-start;
+      padding: 0;
+
+      /* Figma's text boxes run from the cap top to the last baseline: 629x58 and 734x63 */
+      .title,
+      p {
+        text-box: trim-both cap alphabetic;
+      }
+
+      .title {
+        width: calc(629px * var(--collage-u, 1));
+        height: calc(58px * var(--collage-u, 1));
+      }
+
+      p {
+        width: calc(734px * var(--collage-u, 1));
+        height: calc(63px * var(--collage-u, 1));
+      }
+
+      @supports not (text-box: trim-both cap alphabetic) {
+        .title {
+          translate: 0 -0.3em;
+        }
+
+        p {
+          translate: 0 -0.4222em;
+        }
+      }
+    }
+
+    &.static .statement {
+      top: calc(75% + (281.5px - 360px) * var(--collage-u, 1));
+    }
+  }
+
   &.editing {
     --collage-screen: min(100vh, 1000px);
 
@@ -296,8 +310,6 @@ main > .section.collage-pinned > .collage-wrapper {
     display: none;
   }
 
-  /* Universal Editor: more than five images, or images without a place of their own, are not
-     shown; this note says so (collage.js) */
   .limit-note {
     margin: 0 0 8px;
     padding: 8px 12px;
@@ -309,7 +321,6 @@ main > .section.collage-pinned > .collage-wrapper {
     line-height: 1.4;
   }
 
-  /* until the timeline has set the first frame, nothing of it shows (the showcase does) */
   &.animated:not(.ready) .card {
     visibility: hidden;
   }
