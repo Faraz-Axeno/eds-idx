@@ -109,22 +109,23 @@ main > .section.collage-pinned > .collage-wrapper {
   }
 
   /* Figma's 196x252 layers rotated -90deg about (98px, 98px), so they cover 252x196 from their
-     top/left; the photo inside is turned back upright */
+     top/left; their photos are turned back upright */
   .bottom-left,
   .top-right {
     width: 196px;
     height: 252px;
     transform: rotate(-90deg);
     transform-origin: 98px 98px;
+  }
 
-    picture {
-      position: absolute;
-      top: 28px;
-      left: -28px;
-      width: 252px;
-      height: 196px;
-      transform: rotate(90deg);
-    }
+  .bottom-left picture,
+  .top-right picture {
+    position: absolute;
+    top: 28px;
+    left: -28px;
+    width: 252px;
+    height: 196px;
+    transform: rotate(90deg);
   }
 
   .bottom-left {
