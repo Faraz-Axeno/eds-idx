@@ -256,31 +256,34 @@ main > .section.collage-pinned > .collage-wrapper {
     }
   }
 
-  /* the statement at its Figma box (734x157 at 273, 281.5); phones keep it centred, readable */
+  /* the statement at its Figma box (734 wide at 273; 157 tall, centred on the frame: top
+     281.5); longer text grows evenly around that centre; phones keep it centred, readable */
   @media (min-width: 900px) and (orientation: landscape) {
     .statement {
-      inset: auto;
-      top: calc(50% + (281.5px - 360px) * var(--collage-u, 1));
+      inset: 0 auto;
       left: calc(50% + (273px - 640px) * var(--collage-u, 1));
       width: calc(734px * var(--collage-u, 1));
-      height: calc(157px * var(--collage-u, 1));
-      justify-content: flex-start;
       padding: 0;
 
       /* Figma's text boxes run from the cap top to the last baseline: 629x58 and 734x63 */
       .title,
       p {
+        flex: none;
         text-box: trim-both cap alphabetic;
       }
 
       .title {
         width: calc(629px * var(--collage-u, 1));
-        height: calc(58px * var(--collage-u, 1));
+        min-height: calc(58px * var(--collage-u, 1));
       }
 
       p {
         width: calc(734px * var(--collage-u, 1));
-        height: calc(63px * var(--collage-u, 1));
+        min-height: calc(63px * var(--collage-u, 1));
+      }
+
+      p + p {
+        margin-top: calc(-24px * var(--collage-u, 1));
       }
 
       @supports not (text-box: trim-both cap alphabetic) {
@@ -295,7 +298,7 @@ main > .section.collage-pinned > .collage-wrapper {
     }
 
     &.static .statement {
-      top: calc(75% + (281.5px - 360px) * var(--collage-u, 1));
+      top: 50%;
     }
   }
 

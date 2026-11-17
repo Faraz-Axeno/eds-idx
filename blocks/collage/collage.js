@@ -29,8 +29,8 @@ function acceptedPicture(picture, allowed, field, block) {
 const BLOCK = 'collage';
 
 const TEXT_LIMITS = {
-  heading: 60,
-  text: 300,
+  heading: 120,
+  description: 600,
 };
 
 const GSAP_SRC = `${window.hlx?.codeBasePath || ''}/scripts/vendor/gsap.min.js`;
@@ -85,11 +85,33 @@ function el(tag, className, attrs = {}) {
 
 const cellsOf = (row) => [...(row?.children || [])];
 
-function cap(node, limit, editing) {
-  const text = node?.textContent.trim();
-  if (!text || editing || text.length <= limit) return;
-  node.title = text;
-  node.textContent = `${text.slice(0, limit).trimEnd()}…`;
+// cuts rich text at `limit` characters (across the nodes, in order) with "...", keeping the tags
+// before the cut; the whole text becomes a tooltip; the editor shows it whole (edited in place)
+function cap(nodes, limit, editing) {
+  const parts = nodes.filter(Boolean);
+  const full = parts.map((n) => n.textContent).join(' ').replace(/\s+/g, ' ').trim();
+  if (!full || editing || full.length <= limit) return;
+  parts[0].title = full;
+  let left = limit;
+  let cut = null;
+  parts.forEach((part) => {
+    if (cut) {
+      part.remove();
+      return;
+    }
+    const walker = document.createTreeWalker(part, NodeFilter.SHOW_TEXT);
+    for (let t = walker.nextNode(); t && !cut; t = walker.nextNode()) {
+      if (t.data.length < left) left -= t.data.length;
+      else {
+        t.data = `${t.data.slice(0, left).trimEnd()}...`;
+        cut = t;
+      }
+    }
+    // everything after the cut, in document order, goes
+    for (let n = cut; n && n !== part; n = n.parentNode) {
+      while (n.nextSibling) n.nextSibling.remove();
+    }
+  });
 }
 
 const toClass = (s) => s.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '');
@@ -368,8 +390,8 @@ export default function decorate(block) {
     statement.append(...cell.childNodes);
     const heading = statement.querySelector('h1, h2, h3');
     heading?.classList.add('title');
-    cap(heading, TEXT_LIMITS.heading, editing);
-    statement.querySelectorAll('p').forEach((p) => cap(p, TEXT_LIMITS.text, editing));
+    cap([heading], TEXT_LIMITS.heading, editing);
+    cap([...statement.querySelectorAll('p')], TEXT_LIMITS.description, editing);
   }
   const items = {};
   imageRows.forEach((row) => {
