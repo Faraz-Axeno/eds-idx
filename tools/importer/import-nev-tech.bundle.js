@@ -59,6 +59,17 @@ var CustomImportScript = (() => {
       ]
     }
   ];
+  var COLLAGE_TEXT = {
+    heading: "DRIVING INDIA INTO A MORE SUSTAINABLE FUTURE",
+    text: "India is moving faster, travelling further and demanding more from mobility. New-energy vehicles can reduce dependence on fossil fuels while making cleaner technology practical for the realities of Indian roads, distances and infrastructure."
+  };
+  var COLLAGE_IMAGES = [
+    [["engine-black.jpg", "Electrified engine with carbon intake pipes"], "center-engine"],
+    [["ev-charger.jpg", "Wall-mounted EV charger plugged into a car"], "top-left"],
+    [["test-hall.jpg", "Empty vehicle test hall with ceiling lights"], "top-right"],
+    [["bridge-road-aerial.jpg", "Aerial view of a road bridge over water"], "bottom-left"],
+    [["suspension-spring.jpg", "Close-up of a black suspension coil spring"], "bottom-right"]
+  ];
   function hinted(document, field, nodes) {
     const frag = document.createDocumentFragment();
     frag.appendChild(document.createComment(` field:${field} `));
@@ -98,6 +109,14 @@ var CustomImportScript = (() => {
       ];
       const main = document.createElement("div");
       main.append(WebImporter.Blocks.createBlock(document, { name: "interactive-showcase", cells }));
+      const collageCells = [
+        [hinted(document, "text", [el(document, "h2", COLLAGE_TEXT.heading), el(document, "p", COLLAGE_TEXT.text)])],
+        ...COLLAGE_IMAGES.map(([image, place]) => [
+          hinted(document, "image", [picture(document, image)]),
+          hinted(document, "position", [el(document, "p", place)])
+        ])
+      ];
+      main.append(WebImporter.Blocks.createBlock(document, { name: "collage", cells: collageCells }));
       return [{ element: main, path: "/jsw/nev-tech", report: { title: "nev-tech" } }];
     }
   };

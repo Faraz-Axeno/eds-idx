@@ -8,7 +8,10 @@
  * description | hotspots (bullets "x, y | TITLE | text", x and y in % of the showcase image
  * from its bottom-left corner). Images, texts and hotspots are the Phase 3 NEV Tech section's
  * (/jsw/jsw-phase-3), in content/jsw/images/jsw/; the first item's + points are moved onto the
- * design's "NEV / Tech 1" frame. The page keeps the site's header and footer.
+ * design's "NEV / Tech 1" frame.
+ * After it, in the same section (so both pin and animate together on scroll), the collage
+ * block ("05 Events" frames): its heading + subtitle row, then five image | place rows, the
+ * parallax-collage's first-screen images and text (/jsw/jsw-phase-3).
  */
 
 const IMG = 'images/jsw';
@@ -47,6 +50,19 @@ const ITEMS = [
       '20, 27 | ENERGY CONTROL | Decides when to generate, store or regenerate power, based on route and charge level.',
     ],
   },
+];
+
+const COLLAGE_TEXT = {
+  heading: 'DRIVING INDIA INTO A MORE SUSTAINABLE FUTURE',
+  text: 'India is moving faster, travelling further and demanding more from mobility. New-energy vehicles can reduce dependence on fossil fuels while making cleaner technology practical for the realities of Indian roads, distances and infrastructure.',
+};
+
+const COLLAGE_IMAGES = [
+  [['engine-black.jpg', 'Electrified engine with carbon intake pipes'], 'center-engine'],
+  [['ev-charger.jpg', 'Wall-mounted EV charger plugged into a car'], 'top-left'],
+  [['test-hall.jpg', 'Empty vehicle test hall with ceiling lights'], 'top-right'],
+  [['bridge-road-aerial.jpg', 'Aerial view of a road bridge over water'], 'bottom-left'],
+  [['suspension-spring.jpg', 'Close-up of a black suspension coil spring'], 'bottom-right'],
 ];
 
 function hinted(document, field, nodes) {
@@ -92,6 +108,16 @@ export default {
 
     const main = document.createElement('div');
     main.append(WebImporter.Blocks.createBlock(document, { name: 'interactive-showcase', cells }));
+
+    // the collage, in the same section (no section break between them)
+    const collageCells = [
+      [hinted(document, 'text', [el(document, 'h2', COLLAGE_TEXT.heading), el(document, 'p', COLLAGE_TEXT.text)])],
+      ...COLLAGE_IMAGES.map(([image, place]) => [
+        hinted(document, 'image', [picture(document, image)]),
+        hinted(document, 'position', [el(document, 'p', place)]),
+      ]),
+    ];
+    main.append(WebImporter.Blocks.createBlock(document, { name: 'collage', cells: collageCells }));
 
     return [{ element: main, path: '/jsw/nev-tech', report: { title: 'nev-tech' } }];
   },
