@@ -67,7 +67,7 @@ var CustomImportScript = (() => {
     [["engine-black.jpg", "Electrified engine with carbon intake pipes"], "center-engine"],
     [["ev-charger.jpg", "Wall-mounted EV charger plugged into a car"], "top-left"],
     [["test-hall.jpg", "Empty vehicle test hall with ceiling lights"], "top-right"],
-    [["bridge-road-aerial.jpg", "Aerial view of a road bridge over water"], "bottom-left"],
+    [["bridge-road-collage.jpg", "Aerial view of a road bridge over water"], "bottom-left"],
     [["suspension-spring.jpg", "Close-up of a black suspension coil spring"], "bottom-right"]
   ];
   function hinted(document, field, nodes) {
