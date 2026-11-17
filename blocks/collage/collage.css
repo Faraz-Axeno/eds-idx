@@ -1,0 +1,316 @@
+/*
+ * collage: values from the "05 Events" frames, 1280 x 720 (collage.js plays them on scroll):
+ * 1 Engine - the showcase's engine alone on the light card; 2 Collage - the 280 x 360 centre
+ * engine card at 500, 180 and four images around it on a white card; 3 Statement - the heading
+ * and text in a 734px column in the centre. Everything in the frame is in Figma px: the frame
+ * is scaled to the card (--collage-u, collage.js). Pinned with the interactive-showcase block
+ * in the same section (.collage-pinned): both stick to the top of the screen while the section
+ * scrolls through the collage's room.
+ */
+
+/* the block's wrapper: edge to edge, no space around it (styles/styles.css centres it) */
+main > .section > .collage-wrapper {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* the showcase and the collage in one section (collage.js adds .collage-pinned): the showcase
+   holds on the screen and the collage's wrapper lies over it (pulled up by the showcase's one
+   screen), above everything in it; it lets clicks through to the showcase below (only images
+   and text in it) */
+main > .section.collage-pinned > .interactive-showcase-wrapper {
+  position: sticky;
+  top: 0;
+}
+
+main > .section.collage-pinned > .collage-wrapper {
+  position: relative;
+  z-index: 10;
+  margin-top: -100vh;
+  margin-top: -100svh;
+  pointer-events: none;
+}
+
+/* the block, as Adobe's guide (Develop a block with CSS and JS) scopes it: .block.collage, every
+   rule nested inside it */
+.block.collage {
+  /* one screen (the showcase's height); at most 1000px in Universal Editor, below */
+  --collage-screen: 100vh;
+  --collage-heading-color: #111;
+  --collage-text-color: #8a8a8a;
+
+  position: relative;
+
+  @supports (height: 1svh) {
+    --collage-screen: 100svh;
+  }
+
+  /* the page holding the pinned section scrolls freely through its room: no snapping to its
+     sections (styles/styles.css); scroll snapping can only be set on the page itself, so this
+     one rule sits above the block, keyed on the block being pinned on the page */
+  :root.panels-ready:has(.collage-pinned &) {
+    scroll-snap-type: none;
+  }
+
+  /* the screen the frames play on: it holds while the block scrolls through its room */
+  .stage {
+    position: sticky;
+    top: 0;
+    box-sizing: border-box;
+    height: var(--collage-screen);
+    padding: 8px;
+  }
+
+  /* the Figma wrapper frame: 1280 x 720, 20px corners (inset 8px on the screen, as the
+     showcase's card) */
+  .card {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 20px;
+  }
+
+  /* "1 Engine": the light card (the showcase's), over the showcase; "2 Collage": white */
+  .veil,
+  .paper {
+    position: absolute;
+    inset: 0;
+  }
+
+  .veil {
+    opacity: 0;
+    background:
+      linear-gradient(291.69deg, rgb(0 0 0 / 18.24%) 0.96%, rgb(246 246 246 / 38%) 48.73%, rgb(255 255 255 / 38%) 62.61%),
+      #fff;
+  }
+
+  .paper {
+    background-color: #fff;
+  }
+
+  /* the 1280 x 720 frame, centred and scaled to the card (--collage-u: its design-pixel size) */
+  .frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1280px;
+    height: 720px;
+    transform: translate(-50%, -50%) scale(var(--collage-u, 1));
+  }
+
+  /* Sequence 1's engine on its way into the centre card (collage.js places it) */
+  .flight {
+    position: absolute;
+    z-index: 3;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+    transform-origin: 0 0;
+
+    img {
+      position: absolute;
+      display: block;
+      max-width: none;
+    }
+  }
+
+  /* "2 Collage": each image at its Figma box, 16px corners */
+  .item {
+    position: absolute;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 16px;
+    background-color: #0d0d0d;
+
+    picture,
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    img {
+      object-fit: cover;
+    }
+  }
+
+  .center-engine {
+    top: 180px;
+    left: 500px;
+    width: 280px;
+    height: 360px;
+
+    /* the engine fills more of the card and sits lower, as in the frame (as parallax-collage
+       frames the same photo) */
+    picture img {
+      transform: translate(12%, 10%) scale(1.22);
+    }
+
+    /* the showcase's selected engine (collage.js, inheritSelection): placed in the card as the
+       flight lands it, on the flight's black, in place of the card's own picture */
+    .landed {
+      position: absolute;
+      display: none;
+      max-width: none;
+      object-fit: contain;
+    }
+
+    &.inherits {
+      background-color: #000;
+
+      picture {
+        display: none;
+      }
+
+      .landed {
+        display: block;
+      }
+    }
+  }
+
+  .top-left {
+    top: 180px;
+    left: 368px;
+    width: 120px;
+    height: 152px;
+  }
+
+  /* the two wide images: Figma's 196 x 252 layers turned -90deg, so 252 x 196 on the frame
+     (their photos upright, as the frame shows them) */
+  .bottom-left {
+    top: 344px;
+    left: 236px;
+    width: 252px;
+    height: 196px;
+  }
+
+  .top-right {
+    top: 180px;
+    left: 792px;
+    width: 252px;
+    height: 196px;
+  }
+
+  .bottom-right {
+    top: 388px;
+    left: 792px;
+    width: 120px;
+    height: 152px;
+  }
+
+  /* "3 Statement": the heading (629px wide) over the text (734px wide), each centred, 36px
+     apart, in the centre of the frame (281.5 down, 273 in); the widths are the frame's (scaled
+     with it), never narrower than the screen allows to read */
+  .statement {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: calc(36px * var(--collage-u, 1));
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    text-align: center;
+
+    .title,
+    p {
+      max-width: 100%;
+      margin: 0;
+    }
+
+    /* New Science Medium Extended 30px / 120%, 1%, uppercase, centred, 629px wide */
+    .title {
+      width: max(calc(629px * var(--collage-u, 1)), min(100%, 340px));
+      color: var(--collage-heading-color);
+      font-family: var(--font-new-science-extended);
+      font-size: max(20px, calc(30px * var(--collage-u, 1)));
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    /* New Science Medium 18px / 140%, 0, centred, 734px wide */
+    p {
+      width: max(calc(734px * var(--collage-u, 1)), min(100%, 340px));
+      color: var(--collage-text-color);
+      font-family: var(--font-new-science);
+      font-size: max(13px, calc(18px * var(--collage-u, 1)));
+      font-weight: 500;
+      line-height: 1.4;
+      letter-spacing: 0;
+      text-align: center;
+    }
+  }
+
+  /* the scroll room the frames play through: one screen per sequence (collage.js) */
+  .room {
+    display: none;
+    height: calc(2 * var(--collage-screen));
+  }
+
+  &.animated .room {
+    display: block;
+  }
+
+  /* nothing moving (Universal Editor, reduced motion, no GSAP): the collage, then the
+     statement under it, each a screen of its own */
+  &.static {
+    .stage {
+      position: relative;
+      height: auto;
+    }
+
+    .card {
+      height: calc(2 * (var(--collage-screen) - 16px));
+    }
+
+    .veil {
+      display: none;
+    }
+
+    .frame {
+      top: 25%;
+    }
+
+    .statement {
+      top: 50%;
+    }
+  }
+
+  /* Universal Editor (collage.js adds .editing; never on the published page): the editor's
+     canvas can grow to fit the page, and a page one screen tall would then grow it without end,
+     so there a screen is at most 1000px tall */
+  &.editing {
+    --collage-screen: min(100vh, 1000px);
+
+    @supports (height: 1svh) {
+      --collage-screen: min(100svh, 1000px);
+    }
+  }
+
+  .unplaced {
+    display: none;
+  }
+
+  /* Universal Editor: more than five images, or images without a place of their own, are not
+     shown; this note says so (collage.js) */
+  .limit-note {
+    margin: 0 0 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #5c3b00;
+    background-color: #fff3d6;
+    font-family: var(--font-new-science);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  /* until the timeline has set the first frame, nothing of it shows (the showcase does) */
+  &.animated:not(.ready) .card {
+    visibility: hidden;
+  }
+}
