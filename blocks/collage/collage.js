@@ -35,6 +35,11 @@ const TEXT_LIMITS = {
 
 const GSAP_SRC = `${window.hlx?.codeBasePath || ''}/scripts/vendor/gsap.min.js`;
 const SCROLL_TRIGGER_SRC = `${window.hlx?.codeBasePath || ''}/scripts/vendor/ScrollTrigger.min.js`;
+const SCROLL_TO_SRC = `${window.hlx?.codeBasePath || ''}/scripts/vendor/ScrollToPlugin.min.js`;
+// touch screens (phones, tablets): a swipe glides one stop, as a wheel gesture does on desktop
+const TOUCH_MEDIA = '(hover: none) and (pointer: coarse)';
+const SWIPE = 24;
+const GLIDE_TIME = 1.8;
 
 const ENGINE = 'center-engine';
 const PLACES = [ENGINE, 'top-left', 'top-right', 'bottom-left', 'bottom-right'];
@@ -290,6 +295,88 @@ function secondScroll(card, statement) {
   );
 }
 
+// the page's stops, found as scripts/delayed.js finds them for the wheel's glides
+function glideStops() {
+  const maxY = document.documentElement.scrollHeight - window.innerHeight;
+  const stops = new Set([0, maxY]);
+  document.querySelectorAll('main > .section').forEach((section) => {
+    const rect = section.getBoundingClientRect();
+    if (rect.height < 2) return;
+    const top = Math.round(rect.top + window.scrollY);
+    stops.add(Math.min(top, maxY));
+    if (rect.height > window.innerHeight * 1.25) {
+      stops.add(Math.min(top + Math.round(rect.height) - window.innerHeight, maxY));
+    }
+  });
+  document.querySelectorAll('main [data-scroll-stops]').forEach((owner) => {
+    const top = owner.getBoundingClientRect().top + window.scrollY;
+    owner.dataset.scrollStops.split(',').map(Number).filter((n) => n > 0)
+      .forEach((offset) => stops.add(Math.min(Math.round(top + offset), maxY)));
+  });
+  return [...stops].sort((a, b) => a - b);
+}
+
+// real phones start native scrolling before touchmove can be cancelled, so the section's own
+// vertical panning is off (taps, sideways panning, pinch zoom stay) and each swipe glides
+function touchGlides(area, gsap) {
+  const root = document.documentElement;
+  let gliding = false;
+  const done = () => {
+    gliding = false;
+    root.classList.remove('gsap-scrolling');
+  };
+  const glide = (dir) => {
+    if (gliding) return;
+    const y = window.scrollY;
+    const stops = glideStops();
+    const to = dir > 0 ? stops.find((st) => st > y + 2) ?? stops[stops.length - 1]
+      : [...stops].reverse().find((st) => st < y - 2) ?? 0;
+    if (Math.abs(to - y) < 2) return;
+    gliding = true;
+    root.classList.add('gsap-scrolling');
+    gsap.to(window, {
+      duration: GLIDE_TIME,
+      scrollTo: { y: to, autoKill: false },
+      ease: 'power2.inOut',
+      overwrite: 'auto',
+      onComplete: done,
+      onInterrupt: done,
+    });
+  };
+  area.style.touchAction = 'pan-x';
+  area.style.touchAction = 'pan-x pinch-zoom';
+  let start = null;
+  let mode = null;
+  let swiped = false;
+  const swipe = (dy) => {
+    if (swiped || mode !== 'panel' || Math.abs(dy) < SWIPE) return;
+    swiped = true;
+    glide(dy < 0 ? 1 : -1);
+  };
+  area.addEventListener('touchstart', (e) => {
+    start = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+    mode = start ? null : 'native';
+    swiped = false;
+  }, { passive: true });
+  area.addEventListener('touchmove', (e) => {
+    if (!start || mode === 'native' || e.touches.length !== 1) {
+      mode = 'native';
+      return;
+    }
+    const dx = e.touches[0].clientX - start.x;
+    const dy = e.touches[0].clientY - start.y;
+    if (!mode) mode = Math.abs(dy) >= Math.abs(dx) ? 'panel' : 'native';
+    if (mode !== 'panel') return;
+    if (e.cancelable) e.preventDefault();
+    swipe(dy);
+  }, { passive: false });
+  area.addEventListener('touchend', (e) => {
+    const touch = e.changedTouches[0];
+    if (start && touch) swipe(touch.clientY - start.y);
+    start = null;
+  }, { passive: true });
+}
+
 async function playSequences({
   block, stage, veil, paper, statement, items, showcase, fly,
 }) {
@@ -358,6 +445,12 @@ async function playSequences({
   ScrollTrigger.refresh();
   if (document.readyState !== 'complete') {
     window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+  }
+  if (window.matchMedia(TOUCH_MEDIA).matches) {
+    loadScript(SCROLL_TO_SRC).then(() => {
+      gsap.registerPlugin(window.ScrollToPlugin);
+      touchGlides(block.closest('.section') || block, gsap);
+    }).catch(() => {});
   }
 }
 
