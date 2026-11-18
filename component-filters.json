@@ -66,6 +66,16 @@
     ]
   },
   {
+    "id": "collage",
+    "components": [
+      "collage-item"
+    ]
+  },
+  {
+    "id": "collage-full",
+    "components": []
+  },
+  {
     "id": "columns",
     "components": [
       "column"
@@ -88,6 +98,16 @@
   },
   {
     "id": "hotspot-showcase-full",
+    "components": []
+  },
+  {
+    "id": "interactive-showcase",
+    "components": [
+      "interactive-showcase-item"
+    ]
+  },
+  {
+    "id": "interactive-showcase-full",
     "components": []
   },
   {

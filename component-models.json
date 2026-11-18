@@ -478,6 +478,67 @@
     ]
   },
   {
+    "id": "collage",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Main heading and subtitle",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "collage-item",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Alt",
+        "value": ""
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "position",
+        "label": "Place in the design",
+        "value": "",
+        "description": "Each place holds one image; an image without a place is not shown.",
+        "options": [
+          {
+            "name": "Centre engine",
+            "value": "center-engine"
+          },
+          {
+            "name": "Top left",
+            "value": "top-left"
+          },
+          {
+            "name": "Top right",
+            "value": "top-right"
+          },
+          {
+            "name": "Bottom left",
+            "value": "bottom-left"
+          },
+          {
+            "name": "Bottom right",
+            "value": "bottom-right"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "columns",
     "fields": [
       {
@@ -714,6 +775,104 @@
         "name": "body_ctaText",
         "label": "Button text",
         "value": "DISCOVER NEW ENERGY"
+      }
+    ]
+  },
+  {
+    "id": "interactive-showcase",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Main heading",
+        "value": "",
+        "description": "Up to 40 characters, so the title fits the card on every screen.",
+        "validation": {
+          "maxLength": 40,
+          "customErrorMsg": "Keep the title to 40 characters at most."
+        }
+      },
+      {
+        "component": "multiselect",
+        "name": "classes",
+        "label": "Options",
+        "description": "JSW navigation: the JSW navbar (from the jsw-nav page) on the card.",
+        "options": [
+          {
+            "name": "JSW navigation",
+            "value": "with-nav"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "interactive-showcase-item",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "media_thumbnail",
+        "label": "Thumbnail",
+        "multi": false,
+        "required": true,
+        "description": "Required: the item needs its thumbnail."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_thumbnailAlt",
+        "label": "Thumbnail alt",
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "media_image",
+        "label": "Showcase image",
+        "multi": false,
+        "required": true,
+        "description": "Required: the item needs its showcase image."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_imageAlt",
+        "label": "Showcase image alt",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Title",
+        "value": "",
+        "description": "Up to 40 characters, so the title fits the card on every screen.",
+        "validation": {
+          "maxLength": 40,
+          "customErrorMsg": "Keep the title to 40 characters at most."
+        }
+      },
+      {
+        "component": "textarea",
+        "valueType": "string",
+        "name": "description",
+        "label": "Description",
+        "value": "",
+        "description": "Up to 160 characters, so the description fits the card on every screen.",
+        "validation": {
+          "maxLength": 160,
+          "customErrorMsg": "Keep the description to 160 characters at most."
+        }
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "hotspots",
+        "label": "Hotspots (+ points)",
+        "value": "",
+        "description": "One bullet per + (max 6): x, y | TITLE | text; x, y in % from bottom-left."
       }
     ]
   },

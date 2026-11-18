@@ -1,8 +1,8 @@
 // add delayed functionality here
 import { loadScript } from './aem.js';
 
-const GSAP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
-const SCROLL_TO_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js';
+const GSAP_SRC = `${window.hlx?.codeBasePath || ''}/scripts/vendor/gsap.min.js`;
+const SCROLL_TO_SRC = `${window.hlx?.codeBasePath || ''}/scripts/vendor/ScrollToPlugin.min.js`;
 
 /** scroll positions of the full-viewport panels (sections + footer), ascending */
 function panelStops() {
