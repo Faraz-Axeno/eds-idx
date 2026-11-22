@@ -4,6 +4,11 @@ main > .section.cards-container:has(.cards.pillars) {
   --p-u: min(100vw / 375, 100svh / 815);
   --pl-text: #232323;
 
+  /* this project's values for the font tokens the Pillars text uses: New Science (JSW) */
+  --font-family-base: var(--font-new-science);
+  --font-family-display: var(--font-new-science-extended);
+  --font-weight-medium: 500;
+
   justify-content: center;
   padding: 0;
   background-color: var(--color-white);
@@ -371,6 +376,99 @@ main > .section.cards-container:has(.cards.pillars) {
     }
   }
 
+  /* Pillar Horizontal: the next image slides in over the current from the right, its rounded
+     corners kept and the frame's right edge clipping it; the text crossfades with a small slide
+     the same way; the progress dots run along the bottom left inside the image */
+  &.pillar-horizontal.is-stepped {
+    --pl-zoom-next: var(--pl-zoom-on);
+    --pl-shift: calc(24 * var(--p-u));
+    --pl-r: calc(24 * var(--p-u));
+
+    /* the images still to come wait off to the right: they must not widen the page */
+    overflow: hidden;
+    overflow: clip;
+
+    @media (min-width: 900px) {
+      --pl-r: calc(28 * var(--p-u));
+    }
+
+    .card {
+      & .card-image {
+        clip-path: inset(0 round var(--pl-r));
+        transition:
+          transform var(--pl-move) var(--pl-ease),
+          clip-path var(--pl-move) var(--pl-ease);
+      }
+
+      & .card-body {
+        transform: translateX(var(--pl-shift));
+        transition:
+          opacity var(--pl-move) var(--pl-ease),
+          transform var(--pl-move) var(--pl-ease);
+      }
+
+      /* still to come: off to the right, clipped at the frame's right edge */
+      &:not(.is-active, .is-before) .card-image {
+        transform: translateX(100%);
+        clip-path: inset(0 100% 0 0 round var(--pl-r));
+      }
+
+      /* passed: stays in place under the image that slid over it */
+      &.is-before .card-image {
+        clip-path: inset(0 round var(--pl-r));
+      }
+
+      &.is-before .card-body {
+        transform: translateX(calc(-1 * var(--pl-shift)));
+      }
+
+      &.is-active .card-body {
+        transform: none;
+      }
+    }
+
+    .pl-rail {
+      top: calc((106 + 335 - 20 - 6) * var(--p-u));
+      flex-direction: row;
+
+      @media (min-width: 900px) {
+        top: calc((128.5 + 564 - 24 - 6) * var(--p-u));
+        left: calc((102 + 24) * var(--p-u));
+        padding: 0;
+      }
+    }
+
+    .pl-mark {
+      --track: rgb(255 255 255 / 60%);
+      --fill: var(--color-white);
+
+      transition: width var(--pl-move) var(--pl-ease);
+
+      &::before {
+        inset: 0 auto 0 0;
+        width: 0;
+        height: auto;
+      }
+
+      &[aria-current='step'] {
+        --track: rgb(255 255 255 / 40%);
+
+        width: var(--mark-on);
+        height: var(--mark);
+
+        &::before {
+          width: 78%;
+          height: auto;
+          animation-name: pl-fill-x;
+        }
+      }
+
+      &:focus-visible {
+        outline-color: var(--color-white);
+      }
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .card-image,
     .card-body,
@@ -392,4 +490,35 @@ main > .section.cards-container:has(.cards.pillars) {
 @keyframes pl-fill {
   from { height: 16%; }
   to { height: 78%; }
+}
+
+/* the JSW navigation over the frame, 50px down as in the Figma frames (desktop) */
+@media (min-width: 900px) {
+  .cards.pillars.is-stepped .pill-nav {
+    top: calc(50 * var(--p-u));
+  }
+}
+
+/* the horizontal rail's fill, as pl-fill across */
+@keyframes pl-fill-x {
+  from { width: 16%; }
+  to { width: 78%; }
+}
+
+/* the site's own scroll (cards-pillars.js, no snap engine): the section scrolls one screen per
+   pillar while the block stays pinned; no panel snapping inside it */
+main > .section.cards-container.pl-runway:has(.cards.pillars) {
+  height: calc(var(--pl-count) * 100vh);
+  height: calc(var(--pl-count) * 100svh);
+
+  & > .cards-wrapper {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+  }
+}
+
+html.panels-ready:has(main > .section.pl-runway) {
+  scroll-snap-type: none;
 }
