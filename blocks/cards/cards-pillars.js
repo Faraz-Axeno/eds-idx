@@ -1,6 +1,23 @@
 // Cards "Pillars" style (About Us): one pillar per scroll step
 
 import { attachToSnap, createGestureStepper } from '../../scripts/utils/gesture-stepper.js';
+import { loadCSS } from '../../scripts/aem.js';
+import { loadPillNav } from '../jsw-nav/pill-nav.js';
+
+// the JSW page around the pillars: the Adobe Fonts kit with New Science, the JSW navigation
+const FONT_KIT = 'https://use.typekit.net/qil0qom.css';
+
+function loadFontKit() {
+  if (document.querySelector(`link[href="${FONT_KIT}"]`)) return;
+  const preconnect = document.createElement('link');
+  preconnect.rel = 'preconnect';
+  preconnect.href = 'https://use.typekit.net';
+  preconnect.crossOrigin = '';
+  const kit = document.createElement('link');
+  kit.rel = 'stylesheet';
+  kit.href = FONT_KIT;
+  document.head.append(preconnect, kit);
+}
 
 // step lock: --pl-move in the CSS plus a little
 const STEP_MS = 1300;
@@ -58,12 +75,59 @@ function classCard(li) {
 }
 
 /**
+ * The site's own scroll (scripts/delayed.js) when the snap engine doesn't run: the section
+ * pins the block for one screen of scroll per pillar and stops a wheel glide at each, and the
+ * pillar showing follows the scroll both ways.
+ * @param {Element} block the cards block
+ * @param {number} count pillars
+ * @param {function(number): void} show shows a pillar
+ * @param {function(): number} current the pillar showing
+ * @returns {function(number): void} scrolls to a pillar
+ */
+function scrollRunway(block, count, show, current) {
+  const section = block.closest('.section');
+  const pin = block.parentElement;
+  section.classList.add('pl-runway');
+  section.style.setProperty('--pl-count', count);
+  const screen = () => pin.clientHeight || window.innerHeight;
+  const setStops = () => {
+    section.dataset.scrollStops = Array.from({ length: count - 1 }, (_, i) => Math.round((i + 1) * screen())).join(',');
+  };
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    const step = Math.round(-section.getBoundingClientRect().top / screen());
+    const to = Math.max(0, Math.min(count - 1, step));
+    if (to !== current()) show(to);
+  };
+  const schedule = () => {
+    if (!frame) frame = requestAnimationFrame(update);
+  };
+  setStops();
+  window.addEventListener('resize', () => {
+    setStops();
+    schedule();
+  });
+  window.addEventListener('scroll', schedule, { passive: true });
+  update();
+  return (i) => window.scrollTo({
+    top: section.getBoundingClientRect().top + window.scrollY + i * screen(),
+    behavior: 'smooth',
+  });
+}
+
+/**
  * Decorates the Pillars style.
  * @param {Element} block the cards block
  * @param {HTMLUListElement} ul the card list
  */
 export default function decoratePillars(block, ul) {
   const authoring = !!document.querySelector('[data-aue-resource]');
+  loadFontKit();
+  if (!authoring) {
+    loadCSS(`${window.hlx.codeBasePath}/blocks/jsw-nav/pill-nav.css`);
+    loadPillNav().then((nav) => block.prepend(nav)).catch(() => {});
+  }
   [...ul.children].forEach((li) => {
     if (hasValidImage(li)) return;
     // Universal Editor can't restrict the asset type, so tell the author on
@@ -111,8 +175,10 @@ export default function decoratePillars(block, ul) {
     return mark;
   });
 
-  // stack the images, first on top
-  cards.forEach((li, i) => li.style.setProperty('--pl-z', cards.length - i));
+  // stack the images: first on top (vertical, each wipes up to the next), or last on top
+  // (horizontal, each next one slides in over the current)
+  const horizontal = block.classList.contains('pillar-horizontal');
+  cards.forEach((li, i) => li.style.setProperty('--pl-z', horizontal ? i + 1 : cards.length - i));
 
   let active = 0;
   const show = (to) => {
@@ -129,7 +195,9 @@ export default function decoratePillars(block, ul) {
       else mark.removeAttribute('aria-current');
     });
   };
-  marks.forEach((mark, i) => mark.addEventListener('click', () => show(i)));
+  // scroll-linked (the site's own scroll), a mark scrolls to its pillar
+  let goToStep = null;
+  marks.forEach((mark, i) => mark.addEventListener('click', () => (goToStep ? goToStep(i) : show(i))));
 
   block.classList.add('is-stepped');
   // let the snap engine treat the block as one screen, not an inner scroller
@@ -155,4 +223,16 @@ export default function decoratePillars(block, ul) {
     rail.remove();
     cards.forEach((li) => li.removeAttribute('aria-hidden'));
   });
+
+  // no snap engine on the page (it marks the root snap-ready once started): the site's scroll
+  const root = document.documentElement;
+  const useSiteScroll = () => {
+    if (root.classList.contains('snap-ready')) return;
+    import('../../scripts/section-snap.js')
+      .then((mod) => mod.unregisterBlockScroll(block.closest('.section')))
+      .catch(() => {});
+    goToStep = scrollRunway(block, cards.length, show, () => active);
+  };
+  if (document.readyState === 'complete') window.setTimeout(useSiteScroll, 500);
+  else window.addEventListener('load', () => window.setTimeout(useSiteScroll, 500), { once: true });
 }

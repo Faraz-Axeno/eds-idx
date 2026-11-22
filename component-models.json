@@ -321,6 +321,31 @@
             "value": "roller"
           }
         ]
+      },
+      {
+        "component": "select",
+        "name": "classes_pillars",
+        "label": "Pillars layout",
+        "description": "Pillars only: vertical or horizontal image transition on scroll.",
+        "value": "pillar-vertical",
+        "options": [
+          {
+            "name": "Pillar Vertical",
+            "value": "pillar-vertical"
+          },
+          {
+            "name": "Pillar Horizontal",
+            "value": "pillar-horizontal"
+          }
+        ],
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "pillars"
+          ]
+        }
       }
     ]
   },
