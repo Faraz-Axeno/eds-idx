@@ -74,46 +74,133 @@ function classCard(li) {
   });
 }
 
+// wheel events further apart than this start a new gesture; a swipe this long (px) counts
+const GESTURE_GAP_MS = 200;
+const SWIPE = 24;
+
 /**
- * The site's own scroll (scripts/delayed.js) when the snap engine doesn't run: the section
- * pins the block for one screen of scroll per pillar and stops a wheel glide at each, and the
- * pillar showing follows the scroll both ways.
+ * the page's section stops (section tops and the page's end), as scripts/delayed.js glides to
+ * @returns {number[]}
+ */
+function sectionStops() {
+  const maxY = document.documentElement.scrollHeight - window.innerHeight;
+  const stops = new Set([0, maxY]);
+  document.querySelectorAll('main > .section').forEach((section) => {
+    const { top, height } = section.getBoundingClientRect();
+    if (height >= 2) stops.add(Math.min(Math.round(top + window.scrollY), maxY));
+  });
+  return [...stops].sort((a, b) => a - b);
+}
+
+/**
+ * The site's own scroll (scripts/delayed.js) when the snap engine doesn't run. Only a gesture
+ * over the image steps the pillars, one per gesture, while the section sits on the screen;
+ * anywhere else, at the first / last pillar, or upward once the section was reached from the
+ * section below, the gesture moves the page on to the previous / next section instead.
  * @param {Element} block the cards block
  * @param {number} count pillars
  * @param {function(number): void} show shows a pillar
  * @param {function(): number} current the pillar showing
- * @returns {function(number): void} scrolls to a pillar
  */
-function scrollRunway(block, count, show, current) {
+function imageZone(block, count, show, current) {
   const section = block.closest('.section');
-  const pin = block.parentElement;
-  section.classList.add('pl-runway');
-  section.style.setProperty('--pl-count', count);
-  const screen = () => pin.clientHeight || window.innerHeight;
-  const setStops = () => {
-    section.dataset.scrollStops = Array.from({ length: count - 1 }, (_, i) => Math.round((i + 1) * screen())).join(',');
+  const zone = document.createElement('div');
+  zone.className = 'pl-zone';
+  zone.setAttribute('aria-hidden', 'true');
+  block.append(zone);
+
+  let busyUntil = 0;
+  const busy = () => performance.now() < busyUntil;
+  const play = (to) => {
+    busyUntil = performance.now() + STEP_MS;
+    show(to);
   };
-  let frame = 0;
-  const update = () => {
-    frame = 0;
-    const step = Math.round(-section.getBoundingClientRect().top / screen());
-    const to = Math.max(0, Math.min(count - 1, step));
-    if (to !== current()) show(to);
+
+  // reached from the section below (the page was further down): upward gestures pass on
+  let wasBelow = false;
+  let upwardPass = false;
+  const settled = () => Math.abs(section.getBoundingClientRect().top) <= 2;
+  const track = () => {
+    const { top } = section.getBoundingClientRect();
+    if (top < -2) wasBelow = true;
+    else if (top > 2) wasBelow = false;
+    else upwardPass = wasBelow;
   };
-  const schedule = () => {
-    if (!frame) frame = requestAnimationFrame(update);
+  window.addEventListener('scroll', track, { passive: true });
+  track();
+
+  // the pillar a gesture goes to, or null: it moves the page instead
+  const stepFor = (dir) => {
+    if (!settled()) return null;
+    if (dir < 0 && upwardPass) return null;
+    if (dir > 0) upwardPass = false;
+    const to = current() + dir;
+    return to >= 0 && to < count ? to : null;
   };
-  setStops();
-  window.addEventListener('resize', () => {
-    setStops();
-    schedule();
-  });
-  window.addEventListener('scroll', schedule, { passive: true });
-  update();
-  return (i) => window.scrollTo({
-    top: section.getBoundingClientRect().top + window.scrollY + i * screen(),
-    behavior: 'smooth',
-  });
+
+  // wheel: the first event of a gesture decides; the rest of it follows (stays with the
+  // pillars, or with the page and scripts/delayed.js)
+  let gesture = { last: -Infinity, stepped: false, passed: false };
+  zone.addEventListener('wheel', (e) => {
+    if (!e.deltaY || e.ctrlKey) return;
+    const now = performance.now();
+    if (now - gesture.last > GESTURE_GAP_MS) gesture = { stepped: false, passed: false };
+    gesture.last = now;
+    if (gesture.passed) return;
+    if (gesture.stepped || busy()) {
+      e.preventDefault();
+      return;
+    }
+    const to = stepFor(Math.sign(e.deltaY));
+    if (to === null) {
+      gesture.passed = true;
+      return;
+    }
+    e.preventDefault();
+    gesture.stepped = true;
+    play(to);
+  }, { passive: false });
+
+  // touch: the zone has no native vertical panning (pillars.css), so a swipe that doesn't step
+  // moves the page to the previous / next section itself
+  const pageTo = (dir) => {
+    const y = window.scrollY;
+    const stops = sectionStops();
+    const to = dir > 0 ? stops.find((st) => st > y + 2) ?? stops[stops.length - 1]
+      : [...stops].reverse().find((st) => st < y - 2) ?? 0;
+    window.scrollTo({ top: to, behavior: 'smooth' });
+  };
+  let start = null;
+  let mode = null;
+  let swiped = false;
+  const swipe = (dy) => {
+    if (swiped || mode !== 'v' || Math.abs(dy) < SWIPE) return;
+    swiped = true;
+    if (busy()) return;
+    const dir = dy < 0 ? 1 : -1;
+    const to = stepFor(dir);
+    if (to === null) pageTo(dir);
+    else play(to);
+  };
+  zone.addEventListener('touchstart', (e) => {
+    start = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+    mode = null;
+    swiped = false;
+  }, { passive: true });
+  zone.addEventListener('touchmove', (e) => {
+    if (!start || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - start.x;
+    const dy = e.touches[0].clientY - start.y;
+    if (!mode) mode = Math.abs(dy) >= Math.abs(dx) ? 'v' : 'h';
+    if (mode !== 'v') return;
+    if (e.cancelable) e.preventDefault();
+    swipe(dy);
+  }, { passive: false });
+  zone.addEventListener('touchend', (e) => {
+    const touch = e.changedTouches[0];
+    if (start && touch) swipe(touch.clientY - start.y);
+    start = null;
+  }, { passive: true });
 }
 
 /**
@@ -195,9 +282,7 @@ export default function decoratePillars(block, ul) {
       else mark.removeAttribute('aria-current');
     });
   };
-  // scroll-linked (the site's own scroll), a mark scrolls to its pillar
-  let goToStep = null;
-  marks.forEach((mark, i) => mark.addEventListener('click', () => (goToStep ? goToStep(i) : show(i))));
+  marks.forEach((mark, i) => mark.addEventListener('click', () => show(i)));
 
   block.classList.add('is-stepped');
   // let the snap engine treat the block as one screen, not an inner scroller
@@ -231,7 +316,7 @@ export default function decoratePillars(block, ul) {
     import('../../scripts/section-snap.js')
       .then((mod) => mod.unregisterBlockScroll(block.closest('.section')))
       .catch(() => {});
-    goToStep = scrollRunway(block, cards.length, show, () => active);
+    imageZone(block, cards.length, show, () => active);
   };
   if (document.readyState === 'complete') window.setTimeout(useSiteScroll, 500);
   else window.addEventListener('load', () => window.setTimeout(useSiteScroll, 500), { once: true });
