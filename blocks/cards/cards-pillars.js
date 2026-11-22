@@ -76,7 +76,20 @@ function classCard(li) {
 
 // wheel events further apart than this start a new gesture; a swipe this long (px) counts
 const GESTURE_GAP_MS = 200;
+const HOLD_QUIET_MS = 400;
 const SWIPE = 24;
+
+/**
+ * a section's top on the screen where the page's layout puts it, leaving out a shift on the
+ * section itself (the Timeline style above slides it, cards-timeline.js --tl-reveal-y, so it
+ * looks in place while the page is still on its way)
+ * @param {Element} section
+ * @returns {number}
+ */
+function layoutTop(section) {
+  const shift = new DOMMatrixReadOnly(getComputedStyle(section).transform).m42;
+  return section.getBoundingClientRect().top - shift;
+}
 
 /**
  * the page's section stops (section tops and the page's end), as scripts/delayed.js glides to
@@ -86,8 +99,8 @@ function sectionStops() {
   const maxY = document.documentElement.scrollHeight - window.innerHeight;
   const stops = new Set([0, maxY]);
   document.querySelectorAll('main > .section').forEach((section) => {
-    const { top, height } = section.getBoundingClientRect();
-    if (height >= 2) stops.add(Math.min(Math.round(top + window.scrollY), maxY));
+    if (section.offsetHeight < 2) return;
+    stops.add(Math.min(Math.round(layoutTop(section) + window.scrollY), maxY));
   });
   return [...stops].sort((a, b) => a - b);
 }
@@ -119,9 +132,9 @@ function imageZone(block, count, show, current) {
   // reached from the section below (the page was further down): upward gestures pass on
   let wasBelow = false;
   let upwardPass = false;
-  const settled = () => Math.abs(section.getBoundingClientRect().top) <= 2;
+  const settled = () => Math.abs(layoutTop(section)) <= 2;
   const track = () => {
-    const { top } = section.getBoundingClientRect();
+    const top = layoutTop(section);
     if (top < -2) wasBelow = true;
     else if (top > 2) wasBelow = false;
     else upwardPass = wasBelow;
@@ -129,14 +142,37 @@ function imageZone(block, count, show, current) {
   window.addEventListener('scroll', track, { passive: true });
   track();
 
-  // a glide onto the section ends there: while scripts/delayed.js eases the page in (or out),
-  // the rest of the gesture is held back, so no other section's own wheel handling (e.g. a
-  // hotspot-showcase below gliding the page on to itself) carries the page past the pillars
+  // a glide onto the section ends there: from the moment scripts/delayed.js eases the page in
+  // until the wheel has rested for HOLD_QUIET_MS (a touchpad's momentum, or a mouse wheel
+  // still turning, runs on past the glide), its wheel events are held back, so nothing reads
+  // them as a new gesture (page or pillar step); if the browser scrolls on by itself meanwhile
+  // (momentum it won't let be cancelled), the page is put back on the section
   const root = document.documentElement;
+  let holding = false;
+  let landed = false;
+  let lastWheel = -Infinity;
   window.addEventListener('wheel', (e) => {
-    if (!root.classList.contains('gsap-scrolling') || settled()) return;
-    if (Math.abs(section.getBoundingClientRect().top) < window.innerHeight) e.preventDefault();
+    const now = performance.now();
+    const gap = now - lastWheel;
+    lastWheel = now;
+    const near = Math.abs(layoutTop(section)) <= window.innerHeight + 2;
+    if (root.classList.contains('gsap-scrolling') && near && !settled()) {
+      if (!holding) landed = false;
+      holding = true;
+    } else if (holding && gap > HOLD_QUIET_MS) {
+      holding = false;
+    }
+    if (holding && settled() && !root.classList.contains('gsap-scrolling')) landed = true;
+    if (holding) e.preventDefault();
   }, { capture: true, passive: false });
+  window.addEventListener('scroll', () => {
+    if (!holding || root.classList.contains('gsap-scrolling')) return;
+    if (settled()) {
+      landed = true;
+      return;
+    }
+    if (landed) window.scrollTo({ top: layoutTop(section) + window.scrollY, behavior: 'instant' });
+  }, { passive: true });
 
   // the pillar a gesture goes to, or null: it moves the page instead
   const stepFor = (dir) => {
@@ -151,7 +187,7 @@ function imageZone(block, count, show, current) {
   // pillars, or with the page and scripts/delayed.js)
   let gesture = { last: -Infinity, stepped: false, passed: false };
   zone.addEventListener('wheel', (e) => {
-    if (!e.deltaY || e.ctrlKey) return;
+    if (!e.deltaY || e.ctrlKey || holding) return;
     const now = performance.now();
     if (now - gesture.last > GESTURE_GAP_MS) gesture = { stepped: false, passed: false };
     gesture.last = now;
