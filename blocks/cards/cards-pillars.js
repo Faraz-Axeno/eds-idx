@@ -19,8 +19,12 @@ function loadFontKit() {
   document.head.append(preconnect, kit);
 }
 
-// step lock: --pl-move in the CSS plus a little
+// step lock: --pl-move in the CSS plus a little (the layout sets its own, e.g. Pillar Horizontal)
 const STEP_MS = 1300;
+const stepMs = (block) => {
+  const move = parseFloat(getComputedStyle(block).getPropertyValue('--pl-move'));
+  return Number.isFinite(move) ? move * 1000 + 100 : STEP_MS;
+};
 // pillars authors may add
 const CARDS_MAX = 6;
 const IMAGE_TYPES = ['jpg', 'jpeg', 'png'];
@@ -125,7 +129,7 @@ function imageZone(block, count, show, current) {
   let busyUntil = 0;
   const busy = () => performance.now() < busyUntil;
   const play = (to) => {
-    busyUntil = performance.now() + STEP_MS;
+    busyUntil = performance.now() + stepMs(block);
     show(to);
   };
 
@@ -341,7 +345,7 @@ export default function decoratePillars(block, ul) {
     count: cards.length,
     current: () => active,
     play: (to) => {
-      busyUntil = performance.now() + STEP_MS;
+      busyUntil = performance.now() + stepMs(block);
       show(to);
     },
     busy: () => performance.now() < busyUntil,
