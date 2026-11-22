@@ -129,6 +129,15 @@ function imageZone(block, count, show, current) {
   window.addEventListener('scroll', track, { passive: true });
   track();
 
+  // a glide onto the section ends there: while scripts/delayed.js eases the page in (or out),
+  // the rest of the gesture is held back, so no other section's own wheel handling (e.g. a
+  // hotspot-showcase below gliding the page on to itself) carries the page past the pillars
+  const root = document.documentElement;
+  window.addEventListener('wheel', (e) => {
+    if (!root.classList.contains('gsap-scrolling') || settled()) return;
+    if (Math.abs(section.getBoundingClientRect().top) < window.innerHeight) e.preventDefault();
+  }, { capture: true, passive: false });
+
   // the pillar a gesture goes to, or null: it moves the page instead
   const stepFor = (dir) => {
     if (!settled()) return null;
