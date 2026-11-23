@@ -57,6 +57,23 @@
 
   /* nav height */
   --nav-height: var(--site-nav-height);
+
+  /* JSW tokens, as in the JSW repo's styles.css, for the cards / jsw-cards blocks (only the
+     names this file didn't define; nothing above changes) */
+  --color-accent: #4aadd1;
+  --color-gray-10: #e6e6e6;
+  --color-gray-20: #ccc;
+  --color-gray-60: #666;
+  --font-family-base: 'new-science', 'Anek Latin', arial, sans-serif;
+  --font-family-display: 'new-science-extended', var(--font-family-base);
+  --font-weight-medium: 500;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-64: 64px;
+  --radius-4: 4px;
+  --nav-offset: calc(94 * clamp(0.7px, min(100vw / 402, 100svh / 874), 1px));
 }
 
 /* fallback fonts */

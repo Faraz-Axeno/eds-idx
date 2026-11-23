@@ -405,6 +405,7 @@ export function decorateMain(main) {
  *   /jsw/nev-tech       interactive-showcase            -> showcase-page (no header or footer;
  *                       the block's "JSW navigation" option adds the JSW navbar)
  *   /jsw/cards          cards (Pillars style)           -> pillars-page
+ *   /jsw/jsw-cards      jsw-cards (Pillars style)       -> pillars-page
  * An entry with a footer gets that page as its footer (loadPageFooter) instead of the site's.
  * Every other page is unaffected.
  */
@@ -419,6 +420,7 @@ const STANDALONE_PAGES = [
   { block: 'jsw-nav', bodyClass: 'nav-page' },
   { block: 'interactive-showcase', bodyClass: 'showcase-page' },
   { block: 'cards.pillars', bodyClass: 'pillars-page' },
+  { block: 'jsw-cards.pillars', bodyClass: 'pillars-page' },
 ];
 
 /**

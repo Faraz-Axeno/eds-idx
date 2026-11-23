@@ -14,6 +14,7 @@
       "title",
       "hero",
       "cards",
+      "jsw-cards",
       "columns",
       "fragment",
       "mg-hero",
@@ -109,6 +110,12 @@
   {
     "id": "interactive-showcase-full",
     "components": []
+  },
+  {
+    "id": "jsw-cards",
+    "components": [
+      "jsw-card"
+    ]
   },
   {
     "id": "jsw-collage",

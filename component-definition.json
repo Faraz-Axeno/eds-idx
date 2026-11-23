@@ -405,6 +405,37 @@
           }
         },
         {
+          "title": "Jsw Cards",
+          "id": "jsw-cards",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Jsw Cards",
+                  "model": "jsw-cards",
+                  "filter": "jsw-cards"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Jsw Card",
+          "id": "jsw-card",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Jsw Card",
+                  "model": "jsw-card"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Jsw Collage",
           "id": "jsw-collage",
           "plugins": {
