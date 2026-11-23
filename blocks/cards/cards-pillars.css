@@ -505,26 +505,3 @@ main > .section.cards-container:has(.cards.pillars) {
   from { width: 16%; }
   to { width: 78%; }
 }
-
-/* the site's own scroll (cards-pillars.js, no snap engine): gestures over the image step the
-   pillars; this zone lies exactly over the image frame (under the progress rail), without the
-   browser's own vertical panning there; outside it the page scrolls as usual */
-.cards.pillars.is-stepped .pl-zone {
-  position: absolute;
-  z-index: 99;
-  top: calc(106 * var(--p-u));
-  left: calc(20 * var(--p-u));
-  width: calc(335 * var(--p-u));
-  height: calc(335 * var(--p-u));
-  border-radius: calc(24 * var(--p-u));
-  touch-action: pan-x;
-  touch-action: pan-x pinch-zoom;
-
-  @media (min-width: 900px) {
-    top: calc(128.5 * var(--p-u));
-    left: calc(102 * var(--p-u));
-    width: calc(564 * var(--p-u));
-    height: calc(564 * var(--p-u));
-    border-radius: calc(28 * var(--p-u));
-  }
-}
