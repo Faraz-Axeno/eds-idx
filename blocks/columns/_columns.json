@@ -33,6 +33,31 @@
           "name": "rows",
           "value": "",
           "label": "Rows"
+        },
+        {
+          "component": "select",
+          "name": "classes",
+          "label": "Style",
+          "description": "Default is a standard columns layout. Thank You is a full-bleed split (image + centered content) on a dark surface. Reach Us is the Contact Us layout (use 3 columns × 2 rows): it also styles the Title above and the Text below it in the same section and adds a live IST clock. Split is two full-screen video panes side by side (2 columns): each column a link to an MP4, a heading, bold-first stat lines (e.g. **1100+ KM** range), a heading and text for its card; an optional 2nd row is a film card (image | eyebrow, line, MP4 link, then a heading and text for the film).",
+          "value": "",
+          "options": [
+            {
+              "name": "Default",
+              "value": ""
+            },
+            {
+              "name": "Thank You",
+              "value": "thank-you"
+            },
+            {
+              "name": "Reach Us",
+              "value": "reach-us"
+            },
+            {
+              "name": "Split",
+              "value": "split"
+            }
+          ]
         }
       ]
     }

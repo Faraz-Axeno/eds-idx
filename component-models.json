@@ -172,6 +172,41 @@
     ]
   },
   {
+    "id": "accordion",
+    "fields": [
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "classes_dark",
+        "label": "Dark theme",
+        "description": "White text on a black band across the page"
+      }
+    ]
+  },
+  {
+    "id": "accordion-item",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "summary",
+        "label": "Title",
+        "description": "Up to 120 characters, the line that opens and closes the item.",
+        "validation": {
+          "maxLength": 120,
+          "customErrorMsg": "Keep the title to 120 characters at most."
+        }
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Content",
+        "description": "Up to 600 characters, shown when the item is open. Longer content is shortened on the page."
+      }
+    ]
+  },
+  {
     "id": "blog-carousel",
     "fields": [
       {
@@ -621,6 +656,31 @@
         "name": "rows",
         "value": "",
         "label": "Rows"
+      },
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "description": "Default is a standard columns layout. Thank You is a full-bleed split (image + centered content) on a dark surface. Reach Us is the Contact Us layout (use 3 columns × 2 rows): it also styles the Title above and the Text below it in the same section and adds a live IST clock. Split is two full-screen video panes side by side (2 columns): each column a link to an MP4, a heading, bold-first stat lines (e.g. **1100+ KM** range), a heading and text for its card; an optional 2nd row is a film card (image | eyebrow, line, MP4 link, then a heading and text for the film).",
+        "value": "",
+        "options": [
+          {
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Thank You",
+            "value": "thank-you"
+          },
+          {
+            "name": "Reach Us",
+            "value": "reach-us"
+          },
+          {
+            "name": "Split",
+            "value": "split"
+          }
+        ]
       }
     ]
   },
@@ -680,22 +740,428 @@
         "component": "reference",
         "valueType": "string",
         "name": "image",
-        "label": "Image",
+        "label": "Background Image or Video (Desktop)",
+        "required": true,
+        "condition": {
+          "and": [
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "carousel"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "tech-slides"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "statement"
+              ]
+            }
+          ]
+        },
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "mobileImage",
+        "label": "Background Image or Video (Mobile)",
+        "description": "Optional. Uses the desktop one if empty.",
+        "condition": {
+          "and": [
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "carousel"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "tech-slides"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "statement"
+              ]
+            }
+          ]
+        },
         "multi": false
       },
       {
         "component": "text",
         "valueType": "string",
         "name": "imageAlt",
-        "label": "Alt",
+        "label": "Image Alt Text",
+        "condition": {
+          "and": [
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "carousel"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "tech-slides"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "statement"
+              ]
+            }
+          ]
+        },
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "thumbnail",
+        "label": "Video Thumbnail (Desktop)",
+        "description": "Optional. Only used for a video: the image shown until it plays. Product: the image of the Watch the film card.",
+        "condition": {
+          "and": [
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "carousel"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "tech-slides"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "statement"
+              ]
+            }
+          ]
+        },
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "mobileThumbnail",
+        "label": "Video Thumbnail (Mobile)",
+        "description": "Optional. Only used for a video on mobile. Uses the desktop thumbnail if empty.",
+        "condition": {
+          "and": [
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "carousel"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "tech-slides"
+              ]
+            },
+            {
+              "!==": [
+                {
+                  "var": "classes"
+                },
+                "statement"
+              ]
+            }
+          ]
+        },
+        "multi": false
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
+        "label": "Text",
+        "description": "Heading, text and buttons. Carousel: shown on every slide without its own Text (with Opening Animation, its first two paragraphs are the animation's lines). Tech Slides: shown below every slide; key and value paragraph pairs (e.g. Battery / 26.7 kWh) become stat tiles, then the button. Product, in this order: title (Heading 1), a link to the film's MP4 (its text is the card's eyebrow, e.g. Watch the film) and the card's text in the next paragraph, the price line (amount in bold), then the button.",
         "value": ""
       },
       {
         "component": "richtext",
-        "name": "text",
+        "valueType": "string",
+        "name": "manifesto",
+        "label": "Scroll Manifesto (Editorial and Intro)",
+        "description": "Editorial and Intro styles only. Appears on scroll.",
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "backgroundImage",
+        "label": "Background Image",
+        "description": "Showcase only. Optional. A decorative layer behind the main image, e.g. a sky behind a cut-out car photo.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "showcase"
+          ]
+        },
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "logo",
+        "label": "Logo (Product)",
+        "description": "Product only. The model's logo or lockup, shown above the title.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "product"
+          ]
+        },
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "logoAlt",
+        "label": "Logo Alt Text",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "product"
+          ]
+        },
+        "value": ""
+      },
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "description": "Hero layout. Carousel and Tech Slides take up to 3 slides. Product: a car launch hero with the logo and a big centred title, a Watch the film card and the price beside the button. Its Background Image is the whole scene (e.g. the car in its landscape); the Logo has its own field.",
         "value": "",
+        "options": [
+          {
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Editorial",
+            "value": "editorial"
+          },
+          {
+            "name": "Teaser",
+            "value": "teaser"
+          },
+          {
+            "name": "Showcase",
+            "value": "showcase"
+          },
+          {
+            "name": "Carousel",
+            "value": "carousel"
+          },
+          {
+            "name": "Intro",
+            "value": "intro"
+          },
+          {
+            "name": "Statement",
+            "value": "statement"
+          },
+          {
+            "name": "Tech Slides",
+            "value": "tech-slides"
+          },
+          {
+            "name": "Product",
+            "value": "product"
+          }
+        ]
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "classes_opening",
+        "label": "Opening Animation",
+        "description": "Carousel only. On load the first slide plays in a small card in the middle of the screen, then grows to fill it. The first two Text paragraphs appear either side of the card, and only there (screen readers still get them).",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "carousel"
+          ]
+        }
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "classes_thumbs-bottom",
+        "label": "Thumbnails at the Bottom",
+        "description": "Carousel only. Moves the thumbnails to a row at the bottom right and keeps the heading and text clear of them and of the Test Drive strip.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "carousel"
+          ]
+        }
+      },
+      {
+        "component": "select",
+        "name": "classes_align",
+        "label": "Heading Position",
+        "description": "Where the heading sits: left, centre or right. Only the heading moves; the text and buttons stay where the style puts them. Default keeps the style's own layout.",
+        "value": "",
+        "options": [
+          {
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Left",
+            "value": "align-left"
+          },
+          {
+            "name": "Center",
+            "value": "align-center"
+          },
+          {
+            "name": "Right",
+            "value": "align-right"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hero-slide",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Background Image or Video (Desktop)",
+        "required": true,
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Image Alt Text",
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "mobileImage",
+        "label": "Background Image or Video (Mobile)",
+        "description": "Optional. Uses the desktop one if empty.",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "thumbnail",
+        "label": "Thumbnail (Desktop)",
+        "description": "Optional. Tech Slides: the close-up tile. Carousel: the video's poster and slide strip image.",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "mobileThumbnail",
+        "label": "Thumbnail (Mobile)",
+        "description": "Carousel: only used for a video on mobile. Uses the desktop thumbnail if empty. Optional.",
+        "multi": false
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "videoControls",
+        "label": "Enable Video Control",
+        "description": "Shows mute and pause buttons when this slide is a video."
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "text",
         "label": "Text",
-        "valueType": "string"
+        "description": "Optional. Heading, text and buttons for this slide. Uses the Hero's Text if empty. Tech Slides: label, heading, description, stats (e.g. Battery / 26.7 kWh) and a button.",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tilePosition",
+        "label": "Tile Position",
+        "description": "Tech Slides only. Written as: x, y (e.g. 33, 61). You can drag the tile to any position in preview mode.",
+        "value": "",
+        "valueFormat": "regexp",
+        "validation": {
+          "regExp": "^(\\s*(\\d{1,2}(\\.\\d+)?|100)\\s*,\\s*(\\d{1,2}(\\.\\d+)?|100)\\s*)?$",
+          "customErrorMsg": "Write it as x, y: two numbers from 0 to 100, e.g. 33, 61."
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tilePositionMobile",
+        "label": "Tile Position (Mobile)",
+        "description": "Tech Slides only. Optional, written as: x, y. Uses Tile Position if empty. Drag the tile at mobile size in preview mode.",
+        "value": "",
+        "valueFormat": "regexp",
+        "validation": {
+          "regExp": "^(\\s*(\\d{1,2}(\\.\\d+)?|100)\\s*,\\s*(\\d{1,2}(\\.\\d+)?|100)\\s*)?$",
+          "customErrorMsg": "Write it as x, y: two numbers from 0 to 100, e.g. 50, 70."
+        }
       }
     ]
   },
@@ -852,7 +1318,7 @@
         "component": "text",
         "valueType": "string",
         "name": "title",
-        "label": "Main heading",
+        "label": "Title",
         "value": "",
         "description": "Up to 40 characters, so the title fits the card on every screen.",
         "validation": {
@@ -861,16 +1327,75 @@
         }
       },
       {
-        "component": "multiselect",
+        "component": "select",
         "name": "classes",
-        "label": "Options",
-        "description": "JSW navigation: the JSW navbar (from the jsw-nav page) on the card.",
+        "label": "Style",
+        "value": "",
+        "description": "Default: the white card, with the text and thumbnails beside the image. Cover: the image fills the screen, the items become colour swatches down the left (each item's Thumbnail is its swatch, e.g. a paint colour) and the title sits at the bottom. Two Cover showcases in sections one after the other (e.g. Exterior and Interior) get a switch at the top between them: give each a View name.",
         "options": [
           {
-            "name": "JSW navigation",
-            "value": "with-nav"
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Cover",
+            "value": "cover"
           }
         ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "View name",
+        "value": "",
+        "description": "Cover only: this view's name on the switch, e.g. Exterior. Up to 16 characters.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "cover"
+          ]
+        },
+        "validation": {
+          "maxLength": 16,
+          "customErrorMsg": "Keep the view name to 16 characters at most."
+        }
+      },
+      {
+        "component": "aem-content",
+        "name": "link",
+        "label": "Button link",
+        "description": "Cover only, optional: a button at the bottom right, e.g. to the car configurator.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "cover"
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "linkText",
+        "label": "Button text",
+        "value": "",
+        "description": "Cover only: the button's text, e.g. Build your own. Up to 24 characters.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "cover"
+          ]
+        },
+        "validation": {
+          "maxLength": 24,
+          "customErrorMsg": "Keep the button text to 24 characters at most."
+        }
       }
     ]
   },
@@ -922,16 +1447,12 @@
         }
       },
       {
-        "component": "textarea",
+        "component": "richtext",
         "valueType": "string",
         "name": "description",
         "label": "Description",
         "value": "",
-        "description": "Up to 160 characters, so the description fits the card on every screen.",
-        "validation": {
-          "maxLength": 160,
-          "customErrorMsg": "Keep the description to 160 characters at most."
-        }
+        "description": "Up to 160 characters, so the description fits the card on every screen; longer text is shortened on the page. A paragraph, or a heading where the description is the item's caption (Combat page)."
       },
       {
         "component": "richtext",
@@ -939,7 +1460,7 @@
         "name": "hotspots",
         "label": "Hotspots (+ points)",
         "value": "",
-        "description": "One bullet per + (max 6): x, y | TITLE | text; x, y in % from bottom-left."
+        "description": "Up to 8 bullets, one per + point, written as: x, y | TITLE | description (title up to 40 characters, description up to 200). x and y are percentages of the image from its bottom-left corner, and the + is centred on that point. You can drag the + points to any position in preview mode. A maximum of 8 hotspots is allowed. Cover style: link a point's TITLE to its photo in AEM Assets and the photo shows in its detail panel; the photos linked on one colour are used for the other colours too."
       }
     ]
   },
@@ -2121,6 +2642,59 @@
             "value": "card-stage"
           }
         ]
+      }
+    ]
+  },
+  {
+    "id": "register-form",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Decorative Image",
+        "required": true,
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Image Alt Text",
+        "description": "Describe the image for screen readers and SEO.",
+        "required": true,
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading & Intro",
+        "required": true,
+        "value": "<h2>Be the first to know</h2><p>Leave your details and we'll tell you when reservations open, before anyone else hears about it.</p>"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "consent",
+        "label": "Consent Text",
+        "required": true,
+        "value": "I agree to JSW Motors storing my details and contacting me about the launch, reservations and related updates over email, SMS, WhatsApp and phone, as in the <a href=\"#privacy\">Privacy Notice.</a>"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "notice",
+        "label": "Privacy Notice",
+        "required": true,
+        "value": ""
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "redirect",
+        "label": "Thank-you Page Link",
+        "description": "Page to redirect to after a successful registration. Internal path (e.g. /thank-you) or a full URL."
       }
     ]
   },
