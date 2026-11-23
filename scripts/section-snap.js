@@ -8,32 +8,19 @@ const VENDOR = `${window.hlx.codeBasePath}/scripts/vendor`;
 // Blocks that consume gestures to step their own content before the page advances.
 const blockScrollRegistry = new Map();
 
-/**
- * Register a block's scroll controller: while canScrollDown/canScrollUp is true a gesture steps
- * the block instead of the page. Optional: isBusy() swallows gestures while a step animates;
- * hurryDown() is called for a downward gesture while busy; stopOffset() adds pixels below the
- * section top to its snap stop.
- * @param {Element} sectionEl The block's `.section` ancestor
- * @param {{canScrollDown: function, canScrollUp: function, scrollDown: function,
- *   scrollUp: function, isBusy?: function, hurryDown?: function, stopOffset?: function,
- *   destroy?: function}} controller
- */
+/** Register a block's scroll controller */
 export function registerBlockScroll(sectionEl, controller) {
   blockScrollRegistry.set(sectionEl, controller);
 }
 
-/**
- * Unregister a block's scroll controller, calling `destroy` if provided.
- * @param {Element} sectionEl The block's `.section` ancestor
- */
+/** Unregister a block's scroll controller, calling `destroy` if provided */
 export function unregisterBlockScroll(sectionEl) {
   const controller = blockScrollRegistry.get(sectionEl);
   if (controller?.destroy) controller.destroy();
   blockScrollRegistry.delete(sectionEl);
 }
 
-// No ScrollTrigger: it cost ~1.8s of main-thread work on mobile for a refresh event the engine
-// now takes from the window.
+// no ScrollTrigger
 const GSAP_FILES = ['gsap.min.js', 'Observer.min.js', 'ScrollToPlugin.min.js'];
 
 // gsap first, then the plugins that register onto it
@@ -46,10 +33,7 @@ async function loadGsap() {
   return window.gsap;
 }
 
-/**
- * Downloads GSAP without running it while the page loads, so initSectionSnap doesn't wait on the
- * network and native scrolling unlocks sooner.
- */
+/** Preloads GSAP while the page loads, so the engine starts without waiting on the network */
 export function preloadSectionSnap() {
   if (window.gsap) return;
   GSAP_FILES.forEach((file) => {
@@ -63,12 +47,65 @@ export function preloadSectionSnap() {
   });
 }
 
-/**
- * While GSAP loads, native scrolling is held by CSS (`html:not(.snap-ready)`); this records the
- * last gesture direction so it can be replayed once the engine is live.
- * @returns {{release: function(): number}} release() unlocks scrolling, returns the queued
- *   direction (1 = down, -1 = up, 0 = none)
- */
+// carry the background colour of the section (or footer) under each edge.
+const isFilled = (c) => !!c && c !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(c);
+
+// a node's colour, '' if see-through, null for a background picture
+function paintOf(node) {
+  const style = getComputedStyle(node);
+  if (style.backgroundImage !== 'none') return null;
+  return isFilled(style.backgroundColor) ? style.backgroundColor : '';
+}
+
+// the section's own colour, never its blocks' or animations' (the footer paints on its .footer)
+function colourOf(part) {
+  for (let node = part, depth = 0; node && depth < 3; node = node.firstElementChild, depth += 1) {
+    const paint = paintOf(node);
+    if (paint !== '') return paint || '';
+  }
+  return '';
+}
+
+export function initBarTint(main) {
+  if (!CSS.supports('-webkit-touch-callout', 'none')) return;
+  if (document.querySelector('[data-aue-resource]')) return;
+  const strips = ['top', 'bottom'].map((edge) => {
+    const strip = document.createElement('div');
+    strip.className = `bar-tint is-${edge}`;
+    strip.setAttribute('aria-hidden', 'true');
+    return strip;
+  });
+  // 100svh, the sections' height: innerHeight reaches behind the toolbar into the next section
+  const screen = document.createElement('div');
+  screen.style.cssText = 'position:absolute;top:0;height:100svh;visibility:hidden;pointer-events:none';
+  document.body.append(...strips, screen);
+
+  const tinted = {};
+  // from the layout (offsetTop), so a Wave In cut doesn't switch the top bar early
+  const tint = () => {
+    const parts = [...main.querySelectorAll(':scope > .section'), document.querySelector('footer')]
+      .filter(Boolean);
+    const end = Math.max(0, document.body.offsetHeight - window.innerHeight);
+    const y = Math.min(Math.max(0, window.scrollY), end);
+    const view = screen.offsetHeight || window.innerHeight;
+    [['top', y + 0.5], ['bottom', y + view - 0.5]].forEach(([edge, at]) => {
+      const part = parts.find((el) => el.offsetTop <= at && el.offsetTop + el.offsetHeight > at);
+      if (!part) return;
+      const colour = colourOf(part);
+      if (colour === tinted[edge]) return;
+      tinted[edge] = colour;
+      if (colour) document.body.style.setProperty(`--bar-tint-${edge}`, colour);
+      else document.body.style.removeProperty(`--bar-tint-${edge}`);
+    });
+  };
+  tint();
+  window.addEventListener('scroll', tint, { passive: true });
+  window.addEventListener('resize', tint, { passive: true });
+  // a few times a second too, for animations that change a section in place
+  window.setInterval(() => { if (!document.hidden) tint(); }, 250);
+}
+
+/** While GSAP loads, native scrolling is held by CSS (`html:not(.snap-ready)`) */
 function guardScrollUntilReady() {
   const root = document.documentElement;
 
@@ -111,10 +148,7 @@ function guardScrollUntilReady() {
   };
 }
 
-/**
- * Wire up section-by-section snapping with GSAP.
- * @param {Element} main The <main> element
- */
+/** Wire up section-by-section snapping with GSAP */
 export default async function initSectionSnap(main) {
   const sections = [...main.querySelectorAll(':scope > .section')];
   if (sections.length < 2) return;
@@ -141,8 +175,7 @@ export default async function initSectionSnap(main) {
   gsap.registerPlugin(Observer, ScrollToPlugin);
 
   const footer = document.querySelector('footer');
-  // the footer's scroll-margin-top (footer.css): stopping at the footer's top, the page stops
-  // this far above it so the footer's content starts below the fixed header
+  // the footer's scroll-margin-top (footer.css)
   const footerRoom = () => (footer ? parseFloat(getComputedStyle(footer).scrollMarginTop) || 0 : 0);
 
   // each section top, plus one final stop for the footer
@@ -158,23 +191,18 @@ export default async function initSectionSnap(main) {
     return stops;
   };
 
-  // .scroll-runway sections scroll natively while they fill the screen; crossing either edge
-  // hands back to the snap
+  // .scroll-runway sections scroll natively while they fill the screen
   const runways = sections.filter((section) => section.classList.contains('scroll-runway'));
   const runwayEnd = (section) => section.offsetTop + section.offsetHeight - window.innerHeight;
 
-  // A footer that doesn't fit below the header reads like a runway: from its stop (its top,
-  // clear of the header) it scrolls natively to the end of the page, and scrolling back up past
-  // that stop snaps to the last section. A footer that fits keeps its single stop.
+  // A footer that doesn't fit below the header reads like a runway
   const footerIndex = sections.length;
   const footerTall = () => !!footer
     && footer.offsetHeight + footerRoom() > window.innerHeight + 1;
   const activeRunways = () => (footerTall() ? [...runways, footer] : runways);
   // where a runway starts: a section's top, or the footer's stop
   const runwayTop = (el) => (el === footer ? footer.offsetTop - footerRoom() : el.offsetTop);
-  // `y` is inside runway `el` (give or take `slack` px). The footer ends the page, so anything
-  // past its end is still the footer: iOS reports positions past the end while the page
-  // bounces there, and reading those as "left the footer" pulled the page back up to its top.
+  // `y` is inside runway `el` (give or take `slack` px)
   const withinRunway = (el, y, slack) => y >= runwayTop(el) - slack
     && (el === footer || y <= runwayEnd(el) + slack);
 
@@ -182,23 +210,15 @@ export default async function initSectionSnap(main) {
   let animating = false;
   let inRunway = false;
 
-  // iOS/iPadOS 26 Safari draws page content behind its translucent bars, outside the svh box a
-  // section fills, so neighbouring sections showed there. `.bar-cover` (styles.css) is kept on
-  // the visible area in the same frame as every scroll step; its black strips sit only behind
-  // the bars. iPhone/iPad only.
   const BAR_COVER_ABOVE = 150; // px, taller than any status bar / top address bar
   const BAR_COVER_BELOW = 200; // px, taller than any floating address bar area
   const barCover = CSS.supports('-webkit-touch-callout', 'none') ? document.createElement('div') : null;
   const placeBarCover = () => {
     if (!barCover) return;
-    // The page's own end (the cover, absolutely placed, isn't counted in it). The cover never
-    // goes past it: iOS reports positions past the end while the page bounces there, and a
-    // cover moved that far made the page longer, so it could be scrolled on past the footer.
+    // the page's own end (the cover, absolutely placed, isn't counted in it)
     const end = document.body.offsetHeight;
     const y = Math.min(Math.max(0, window.scrollY), Math.max(0, end - window.innerHeight));
-    // No strip below once the page is at the footer (on its stop, or in it when it scrolls): the
-    // footer runs to the page end with its own background, and with the browser's bar minimised
-    // (the screen taller than the cover's 100svh) the strip lay over the footer's bottom links.
+    // no strip below once the page is at the footer (on its stop, or in it when it scrolls)
     const footerStop = footer
       ? Math.min(runwayTop(footer), footer.offsetTop + footer.offsetHeight - window.innerHeight)
       : Infinity;
@@ -237,8 +257,7 @@ export default async function initSectionSnap(main) {
   // the element a stop belongs to: a section, or the footer for the final stop
   const stopElement = (i) => sections[i] || footer;
 
-  // `align` (anchor links) also re-aligns a page that arrived off-stop at the same section;
-  // `motion` overrides the tween's duration/ease, and `motion.step` marks a one-section move
+  // `align` (anchor links) also re-aligns a page that arrived off-stop at the same section
   const goTo = (target, align = false, motion = {}) => {
     const stops = getStops();
     const clamped = Math.min(Math.max(target, 0), stops.length - 1);
@@ -265,15 +284,13 @@ export default async function initSectionSnap(main) {
     });
   };
 
-  // Trackpad/wheel momentum keeps firing after a step, which would read as a second gesture: stay
-  // locked until wheel input has been quiet for QUIET_MS.
+  // trackpad/wheel momentum keeps firing after a step, which would read as a second gesture
   const QUIET_MS = 200;
   const NEW_GESTURE_MIN = 10; // ignore the tiny deltas at the end of a momentum tail
   const NOTCH_MIN = 50; // a single mouse-wheel notch is ~100, well above any decayed tail
   let lastMag = 0;
   let lastNativeAt = -Infinity; // last wheel event handled by an inner scroller
-  // A wheel delta that continues a momentum tail: smaller than the one before (small deltas may
-  // repeat or jitter up by a pixel). Wheel notches repeat at full size, so they never are.
+  // A wheel delta that continues a momentum tail
   const isDecaying = (mag, prev) => (mag < NOTCH_MIN ? mag <= prev + 1 : mag < prev);
   let locked = false;
   let unlockTimer;
@@ -285,13 +302,27 @@ export default async function initSectionSnap(main) {
     locked = true;
     armUnlock();
   };
+  // a new touch is always a new gesture, and one swipe takes one step at most
+  let touchDown = false;
+  let touchStepped = false;
+  window.addEventListener('touchstart', () => {
+    clearTimeout(unlockTimer);
+    locked = false;
+    touchDown = true;
+    touchStepped = false;
+  }, { capture: true, passive: true });
+  ['touchend', 'touchcancel'].forEach((type) => {
+    window.addEventListener(type, (e) => {
+      if (!e.touches.length) touchDown = false;
+    }, { capture: true, passive: true });
+  });
 
   // the mobile menu or a modal is open: the page behind it stays put
   const navOpen = () => document.documentElement.matches('.is-nav-open, .is-modal-open');
 
   // a gesture steps the current section's registered block first, while it has steps
   const handleDirection = (direction) => {
-    if (animating || locked || navOpen()) return;
+    if (animating || locked || navOpen() || (touchDown && touchStepped)) return;
     lock();
     const controller = blockScrollRegistry.get(sections[index]);
     if (controller) {
@@ -299,9 +330,11 @@ export default async function initSectionSnap(main) {
         if (direction > 0) controller.hurryDown?.();
         return;
       }
+      touchStepped = touchDown;
       if (direction > 0 && controller.canScrollDown?.()) { controller.scrollDown(); return; }
       if (direction < 0 && controller.canScrollUp?.()) { controller.scrollUp(); return; }
     }
+    touchStepped = touchDown;
     goTo(index + direction, false, { step: true });
   };
 
@@ -319,8 +352,8 @@ export default async function initSectionSnap(main) {
   // a floating layer: fixed/absolute and clipped (replaced media excluded)
   const isFloatingLayer = (node) => {
     if (['IMG', 'VIDEO', 'CANVAS', 'OBJECT', 'EMBED'].includes(node.tagName)) return false;
-    // blocks can opt their clipped, positioned content out (e.g. the social deck cards)
-    if (node.closest('[data-snap-passthrough]')) return false;
+    // data-snap-passthrough opts content out; a nearer data-snap-hold opts it back in
+    if (node.closest('[data-snap-passthrough], [data-snap-hold]')?.matches('[data-snap-passthrough]')) return false;
     const style = getComputedStyle(node);
     return (style.position === 'fixed' || style.position === 'absolute') && style.overflowY !== 'visible';
   };
@@ -366,24 +399,17 @@ export default async function initSectionSnap(main) {
   let inFreeWheel = false;
   let freeWheelTimer;
 
-  // "No Snap" sections scroll natively, in and out. Inside one the Observer is off; on a snapping
-  // stop next to one, a gesture towards it is left to the browser (boundaryFree) while a gesture
-  // the other way still snaps.
+  // "No Snap" sections scroll natively, in and out
   const noSnapSections = sections.filter((section) => section.classList.contains('no-snap')
     && !section.classList.contains('scroll-runway'));
   const noSnapVisible = new Set();
 
-  // A snapping section of text only (no block, no section style with its own layout, not No Snap
-  // or a runway) whose text is taller than the screen below the header: the text scrolls inside
-  // the section, starting below the header (.has-text-scroll, styles.css)
   const textArea = (section) => section.querySelector(':scope > .default-content-wrapper');
   const textSections = sections.filter((section) => section.children.length === 1
     && textArea(section) && !noSnapSections.includes(section) && !runways.includes(section)
     && !hasSectionStyle(section));
   const navProbe = document.createElement('div');
   navProbe.style.cssText = 'position:absolute;visibility:hidden;height:var(--nav-offset)';
-  // the text's own height, first element's top margin to last element's bottom margin (the
-  // area's scrollHeight is never less than its own height once it scrolls)
   const textHeight = (area) => {
     const first = area.firstElementChild;
     const last = area.lastElementChild;
@@ -432,12 +458,8 @@ export default async function initSectionSnap(main) {
   const currentTextArea = () => (sections[index]?.classList.contains('has-text-scroll')
     ? textArea(sections[index]) : null);
 
-  // after scrolling out of a No Snap zone, the page is held on its stop for a moment so
-  // momentum can't carry it on
   const EXIT_HOLD_MS = 500;
   let exitHoldUntil = 0;
-  // resting on a stop whose neighbour in `direction` is a No Snap section, with no block owning
-  // the gesture
   const boundaryFree = (direction) => {
     if (animating || inRunway || noSnapVisible.size > 0 || navOpen()
       || performance.now() < exitHoldUntil) return false;
@@ -448,8 +470,6 @@ export default async function initSectionSnap(main) {
     return Math.abs(window.scrollY - getStops()[index]) < 2;
   };
 
-  // Native user scrolling is off (html.snap-locked, styles.css) while the engine moves the page,
-  // except in runways, No Snap sections and on a stop next to one.
   const html = document.documentElement;
   const syncLock = () => html.classList.toggle(
     'snap-locked',
@@ -473,9 +493,7 @@ export default async function initSectionSnap(main) {
     updateObserverState();
   };
 
-  // Inside a runway, wheel/trackpad input is applied here (preventDefault + scrollTo), not
-  // natively: a gesture latched to native scroll can't be cancelled and would fight the snap
-  // tween at the edge. Touch, keys and the scrollbar scroll natively and hand over at the edge.
+  // inside a runway, wheel/trackpad input is applied here (preventDefault + scrollTo), not natively
   if (runways.length || footer) {
     const SMOOTH_MIN = 40; // wheel notches (~100px) glide; trackpad pixel deltas apply directly
     let lastY = window.scrollY;
@@ -503,8 +521,7 @@ export default async function initSectionSnap(main) {
     const glideStep = () => {
       const y = window.scrollY;
       const d = targetY - y;
-      // The page scrolls in whole pixels, so a step under half a pixel rounds away: finish there,
-      // or the glide never ends and keeps pulling the page back to its target.
+      // the page scrolls in whole pixels, so a step under half a pixel rounds away
       if (Math.abs(d * 0.2) < 0.5) {
         window.scrollTo(0, targetY);
         placeBarCover();
@@ -542,9 +559,7 @@ export default async function initSectionSnap(main) {
       const y = window.scrollY;
       const direction = y >= lastY ? 1 : -1;
       lastY = y;
-      // A snap tween may pass through a runway's edge on its way out; read mid-tween, that
-      // re-entered the runway and then handed over again, sometimes back up past it. Where the
-      // tween lands is checked on snap:end instead.
+      // A snap tween may pass through a runway's edge on its way out
       if (animating) return;
       const active = activeRunways().find((section) => withinRunway(section, y, 1));
       if (active) {
@@ -557,8 +572,7 @@ export default async function initSectionSnap(main) {
         return;
       }
       if (!inRunway || animating) return;
-      // the footer shrank to fit the screen (e.g. a footer accordion closed): rest on its stop
-      // rather than handing over to the section above
+      // the footer shrank to fit the screen (its accordion closed): rest on its stop
       if (runwayIndex === footerIndex && !footerTall()) {
         stopGlide();
         inRunway = false;
@@ -574,8 +588,7 @@ export default async function initSectionSnap(main) {
     document.addEventListener('snap:end', onRunwayScroll);
     onRunwayScroll();
 
-    // the footer changes height (it loads late, its accordion opens and closes): re-read
-    // whether the page is in it, and settle a page left between stops onto the footer's stop
+    // the footer changes height (it loads late, its accordion opens and closes)
     if (footer) {
       new ResizeObserver(() => {
         if (animating) return;
@@ -586,9 +599,7 @@ export default async function initSectionSnap(main) {
     }
   }
 
-  // The Observer preventDefaults every pointerdown, which blocks mouse drag-to-select: it is off
-  // for the whole mouse press. A press on a draggable element (an <img>) ends in pointercancel,
-  // not pointerup, so both clear it.
+  // the Observer preventDefaults every pointerdown, which blocks mouse drag-to-select
   document.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'mouse') return;
     mouseDown = true;
@@ -602,8 +613,7 @@ export default async function initSectionSnap(main) {
   document.addEventListener('pointerup', clearMouseDown, { capture: true });
   document.addEventListener('pointercancel', clearMouseDown, { capture: true });
 
-  // Touch long-press-to-select: off from selectstart until the press ends (a selecting press ends
-  // in pointercancel/touchcancel), with the next touchstart as a backstop.
+  // touch long-press-to-select
   document.addEventListener('selectstart', () => {
     selecting = true;
     updateObserverState();
@@ -624,10 +634,7 @@ export default async function initSectionSnap(main) {
 
   document.addEventListener('pointermove', (e) => setOverlayState(isSelfScrollable(eventOrigin(e))), { passive: true });
   document.addEventListener('touchstart', (e) => setOverlayState(isSelfScrollable(eventOrigin(e))), { capture: true, passive: true });
-  // A sideways swipe always drifts vertically too, and the Observer would page on that drift.
-  // The axis is decided from the first movement (capture phase, ahead of the Observer): a
-  // sideways gesture is hidden from it and its native scroll cancelled, unless it starts on a
-  // native horizontal scroller (e.g. the article carousel), which keeps its scroll.
+  // A sideways swipe always drifts vertically too, and the Observer would page on that drift
   const AXIS_LOCK = 6; // px of travel before the axis is decided
   const VERTICAL_BIAS = 1.8; // vertical must beat horizontal by this factor to count as vertical
   const sidewaysScroller = (el) => {
@@ -644,8 +651,6 @@ export default async function initSectionSnap(main) {
   // this touch scrolls natively into a No Snap section (see boundaryFree)
   let zoneFree = false;
   let zoneFirstMove = false;
-  // the vertical scroll area the touch started on (not a floating layer), and whether this
-  // touch has paged the section because that area was already at its end
   const verticalScroller = (el) => {
     for (let node = el; node && node !== document.body; node = node.parentElement) {
       if (node.tagName === 'IFRAME' || isFloatingLayer(node)) return null;
@@ -678,8 +683,6 @@ export default async function initSectionSnap(main) {
       return;
     }
     const towards = zoneY > e.touches[0].clientY ? 1 : -1; // finger up = page down
-    // Next to a No Snap section native scroll isn't locked, and the browser commits on the first
-    // uncancelled move: cancel it unless it heads into the No Snap section.
     if (zoneFirstMove) {
       zoneFirstMove = false;
       const onBoundary = boundaryFree(1) || boundaryFree(-1);
@@ -696,8 +699,6 @@ export default async function initSectionSnap(main) {
         e.stopPropagation();
         return;
       }
-      // a swipe on a scroll area already at its end that way pages on, as the wheel does (the
-      // Observer is off over a scroll area, so it would never see it)
       if (zoneAxis === 'y' && zoneVScroller && overOverlay
         && !canScrollFurther(zoneVScroller, towards)) {
         zonePaged = true;
@@ -713,16 +714,28 @@ export default async function initSectionSnap(main) {
     }
   }, { capture: true, passive: false });
 
+  // a sideways swipe keeps its drift and zero-delta end/momentum events, or Safari's snap shakes
+  let sidewaysUntil = 0;
+  let sidewaysTimer;
+  const endSideways = () => {
+    clearTimeout(sidewaysTimer);
+    sidewaysUntil = 0;
+    inHorizontalWheel = false;
+    updateObserverState();
+  };
   // not passive: the 'swallow' case calls preventDefault() directly
   document.addEventListener('wheel', (e) => {
-    // A mostly sideways wheel (a trackpad drifts vertically too) is hidden from the Observer for
-    // this one event, not stopped, so a block's own horizontal wheel handler still gets it.
-    if (!(Math.abs(e.deltaY) > Math.abs(e.deltaX) * VERTICAL_BIAS) && e.deltaX) {
+    const now = performance.now();
+    const sideways = !(Math.abs(e.deltaY) > Math.abs(e.deltaX) * VERTICAL_BIAS) && e.deltaX;
+    if (sideways || (now < sidewaysUntil && Math.abs(e.deltaY) < NEW_GESTURE_MIN)) {
+      sidewaysUntil = now + QUIET_MS;
       inHorizontalWheel = true;
       updateObserverState();
-      setTimeout(() => { inHorizontalWheel = false; updateObserverState(); }, 0);
+      clearTimeout(sidewaysTimer);
+      sidewaysTimer = setTimeout(endSideways, QUIET_MS);
       return;
     }
+    if (sidewaysUntil) endSideways();
     const mag = Math.abs(e.deltaY);
     if (locked) {
       // momentum only decays, so after the tween a strong or growing delta is a new gesture
@@ -737,17 +750,12 @@ export default async function initSectionSnap(main) {
     lastMag = mag;
     const direction = e.deltaY > 0 ? 1 : -1;
     const result = resolveGesture(eventOrigin(e), direction);
-    const now = performance.now();
     if (result?.mode === 'native') {
       lastNativeAt = now;
-      // an inner scroll (a long text, the register form) took this: the page isn't moving, so
-      // the lock left from the step into this section has nothing left to absorb
+      // an inner scroll (a long text, the register form) took this
       clearTimeout(unlockTimer);
       locked = false;
     }
-    // Momentum from an inner scroll is swallowed while it dies away, so it can't carry the page
-    // on by itself. Anything that isn't dying away (a new flick, a wheel notch, fingers still
-    // pushing past the end) is a fresh gesture and moves on at once, with no pause needed.
     let isNativeTail = result === null && now - lastNativeAt < QUIET_MS;
     if (isNativeTail && !isDecaying(mag, prevMag)) {
       isNativeTail = false;
@@ -756,8 +764,7 @@ export default async function initSectionSnap(main) {
     if (isNativeTail) lastNativeAt = now;
     setOverlayState(result !== null || isNativeTail);
     if (result?.mode === 'swallow' || isNativeTail) e.preventDefault();
-    // Into a No Snap section from the stop next to it: hidden from the Observer until the wheel
-    // goes quiet, so the browser scrolls it natively.
+    // into a No Snap section from the stop next to it
     if (result === null && !isNativeTail && !locked && boundaryFree(direction)) {
       inFreeWheel = true;
       updateObserverState();
@@ -799,8 +806,7 @@ export default async function initSectionSnap(main) {
     if (e.key === 'End') { e.preventDefault(); goTo(getStops().length - 1); }
   });
 
-  // snap to an anchor's section; a target outside the sections (e.g. the footer) goes to the
-  // last stop
+  // snap to an anchor's section
   const snapToHash = (hash) => {
     if (!hash || hash === '#') return false;
     let target;
@@ -812,8 +818,7 @@ export default async function initSectionSnap(main) {
     if (!target) return false;
     const targetSection = target.closest('.section');
     const sectionIndex = targetSection ? sections.indexOf(targetSection) : -1;
-    // in a No Snap section: jump straight there, to the section top if the target is on its
-    // first screen, else to the target
+    // in a No Snap section
     if (noSnapSections.includes(targetSection)) {
       const sectionTop = targetSection.offsetTop;
       const targetTop = target.getBoundingClientRect().top + window.scrollY;
@@ -865,10 +870,6 @@ export default async function initSectionSnap(main) {
   if (document.readyState !== 'complete') window.addEventListener('load', syncIndex, { once: true });
   window.addEventListener('resize', () => { syncIndex(); });
 
-  // Instant re-align whenever the page rests off a stop the engine didn't put it on (find in
-  // page, scroll restore, focus scrolling, a hash that matched nothing). Not while the page
-  // scrolls on its own, nor while typing: iOS scrolls to keep the caret above the keyboard, and
-  // pulling it back made the register form bounce (focusout re-aligns afterwards).
   const typingField = (el) => el?.closest?.('input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"]), textarea, select, [contenteditable="true"]');
   const engineIdle = () => {
     if (animating || inRunway || overOverlay || selecting || mouseDown || navOpen()
@@ -891,8 +892,6 @@ export default async function initSectionSnap(main) {
     syncIndex();
     jumpTo(index);
   };
-  // Which No Snap sections are on screen, read from the layout on every scroll (an
-  // IntersectionObserver never fired again for a section starting at the viewport edge).
   const refreshNoSnap = () => {
     if (!noSnapSections.length) return;
     const wasIn = noSnapVisible.size > 0;
@@ -938,8 +937,7 @@ export default async function initSectionSnap(main) {
     if (target < 0) return;
     window.setTimeout(() => { if (engineIdle()) jumpTo(target); }, 0);
   });
-  // leaving a text field closes the keyboard and iOS scrolls back: return to the field's own
-  // section once that has settled (the nearest stop mid-way can be the next section)
+  // leaving a text field closes the keyboard and iOS scrolls back
   let settleTimer = 0;
   let maxTimer = 0;
   let holdUntil = 0;
@@ -948,8 +946,6 @@ export default async function initSectionSnap(main) {
     clearTimeout(maxTimer);
     const target = keyboardSection;
     if (target < 0) return;
-    // a press or real text selection under way (a tap on text also fires selectstart, with
-    // nothing selected): return once it has ended (up to 5s)
     const selected = selecting && !window.getSelection()?.isCollapsed;
     if ((selected || mouseDown) && performance.now() < holdUntil) {
       settleTimer = window.setTimeout(releaseKeyboard, 200);
@@ -1005,8 +1001,7 @@ export default async function initSectionSnap(main) {
     get current() { return stopElement(index); },
   };
 
-  // Engine is live: give scrolling back and replay a gesture made while GSAP was loading.
-  // `snap-active` tells gesture-stepping blocks the engine is driving.
+  // engine is live
   syncLock();
   document.documentElement.classList.add('snap-active');
   const queuedDirection = guard?.release();
