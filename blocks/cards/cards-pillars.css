@@ -386,7 +386,7 @@ main > .section.cards-container:has(.cards.pillars) {
     overflow: hidden;
     overflow: clip;
 
-    @media (min-width: 900px) {
+    @media (width >= 900px) {
       --pl-r: calc(28 * var(--p-u));
     }
 
@@ -439,7 +439,7 @@ main > .section.cards-container:has(.cards.pillars) {
       top: calc((106 + 335 - 20 - 6) * var(--p-u));
       flex-direction: row;
 
-      @media (min-width: 900px) {
+      @media (width >= 900px) {
         top: calc((128.5 + 564 - 24 - 6) * var(--p-u));
         left: calc((102 + 24) * var(--p-u));
         padding: 0;
