@@ -1,10 +1,8 @@
 // Cards "Pillars" style (About Us): one pillar per scroll step
 
 import { attachToSnap, createGestureStepper } from '../../scripts/utils/gesture-stepper.js';
-import { loadCSS } from '../../scripts/aem.js';
-import { loadPillNav } from '../jsw-nav/pill-nav.js';
 
-// the JSW page around the pillars: the Adobe Fonts kit with New Science, the JSW navigation
+// the Adobe Fonts kit with New Science
 const FONT_KIT = 'https://use.typekit.net/qil0qom.css';
 
 function loadFontKit() {
@@ -260,10 +258,6 @@ function imageZone(block, count, show, current) {
 export default function decoratePillars(block, ul) {
   const authoring = !!document.querySelector('[data-aue-resource]');
   loadFontKit();
-  if (!authoring) {
-    loadCSS(`${window.hlx.codeBasePath}/blocks/jsw-nav/pill-nav.css`);
-    loadPillNav().then((nav) => block.prepend(nav)).catch(() => {});
-  }
   [...ul.children].forEach((li) => {
     if (hasValidImage(li)) return;
     // Universal Editor can't restrict the asset type, so tell the author on

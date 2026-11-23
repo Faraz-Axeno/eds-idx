@@ -505,13 +505,6 @@ main > .section.cards-container:has(.cards.pillars) {
   to { height: 78%; }
 }
 
-/* the JSW navigation over the frame, 50px down as in the Figma frames (desktop) */
-@media (min-width: 900px) {
-  .cards.pillars.is-stepped .pill-nav {
-    top: calc(50 * var(--p-u));
-  }
-}
-
 /* the horizontal rail's fill, as pl-fill across */
 @keyframes pl-fill-x {
   from { width: 16%; }
