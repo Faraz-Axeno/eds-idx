@@ -50,6 +50,17 @@ main > .section.cards-container:has(.cards.pillars) {
     object-fit: cover;
   }
 
+  /* imported and published content wraps the picture in a <p>: it still fills the frame */
+  .card-image p:has(> picture) {
+    height: 100%;
+    margin: 0;
+  }
+
+  .card-image p > picture {
+    display: block;
+    height: 100%;
+  }
+
   :where(.card-body p, .pl-title) {
     margin: 0;
   }
@@ -112,6 +123,58 @@ main > .section.cards-container:has(.cards.pillars) {
     }
   }
 
+  /* a card's link (e.g. "Download brochure"): black, underlined, an arrow after it; also when
+     the page made it a button (a link alone in its paragraph) */
+  .pl-link {
+    margin-top: calc(12 * var(--p-u));
+
+    @media (width >= 900px) {
+      margin-top: calc(16 * var(--p-u));
+    }
+
+    a:any-link,
+    a.button:any-link {
+      display: inline-flex;
+      align-items: center;
+      gap: calc(8 * var(--p-u));
+      margin: 0;
+      padding: 0 0 calc(2 * var(--p-u));
+      border: 0;
+      border-bottom: 1px solid currentcolor;
+      border-radius: 0;
+      background: none;
+      color: var(--color-black);
+      font-family: var(--font-family-base);
+      font-size: calc(16 * var(--p-u));
+      font-weight: var(--font-weight-medium);
+      line-height: 1.2;
+      letter-spacing: 0;
+      text-decoration: none;
+      text-transform: none;
+      white-space: nowrap;
+
+      &::after {
+        content: '';
+        flex: 0 0 auto;
+        width: calc(14 * var(--p-u));
+        height: calc(14 * var(--p-u));
+        background-color: currentcolor;
+        mask: url('../../icons/arrow-right.svg') center / contain no-repeat;
+      }
+
+      &:hover {
+        background: none;
+        color: var(--color-black);
+        opacity: 0.7;
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-black);
+        outline-offset: 3px;
+      }
+    }
+  }
+
   /* static: a plain list (reduced motion, Universal Editor) */
   &.is-static {
     padding: calc(80 * var(--p-u)) calc(20 * var(--p-u));
@@ -125,6 +188,10 @@ main > .section.cards-container:has(.cards.pillars) {
     .card {
       display: grid;
       gap: calc(32 * var(--p-u));
+
+      /* not the default cards' bordered tile */
+      border: 0;
+      background: none;
 
       @media (width >= 900px) {
         grid-template-columns: calc(564 * var(--p-u)) calc(390 * var(--p-u));

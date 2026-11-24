@@ -56,6 +56,13 @@ function classCard(li) {
       seenHeading = true;
       return;
     }
+    // after the heading, a paragraph that is just a link (e.g. Download brochure): the
+    // card's link, black and underlined with an arrow
+    const link = el.querySelector('a[href]');
+    if (seenHeading && link && el.textContent.trim() === link.textContent.trim()) {
+      el.classList.add('pl-link');
+      return;
+    }
     // before the heading: label; after it: description
     el.classList.add(seenHeading ? 'pl-desc' : 'pl-label');
   });
