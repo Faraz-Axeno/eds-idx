@@ -98,6 +98,12 @@
     ]
   },
   {
+    "id": "content-listing",
+    "components": [
+      "content-listing-tab"
+    ]
+  },
+  {
     "id": "hero",
     "components": [
       "hero-slide"
@@ -333,5 +339,15 @@
     "components": [
       "parallax-collage-item"
     ]
+  },
+  {
+    "id": "tabs",
+    "components": [
+      "tab"
+    ]
+  },
+  {
+    "id": "tabs-full",
+    "components": []
   }
 ]

@@ -314,6 +314,52 @@
           }
         },
         {
+          "title": "Content Listing",
+          "id": "content-listing",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Content Listing",
+                  "model": "content-listing",
+                  "filter": "content-listing"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Content Listing Tab",
+          "id": "content-listing-tab",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Content Listing Tab",
+                  "model": "content-listing-tab"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Countdown",
+          "id": "countdown",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Countdown",
+                  "model": "countdown"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Expandable Blog Teaser",
           "id": "expandable-blog-teaser",
           "plugins": {
@@ -323,6 +369,21 @@
                 "template": {
                   "name": "Expandable Blog Teaser",
                   "model": "expandable-blog-teaser"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Featured Blogs",
+          "id": "featured-blogs",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Featured Blogs",
+                  "model": "featured-blogs"
                 }
               }
             }
@@ -921,6 +982,38 @@
                 "template": {
                   "name": "Reservation Form",
                   "model": "reservation-form"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Tabs",
+          "id": "tabs",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Tabs",
+                  "model": "tabs",
+                  "filter": "tabs"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Tab",
+          "id": "tab",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Tab",
+                  "model": "tab",
+                  "filter": "richtext"
                 }
               }
             }

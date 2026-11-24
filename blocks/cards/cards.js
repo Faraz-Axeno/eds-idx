@@ -1,5 +1,6 @@
 import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
+import snapRow from '../../scripts/utils/snap-row.js';
 
 const AUTOPLAY_MS = 3000;
 // cards the ring holds at least: five on show plus spares on both sides
@@ -124,6 +125,11 @@ function decorateCarousel(block, ul, options = {}) {
 
   const stage = document.createElement('div');
   stage.className = 'carousel-stage';
+  // it takes focus (arrow keys move it), so it needs a role and a name: the section's heading
+  const heading = block.closest('.section')?.querySelector('h1, h2, h3');
+  stage.setAttribute('role', 'group');
+  stage.setAttribute('aria-roledescription', 'carousel');
+  stage.setAttribute('aria-label', heading?.textContent.trim() || 'Cards');
   stage.append(ul);
 
   const nav = document.createElement('div');
@@ -178,6 +184,18 @@ function decorateCarousel(block, ul, options = {}) {
       li.style.setProperty('--offset', offset);
       li.style.setProperty('--dir', Math.sign(offset));
       li.setAttribute('aria-hidden', offset === 0 ? 'false' : 'true');
+      // a card hidden from screen readers mustn't take keyboard focus either (its links would
+      // be reachable but unnamed): out of the tab order while hidden, back as it was once shown
+      li.querySelectorAll('a[href], button, input, select, textarea, [tabindex]').forEach((el) => {
+        if (offset !== 0) {
+          if (!('tabHold' in el.dataset)) el.dataset.tabHold = el.getAttribute('tabindex') ?? '';
+          el.tabIndex = -1;
+        } else if ('tabHold' in el.dataset) {
+          if (el.dataset.tabHold) el.setAttribute('tabindex', el.dataset.tabHold);
+          else el.removeAttribute('tabindex');
+          delete el.dataset.tabHold;
+        }
+      });
     });
     // flush layout so jumps apply instantly, then restore transitions
     ul.getBoundingClientRect();
@@ -300,16 +318,17 @@ function decorateCarousel(block, ul, options = {}) {
     });
   });
 
-  stage.tabIndex = 0;
-  stage.addEventListener('keydown', (e) => {
+  // the arrow keys move it while focus is on its links or arrow buttons (the stage itself is
+  // not a Tab stop, so no focus ring around the whole strip)
+  block.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
   });
-  stage.addEventListener('focusin', () => {
-    focused = stage.matches(':focus-visible');
+  block.addEventListener('focusin', () => {
+    focused = !!block.querySelector(':focus-visible');
     schedule();
   });
-  stage.addEventListener('focusout', () => {
+  block.addEventListener('focusout', () => {
     focused = false;
     schedule();
   });
@@ -399,6 +418,93 @@ function decorateCarousel(block, ul, options = {}) {
   };
 }
 
+/**
+ * Rail variant: the cards sit in one row of fixed-width cards that scrolls
+ * natively (touch, trackpad, keyboard, scrollbar-free) with scroll snapping,
+ * and can be dragged with a mouse; one dash per card below shows where along
+ * the row the visitor is. Nothing is cloned or locked, so every card stays
+ * reachable in Universal Editor too.
+ * @param {Element} block
+ * @param {HTMLUListElement} ul the decorated card list
+ */
+function decorateRail(block, ul) {
+  ul.classList.add('rail-track');
+  // focusable so keyboard users can scroll it; it keeps its list role (a
+  // region role isn't allowed on <ul> and would orphan the <li> cards)
+  ul.tabIndex = 0;
+  ul.setAttribute('aria-label', 'Cards, scroll sideways for more');
+
+  const cards = [...ul.children];
+  const progress = document.createElement('div');
+  progress.className = 'rail-progress';
+  progress.setAttribute('aria-hidden', 'true');
+  const dashes = cards.map(() => {
+    const dash = document.createElement('span');
+    dash.className = 'rail-progress-dash';
+    return dash;
+  });
+  progress.append(...dashes);
+  block.append(progress);
+
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    const max = ul.scrollWidth - ul.clientWidth;
+    const ratio = max > 0 ? Math.min(1, Math.max(0, ul.scrollLeft / max)) : 0;
+    const active = Math.round(ratio * (dashes.length - 1));
+    block.classList.toggle('is-scrollable', max > 1);
+    block.classList.toggle('is-moved', max > 1 && ul.scrollLeft > 1);
+    block.classList.toggle('is-end', max <= 1 || ul.scrollLeft >= max - 1);
+    dashes.forEach((dash, i) => dash.classList.toggle('is-active', i === active));
+  };
+  const queue = () => {
+    if (!frame) frame = window.requestAnimationFrame(update);
+  };
+  ul.addEventListener('scroll', queue, { passive: true });
+  new ResizeObserver(queue).observe(ul);
+  update();
+  snapRow(ul);
+
+  // mouse drag (touch and trackpads already scroll natively)
+  let drag = null;
+  let dragged = false;
+  // a drag is not a click on the card under the pointer
+  ul.addEventListener('click', (e) => {
+    if (dragged) e.preventDefault();
+  }, { capture: true });
+  ul.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    drag = { x: e.clientX, left: ul.scrollLeft, moved: false };
+  });
+  ul.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x;
+    if (!drag.moved && Math.abs(dx) < 5) return;
+    if (!drag.moved) {
+      drag.moved = true;
+      ul.classList.add('is-dragging');
+      ul.setPointerCapture(e.pointerId);
+    }
+    ul.scrollLeft = drag.left - dx;
+  });
+  const endDrag = (e) => {
+    if (!drag) return;
+    const { moved } = drag;
+    drag = null;
+    if (!moved) return;
+    if (ul.hasPointerCapture(e.pointerId)) ul.releasePointerCapture(e.pointerId);
+    // snapping comes back on, so the row settles on the nearest card
+    const left = ul.scrollLeft;
+    ul.classList.remove('is-dragging');
+    ul.scrollLeft = left;
+    dragged = true;
+    setTimeout(() => { dragged = false; });
+  };
+  ul.addEventListener('pointerup', endDrag);
+  ul.addEventListener('pointercancel', endDrag);
+  ul.addEventListener('dragstart', (e) => e.preventDefault());
+}
+
 export default async function decorate(block) {
   const ul = document.createElement('ul');
   ul.className = 'card-list';
@@ -418,6 +524,13 @@ export default async function decorate(block) {
     ul.append(li);
   });
   ul.querySelectorAll('picture > img').forEach((img) => {
+    // createOptimizedPicture keeps only the path: an image from another origin, or an SVG,
+    // keeps its authored picture
+    const url = new URL(img.src, window.location.href);
+    if (url.origin !== window.location.origin || /\.svg$/i.test(url.pathname)) {
+      img.classList.add('card-img');
+      return;
+    }
     const optimizedPic = createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }]);
     const optimizedImg = optimizedPic.querySelector('img');
     optimizedImg.classList.add('card-img');
@@ -458,5 +571,55 @@ export default async function decorate(block) {
     return;
   }
 
-  if (block.classList.contains('carousel')) decorateCarousel(block, ul);
+  if (block.classList.contains('rail')) {
+    decorateRail(block, ul);
+    return;
+  }
+
+  // Features style: fetched only when used
+  if (block.classList.contains('features')) {
+    const [, { default: decorateFeatures }] = await Promise.all([
+      loadCSS(`${window.hlx.codeBasePath}/blocks/cards/cards-features.css`),
+      import('./cards-features.js'),
+    ]);
+    decorateFeatures(block, ul);
+    return;
+  }
+
+  if (!block.classList.contains('carousel')) return;
+
+  // Combat theme: the highlights carousel opens on the first card, moves
+  // only when the visitor asks (no autoplay) and shows "01 / 06" beside the
+  // arrows, as on the Combat page design
+  if (document.body.classList.contains('combat')) {
+    const total = ul.children.length;
+    const pad = (n) => String(n).padStart(2, '0');
+    const count = document.createElement('p');
+    count.className = 'carousel-count';
+    count.setAttribute('aria-live', 'polite');
+    const current = document.createElement('b');
+    const of = document.createElement('span');
+    of.textContent = `/ ${pad(Math.min(total, CARDS_MAX))}`;
+    count.append(current, of);
+    const ring = decorateCarousel(block, ul, {
+      autoplay: false,
+      start: 0,
+      onChange: (index) => { current.textContent = pad(index + 1); },
+    });
+    if (ring) block.querySelector('.carousel-nav')?.prepend(count);
+    return;
+  }
+
+  // Carousel in a Light section (e.g. Code T highlights): wide feature cards with a counter
+  // and the brochure menu, fetched only when used
+  if (block.closest('.section.light')) {
+    const [, { default: decorateCarouselLight }] = await Promise.all([
+      loadCSS(`${window.hlx.codeBasePath}/blocks/cards/cards-carousel-light.css`),
+      import('./cards-carousel-light.js'),
+    ]);
+    decorateCarouselLight(block, ul, decorateCarousel);
+    return;
+  }
+
+  decorateCarousel(block, ul);
 }

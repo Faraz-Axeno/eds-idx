@@ -376,6 +376,11 @@ export default function decorateRoller(block, ul) {
   let shown = introAt;
   let tween = 0;
   let turnedAt = -Infinity;
+  // a finger put down (or a key pressed) since the last turn is a new gesture: it turns the drum
+  // at once, even mid-turn; the hold below is only for a trackpad swipe's burst of wheel events
+  let fresh = false;
+  window.addEventListener('touchstart', () => { fresh = true; }, { capture: true, passive: true });
+  window.addEventListener('keydown', (e) => { if (!e.repeat) fresh = true; }, { capture: true });
   const placeOf = (k) => (k < 0 ? introAt : k);
   const paint = (s) => {
     render(s);
@@ -386,6 +391,7 @@ export default function decorateRoller(block, ul) {
     step = clamp(k, -1, count - 1);
     block.classList.toggle('is-intro', step < 0);
     cancelAnimationFrame(tween);
+    fresh = false;
     const from = shown;
     const to = placeOf(step);
     // a jump of several cards (a mark) takes a little longer, not one card's time each
@@ -414,7 +420,7 @@ export default function decorateRoller(block, ul) {
     canScrollUp: () => step > -1,
     scrollDown: () => playTo(step + 1),
     scrollUp: () => playTo(step - 1),
-    isBusy: () => tween !== 0 && performance.now() - turnedAt < STEP_HOLD_MS,
+    isBusy: () => tween !== 0 && !fresh && performance.now() - turnedAt < STEP_HOLD_MS,
     destroy: () => cancelAnimationFrame(tween),
   };
   let goToCard = (i) => playTo(i);
