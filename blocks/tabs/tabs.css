@@ -242,49 +242,335 @@
 /* The tab bar dissolves (display: contents) so its buttons and the panels
    share one column; --tab-index (set in tabs.js) orders them
    tab 1, panel 1, tab 2, panel 2… One panel is always open, as with tabs. */
-@media (width < 600px) {
+.tabs.accordion-mobile {
+  --tabs-panel-padding: var(--spacing-16) 0 var(--spacing-24);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs.accordion-mobile > .tabs-list {
+  display: contents;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.tabs.accordion-mobile > .tabs-list > .tabs-tab {
+  order: calc(var(--tab-index) * 2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-16) 0;
+  border-bottom: 1px solid var(--tabs-border-color);
+  border-radius: 0;
+  background: none;
+  white-space: normal;
+}
+
+.tabs.accordion-mobile > .tabs-panel {
+  order: calc(var(--tab-index) * 2 + 1);
+}
+
+/* + / − instead of the underline */
+.tabs.accordion-mobile > .tabs-list > .tabs-tab::after {
+  content: '+' / '';
+  position: static;
+  height: auto;
+  background: none;
+  font-size: 1.5em;
+  line-height: 1;
+  transform: none;
+}
+
+.tabs.accordion-mobile > .tabs-list > .tabs-tab[aria-selected='true']::after {
+  content: '−' / '';
+}
+
+/* From 600px the variant is the tabs it is combined with (plain tabs, or Vertical, Pills,
+   Brackets, Specs, Locations, FAQ, the Combat and Vertical Light looks): the browser's defaults
+   where no tabs rule sets a property, then each tabs rule (from this file, tabs-locations.css
+   and tabs-vertical-light.css, in that order) that sets one of the properties above, again with
+   .accordion-mobile: one class more for each keeps their order and puts it over the phone rules */
+/* stylelint-disable no-descending-specificity, no-duplicate-selectors */
+@media (width >= 600px) {
   .tabs.accordion-mobile {
-    --tabs-panel-padding: var(--spacing-16) 0 var(--spacing-24);
+    display: block;
+    flex-direction: row;
+  }
+
+  .tabs.accordion-mobile > .tabs-panel {
+    order: 0;
+  }
+
+  .tabs.accordion-mobile > .tabs-list > .tabs-tab {
+    order: 0;
+    display: inline-block;
+    justify-content: normal;
+    align-items: normal;
+  }
+
+  .tabs.accordion-mobile > .tabs-list > .tabs-tab::after {
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  .tabs.accordion-mobile > .tabs-list > .tabs-tab[aria-selected='true']::after {
+    content: '';
+  }
+
+  /* tabs.css */
+
+  .tabs.accordion-mobile {
+    --tabs-panel-padding: var(--spacing-24) 0 0;
+  }
+
+  .tabs.accordion-mobile > .tabs-list {
+    display: flex;
+  }
+
+  .tabs.accordion-mobile > .tabs-list.tabs-list-single {
+    display: none;
+  }
+
+  .tabs.accordion-mobile > .tabs-list > .tabs-tab {
+    padding: var(--tabs-tab-padding);
+    border: var(--tabs-tab-border);
+    border-radius: var(--tabs-tab-radius);
+    background-color: var(--tabs-tab-bg);
+    white-space: nowrap;
+  }
+
+  .tabs.accordion-mobile > .tabs-list > .tabs-tab::after {
+    content: '';
+    position: absolute;
+    height: var(--tabs-indicator-size);
+    background-color: var(--tabs-tab-active-color);
+    transform: scaleX(0);
+  }
+
+  .tabs.accordion-mobile > .tabs-list > .tabs-tab[aria-selected='true'] {
+    background-color: var(--tabs-tab-active-bg);
+  }
+
+  .tabs.accordion-mobile > .tabs-list > .tabs-tab[aria-selected='true']::after {
+    transform: scaleX(1);
+  }
+
+  @media (width >= 900px) {
+    .tabs.accordion-mobile {
+      --tabs-panel-padding: var(--spacing-32) 0 0;
+    }
+  }
+
+  .tabs.accordion-mobile.brackets > .tabs-list > .tabs-tab[aria-selected='true']::after {
+    content: ']' / '';
+    position: static;
+    height: auto;
+    background: none;
+    transform: none;
+  }
+
+  .tabs.accordion-mobile.pills > .tabs-list > .tabs-tab:hover:not([aria-selected='true']) {
+    background-color: color-mix(in srgb, currentcolor 10%, transparent);
+  }
+
+  @media (width >= 900px) {
+    .tabs.accordion-mobile.vertical {
+      --tabs-panel-padding: 0;
+
+      display: grid;
+    }
+  }
+
+  @media (width >= 900px) {
+    .tabs.accordion-mobile.vertical > .tabs-list > .tabs-tab {
+      padding: var(--spacing-12) var(--spacing-16);
+      white-space: normal;
+    }
+  }
+
+  @media (width >= 900px) {
+    .tabs.accordion-mobile.vertical > .tabs-list > .tabs-tab::after {
+      height: auto;
+      transform: scaleY(0);
+    }
+  }
+
+  @media (width >= 900px) {
+    .tabs.accordion-mobile.vertical > .tabs-list > .tabs-tab[aria-selected='true']::after {
+      transform: scaleY(1);
+    }
+  }
+
+  :is(body.combat .modal, .modal dialog.side-panel:has(.section.side-panel.light)) .tabs.accordion-mobile.specs {
+    --tabs-panel-padding: 40px 0 0;
 
     display: flex;
     flex-direction: column;
   }
 
-  .tabs.accordion-mobile > .tabs-list {
-    display: contents;
+  :is(body.combat .modal, .modal dialog.side-panel:has(.section.side-panel.light)) .tabs.accordion-mobile.specs.has-ink > .tabs-list > .tabs-tab::after {
+    content: none;
   }
 
-  .tabs.accordion-mobile > .tabs-list > .tabs-tab {
-    order: calc(var(--tab-index) * 2);
+  body.combat .tabs.accordion-mobile.vertical.combat-comfort {
+    --tabs-panel-padding: 0;
+
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-16) 0;
-    border-bottom: 1px solid var(--tabs-border-color);
-    border-radius: 0;
-    background: none;
+    flex-direction: column;
+  }
+
+  body.combat .tabs.accordion-mobile.vertical.combat-comfort > .tabs-panel {
+    order: 1;
+  }
+
+  body.combat .tabs.accordion-mobile.vertical.combat-comfort > .tabs-list > .tabs-tab {
+    padding: 0;
     white-space: normal;
   }
 
-  .tabs.accordion-mobile > .tabs-panel {
-    order: calc(var(--tab-index) * 2 + 1);
+  body.combat .tabs.accordion-mobile.vertical.combat-comfort > .tabs-list > .tabs-tab::after {
+    content: none;
   }
 
-  /* + / − instead of the underline */
-  .tabs.accordion-mobile > .tabs-list > .tabs-tab::after {
-    content: '+' / '';
-    position: static;
+  body.combat .tabs.accordion-mobile.vertical.combat-comfort > .tabs-list > .tabs-tab:not([aria-selected='true']) {
+    white-space: nowrap;
+  }
+
+  body.combat .tabs.accordion-mobile.vertical.combat-comfort > .tabs-list > .tabs-tab[aria-selected='true'] + .tabs-tab-more {
+    display: block;
+  }
+
+  @media (width >= 900px) {
+    body.combat .tabs.accordion-mobile.vertical.combat-comfort {
+      display: grid;
+    }
+  }
+
+  @media (width >= 900px) {
+    body.combat .tabs.accordion-mobile.vertical.combat-comfort > .tabs-list > .tabs-tab:not([aria-selected='true']) {
+      white-space: normal;
+    }
+  }
+
+  @media (width >= 900px) {
+    body.combat .tabs.accordion-mobile.vertical.combat-comfort > .tabs-list > .tabs-tab-more {
+      display: block;
+    }
+  }
+
+  @media (width >= 900px) {
+    body.combat .tabs.accordion-mobile.vertical.combat-comfort > .tabs-list > .tabs-tab[aria-selected='true'] + .tabs-tab-more {
+      display: block;
+    }
+  }
+
+  .tabs.accordion-mobile.faq {
+    --tabs-panel-padding: 24px 0 0;
+  }
+
+  /* tabs-locations.css */
+
+  .tabs.accordion-mobile.locations > .tabs-list {
+    display: grid;
+  }
+
+  .tabs.accordion-mobile.locations > .tabs-list.tabs-list-single {
+    display: none;
+  }
+
+  .tabs.accordion-mobile.locations > .tabs-list > .tabs-tab {
+    display: flex;
+    align-items: flex-end;
+    padding: 7px 2px 7px 5.5px;
+    border-radius: 10px;
+  }
+
+  @media (width >= 900px) {
+    .tabs.accordion-mobile.locations > .tabs-list > .tabs-tab {
+      padding: calc(12 * var(--loc-u)) calc(10 * var(--loc-u));
+      border-radius: calc(12 * var(--loc-u));
+    }
+  }
+
+  .tabs.accordion-mobile.locations > .tabs-list > .tabs-tab::after {
     height: auto;
-    background: none;
-    font-size: 1.5em;
-    line-height: 1;
+    background: linear-gradient(0deg, rgb(0 0 0) 0%, rgb(0 0 0 / 0%) var(--loc-active-shade));
     transform: none;
   }
 
-  .tabs.accordion-mobile > .tabs-list > .tabs-tab[aria-selected='true']::after {
-    content: '−' / '';
+  .tabs.accordion-mobile.locations > .tabs-list > .tabs-tab[aria-selected='true']::after {
+    transform: none;
+  }
+
+  /* tabs-vertical-light.css */
+
+  .section.light .tabs.accordion-mobile.vertical {
+    --tabs-panel-padding: 6px 0 0;
+  }
+
+  .section.light .tabs.accordion-mobile.vertical > .tabs-list {
+    display: block;
+  }
+
+  .section.light .tabs.accordion-mobile.vertical > .tabs-list > .tabs-tab {
+    display: block;
+    padding: 0;
+    white-space: normal;
+  }
+
+  .section.light .tabs.accordion-mobile.vertical > .tabs-list > .tabs-tab:not([aria-selected='true']) {
+    white-space: nowrap;
+  }
+
+  .section.light .tabs.accordion-mobile.vertical .tabs-tab-label {
+    display: -webkit-box;
+  }
+
+  @media (width >= 900px) {
+    .section.light .tabs.accordion-mobile.vertical {
+      --tabs-panel-padding: 10px 0 0 26px;
+
+      display: grid;
+    }
+  }
+
+  @media (width >= 900px) {
+    .section.light .tabs.accordion-mobile.vertical > .tabs-list {
+      display: grid;
+    }
+  }
+
+  @media (width >= 900px) {
+    .section.light .tabs.accordion-mobile.vertical > .tabs-list > .tabs-tab {
+      padding: 0 0 0 26px;
+    }
+  }
+
+  @media (width >= 900px) {
+    .section.light .tabs.accordion-mobile.vertical > .tabs-list > .tabs-tab:not([aria-selected='true']) {
+      padding: 0 0 0 26px;
+    }
+  }
+
+  @media (width >= 900px) {
+    .section.light .tabs.accordion-mobile.vertical > .tabs-list > .tabs-tab {
+      white-space: normal;
+    }
+  }
+
+  @media (width >= 900px) {
+    .section.light .tabs.accordion-mobile.vertical > .tabs-list > .tabs-tab:not([aria-selected='true']) {
+      white-space: normal;
+    }
+  }
+
+  @media (width >= 900px) {
+    .section.light .tabs.accordion-mobile.vertical.is-motion > .tabs-list > .tabs-tab-more {
+      display: block;
+    }
   }
 }
+/* stylelint-enable no-descending-specificity, no-duplicate-selectors */
 
 /* ---------- Variant: specs — spec comparison from a Columns block ---------- */
 

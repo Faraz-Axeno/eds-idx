@@ -349,10 +349,13 @@ main > .section.cards-container:has(.cards.pillars) {
     }
 
     &[aria-current='step'] {
+      --track: rgb(255 255 255 / 40%);
+
       height: var(--mark-on);
 
-      @media (width < 900px) {
-        --track: rgb(255 255 255 / 40%);
+      /* desktop: the marks' own track (above) */
+      @media (width >= 900px) {
+        --track: #d9d9d9;
       }
 
       &::before {

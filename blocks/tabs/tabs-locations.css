@@ -14,10 +14,14 @@ main > .section.has-locations {
   row-gap: 36px;
   padding: 0 20px max(36px, 5.2svh);
 
-  @media (width < 900px) {
-    &:has(.tabs-list-single) {
-      row-gap: 0;
-      padding-bottom: 38px;
+  /* one location: no row gap, 38px below (desktop: the section's own 32 row gap; its bottom
+     padding is set with the desktop layout below) */
+  &:has(.tabs-list-single) {
+    row-gap: 0;
+    padding-bottom: 38px;
+
+    @media (width >= 900px) {
+      row-gap: calc(32 * var(--loc-u));
     }
   }
 

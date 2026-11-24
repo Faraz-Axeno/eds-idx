@@ -561,11 +561,11 @@ main > .section.cards-container:has(.cards.roller.is-stepped) {
       will-change: transform, opacity;
     }
 
-    /* only the front card shows its caption */
+    /* only the front card shows its caption (blurred out of the way on desktop only) */
     .rl-copy > * {
       opacity: 0;
       transform: translateY(12px);
-      filter: blur(3px);
+      filter: none;
       transition:
         opacity 0.2s,
         transform 0.2s,
@@ -586,10 +586,9 @@ main > .section.cards-container:has(.cards.roller.is-stepped) {
       transition-delay: 0.06s;
     }
 
-    @media (width < 900px) {
-      .rl-copy > *,
-      .card.is-active .rl-copy > * {
-        filter: none;
+    @media (width >= 900px) {
+      .rl-copy > * {
+        filter: blur(3px);
       }
     }
 

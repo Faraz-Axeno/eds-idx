@@ -9,7 +9,7 @@
 
     /* Dimming of the digits and colons. Applied to them directly (not the
        whole timer) so the unit labels can keep their own opacity. */
-    --cd-dim: 0.2;
+    --cd-dim: 0.3;
 
     /* New Science Extended (the wide cut) per Figma — global display family. */
     --cd-font-family: var(--font-family-display);
@@ -21,10 +21,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 17.6vh 24px 24px;
+    padding: 17.6vh 20px 40px;
     background-color: var(--cd-bg);
     overflow: hidden;
     text-align: center;
+
+    /* phones above; from 600px: the digits and colons at 0.2, 24px at the sides and bottom */
+    @media (width >= 600px) {
+      --cd-dim: 0.2;
+
+      padding: 17.6vh 24px 24px;
+    }
 
     /* author mode: fixed height so the resizing UE iframe can't feed
        viewport units back into an infinite scroll */
@@ -57,34 +64,45 @@
     }
 
     .countdown-label {
-      margin: 0 0 0.75vw;
+      margin: 0 0 20px;
       color: var(--cd-label-color);
       font-family: var(--cd-font-family);
       font-weight: 400;
       font-style: normal;
-      font-size: clamp(30px, 3.74vw, 68px);
-      line-height: 1;
+      font-size: 28px;
+      line-height: 1.28;
       letter-spacing: -0.045em;
       text-transform: uppercase;
       opacity: 0;
       transform: translateY(24px);
       transition: opacity 0.7s ease, transform 0.7s ease;
+
+      @media (width >= 600px) {
+        margin: 0 0 0.75vw;
+        font-size: clamp(30px, 3.74vw, 68px);
+        line-height: 1;
+      }
     }
 
     .countdown-timer {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: clamp(8px, 1.1vw, 22px);
+      gap: 2px;
       color: var(--cd-digit-color);
       font-family: var(--cd-font-family);
       font-weight: 400;
-      font-size: clamp(64px, 8.29vw, 150px);
+      font-size: 36px;
       line-height: 1.4;
       letter-spacing: -0.05em;
       font-variant-numeric: tabular-nums;
       transform: translateY(28px);
       transition: transform 0.8s ease 0.1s;
+
+      @media (width >= 600px) {
+        gap: clamp(8px, 1.1vw, 22px);
+        font-size: clamp(64px, 8.29vw, 150px);
+      }
     }
 
     /* revealed once JS adds .is-visible */
@@ -138,7 +156,11 @@
 
     .countdown-sep {
       color: var(--cd-digit-color);
-      font-size: clamp(40px, 5.51vw, 100px);
+      font-size: 29.4px;
+
+      @media (width >= 600px) {
+        font-size: clamp(40px, 5.51vw, 100px);
+      }
     }
 
     /* visible unit captions (DAY / HRS / MIN / SEC), centred over their digit
@@ -179,33 +201,6 @@
         font-size: var(--type-label-s-size);
         line-height: var(--type-label-s-line-height);
         letter-spacing: var(--type-label-s-tracking);
-      }
-    }
-
-    @media (width < 600px) {
-      --cd-dim: 0.3;
-
-      padding: 17.6vh 20px 40px;
-
-      .countdown-label {
-        margin: 0 0 20px;
-        font-size: 28px;
-        line-height: 1.28;
-        letter-spacing: -0.045em;
-      }
-
-      .countdown-timer {
-        gap: 2px;
-        font-size: 36px;
-        line-height: 1.4;
-      }
-
-      .countdown-unit {
-        width: 2ch;
-      }
-
-      .countdown-sep {
-        font-size: 29.4px;
       }
     }
 

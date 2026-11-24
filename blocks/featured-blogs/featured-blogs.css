@@ -87,14 +87,24 @@
   transform: rotate(180deg);
 }
 
+/* phones: the bars share the row of three (3 x 61.5 + 2 x 14 = 212.5), so more blogs make
+   them narrower instead of running off the screen; larger screens: 61.5 each */
 & .featured-blogs-dot {
-  width: calc(61.5 * var(--fb-u));
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
   height: 2px;
   border: 0;
   padding: 0;
   background: rgb(255 255 255 / 30%);
   cursor: pointer;
   transition: background-color 0.3s ease;
+
+  @media (width >= 900px), (width >= 600px) and (orientation: landscape) {
+    flex: 0 1 auto;
+    width: calc(61.5 * var(--fb-u));
+    min-width: auto;
+  }
 }
 
 & .featured-blogs-dot.is-active {
@@ -138,6 +148,13 @@
   text-align: center;
   text-transform: uppercase;
   color: var(--color-white);
+
+  /* phones: at most 278 wide */
+  width: min(calc(278 * var(--fb-u)), 100%);
+
+  @media (width >= 900px), (width >= 600px) and (orientation: landscape) {
+    width: auto;
+  }
 }
 
 .featured-blogs a.featured-blogs-viewall:any-link,
@@ -145,6 +162,10 @@
   border: 1px solid var(--color-white);
   border-radius: calc(6 * var(--fb-u));
   padding: calc(12 * var(--fb-u)) calc(19 * var(--fb-u));
+
+  /* phones: 99 wide, the label centred in it */
+  width: calc(99 * var(--fb-u));
+  padding-inline: 0;
   font-family: var(--text-font-family);
   font-size: max(10px, calc(12 * var(--fb-u)));
   font-weight: var(--font-weight-regular);
@@ -155,6 +176,11 @@
   color: var(--color-white);
   background: transparent;
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+
+  @media (width >= 900px), (width >= 600px) and (orientation: landscape) {
+    width: auto;
+    padding-inline: calc(19 * var(--fb-u));
+  }
 }
 
 /* secondary (outlined) CTA on dark, as the hero's "Discover NEV": white
@@ -178,6 +204,8 @@
   gap: calc(24 * var(--fb-u));
   box-sizing: border-box;
   flex: 1 1 0;
+  align-self: center;
+  width: calc(363 * var(--fb-u));
   min-height: 0;
   max-height: calc(527 * var(--fb-u));
   margin-top: calc(32 * var(--fb-u));
@@ -187,6 +215,12 @@
   backdrop-filter: blur(30px);
   transform: translateX(calc((100% + var(--entrance-gutter)) * var(--featured-blogs-offset, 1)));
   will-change: transform;
+
+  /* phones: centred, 363 wide */
+  @media (width >= 900px), (width >= 600px) and (orientation: landscape) {
+    align-self: auto;
+    width: auto;
+  }
 }
 
 /* eyebrow — New Science, uppercase, 60% white; 14/20 mobile */
@@ -220,8 +254,10 @@
 }
 
 /* title — New Science, uppercase; 24/32 mobile. 3 lines at most on every
-   screen, the rest cut off (no ellipsis), as the Dissolve style's */
+   screen, the rest cut off (no ellipsis), as the Dissolve style's; on phones a fixed
+   whole-line box of 3 lines (96) */
 .featured-blogs-card-title {
+  height: 3lh;
   max-height: 3lh;
   overflow: hidden;
   margin: 0;
@@ -232,6 +268,10 @@
   letter-spacing: -0.01em;
   text-transform: uppercase;
   color: var(--color-white);
+
+  @media (width >= 900px), (width >= 600px) and (orientation: landscape) {
+    height: auto;
+  }
 }
 
 /* body — New Science; 16/24 mobile. 9 lines at most (12 on desktop), then an
@@ -345,17 +385,31 @@
   background: rgb(0 0 0 / 50%);
 }
 
-/* dot indicators — centred at the bottom on mobile, bottom-left on desktop */
+/* dot indicators — centred at the bottom on mobile, bottom-left on desktop. Phones and
+   upright tablets: in the flow, a 212.5-wide row below the card */
 .featured-blogs-dots {
-  position: absolute;
+  position: static;
 
   /* Figma y 834 (32 below the card), or 40 from the bottom if shorter */
   top: min(calc(834 * var(--fb-u)), calc(100% - 40 * var(--fb-u)));
   left: 50%;
   z-index: 1;
   display: flex;
+  flex-shrink: 0;
+  align-self: center;
   gap: calc(14 * var(--fb-u));
-  transform: translateX(-50%);
+  width: calc(212.5 * var(--fb-u));
+  margin-top: var(--featured-blogs-dots-gap);
+  transform: none;
+
+  @media (width >= 900px), (width >= 600px) and (orientation: landscape) {
+    position: absolute;
+    flex-shrink: 1;
+    align-self: auto;
+    width: auto;
+    margin-top: 0;
+    transform: translateX(-50%);
+  }
 }
 
 /* editor-only placeholder when no articles are flagged as featured */
@@ -368,48 +422,13 @@
   text-align: center;
 }
 
-@media (width < 600px), (width < 900px) and (orientation: portrait) {
-  .featured-blogs-heading {
-    width: min(calc(278 * var(--fb-u)), 100%);
-  }
-
-.featured-blogs a.featured-blogs-viewall:any-link,
-.featured-blogs .featured-blogs-viewall {
-  width: calc(99 * var(--fb-u));
-  padding-inline: 0;
-}
-
-.featured-blogs-card {
-  align-self: center;
-  width: calc(363 * var(--fb-u));
-}
-
-/* the bars share the row of three (3 × 61.5 + 2 × 14 = 212.5), so more
-   blogs make them narrower instead of running off the screen */
-.featured-blogs-dots {
-  position: static;
-  flex-shrink: 0;
-  align-self: center;
-  width: calc(212.5 * var(--fb-u));
-  margin-top: var(--featured-blogs-dots-gap);
-  transform: none;
-}
-
-.featured-blogs .featured-blogs-dot {
-  flex: 1 1 0;
-  width: auto;
-  min-width: 0;
-}
-
+/* phones and upright tablets: the bars' room below the card (larger screens: none) */
 .featured-blogs:has(> .featured-blogs-dots) {
   padding-bottom: calc(var(--featured-blogs-bottom-space) - var(--featured-blogs-dots-gap) - 2px);
-}
 
-/* fixed whole-line box: title 3 lines (96), cut off after them (no ellipsis) */
-.featured-blogs-card-title {
-  overflow: hidden;
-  height: 3lh;
-}
+  @media (width >= 900px), (width >= 600px) and (orientation: landscape) {
+    padding-bottom: 0;
+  }
 }
 
 @media (width >= 900px), (width >= 600px) and (orientation: landscape) {
