@@ -742,10 +742,12 @@
     margin-top: calc(32 * var(--rf-u));
 
     /* Mobile OTP Submit is 154px wide (Figma node 1349:4340), narrower than
-       the fields-screen GET OTP (197px) that the base .submit uses. Desktop
-       stays at the base 172px override, so scope this to mobile only. */
-    @media (width < 900px) {
-      min-width: calc(154 * var(--rf-u));
+       the fields-screen GET OTP (197px) that the base .submit uses. Desktop:
+       the base .submit's 172px. */
+    min-width: calc(154 * var(--rf-u));
+
+    @media (width >= 900px) {
+      min-width: calc(172 * var(--rf-u));
     }
   }
 

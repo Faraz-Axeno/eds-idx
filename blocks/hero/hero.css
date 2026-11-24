@@ -93,9 +93,17 @@ main > .section.hero-container {
           }
         }
 
+        /* hidden until 900px, then shown as it is elsewhere: a picture inline, a video's
+           still a block (.video-still) */
         .only-desktop {
-          @media (width < 900px) {
-            display: none;
+          display: none;
+
+          @media (width >= 900px) {
+            display: inline;
+
+            &.video-still {
+              display: block;
+            }
           }
         }
 
@@ -1349,17 +1357,25 @@ main > .section.hero-container {
           }
 
           /* mobile: the video controls sit 23 above the current slide's heading (hero.js moves
-             them along), in the space each slide's content keeps for them, so no text moves */
-          @media (width < 900px) {
-            &:has(.slide-controls) > .content {
-              padding-top: calc(30px + 23 * var(--h-u));
-            }
+             them along), in the space each slide's content keeps for them, so no text moves;
+             desktop: no space kept, the controls top right (.slide-controls, below) */
+          &:has(.slide-controls) > .content {
+            padding-top: calc(30px + 23 * var(--h-u));
 
-            > .content > .slide-controls {
-              position: absolute;
-              top: 0;
-              left: 0;
-              margin: 0;
+            @media (width >= 900px) {
+              padding-top: 0;
+            }
+          }
+
+          > .content > .slide-controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 0;
+
+            @media (width >= 900px) {
+              top: calc(31 * var(--h-u));
+              left: auto;
             }
           }
         }

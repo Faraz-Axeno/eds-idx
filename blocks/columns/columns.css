@@ -114,21 +114,30 @@ main {
         display: block;
       }
 
+      /* mobile: the second image (the mobile one) shows in place of the first */
       picture:nth-of-type(2),
       p:nth-of-type(2) picture {
+        display: block;
+      }
+
+      picture:first-of-type:not(:last-of-type),
+      p:first-of-type:not(:last-of-type) picture {
         display: none;
       }
 
-      @media (width < 900px) {
-        picture:nth-of-type(2),
-        p:nth-of-type(2) picture {
-          display: block;
-        }
-
+      /* desktop: the first image, as a picture shows by default; the second hidden */
+      @media (width >=900px) {
         picture:first-of-type:not(:last-of-type),
         p:first-of-type:not(:last-of-type) picture {
+          display: inline;
+        }
+
+        /* stylelint-disable no-descending-specificity */
+        picture:nth-of-type(2),
+        p:nth-of-type(2) picture {
           display: none;
         }
+        /* stylelint-enable no-descending-specificity */
       }
     }
 
@@ -232,14 +241,21 @@ main {
     /* Figma mobile groups the content as 32 / 24 / 32 gaps (icon→heading /
        heading→subtext / subtext→button, node 1349:4196). Our DOM is flat siblings
        with a uniform 24px flex gap, so add 8px (proportional) on the icon (bottom)
-       and button (top) to lift those two gaps to 32px. Mobile only — desktop 48px. */
-    @media (width < 900px) {
-      .ty-content p:has(> picture) {
-        margin-bottom: calc(8 * var(--tu));
-      }
+       and button (top) to lift those two gaps to 32px. Desktop: none (its gap is 48px). */
+    /* stylelint-disable-next-line no-descending-specificity */
+    .ty-content p:has(> picture) {
+      margin-bottom: calc(8 * var(--tu));
 
-      .ty-content .ty-cta {
-        margin-top: calc(8 * var(--tu));
+      @media (width >=900px) {
+        margin-bottom: 0.25em; /* the site's paragraph margin (styles.css) */
+      }
+    }
+
+    .ty-content .ty-cta {
+      margin-top: calc(8 * var(--tu));
+
+      @media (width >=900px) {
+        margin-top: 0;
       }
     }
 

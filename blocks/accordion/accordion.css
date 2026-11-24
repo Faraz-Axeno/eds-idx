@@ -19,7 +19,7 @@
   --accordion-question: color-mix(in srgb, currentcolor 80%, transparent);
   --accordion-question-open: currentcolor;
   --accordion-answer: color-mix(in srgb, currentcolor 65%, transparent);
-  --accordion-gutter: 72px;
+  --accordion-gutter: 40px;
   --accordion-ease: ease;
 
   max-width: 940px;
@@ -28,8 +28,8 @@
   color-scheme: light;
   font-family: var(--accordion-font);
 
-  @media (width <= 599.98px) {
-    --accordion-gutter: 40px;
+  @media (width >= 600px) {
+    --accordion-gutter: 72px;
   }
 
   /* opening and closing slide where the browser can animate the details' height */
@@ -62,7 +62,7 @@
   .accordion-item-label {
     display: flex;
     align-items: baseline;
-    padding: 24px 0;
+    padding: 18px 0;
     list-style: none;
     cursor: pointer;
 
@@ -75,8 +75,8 @@
       outline-offset: 4px;
     }
 
-    @media (width <= 599.98px) {
-      padding: 18px 0;
+    @media (width >= 600px) {
+      padding: 24px 0;
     }
   }
 
@@ -92,7 +92,7 @@
     min-width: 0;
     overflow-wrap: anywhere;
     color: var(--accordion-question);
-    font-size: 26px;
+    font-size: 19px;
     line-height: 1.3;
     transition: color 0.2s var(--accordion-ease);
 
@@ -100,8 +100,8 @@
       margin: 0;
     }
 
-    @media (width <= 599.98px) {
-      font-size: 19px;
+    @media (width >= 600px) {
+      font-size: 26px;
     }
   }
 
@@ -109,11 +109,11 @@
      the box, so the x stays inside the block) */
   .accordion-item-icon {
     position: relative;
-    flex: 0 0 22px;
+    flex: 0 0 18px;
     align-self: center;
-    width: 22px;
-    height: 22px;
-    margin-left: 24px;
+    width: 18px;
+    height: 18px;
+    margin-left: 16px;
     color: var(--accordion-question);
     transition: color 0.2s var(--accordion-ease);
 
@@ -134,11 +134,11 @@
       transform: rotate(90deg);
     }
 
-    @media (width <= 599.98px) {
-      flex-basis: 18px;
-      width: 18px;
-      height: 18px;
-      margin-left: 16px;
+    @media (width >= 600px) {
+      flex-basis: 22px;
+      width: 22px;
+      height: 22px;
+      margin-left: 24px;
     }
   }
 
@@ -165,10 +165,10 @@
 
   .accordion-item-body {
     overflow-wrap: anywhere;
-    padding: 0 66px 34px var(--accordion-gutter);
+    padding: 0 0 28px var(--accordion-gutter);
     color: var(--accordion-answer);
-    font-size: 20px;
-    line-height: 1.8;
+    font-size: 16px;
+    line-height: 1.7;
 
     > :first-child {
       margin-top: 0;
@@ -183,10 +183,10 @@
       text-decoration: underline;
     }
 
-    @media (width <= 599.98px) {
-      padding: 0 0 28px var(--accordion-gutter);
-      font-size: 16px;
-      line-height: 1.7;
+    @media (width >= 600px) {
+      padding: 0 66px 34px var(--accordion-gutter);
+      font-size: 20px;
+      line-height: 1.8;
     }
   }
 
@@ -220,15 +220,15 @@
 main > .section:is(:has(.block.accordion), :has(.block.tabs.faq)) {
   --accordion-section-background: #fff;
 
-  padding-block: 72px;
+  padding-block: 48px;
   background-color: var(--accordion-section-background);
 
   &:has(.block.accordion.dark) {
     --accordion-section-background: #0d0d0d;
   }
 
-  @media (width <= 599.98px) {
-    padding-block: 48px;
+  @media (width >= 600px) {
+    padding-block: 72px;
   }
 }
 

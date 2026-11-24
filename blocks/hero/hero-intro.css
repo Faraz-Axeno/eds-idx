@@ -144,12 +144,25 @@ main > .section.hero-container {
         opacity: 1;
       }
 
-      /* first screen: the heading around the tile */
+      /* first screen: the heading around the tile. Mobile: the heading sits at the bottom
+         left; nothing between it and the first screen is positioned, so the tile (absolute) is
+         placed against the whole screen */
       .screen {
         position: absolute;
         inset: 0;
         z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 0 calc(20 * var(--i-u)) calc(60 * var(--i-u));
         pointer-events: none;
+
+        @media (width >= 900px) {
+          display: block;
+          flex-direction: row;
+          justify-content: normal;
+          padding: 0;
+        }
       }
 
       .content {
@@ -167,6 +180,12 @@ main > .section.hero-container {
         white-space: normal;
         color: var(--ink);
 
+        /* mobile: the two parts stacked, aligned to the start */
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        text-align: start;
+
         /* desktop: the tile is centred on the screen, the two parts either
            side of it (37 / 32 apart, as in the design). The sides stay equal
            whatever the words, so the tile stays centred; a part longer than
@@ -175,11 +194,14 @@ main > .section.hero-container {
           position: absolute;
           inset: 0;
           display: grid;
+          flex-direction: row;
           grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+          gap: normal;
           align-items: center;
           padding-inline: calc(24 * var(--i-u));
           font-size: calc(40 * var(--i-u));
           line-height: calc(56 / 40);
+          text-align: inherit;
         }
       }
 
@@ -226,25 +248,6 @@ main > .section.hero-container {
         }
       }
 
-      /* mobile: the heading sits at the bottom left; nothing between it and the
-         first screen is positioned, so the tile (absolute) is placed against the
-         whole screen */
-      @media (width < 900px) {
-        .screen {
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-end;
-          padding: 0 calc(20 * var(--i-u)) calc(60 * var(--i-u));
-        }
-
-        .heading {
-          display: flex;
-          flex-direction: column;
-          gap: 0;
-          text-align: start;
-        }
-      }
-
       &.is-in .part {
         opacity: calc(1 - var(--grow));
         transform: translateY(calc(var(--grow) * 24 * var(--i-u)));
@@ -264,18 +267,21 @@ main > .section.hero-container {
       /* the tile's place: desktop 100.27 × 56.39 between the heading parts,
          mobile 120 × 72 centred at 371.5 from the top (Figma) */
       .tile {
+        position: absolute;
+        top: calc(371.5 * var(--i-u));
+        left: calc(50% - 60 * var(--i-u));
         display: block;
         flex: 0 0 auto;
-        width: calc(100.27 * var(--i-u));
-        height: calc(56.39 * var(--i-u));
+        width: calc(120 * var(--i-u));
+        height: calc(72 * var(--i-u));
         border-radius: var(--tile-r);
 
-        @media (width < 900px) {
-          position: absolute;
-          top: calc(371.5 * var(--i-u));
-          left: calc(50% - 60 * var(--i-u));
-          width: calc(120 * var(--i-u));
-          height: calc(72 * var(--i-u));
+        @media (width >= 900px) {
+          position: static;
+          top: auto;
+          left: auto;
+          width: calc(100.27 * var(--i-u));
+          height: calc(56.39 * var(--i-u));
         }
       }
 
