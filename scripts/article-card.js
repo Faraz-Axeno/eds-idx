@@ -127,6 +127,16 @@ export function buildArticleCard(item, {
       img.setAttribute('height', '516');
       img.setAttribute('loading', 'lazy');
     }
+    // an image from another site (e.g. a dealer site listing the brand site's news): any
+    // rendition left as a bare path gets that site's origin back
+    const { origin } = new URL(item.image, window.location.href);
+    if (origin !== window.location.origin) {
+      const withOrigin = (value) => (value?.startsWith('/') ? `${origin}${value}` : value);
+      picture.querySelectorAll('source[srcset]').forEach((source) => {
+        source.srcset = withOrigin(source.getAttribute('srcset'));
+      });
+      if (img) img.src = withOrigin(img.getAttribute('src'));
+    }
     media.append(picture);
     a.append(media);
   }

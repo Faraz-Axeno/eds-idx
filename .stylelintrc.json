@@ -1,9 +1,3 @@
 {
-  "extends": ["stylelint-config-standard"],
-  "rules": {
-    "media-feature-range-notation": null,
-    "property-no-vendor-prefix": [true, {
-      "ignoreProperties": ["-webkit-backdrop-filter", "-webkit-mask-image", "-webkit-mask-composite"]
-    }]
-  }
+  "extends": ["stylelint-config-standard"]
 }

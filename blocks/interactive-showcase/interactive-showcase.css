@@ -19,11 +19,11 @@ main > .section > .interactive-showcase-wrapper {
   --interactive-showcase-text-muted-dark: var(--color-gray-70, #4d4d4d);
   --interactive-showcase-text-counter: var(--color-gray-60, #666);
 
-  /* every text in the block is New Science, the main title New Science Extended: the site's
-     global variables (styles/styles.css). The Adobe Fonts kit is loaded by
-     interactive-showcase.js */
-  --interactive-showcase-font: var(--font-new-science);
-  --interactive-showcase-font-display: var(--font-new-science-extended);
+  /* every text in the block is New Science, the project's own text font: its --text-font-family
+     (with its metric-matched fallback) where the project defines one, else New Science itself;
+     the main title is New Science Extended. The Adobe Fonts kit is loaded by head.html */
+  --interactive-showcase-font: var(--text-font-family, new-science, 'Helvetica Neue', arial, sans-serif);
+  --interactive-showcase-font-display: var(--font-family-display, new-science-extended, var(--interactive-showcase-font));
   --interactive-showcase-font-body: var(--interactive-showcase-font);
   --interactive-showcase-radius-card: 24px;
   --interactive-showcase-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -124,11 +124,16 @@ main > .section > .interactive-showcase-wrapper {
     text-transform: uppercase;
   }
 
-  /* Figma's 416px text box, a few px wider: New Science renders its lines 1-4px wider in the
-     browser than in Figma, and they break as in the frame ("…with a petrol engine" / "…engine
-     and motor" / "work the same axle.") only with that room */
-  .description p {
-    max-width: 424px;
+  /* a description may be a heading (the Combat page's captions): it takes the description's
+     type below, not the site's heading styles */
+  .description :is(h2, h3, h4) {
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+  }
+
+  .description :is(p, h2, h3, h4) {
+    max-width: 416px;
     color: var(--interactive-showcase-text-muted-dark, #4d4d4d);
     font-size: 13px;
     line-height: 1.5;
@@ -257,6 +262,41 @@ main > .section > .interactive-showcase-wrapper {
 
   .thumb[aria-selected='true'] img {
     filter: none;
+  }
+
+  /* more than the design's three items (up to eight, e.g. one per paint colour): the
+     thumbnails share the tray's one row, narrowing as needed down to
+     --interactive-showcase-thumb-min; past that the tray scrolls sideways, its scrollbar hidden,
+     faded at an edge with more thumbnails past it (.more-before / .more-after), the selected one
+     kept in view (interactive-showcase.js). Three or fewer keep their design size and tray */
+  .thumbs:has(> .thumb:nth-child(4)) {
+    overflow: auto hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+
+    > .thumb {
+      flex: 0 1 auto;
+      min-width: var(--interactive-showcase-thumb-min, 64px);
+      scroll-snap-align: start;
+    }
+
+    /* the focus ring inside the thumbnail, as the tray clips what is outside it */
+    > .thumb:focus-visible {
+      outline-offset: -3px;
+    }
+  }
+
+  .thumbs.more-after {
+    mask-image: linear-gradient(to left, transparent, #000 24px);
+  }
+
+  .thumbs.more-before {
+    mask-image: linear-gradient(to right, transparent, #000 24px);
+  }
+
+  .thumbs.more-before.more-after {
+    mask-image: linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent);
   }
 
   /* "NEV / Tech 2": the Rotax engine is black and grey in the frame; the photo's blue cast is
@@ -689,35 +729,40 @@ main > .section > .interactive-showcase-wrapper {
   /* the desktop + and its open module, on desktop and on touch tablets held upright (600px
      wide and up: iPad, Surface), whose screens are as large; phones have their own below */
   @media ((width >= 900px) or ((orientation: landscape) and (width >= 600px))) and (not ((hover: none) and (pointer: coarse) and (orientation: portrait))), (hover: none) and (pointer: coarse) and (orientation: portrait) and (width >= 600px) {
-    /* the open module beside its + : always the design's 272 x 120 (16px padding, a 20px row for
-       the title and the minus, 20px, the description's 48px: three 16px lines), a shorter
-       description leaving room below it; one line of title and three of description fit it, as
-       their character limits keep them (interactive-showcase.js) */
+    /* the open module beside its + : the design's 272 x 120 (16px padding, a 20px row for the
+       title and the minus, 20px, the description's 48px: three 16px lines), a shorter
+       description leaving room below it. A title of one line and a description of three fit it,
+       as the design's; a longer one (within the character limits, interactive-showcase.js) makes
+       it taller: a title of up to two lines, a description of up to five */
     .tooltip {
       min-height: 120px;
     }
 
     .tooltip-title {
-      --interactive-showcase-lines: 1;
+      --interactive-showcase-lines: 2;
 
       margin-top: 0;
       line-height: 20px;
     }
 
     .tooltip-text {
-      --interactive-showcase-lines: 3;
+      --interactive-showcase-lines: 5;
 
       line-height: 16px;
     }
 
     /* opening upwards (no room below), 120 too: the minus sits in the bottom corner, beside the
-       description's last line, which stops short of it (a float shaped to that line alone) */
+       description's last line, which stops short of it (a float shaped to that line alone). Its
+       three lines, or as many as a longer one takes (--interactive-showcase-tip-lines, set by
+       interactive-showcase.js) */
     .tooltip[data-align='bottom'] {
       padding-bottom: 16px;
     }
 
     .tooltip[data-align='bottom'] .tooltip-text {
-      height: 48px;
+      --interactive-showcase-tip-height: calc(var(--interactive-showcase-tip-lines, 3) * 16px);
+
+      height: var(--interactive-showcase-tip-height);
       overflow: hidden;
     }
 
@@ -725,8 +770,8 @@ main > .section > .interactive-showcase-wrapper {
       content: '';
       float: right;
       width: 24px;
-      height: 48px;
-      shape-outside: inset(32px 0 0);
+      height: var(--interactive-showcase-tip-height);
+      shape-outside: inset(calc(var(--interactive-showcase-tip-height) - 16px) 0 0);
     }
 
     .tooltip[data-side='right'][data-align='bottom'] .tooltip-text::before {
@@ -852,15 +897,18 @@ main > .section > .interactive-showcase-wrapper {
     }
 
     /* New Science Regular 14px / 135%, -2% */
-    .description p {
+    .description :is(p, h2, h3, h4) {
       max-width: none;
       font-size: 14px;
       line-height: 1.35;
       letter-spacing: -0.02em;
     }
 
-    /* the tray 200 x 79: three 64 x 79 thumbnails, 4px apart */
+    /* the tray 200 x 79: three 64 x 79 thumbnails, 4px apart; with more items they narrow to
+       56px before the tray scrolls */
     .thumbs {
+      --interactive-showcase-thumb-min: 56px;
+
       grid-column: 1 / -1;
       gap: 4px;
       margin-top: 44px;
@@ -905,8 +953,9 @@ main > .section > .interactive-showcase-wrapper {
         padding: 12px;
       }
 
+      /* up to three lines: a + point's title may be 40 characters (interactive-showcase.js) */
       .tooltip-title {
-        --interactive-showcase-lines: 2;
+        --interactive-showcase-lines: 3;
 
         margin-top: 0;
         padding-right: 18px;
@@ -1064,7 +1113,7 @@ main > .section > .interactive-showcase-wrapper {
       font-size: clamp(20px, 2.2vw, 22px);
     }
 
-    .description p {
+    .description :is(p, h2, h3, h4) {
       max-width: 600px;
       font-size: clamp(17px, 1.9vw, 19px);
       line-height: 1.45;
@@ -1214,22 +1263,7 @@ main > .section > .interactive-showcase-wrapper {
     display: none;
   }
 
-  /* the "JSW navigation" option (with-nav, interactive-showcase.js): the JSW navbar 26px from
-     the top of the screen (18px into the inset card), as on the other JSW pages */
-  @media (min-width: 600px) {
-    &.with-nav .pill-nav {
-      top: 18px;
-    }
-  }
-
-  /* phones: the navbar (pill-nav.css places it 44px down) clear of the heading below it */
-  @media (max-width: 599.98px) {
-    &.with-nav .heading {
-      padding-top: 112px;
-    }
-  }
-
-  /* Universal Editor: items after the 3rd are not shown, and texts over their character limit
+  /* Universal Editor: items after the 8th are not shown, and texts over their character limit
      are shortened; these notes say so (interactive-showcase.js) */
   .limit-note {
     grid-column: 1 / -1;
@@ -1269,4 +1303,347 @@ main > .section > .interactive-showcase-wrapper {
     translate: calc(0px - var(--interactive-showcase-sx, 0px)) calc(0px - var(--interactive-showcase-sy, 0px));
     background-color: var(--interactive-showcase-spot-bg);
   }
+}
+
+/* ==========================================================================
+   Combat theme (body.combat, the JSW Combat page only): a full-bleed exterior / interior
+   viewer, as the prototype's #coverZoom. The image covers the whole screen with "+" hotspots
+   on it; the items' thumbnails become an Exterior / Interior segmented toggle at the top; the
+   selected item's description is the caption bottom left. The section's dark background and
+   the "Build your own" link are styled in styles/theme-combat.css. Nothing above changes.
+   Default style only (:where(:not(.cover)), adding no specificity): the Cover style has its
+   own full-bleed layout, swatches and view switch (interactive-showcase-cover.css), which
+   these rules would turn into the toggle.
+   ========================================================================== */
+
+/* stylelint-disable no-descending-specificity */
+
+/* the viewer spans the whole screen: no inset, no 1200px column */
+body.combat .interactive-showcase-wrapper {
+  flex: 1 1 auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) {
+  /* the source's hotspot glass: 32px, radius 8px */
+  --interactive-showcase-spot: 32px;
+  --interactive-showcase-spot-radius: 8px;
+  --interactive-showcase-spot-bg: rgb(22 22 26 / 62%);
+  --interactive-showcase-panel-height: calc(100 * var(--interactive-showcase-svh));
+  --interactive-showcase-combat-edge: var(--combat-gutter, 20px);
+
+  position: relative;
+  display: block;
+  height: var(--interactive-showcase-panel-height);
+  min-height: 0;
+  border-radius: 0;
+  color: var(--color-white, #fff);
+  background: none;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .copy {
+  display: contents;
+}
+
+/* no heading on this page: an empty title row takes no room */
+body.combat .interactive-showcase:where(:not(.cover)) .heading:not(:has(.title:not(:empty))) {
+  display: none;
+}
+
+/* the toggle and caption float over the image; only the toggle takes clicks */
+body.combat .interactive-showcase:where(:not(.cover)) .detail {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: block;
+  padding: 0;
+  pointer-events: none;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .counter,
+body.combat .interactive-showcase:where(:not(.cover)) .item-title {
+  display: none;
+}
+
+/* caption ("Built to look the part off the road"): shown from desktop, as in the source */
+body.combat .interactive-showcase:where(:not(.cover)) .texts {
+  display: none;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .description :is(p, h2, h3, h4) {
+  max-width: none;
+  color: var(--color-white, #fff);
+  font-family: var(--interactive-showcase-font-display);
+  font-size: clamp(22px, 2.2vw, 34px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+/* Exterior / Interior: the thumbnails as a frosted segmented control, its white pill sliding
+   to the selected item; the label is the item's title (the tab's aria-label) */
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs {
+  position: absolute;
+  top: max(76px, var(--interactive-showcase-header-cover, 0px) + 16px);
+  right: var(--interactive-showcase-combat-edge);
+  left: var(--interactive-showcase-combat-edge);
+  z-index: 5;
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 4px;
+  border-radius: 16px;
+  background-color: rgb(18 18 18 / 38%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 16%);
+  backdrop-filter: blur(22px) saturate(1.3);
+  pointer-events: auto;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc((100% - 8px - 4px * (var(--interactive-showcase-tabs, 2) - 1)) / var(--interactive-showcase-tabs, 2));
+  height: calc(100% - 8px);
+  border-radius: 12px;
+  background-color: var(--color-white, #fff);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
+  pointer-events: none;
+  transition: transform 0.45s var(--interactive-showcase-ease);
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs:has(> .thumb:nth-child(3)) {
+  --interactive-showcase-tabs: 3;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs:has(> .thumb:nth-child(2)[aria-selected='true'])::before {
+  transform: translateX(calc(100% + 4px));
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs:has(> .thumb:nth-child(3)[aria-selected='true'])::before {
+  transform: translateX(calc(200% + 8px));
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs .thumb {
+  position: relative;
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: 44px;
+  aspect-ratio: auto;
+  overflow: visible;
+  border-radius: 12px;
+  color: rgb(255 255 255 / 86%);
+  background-color: transparent;
+  font-family: var(--interactive-showcase-font-body);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  transition: color 0.35s, background-color 0.25s;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs .thumb picture {
+  display: none;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs .thumb::after {
+  content: attr(aria-label);
+  position: static;
+  inset: auto;
+  background: none;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs .thumb:not([aria-selected='true']):hover {
+  color: var(--color-white, #fff);
+  background-color: rgb(255 255 255 / 12%);
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs .thumb[aria-selected='true'] {
+  color: var(--color-black, #000);
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .thumbs .thumb:focus-visible {
+  outline: 2px solid var(--color-white, #fff);
+  outline-offset: 2px;
+}
+
+/* the image fills the screen */
+body.combat .interactive-showcase:where(:not(.cover)) .stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  height: auto;
+  margin: 0;
+  pointer-events: none;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .panel {
+  display: block;
+}
+
+/* as the source's cover: 108% of the screen's height across at the image's ratio, never
+   narrower than the screen (and on upright phones at most 160% of it, so the car stays in
+   view), centred; hotspot percentages stay on the artwork */
+body.combat .interactive-showcase:where(:not(.cover)) .panel .figure {
+  --interactive-showcase-cover-w: clamp(100cqw, 108cqh * var(--interactive-showcase-ratio, 1.7778), 160cqw);
+
+  position: absolute;
+  inset:
+    calc((100cqh - var(--interactive-showcase-cover-w) / var(--interactive-showcase-ratio, 1.7778)) / 2)
+    auto auto calc((100cqw - var(--interactive-showcase-cover-w)) / 2);
+  width: var(--interactive-showcase-cover-w);
+  height: auto;
+  margin: 0;
+  aspect-ratio: var(--interactive-showcase-ratio, 16 / 9);
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .panel .figure img {
+  object-fit: cover;
+  filter: none;
+
+  /* phones and upright tablets: the landscape image is a band across the dark screen, its top
+     and bottom edges fading into it (the source fades its phone image's bottom 12%) */
+  mask-image: linear-gradient(transparent, #000 12%, #000 88%, transparent);
+}
+
+/* hotspots: the source's 34px glass squares on phones (32px from desktop) with a 13px plus */
+body.combat .interactive-showcase:where(:not(.cover)) .hotspot {
+  --interactive-showcase-spot: 34px;
+
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 16%), 0 2px 12px rgb(0 0 0 / 24%);
+  backdrop-filter: blur(12px);
+  pointer-events: auto;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .hotspot:is(:hover, :focus-visible):not([aria-expanded='true'], .is-closing) {
+  background-color: rgb(10 10 12 / 82%);
+  outline: none;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .hotspot::before,
+body.combat .interactive-showcase:where(:not(.cover)) .hotspot::after {
+  width: 13px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .hotspot[aria-expanded='true'],
+body.combat .interactive-showcase:where(:not(.cover)) .hotspot.is-closing {
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+/* the open hotspot's module in the same glass; a title-only hotspot gets a single row */
+body.combat .interactive-showcase:where(:not(.cover)) .tooltip {
+  background-color: rgb(22 22 26 / 62%);
+  backdrop-filter: blur(12px);
+  pointer-events: auto;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .tooltip:has(.tooltip-text:empty) {
+  min-height: 0;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .tooltip-text:empty {
+  display: none;
+}
+
+@media (width >= 900px) {
+  body.combat .interactive-showcase:where(:not(.cover)) .hotspot {
+    --interactive-showcase-spot: 32px;
+  }
+
+  body.combat .interactive-showcase:where(:not(.cover)) .panel .figure img {
+    mask-image: none;
+  }
+
+  body.combat .interactive-showcase:where(:not(.cover)) .thumbs {
+    top: max(84px, var(--interactive-showcase-header-cover, 0px) + 16px);
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  body.combat .interactive-showcase:where(:not(.cover)) .thumbs .thumb {
+    flex: none;
+    width: 164px;
+    height: 46px;
+    font-size: 15px;
+  }
+
+  body.combat .interactive-showcase:where(:not(.cover)) .texts {
+    position: absolute;
+    bottom: 84px;
+    left: var(--interactive-showcase-combat-edge);
+    display: block;
+    width: min(600px, 50%);
+  }
+
+  /* the source's two scrims, blurred and fading out: bottom left behind the caption, bottom
+     right (mirrored) behind "Build your own"; over the image, under the hotspots */
+  body.combat .interactive-showcase:where(:not(.cover)) .panel::before,
+  body.combat .interactive-showcase:where(:not(.cover)) .panel::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    width: min(900px, 70vw);
+    height: 62%;
+    pointer-events: none;
+    background: radial-gradient(120% 100% at 0% 100%, rgb(0 0 0 / 50%), rgb(0 0 0 / 28%) 38%, rgb(0 0 0 / 0%) 72%);
+    backdrop-filter: blur(6px);
+    mask-image: radial-gradient(120% 100% at 0% 100%, #000 30%, rgb(0 0 0 / 0%) 72%);
+  }
+
+  body.combat .interactive-showcase:where(:not(.cover)) .panel::after {
+    right: 0;
+    left: auto;
+    width: min(560px, 44vw);
+    height: 34%;
+    transform: scaleX(-1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.combat .interactive-showcase:where(:not(.cover)) .thumbs::before,
+  body.combat .interactive-showcase:where(:not(.cover)) .thumbs .thumb {
+    transition: none;
+  }
+}
+
+/* stylelint-enable no-descending-specificity */
+
+/* ---------- Combat motion (interactive-showcase.js combatViewMotion) ----------
+   The views cross-fade from a blur instead of sliding: the panels stay in place (the active one
+   on top) and the script blurs and fades their images; the one going keeps showing, without its
+   scrims (the new one's are already there), until the new one is in. The hotspots of an image
+   are hidden (.spots-off) while the page moves to the section and during a view switch; the
+   script brings them in. */
+body.combat .interactive-showcase.combat-view .panel {
+  transform: none;
+  transition: none;
+}
+
+body.combat .interactive-showcase.combat-view .panel.is-outgoing {
+  opacity: 1;
+}
+
+body.combat .interactive-showcase.combat-view .panel.is-outgoing::before,
+body.combat .interactive-showcase.combat-view .panel.is-outgoing::after {
+  content: none;
+}
+
+body.combat .interactive-showcase:where(:not(.cover)) .figure.spots-off .hotspot {
+  opacity: 0;
+  pointer-events: none;
 }

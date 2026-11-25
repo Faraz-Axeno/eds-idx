@@ -6,6 +6,153 @@
     ]
   },
   {
+    "id": "text",
+    "rte": {
+      "toolbar": {
+        "format": [
+          "bold",
+          "italic",
+          "underline",
+          "strike",
+          "code_inline",
+          "text_color"
+        ],
+        "alignment": [
+          "left",
+          "center",
+          "right",
+          "justify"
+        ],
+        "direction": [
+          "rtl",
+          "ltr"
+        ],
+        "indentation": [
+          "indent",
+          "outdent"
+        ],
+        "blocks": [
+          "paragraph",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "code_block",
+          "blockquote"
+        ],
+        "list": [
+          "bullet_list",
+          "ordered_list"
+        ],
+        "insert": [
+          "link",
+          "unlink",
+          "image",
+          "table",
+          "special_characters"
+        ],
+        "sr_script": [
+          "superscript",
+          "subscript"
+        ],
+        "editor": [
+          "removeformat",
+          "clean_unsupported_tags",
+          "paste_text",
+          "fullscreen",
+          "find_and_replace"
+        ],
+        "sections": [
+          "blocks",
+          "format",
+          "alignment",
+          "direction",
+          "indentation",
+          "list",
+          "insert",
+          "sr_script",
+          "editor"
+        ]
+      }
+    }
+  },
+  {
+    "id": "richtext",
+    "components": [],
+    "rte": {
+      "toolbar": {
+        "format": [
+          "bold",
+          "italic",
+          "underline",
+          "strike",
+          "code_inline",
+          "text_color"
+        ],
+        "alignment": [
+          "left",
+          "center",
+          "right",
+          "justify"
+        ],
+        "direction": [
+          "rtl",
+          "ltr"
+        ],
+        "indentation": [
+          "indent",
+          "outdent"
+        ],
+        "blocks": [
+          "paragraph",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "code_block",
+          "blockquote"
+        ],
+        "list": [
+          "bullet_list",
+          "ordered_list"
+        ],
+        "insert": [
+          "link",
+          "unlink",
+          "image",
+          "table",
+          "special_characters"
+        ],
+        "sr_script": [
+          "superscript",
+          "subscript"
+        ],
+        "editor": [
+          "removeformat",
+          "clean_unsupported_tags",
+          "paste_text",
+          "fullscreen",
+          "find_and_replace"
+        ],
+        "sections": [
+          "blocks",
+          "format",
+          "alignment",
+          "direction",
+          "indentation",
+          "list",
+          "insert",
+          "sr_script",
+          "editor"
+        ]
+      }
+    }
+  },
+  {
     "id": "section",
     "components": [
       "text",
@@ -14,32 +161,41 @@
       "title",
       "hero",
       "cards",
-      "jsw-cards",
       "columns",
       "fragment",
-      "mg-hero",
-      "mg-vehicles",
-      "mg-masonry-grid",
-      "mg-cards",
-      "mg-timeline",
-      "mg-section-nav",
-      "blog-list",
-      "immersive-hero",
-      "hotspot-showcase",
-      "jsw-collage",
-      "blog-carousel",
-      "brand-footer",
-      "jsw-sustainability",
-      "parallax-collage",
-      "expandable-blog-teaser",
-      "jsw-navbar",
-      "reservation-form",
-      "reservation-confirmation",
-      "open-roles",
-      "career-hero",
-      "career-route",
-      "jsw-footer",
-      "jsw-nav"
+      "social-deck",
+      "countdown",
+      "register-form",
+      "strip-teaser",
+      "featured-blogs",
+      "content-listing",
+      "related-blogs",
+      "article-carousel",
+      "breadcrumb",
+      "article-info",
+      "spec-table",
+      "table",
+      "stats-production",
+      "featured-intro",
+      "events",
+      "embed",
+      "video",
+      "interactive-showcase",
+      "tabs",
+      "accordion",
+      "floater"
+    ]
+  },
+  {
+    "id": "accordion",
+    "components": [
+      "accordion-item"
+    ]
+  },
+  {
+    "id": "article-carousel",
+    "components": [
+      "article-carousel-tab"
     ]
   },
   {
@@ -90,6 +246,168 @@
       "button",
       "title"
     ]
+  },
+  {
+    "id": "content-listing",
+    "components": [
+      "content-listing-tab"
+    ]
+  },
+  {
+    "id": "events",
+    "components": [
+      "event"
+    ]
+  },
+  {
+    "id": "hero",
+    "components": [
+      "hero-slide"
+    ],
+    "rte": {
+      "toolbar": {
+        "format": [
+          "bold",
+          "italic",
+          "underline",
+          "strike",
+          "code_inline",
+          "text_color"
+        ],
+        "alignment": [
+          "left",
+          "center",
+          "right",
+          "justify"
+        ],
+        "direction": [
+          "rtl",
+          "ltr"
+        ],
+        "indentation": [
+          "indent",
+          "outdent"
+        ],
+        "blocks": [
+          "paragraph",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "code_block",
+          "blockquote"
+        ],
+        "list": [
+          "bullet_list",
+          "ordered_list"
+        ],
+        "insert": [
+          "link",
+          "unlink",
+          "image",
+          "table",
+          "special_characters"
+        ],
+        "sr_script": [
+          "superscript",
+          "subscript"
+        ],
+        "editor": [
+          "removeformat",
+          "clean_unsupported_tags",
+          "paste_text",
+          "fullscreen",
+          "find_and_replace"
+        ],
+        "sections": [
+          "blocks",
+          "format",
+          "alignment",
+          "direction",
+          "indentation",
+          "list",
+          "insert",
+          "sr_script",
+          "editor"
+        ]
+      }
+    }
+  },
+  {
+    "id": "hero-full",
+    "components": [],
+    "rte": {
+      "toolbar": {
+        "format": [
+          "bold",
+          "italic",
+          "underline",
+          "strike",
+          "code_inline",
+          "text_color"
+        ],
+        "alignment": [
+          "left",
+          "center",
+          "right",
+          "justify"
+        ],
+        "direction": [
+          "rtl",
+          "ltr"
+        ],
+        "indentation": [
+          "indent",
+          "outdent"
+        ],
+        "blocks": [
+          "paragraph",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "code_block",
+          "blockquote"
+        ],
+        "list": [
+          "bullet_list",
+          "ordered_list"
+        ],
+        "insert": [
+          "link",
+          "unlink",
+          "image",
+          "table",
+          "special_characters"
+        ],
+        "sr_script": [
+          "superscript",
+          "subscript"
+        ],
+        "editor": [
+          "removeformat",
+          "clean_unsupported_tags",
+          "paste_text",
+          "fullscreen",
+          "find_and_replace"
+        ],
+        "sections": [
+          "blocks",
+          "format",
+          "alignment",
+          "direction",
+          "indentation",
+          "list",
+          "insert",
+          "sr_script",
+          "editor"
+        ]
+      }
+    }
   },
   {
     "id": "hotspot-showcase",
@@ -177,5 +495,67 @@
     "components": [
       "parallax-collage-item"
     ]
+  },
+  {
+    "id": "social-deck",
+    "components": [
+      "social-card"
+    ]
+  },
+  {
+    "id": "social-deck-full",
+    "components": []
+  },
+  {
+    "id": "spec-table",
+    "components": [
+      "spec-row"
+    ]
+  },
+  {
+    "id": "table-2-columns",
+    "components": [
+      "table-col-2"
+    ]
+  },
+  {
+    "id": "table-3-columns",
+    "components": [
+      "table-col-3"
+    ]
+  },
+  {
+    "id": "table-4-columns",
+    "components": [
+      "table-col-4"
+    ]
+  },
+  {
+    "id": "table-5-columns",
+    "components": [
+      "table-col-5"
+    ]
+  },
+  {
+    "id": "table-6-columns",
+    "components": [
+      "table-col-6"
+    ]
+  },
+  {
+    "id": "table-7-columns",
+    "components": [
+      "table-col-7"
+    ]
+  },
+  {
+    "id": "tabs",
+    "components": [
+      "tab"
+    ]
+  },
+  {
+    "id": "tabs-full",
+    "components": []
   }
 ]

@@ -565,7 +565,7 @@ export default function decorate(section) {
   });
   const root = document.documentElement;
   const settle = () => {
-    if (!root.classList.contains('snap-ready')) return false;
+    if (!root.classList.contains('snap-settled')) return false;
     if (!root.classList.contains('snap-active')) {
       snap.then((mod) => mod.unregisterBlockScroll(section)).catch(() => {});
       wireRunway(section, steps);

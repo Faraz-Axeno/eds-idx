@@ -308,6 +308,18 @@ main > .section.cards-container:has(.cards.roller.is-stepped) {
     }
   }
 
+  /* one screen: no sticky, or iOS Safari keeps the drum's white in its bars after the roller */
+  &:not(.scroll-runway) > .default-content-wrapper:first-child {
+    position: absolute;
+    top: 50svh;
+    inset-inline: 0;
+    margin-inline: auto;
+  }
+
+  &:not(.scroll-runway) .cards-wrapper {
+    position: relative;
+  }
+
   /* one screen: the price bar rests at its bottom (in the runway, sticky holds it there) */
   &:not(.scroll-runway) .cards-wrapper ~ .default-content-wrapper {
     position: absolute;

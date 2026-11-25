@@ -320,6 +320,19 @@ export default async function initSectionSnap(main) {
   // the mobile menu or a modal is open: the page behind it stays put
   const navOpen = () => document.documentElement.matches('.is-nav-open, .is-modal-open');
 
+  // a block's step can open or close the way into a No Snap neighbour (boundaryFree), so the
+  // scroll lock is checked again once the step has settled
+  let relockTimer;
+  const relockAfterStep = (controller) => {
+    clearTimeout(relockTimer);
+    const check = () => {
+      if (controller.isBusy?.()) relockTimer = setTimeout(check, 50);
+      // eslint-disable-next-line no-use-before-define
+      else syncLock();
+    };
+    relockTimer = setTimeout(check, 0);
+  };
+
   // a gesture steps the current section's registered block first, while it has steps
   const handleDirection = (direction) => {
     if (animating || locked || navOpen() || (touchDown && touchStepped)) return;
@@ -331,8 +344,16 @@ export default async function initSectionSnap(main) {
         return;
       }
       touchStepped = touchDown;
-      if (direction > 0 && controller.canScrollDown?.()) { controller.scrollDown(); return; }
-      if (direction < 0 && controller.canScrollUp?.()) { controller.scrollUp(); return; }
+      if (direction > 0 && controller.canScrollDown?.()) {
+        controller.scrollDown();
+        relockAfterStep(controller);
+        return;
+      }
+      if (direction < 0 && controller.canScrollUp?.()) {
+        controller.scrollUp();
+        relockAfterStep(controller);
+        return;
+      }
     }
     touchStepped = touchDown;
     goTo(index + direction, false, { step: true });
@@ -506,7 +527,16 @@ export default async function initSectionSnap(main) {
       glide = 0;
       targetY = null;
     };
+    // the section next to the runway that way is No Snap: it scrolls natively, so there is
+    // no stop to glide to (a glide would fight the native scroll and the page would jump)
+    const intoNoSnap = (direction) => noSnapSections.includes(sections[runwayIndex + direction]);
+    const release = () => {
+      stopGlide();
+      inRunway = false;
+      updateObserverState();
+    };
     const handOver = (direction) => {
+      if (intoNoSnap(direction)) { release(); return; }
       stopGlide();
       inRunway = false;
       updateObserverState();
@@ -539,9 +569,12 @@ export default async function initSectionSnap(main) {
       const top = runwayTop(section);
       const end = runwayEnd(section);
       const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      const next = (targetY ?? window.scrollY) + delta;
+      // out into a No Snap section: this wheel event scrolls the page natively
+      const way = (next > end + 1 && 1) || (next < top - 1 && -1);
+      if (way && intoNoSnap(way)) { release(); return; }
       if (e.cancelable) e.preventDefault();
       else return; // already latched natively (rare): left to the scroll listener
-      const next = (targetY ?? window.scrollY) + delta;
       // the footer ends the page: past its end there is nothing to hand over to
       if (next > end + 1 && runwayIndex < footerIndex) { handOver(1); return; }
       if (next < top - 1 && runwayIndex > 0) { handOver(-1); return; }

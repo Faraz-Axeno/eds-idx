@@ -433,6 +433,10 @@ async function loadLazy(doc) {
   // alongside the remaining sections rather than after them, and the fallback timer starts now,
   // so on a slow phone the lock lasts seconds less.
   const releaseScroll = () => document.documentElement.classList.add('snap-ready');
+  // .snap-settled: the snap engine has started (.snap-active) or won't. Unlike .snap-ready (also
+  // set by the fallback timer below while the engine may still be loading), blocks that step
+  // with the snap wait for it before falling back to their plain layout.
+  const settleSnap = () => document.documentElement.classList.add('snap-settled');
   // Pages using a free-scroll section style (the blog layouts) read top to
   // bottom natively instead of paging section by section.
   const snaps = main && !isFragmentDocument()
@@ -474,6 +478,7 @@ async function loadLazy(doc) {
   if (snaps) {
     sectionSnap
       .then(({ default: initSectionSnap }) => initSectionSnap(main))
+      .finally(settleSnap)
       .then(() => Promise.all([
         // "Wave In" sections: the snap's moves into them play the wave cut
         main.querySelector('.section.wave-in')
@@ -488,6 +493,7 @@ async function loadLazy(doc) {
       .finally(releaseScroll);
   } else {
     releaseScroll();
+    settleSnap();
   }
 
   // Delegated CTA click tracking, registered once here; delegation on
