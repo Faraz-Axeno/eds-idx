@@ -1491,8 +1491,9 @@ main > .section:has(.cards.features.is-stats) {
       display: -webkit-box;
       grid-area: 1 / 4 / 3 / 5;
       align-self: start;
-      width: max-content;
-      max-width: 14.5625em; /* 466 at 32px, the Figma's: its left 214.42 from the unit's right */
+      width: 15.5625em;
+      max-width: none;
+      margin-right: -1em;
       overflow: hidden;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
