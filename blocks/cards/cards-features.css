@@ -1491,11 +1491,6 @@ main > .section:has(.cards.features.is-stats) {
       display: -webkit-box;
       grid-area: 1 / 4 / 3 / 5;
       align-self: start;
-
-      /* the Figma's 466 at 32px (its left 214.42 from the unit's right), plus 1em of room past
-         its right edge, pulled back by the margin so its left edge stays: browsers set this font
-         a little wider or narrower (Firefox, Chrome on Linux), and without the room a line that
-         just fits in one ("POWER AND TORQUE") would wrap there and be cut */
       width: 15.5625em;
       max-width: none;
       margin-right: -1em;
