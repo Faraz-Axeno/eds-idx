@@ -1,5 +1,4 @@
-// Spec Table "Showcase" in a Light section: the Code T "by the numbers" screen (loaded by
-// spec-table.js only when a page uses it; layout in spec-table-showcase.css).
+// Spec Table "Showcase" in a Light section (Code T specs)
 
 import { inEditor } from '../../scripts/utils/common.js';
 import decorateBrochure from '../../scripts/utils/brochure.js';
@@ -8,8 +7,7 @@ import decorateBrochure from '../../scripts/utils/brochure.js';
 const pictureOnly = (p) => !!p.querySelector('picture, img') && !p.textContent.trim();
 
 /**
- * Two cars: each car's slot takes its image's proportions (--car1-ar, --car2-ar on the section,
- * read by spec-table-showcase.css), from its width and height or, if it has none, once loaded.
+ * Sets a car's proportions (--car1-ar / --car2-ar) from its image.
  * @param {Element} section
  * @param {Element} p the car's paragraph
  * @param {number} n 1 or 2
@@ -34,19 +32,13 @@ const EASE = {
   inOut: (t) => (t < 0.5 ? 4 * t ** 3 : 1 - ((2 - 2 * t) ** 3) / 2),
   out: (t) => 1 - (1 - t) ** 4,
 };
-// the reveal's length in the prototype's timeline units, played over the runway (1.2 screens of
-// scroll, the section's height in spec-table-showcase.css less one screen)
+// reveal length in prototype timeline units
 const TIMELINE = 1.36;
 // how long .specs-arrive stays on: past the dimension lines' fade-in (spec-table-showcase.css)
 const ARRIVE_MS = 2000;
 
 /**
- * The specs reveal (prototype .fold--specs): the section becomes a scroll runway with its
- * layers pinned (spec-table-showcase.css), and the scroll position plays the timeline. The car
- * rises (on desktop 300 design px plus 60, scaled to the screen; on phones half the screen), the
- * phone's dimension lines and then the heading and marks fade away, and the two groups, the
- * closing title, the brochure link and the button rise into place. Not in Universal Editor or under
- * reduced motion, where the section shows everything at once.
+ * Scroll-driven reveal (prototype .fold--specs); not in Universal Editor or reduced motion.
  * @param {Element} section
  */
 function wireReveal(section) {
@@ -78,9 +70,7 @@ function wireReveal(section) {
   const carRise = (h) => (narrow.matches
     ? h / 2
     : 300 * Math.min(window.innerWidth / 1280, h / 720) + 60);
-  // two cars (prototype specsCar): the pair rises to 64px from the top (72px on phones, under
-  // 768px wide) and shrinks to end 32px over the first group label; it shrinks about its own
-  // centre, so each car also moves towards the middle. Measured from the layout, without transforms
+  // two cars: rise and shrink to above the groups (prototype specsCar)
   const twoCars = section.classList.contains('specs-two-cars');
   const stacked = window.matchMedia('(width < 768px)');
   const pairs = inFirst('.specs-car').map((car) => [car, car.nextElementSibling?.matches('.specs-dims')
@@ -156,8 +146,14 @@ function wireReveal(section) {
     },
   ];
 
-  // only what changed is written, so the Wave In cut can rise and fade the shown parts as the
-  // section arrives
+  // the brochure popup closes as its button fades, or it would float over the reveal
+  const closeBrochure = () => {
+    if (!last.classList.contains('is-open')) return;
+    last.classList.remove('is-open');
+    last.querySelector('.brochure-toggle')?.setAttribute('aria-expanded', 'false');
+  };
+
+  // only changed styles are written
   const written = new Map();
   // under 500px tall the section is a plain stack (spec-table-showcase.css): nothing plays there
   const pinned = window.matchMedia('(height >= 500px)');
@@ -179,6 +175,7 @@ function wireReveal(section) {
     const styles = new Map();
     tracks.forEach((track) => {
       const k = track.ease(clamp((t - track.at) / track.dur, 0, 1));
+      if (track.els[0] === label && k < 1) closeBrochure();
       const at = ([from, to]) => from + (to - from) * k;
       track.els.filter(Boolean).forEach((el) => {
         const style = styles.get(el) || {};
@@ -207,8 +204,7 @@ function wireReveal(section) {
     if (!frame) frame = requestAnimationFrame(render);
   };
 
-  // reaching a later part from the keyboard plays the reveal to its end, so what has focus shows;
-  // after the browser has scrolled the focused element into view (that would land at the start)
+  // keyboard focus on a later part plays the reveal to its end
   section.addEventListener('focusin', (e) => {
     if (!pinned.matches || ![...later, links].some((el) => el?.contains(e.target))) return;
     setTimeout(() => {
@@ -218,10 +214,11 @@ function wireReveal(section) {
   });
 
   window.addEventListener('scroll', schedule, { passive: true });
+  document.addEventListener('snap:start', ({ detail }) => {
+    if (detail?.from === section) closeBrochure();
+  });
 
-  // Arriving from above (a snap move down into the section), the dimension lines draw in just
-  // after the car, as the prototype's move into the fold does (.specs-arrive, spec-table-showcase
-  // .css). Arriving from below, on load or without the snap they are simply there.
+  // arriving from above: dimension lines fade in after the car
   let arriveTimer;
   document.addEventListener('snap:start', ({ detail: { from, to } }) => {
     if (to !== section || !from?.compareDocumentPosition || !pinned.matches) return;
@@ -234,17 +231,14 @@ function wireReveal(section) {
   });
 
   // before the snap engine starts, so it takes the section as a runway
-  section.classList.add('specs-scrub', 'scroll-runway');
+  section.classList.add('specs-scrub', 'scroll-runway', 'runway-stop');
   window.addEventListener('resize', schedule, { passive: true });
   pinned.addEventListener('change', schedule);
   render();
 }
 
 /**
- * Shows a dimension drawing (an SVG image) inline, so its labels take the page's font and its
- * lines and labels the drawing styles in spec-table-showcase.css, as in the design (an image
- * can't use the page's fonts). The file's own styles, scripts and handlers are dropped: inline, its
- * <style> would apply to the whole page. If the file can't be read, the image stays.
+ * Inlines an SVG drawing so it uses the page's font and styles.
  * @param {Element} p the drawing's paragraph
  */
 async function inlineDrawing(p) {
@@ -278,12 +272,7 @@ async function inlineDrawing(p) {
 }
 
 /**
- * Sets up a Showcase section, once per section (each of its Spec Tables calls this):
- * - the drawing (default content before the tables): classes for the car and its dimension
- *   drawings, by their order (the car, the desktop drawing, the phone drawing), whether the
- *   images share a paragraph (a document) or each have their own (Universal Editor, which also
- *   keeps an empty paragraph between them: removed on the page)
- * - the brochure button, the reveal
+ * Sets up a Showcase section once: car and drawing classes, brochure, reveal.
  * @param {Element} section
  */
 export default function decorateShowcase(section) {
@@ -326,15 +315,13 @@ export default function decorateShowcase(section) {
     phone?.classList.add('specs-dims', 'specs-dims-phone');
     drawings = [desk, phone];
   }
-  // the drawings are small SVGs with no size of their own until loaded: loaded straight away, so
-  // they are there with the car when the section arrives
+  // load drawings eagerly
   drawings.forEach((p) => {
     const img = p?.querySelector('img');
     if (img) img.loading = 'eager';
     if (!editing) inlineDrawing(p);
   });
-  // the brochure links and their label (the content after the tables) become a "Download the
-  // brochure" button opening them; left as authored in Universal Editor
+  // brochure button (not in Universal Editor)
   const closing = section.querySelector(':scope > .spec-table-wrapper ~ .default-content-wrapper:last-child');
   if (closing && !editing) decorateBrochure(closing, 'specs-brochure-links');
   wireReveal(section);

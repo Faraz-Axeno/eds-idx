@@ -71,6 +71,20 @@ function watchSections(bar) {
 }
 
 /**
+ * Sets --floater-space on the page: the bar's height plus its bottom offset.
+ * @param {HTMLElement} bar
+ */
+function publishRoom(bar) {
+  const set = () => {
+    const bottom = parseFloat(getComputedStyle(bar).bottom) || 0;
+    document.documentElement.style.setProperty('--floater-space', `${Math.ceil(bar.offsetHeight + bottom)}px`);
+  };
+  set();
+  new ResizeObserver(set).observe(bar);
+  window.addEventListener('resize', set, { passive: true });
+}
+
+/**
  * Floater: a bar fixed at the foot of the screen, shown on "Show Floater" sections.
  * @param {Element} block
  */
@@ -115,5 +129,6 @@ export default function decorate(block) {
   document.body.append(block);
   wrapper?.remove();
   if (section && !section.querySelector(':scope > :not(.section-metadata)')) section.remove();
+  publishRoom(block);
   watchSections(block);
 }

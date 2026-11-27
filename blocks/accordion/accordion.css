@@ -909,6 +909,12 @@ main > .section.light .block.accordion:not(.dark) {
     }
   }
 
+  @media (600px <= width < 900px) {
+    .accordion-item-label {
+      padding-inline-end: 16px;
+    }
+  }
+
   /* phones: the question's box rounded up to whole pixels (21), 14 above it and 13.25 to the
      answer (48.25 a row) */
   @media (width < 600px) {
@@ -929,6 +935,12 @@ main > .section.light .block.accordion:not(.dark) {
 
     .accordion-item-question {
       min-height: round(up, var(--accordion-question-lh), 1px);
+    }
+  }
+
+  @media (width >= 900px) {
+    .accordion-item-label {
+      padding-inline-end: 40px;
     }
   }
 

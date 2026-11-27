@@ -667,7 +667,7 @@
         "component": "select",
         "name": "classes",
         "label": "Style",
-        "description": "Default - a grid of cards.\nCarousel - auto-rotates; recommended: 6 to 12 cards.\nTimeline - 6 to 10 cards.\nPillars - up to 6 cards, JPG or PNG images only.\nRoller - 3 to 6 cards, one per scroll step.\nRail - a horizontally scrolling row of fixed-width cards, any number.\nFeatures - cards that open their details in a pop-up, with a Next button to the next card.\n  Image cards (Technology, Safety), any number, in a sideways-scrolling row: the picture fills the card; its title shows on one line, its short line on two; the rest shows in the pop-up (title 2 lines, text 6 lines on phones, 8 on desktop).\n  Stat tiles (Performance), 1 or more: 1 to 4 tiles fill the row; with 5 or more, 4 show at a time (pages of 4, 2 x 2, on phones) and arrows move to the rest. Value in bold, up to 16 characters (e.g. 590 Nm); label up to 2 lines; in the pop-up, title up to 3 lines and description up to 250 characters. The section's figure: up to 4 digits and a 4-letter unit (e.g. 359 PS).\n  Longer texts end in … on the page (Universal Editor shows them whole). Card text order: see the card's Text field.",
+        "description": "Default - a grid of cards.\nCarousel - auto-rotates; recommended: 6 to 12 cards.\nTimeline - 6 to 10 cards.\nPillars - up to 6 cards, JPG or PNG images only.\nRoller - 3 to 6 cards, one per scroll step.\nRail - a horizontally scrolling row of fixed-width cards, any number.\nFeatures (and Features Classic, the earlier version of its look) - cards that open their details in a pop-up, with a Next button to the next card.\n  Image cards (Technology, Safety), any number, in a sideways-scrolling row: the picture fills the card; its title shows on one line, its short line on two; the rest shows in the pop-up (title 2 lines, text 6 lines on phones, 8 on desktop).\n  Stat tiles (Performance), 1 or more: 1 to 4 tiles fill the row; with 5 or more, 4 show at a time (pages of 4, 2 x 2, on phones) and arrows move to the rest. Value in bold, up to 16 characters (e.g. 590 Nm); label up to 2 lines; in the pop-up, title up to 3 lines and description up to 250 characters. The section's figure: up to 4 digits and a 4-letter unit (e.g. 359 PS).\n  Longer texts end in … on the page (Universal Editor shows them whole). Card text order: see the card's Text field.",
         "options": [
           {
             "name": "Default",
@@ -696,6 +696,10 @@
           {
             "name": "Features",
             "value": "features"
+          },
+          {
+            "name": "Features Classic",
+            "value": "features-classic"
           }
         ]
       }
@@ -1462,6 +1466,10 @@
           {
             "name": "Dark",
             "value": "dark"
+          },
+          {
+            "name": "Dark Translucent",
+            "value": "dark-translucent"
           }
         ]
       }
@@ -3520,6 +3528,81 @@
         }
       },
       {
+        "component": "text",
+        "valueType": "string",
+        "name": "mapCoordinates",
+        "label": "Map Coordinates",
+        "description": "Booking only. The dealer's latitude and longitude, comma-separated, e.g. 28°26' N, 77°06' E (or 28.4333, 77.1). Clicking the map and Get directions go to this exact point in Google Maps (else to the Map Address); the Find Us Card also shows them at the top corners of its drawing.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "booking"
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "wayfindRegion",
+        "label": "Find Us: Region",
+        "description": "Find Us Card only. Under the pin on the map drawing, e.g. Gurugram · Haryana.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes_wayfind"
+            },
+            true
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "wayfindCity",
+        "label": "Find Us: City",
+        "description": "Find Us Card only. Beside the pin icon under the address, e.g. Gurugram, India.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes_wayfind"
+            },
+            true
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "wayfindPin",
+        "label": "Find Us: PIN Code",
+        "description": "Find Us Card only. The postal code, e.g. 122011 (shown as PIN 122011).",
+        "condition": {
+          "===": [
+            {
+              "var": "classes_wayfind"
+            },
+            true
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "wayfindNote",
+        "label": "Find Us: Closing Line",
+        "description": "Find Us Card only. The line along the card's foot, e.g. We look forward to meeting you.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes_wayfind"
+            },
+            true
+          ]
+        }
+      },
+      {
         "component": "select",
         "name": "classes",
         "label": "Style",
@@ -3535,6 +3618,21 @@
             "value": "booking"
           }
         ]
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "classes_wayfind",
+        "label": "Find Us Card",
+        "description": "Booking only. The right side shows a Find us card instead of the map: an Our showroom map drawing, the dealer's name (Map Pop-up Name) and address (Map Address), city and PIN, a Get directions button to Google Maps and a closing line. The form on the left is unchanged.",
+        "condition": {
+          "===": [
+            {
+              "var": "classes"
+            },
+            "booking"
+          ]
+        }
       }
     ]
   },
@@ -4453,7 +4551,7 @@
         "component": "multiselect",
         "name": "classes",
         "label": "Style",
-        "description": "Combine freely, e.g. Vertical + Pills. Accordion on mobile stacks the tabs below 600px. Specs lays out a spec comparison: give each tab a Fragment holding a Columns block (one column per model; row 1 the model names, every other cell a label and a value as two paragraphs). Locations shows each tab as an image tile: give each tab a city Title and one image as its Content; the open tab's image fills the section. FAQ puts text tabs above the accordions of a Light FAQ section: give each tab a Title, then add one Accordion block per tab after the Tabs block in the same section (the first accordion goes in the first tab, and so on), or give a tab a Fragment holding an Accordion. Vertical in a Product Page section: 3 to 7 tabs; at most 7, no more can be added after the 7th.",
+        "description": "Combine freely, e.g. Vertical + Pills. Accordion on mobile stacks the tabs below 600px. Specs lays out a spec comparison: give each tab a Fragment holding a Columns block (one column per model; row 1 the model names, every other cell a label and a value as two paragraphs). Locations shows each tab as an image tile: give each tab a city Title and one image as its Content; the open tab's image fills the section. FAQ puts text tabs above the accordions of a Light FAQ section: each tab then asks only for its Title; add one Accordion block per tab after the Tabs block in the same section (the first accordion goes in the first tab, and so on).",
         "options": [
           {
             "name": "Vertical",
@@ -4562,6 +4660,22 @@
         "name": "imageAlt",
         "label": "Image Alt Text",
         "value": ""
+      }
+    ]
+  },
+  {
+    "id": "tab-faq",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Tab Title",
+        "required": true,
+        "description": "Short label shown on the tab. Its questions are the matching Accordion block after the Tabs block (the first accordion for the first tab, and so on).",
+        "validation": {
+          "maxLength": 40
+        }
       }
     ]
   },

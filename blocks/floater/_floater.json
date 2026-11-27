@@ -53,6 +53,10 @@
             {
               "name": "Dark",
               "value": "dark"
+            },
+            {
+              "name": "Dark Translucent",
+              "value": "dark-translucent"
             }
           ]
         }

@@ -94,6 +94,46 @@
           "condition": { "===": [{ "var": "classes" }, "booking"] }
         },
         {
+          "component": "text",
+          "valueType": "string",
+          "name": "mapCoordinates",
+          "label": "Map Coordinates",
+          "description": "Booking only. The dealer's latitude and longitude, comma-separated, e.g. 28°26' N, 77°06' E (or 28.4333, 77.1). Clicking the map and Get directions go to this exact point in Google Maps (else to the Map Address); the Find Us Card also shows them at the top corners of its drawing.",
+          "condition": { "===": [{ "var": "classes" }, "booking"] }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "wayfindRegion",
+          "label": "Find Us: Region",
+          "description": "Find Us Card only. Under the pin on the map drawing, e.g. Gurugram · Haryana.",
+          "condition": { "===": [{ "var": "classes_wayfind" }, true] }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "wayfindCity",
+          "label": "Find Us: City",
+          "description": "Find Us Card only. Beside the pin icon under the address, e.g. Gurugram, India.",
+          "condition": { "===": [{ "var": "classes_wayfind" }, true] }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "wayfindPin",
+          "label": "Find Us: PIN Code",
+          "description": "Find Us Card only. The postal code, e.g. 122011 (shown as PIN 122011).",
+          "condition": { "===": [{ "var": "classes_wayfind" }, true] }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "wayfindNote",
+          "label": "Find Us: Closing Line",
+          "description": "Find Us Card only. The line along the card's foot, e.g. We look forward to meeting you.",
+          "condition": { "===": [{ "var": "classes_wayfind" }, true] }
+        },
+        {
           "component": "select",
           "name": "classes",
           "label": "Style",
@@ -103,6 +143,14 @@
             { "name": "Default", "value": "" },
             { "name": "Booking", "value": "booking" }
           ]
+        },
+        {
+          "component": "boolean",
+          "valueType": "boolean",
+          "name": "classes_wayfind",
+          "label": "Find Us Card",
+          "description": "Booking only. The right side shows a Find us card instead of the map: an Our showroom map drawing, the dealer's name (Map Pop-up Name) and address (Map Address), city and PIN, a Get directions button to Google Maps and a closing line. The form on the left is unchanged.",
+          "condition": { "===": [{ "var": "classes" }, "booking"] }
         }
       ]
     }

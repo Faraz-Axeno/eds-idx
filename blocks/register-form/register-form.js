@@ -269,7 +269,7 @@ export default async function decorate(block) {
   // are set aside for the style
   const bookingRows = booking ? [...block.children].slice(5) : [];
   bookingRows.forEach((row) => row.remove());
-  const [requestSentRow, mapNameRow, mapAddressRow] = bookingRows;
+  const [requestSentRow, mapNameRow, mapAddressRow, mapCoordsRow, ...wayfindRows] = bookingRows;
   const rowText = (row) => row?.textContent.trim() || '';
 
   let picture = null;
@@ -1144,7 +1144,14 @@ export default async function decorate(block) {
       getScreen: () => screen,
       requestCode: () => requestCode(false),
       requestSent: requestSentRow?.querySelector(':scope > div') || requestSentRow,
-      map: { name: rowText(mapNameRow), address: rowText(mapAddressRow) },
+      map: {
+        name: rowText(mapNameRow),
+        address: rowText(mapAddressRow),
+        coordinates: rowText(mapCoordsRow),
+      },
+      // Find Us Card (the Booking style's wayfind option): region, city, PIN, note
+      wayfind: Object.fromEntries(['region', 'city', 'pin', 'note']
+        .map((key, i) => [key, rowText(wayfindRows[i])])),
       setLeadExtras: (fn) => { leadExtras = fn; },
       setAfterFieldsValid: (fn) => { afterFieldsValid = fn; },
     });

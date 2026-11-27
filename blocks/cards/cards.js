@@ -576,10 +576,11 @@ export default async function decorate(block) {
     return;
   }
 
-  // Features style: fetched only when used
-  if (block.classList.contains('features')) {
+  // Features and Features Classic styles (same script, own CSS): fetched only when used
+  const featuresStyle = ['features', 'features-classic'].find((s) => block.classList.contains(s));
+  if (featuresStyle) {
     const [, { default: decorateFeatures }] = await Promise.all([
-      loadCSS(`${window.hlx.codeBasePath}/blocks/cards/cards-features.css`),
+      loadCSS(`${window.hlx.codeBasePath}/blocks/cards/cards-${featuresStyle}.css`),
       import('./cards-features.js'),
     ]);
     decorateFeatures(block, ul);

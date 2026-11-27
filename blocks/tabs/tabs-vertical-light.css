@@ -68,6 +68,7 @@ main > .section.light.is-tv-tightest {
 
   position: relative;
   padding-top: calc(var(--tv-media-h) + 14px);
+  container-type: inline-size;
 }
 
 .section.light .tabs.vertical > .tabs-list {
@@ -142,8 +143,7 @@ main > .section.light.is-tv-tightest {
   inset: 0 0 auto;
   width: 100%;
   max-width: none;
-  max-height: var(--tv-media-max);
-  aspect-ratio: 3 / 4;
+  height: min(100cqw * 4 / 3, var(--tv-media-max));
   margin: 0;
   overflow: hidden;
   border-radius: 18px;
@@ -301,6 +301,7 @@ main > .section.light.is-tv-tightest {
     align-items: start;
     height: var(--tv-h);
     padding-top: 0;
+    container-type: normal;
   }
 
   .section.light .tabs.vertical::before {
