@@ -479,18 +479,6 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
     padding: 0;
   }
 
-  /* the list scrolls inside the screen-tall section when it does not fit */
-  > :is(.accordion-wrapper, .tabs-wrapper) {
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: none;
-  }
-
-  > :is(.accordion-wrapper, .tabs-wrapper)::-webkit-scrollbar {
-    display: none;
-  }
-
   > .default-content-wrapper {
     color: #2e2e2e;
     font-family: var(--font-family-base);
@@ -636,10 +624,6 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
     align-items: start;
     column-gap: 64px;
     padding: calc(max(96px, var(--nav-offset, 0px) + 32px) + var(--faq-top-extra)) 64px 64px;
-
-    > :is(.accordion-wrapper, .tabs-wrapper) {
-      max-height: 100%;
-    }
 
     /* 17.58 from the eyebrow to the title; 31.19 from the description to the button (its
        paragraph as tall as the button) */
