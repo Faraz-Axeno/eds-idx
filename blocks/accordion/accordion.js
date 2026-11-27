@@ -287,15 +287,18 @@ function wireCombatMotion(block, items) {
 function wireFaqRunway(section) {
   if (section.dataset.faqRunway) return;
   section.dataset.faqRunway = 'true';
-  section.classList.add('scroll-runway');
+  section.classList.add('scroll-runway', 'runway-stop');
+  let screen = 0;
   const screenHeight = () => {
+    if (screen) return screen;
     const probe = document.createElement('div');
     probe.style.cssText = 'position:absolute;top:0;width:0;height:100svh;visibility:hidden;pointer-events:none';
     document.body.append(probe);
-    const screen = probe.offsetHeight || window.innerHeight;
+    screen = probe.offsetHeight || window.innerHeight;
     probe.remove();
     return screen;
   };
+  window.addEventListener('resize', () => { screen = 0; }, { passive: true });
 
   const QUIET_MS = 200;
   let lastWheelAt = -Infinity;
@@ -332,13 +335,26 @@ function wireFaqRunway(section) {
   });
   document.addEventListener('snap:end', () => { arriving = false; });
 
-  new ResizeObserver(() => {
+  let release = 0;
+  const fit = new ResizeObserver(() => {
     if (!document.documentElement.classList.contains('snap-active')) return;
     const top = section.offsetTop;
-    const end = Math.max(top, top + section.offsetHeight - screenHeight());
+    const before = section.offsetHeight;
+    const held = section.style.minHeight;
+    section.style.minHeight = '';
+    const height = section.offsetHeight;
+    const end = Math.max(top, top + height - screenHeight());
     const y = window.scrollY;
-    if (y > end && y < top + section.offsetHeight) window.scrollTo({ top: end, behavior: 'instant' });
-  }).observe(section);
+    if (y <= end || y >= top + before) {
+      section.style.minHeight = held;
+      return;
+    }
+    window.scrollTo({ top: end, behavior: 'instant' });
+    section.style.minHeight = `${height}px`;
+    clearTimeout(release);
+    release = setTimeout(() => { section.style.minHeight = ''; }, 150);
+  });
+  [section, ...section.children].forEach((el) => fit.observe(el));
 
   document.addEventListener('snap:start', ({ detail: { from, to } }) => {
     const above = section.previousElementSibling;
