@@ -182,8 +182,18 @@ function keepInView(details) {
   }
   const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
   const until = performance.now() + 900;
+  let cancelled = false;
+  const cancel = () => { cancelled = true; };
+  const stops = [[window, 'wheel'], [window, 'touchstart'], [document, 'snap:start']];
+  stops.forEach(([target, type]) => {
+    target.addEventListener(type, cancel, { once: true, passive: true });
+  });
   const step = () => {
-    if (!details.open || details.classList.contains('is-closing')) return;
+    if (cancelled || !details.open || details.classList.contains('is-closing')
+      || performance.now() >= until) {
+      stops.forEach(([target, type]) => target.removeEventListener(type, cancel));
+      return;
+    }
     const box = details.getBoundingClientRect();
     let top = 0;
     let bottom = window.innerHeight;
@@ -201,7 +211,7 @@ function keepInView(details) {
       if (scroller) scroller.scrollTop += by;
       else window.scrollBy(0, by);
     }
-    if (performance.now() < until) requestAnimationFrame(step);
+    requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
 }
@@ -327,15 +337,21 @@ function wireFaqRunway(section) {
   window.addEventListener('touchmove', (e) => {
     if (holdTouch && e.cancelable) e.preventDefault();
   }, { capture: true, passive: false });
+  let snapping = false;
   document.addEventListener('snap:start', ({ detail: { to } }) => {
+    snapping = true;
     if (to !== section) return;
     arriving = true;
     holdWheel = true;
     holdTouch = touching;
   });
-  document.addEventListener('snap:end', () => { arriving = false; });
+  document.addEventListener('snap:end', () => {
+    snapping = false;
+    arriving = false;
+  });
 
   let release = 0;
+  let lastHeight = 0;
   const fit = new ResizeObserver(() => {
     if (!document.documentElement.classList.contains('snap-active')) return;
     const top = section.offsetTop;
@@ -343,9 +359,11 @@ function wireFaqRunway(section) {
     const held = section.style.minHeight;
     section.style.minHeight = '';
     const height = section.offsetHeight;
+    const shrank = height < lastHeight - 0.5;
+    lastHeight = height;
     const end = Math.max(top, top + height - screenHeight());
     const y = window.scrollY;
-    if (y <= end || y >= top + before) {
+    if (snapping || !shrank || y <= end || y >= top + before) {
       section.style.minHeight = held;
       return;
     }
