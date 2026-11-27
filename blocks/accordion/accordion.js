@@ -282,11 +282,37 @@ function wireCombatMotion(block, items) {
 }
 
 /**
+ * @param {Element} section
+ */
+function wireFaqRunway(section) {
+  if (section.dataset.faqRunway) return;
+  section.dataset.faqRunway = 'true';
+  section.classList.add('scroll-runway');
+  document.addEventListener('snap:start', ({ detail: { from, to } }) => {
+    const above = section.previousElementSibling;
+    if (from !== section || to !== above || !above.classList.contains('scroll-runway')) return;
+    queueMicrotask(() => {
+      const tween = window.gsap?.getTweensOf(window).at(-1);
+      const target = tween?.vars.scrollTo;
+      if (!target || Math.abs(target.y - above.offsetTop) > 1) return;
+      const probe = document.createElement('div');
+      probe.style.cssText = 'position:absolute;top:0;width:0;height:100svh;visibility:hidden;pointer-events:none';
+      document.body.append(probe);
+      const screen = probe.offsetHeight || window.innerHeight;
+      probe.remove();
+      tween.vars.scrollTo = { ...target, y: above.offsetTop + above.offsetHeight - screen };
+      tween.invalidate();
+    });
+  });
+}
+
+/**
  * @param {Element} block
  */
 export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
-  block.closest('main > .section:is(.faq-columns, .faq-center)')?.classList.add('no-snap');
+  const faqSection = block.closest('main > .section:is(.faq-columns, .faq-center)');
+  if (faqSection) wireFaqRunway(faqSection);
   const items = [...block.children].map(buildItem);
 
   // texts over their limit (MAX_CHARS): shortened, and listed for the author in the editor

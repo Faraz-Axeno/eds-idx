@@ -470,6 +470,13 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
   row-gap: 19.8px;
   padding: max(84px, var(--nav-offset, 0px) + 10px) 20px 32px;
 
+  &.scroll-runway {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
   /* min-width 0: a long word (or a tab bar wider than the screen) cuts or wraps in its column,
      it does not widen it past the screen */
   > div {
