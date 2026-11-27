@@ -288,6 +288,58 @@ function wireFaqRunway(section) {
   if (section.dataset.faqRunway) return;
   section.dataset.faqRunway = 'true';
   section.classList.add('scroll-runway');
+  const screenHeight = () => {
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:absolute;top:0;width:0;height:100svh;visibility:hidden;pointer-events:none';
+    document.body.append(probe);
+    const screen = probe.offsetHeight || window.innerHeight;
+    probe.remove();
+    return screen;
+  };
+
+  const QUIET_MS = 200;
+  let lastWheelAt = -Infinity;
+  let arriving = false;
+  let holdWheel = false;
+  let touching = false;
+  let holdTouch = false;
+  window.addEventListener('wheel', (e) => {
+    const now = e.timeStamp || performance.now();
+    const quiet = now - lastWheelAt > QUIET_MS;
+    lastWheelAt = now;
+    if (arriving || !holdWheel) return;
+    if (quiet) {
+      holdWheel = false;
+      return;
+    }
+    if (e.cancelable) e.preventDefault();
+    e.stopImmediatePropagation();
+  }, { capture: true, passive: false });
+  window.addEventListener('touchstart', () => { touching = true; }, { capture: true, passive: true });
+  ['touchend', 'touchcancel'].forEach((type) => window.addEventListener(type, (e) => {
+    if (e.touches.length) return;
+    touching = false;
+    holdTouch = false;
+  }, { capture: true, passive: true }));
+  window.addEventListener('touchmove', (e) => {
+    if (holdTouch && e.cancelable) e.preventDefault();
+  }, { capture: true, passive: false });
+  document.addEventListener('snap:start', ({ detail: { to } }) => {
+    if (to !== section) return;
+    arriving = true;
+    holdWheel = true;
+    holdTouch = touching;
+  });
+  document.addEventListener('snap:end', () => { arriving = false; });
+
+  new ResizeObserver(() => {
+    if (!document.documentElement.classList.contains('snap-active')) return;
+    const top = section.offsetTop;
+    const end = Math.max(top, top + section.offsetHeight - screenHeight());
+    const y = window.scrollY;
+    if (y > end && y < top + section.offsetHeight) window.scrollTo({ top: end, behavior: 'instant' });
+  }).observe(section);
+
   document.addEventListener('snap:start', ({ detail: { from, to } }) => {
     const above = section.previousElementSibling;
     if (from !== section || to !== above || !above.classList.contains('scroll-runway')) return;
@@ -295,12 +347,7 @@ function wireFaqRunway(section) {
       const tween = window.gsap?.getTweensOf(window).at(-1);
       const target = tween?.vars.scrollTo;
       if (!target || Math.abs(target.y - above.offsetTop) > 1) return;
-      const probe = document.createElement('div');
-      probe.style.cssText = 'position:absolute;top:0;width:0;height:100svh;visibility:hidden;pointer-events:none';
-      document.body.append(probe);
-      const screen = probe.offsetHeight || window.innerHeight;
-      probe.remove();
-      tween.vars.scrollTo = { ...target, y: above.offsetTop + above.offsetHeight - screen };
+      tween.vars.scrollTo = { ...target, y: above.offsetTop + above.offsetHeight - screenHeight() };
       tween.invalidate();
     });
   });
@@ -312,7 +359,7 @@ function wireFaqRunway(section) {
 export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
   const faqSection = block.closest('main > .section:is(.faq-columns, .faq-center)');
-  if (faqSection) wireFaqRunway(faqSection);
+  if (faqSection && !editing) wireFaqRunway(faqSection);
   const items = [...block.children].map(buildItem);
 
   // texts over their limit (MAX_CHARS): shortened, and listed for the author in the editor
