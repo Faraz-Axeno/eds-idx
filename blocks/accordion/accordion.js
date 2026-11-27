@@ -286,6 +286,7 @@ function wireCombatMotion(block, items) {
  */
 export default function decorate(block) {
   const editing = Boolean(block.closest('[data-aue-resource]'));
+  block.closest('main > .section:is(.faq-columns, .faq-center)')?.classList.add('no-snap');
   const items = [...block.children].map(buildItem);
 
   // texts over their limit (MAX_CHARS): shortened, and listed for the author in the editor
