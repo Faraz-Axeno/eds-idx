@@ -475,6 +475,15 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
     min-height: 100vh;
     min-height: 100svh;
     overflow: visible;
+    overflow-x: clip;
+  }
+
+  .tabs.faq > .tabs-list {
+    overscroll-behavior-x: none;
+  }
+
+  .tabs.faq > .tabs-scroll {
+    touch-action: manipulation;
   }
 
   /* min-width 0: a long word (or a tab bar wider than the screen) cuts or wraps in its column,
