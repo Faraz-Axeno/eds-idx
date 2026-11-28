@@ -40,7 +40,7 @@ function fragmentPaths(path) {
  * @param {string} path
  * @returns {Promise<{ resp: Response, path: string } | null>}
  */
-async function fetchFragment(path) {
+export async function fetchFragment(path) {
   // eslint-disable-next-line no-restricted-syntax
   for (const candidate of fragmentPaths(path)) {
     // eslint-disable-next-line no-await-in-loop
@@ -50,31 +50,34 @@ async function fetchFragment(path) {
   return null;
 }
 
+/**
+ * Builds a fetched fragment (fetchFragment's result) into a decorated, loaded <main>.
+ * @param {{ resp: Response, path: string } | null} found
+ * @returns {Promise<HTMLElement|null>}
+ */
+export async function buildFragment(found) {
+  if (!found?.resp?.ok) return null;
+  const { resp, path } = found;
+  const main = document.createElement('main');
+  main.innerHTML = await resp.text();
+
+  // reset base path for media to fragment base
+  const resetAttributeBase = (tag, attr) => {
+    main.querySelectorAll(`${tag}[${attr}^="./media_"]`).forEach((elem) => {
+      elem[attr] = new URL(elem.getAttribute(attr), new URL(path, window.location)).href;
+    });
+  };
+  resetAttributeBase('img', 'src');
+  resetAttributeBase('source', 'srcset');
+
+  decorateMain(main);
+  await loadSections(main);
+  return main;
+}
+
 export async function loadFragment(path) {
   if (path && path.startsWith('/') && !path.startsWith('//')) {
-    // eslint-disable-next-line no-param-reassign
-    path = path.replace(/(\.plain)?\.html/, '');
-    const found = await fetchFragment(path);
-    const resp = found?.resp;
-    // eslint-disable-next-line no-param-reassign
-    if (found) path = found.path;
-    if (resp?.ok) {
-      const main = document.createElement('main');
-      main.innerHTML = await resp.text();
-
-      // reset base path for media to fragment base
-      const resetAttributeBase = (tag, attr) => {
-        main.querySelectorAll(`${tag}[${attr}^="./media_"]`).forEach((elem) => {
-          elem[attr] = new URL(elem.getAttribute(attr), new URL(path, window.location)).href;
-        });
-      };
-      resetAttributeBase('img', 'src');
-      resetAttributeBase('source', 'srcset');
-
-      decorateMain(main);
-      await loadSections(main);
-      return main;
-    }
+    return buildFragment(await fetchFragment(path.replace(/(\.plain)?\.html/, '')));
   }
   return null;
 }

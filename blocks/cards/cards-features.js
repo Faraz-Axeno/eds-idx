@@ -81,9 +81,10 @@ function detailPicture(img) {
  * Classes a card's parts and reads what its detail shows.
  * @param {HTMLLIElement} li
  * @param {boolean} authoring
+ * @param {boolean} needsText only a card with a description opens (Features Classic)
  * @returns {object|null} the card, or null when it has no detail to open
  */
-function readCard(li, authoring) {
+function readCard(li, authoring, needsText = false) {
   const body = li.querySelector('.card-body');
   const img = li.querySelector('.card-image img');
   const els = body
@@ -115,14 +116,18 @@ function readCard(li, authoring) {
     detail[0].before(more);
     more.append(...detail);
   }
-  if (!detail.length && !img) return null;
-
-  const name = (detailTitle || title || line)?.textContent.trim() || '';
   const value = stat && !authoring && title.querySelector('strong, b');
   if (value && !value.children.length) {
     value.textContent = clipText(value.textContent.trim(), MAX_CHARS.value);
   }
   const copy = detail.filter((el) => el !== detailTitle);
+  // nothing to open: no "+", no pop-up (Features Classic: also a picture without a description)
+  if (needsText ? !copy.length : !detail.length && !img) {
+    li.classList.add('ft-static');
+    return null;
+  }
+
+  const name = (detailTitle || title || line)?.textContent.trim() || '';
   return {
     li,
     img,
@@ -478,7 +483,8 @@ export default function decorateFeatures(block, ul) {
   const authoring = isAuthoring(block);
   block.classList.toggle('is-authoring', authoring);
   const items = [...ul.children];
-  const cards = items.map((li) => readCard(li, authoring)).filter(Boolean);
+  const needsText = block.classList.contains('features-classic');
+  const cards = items.map((li) => readCard(li, authoring, needsText)).filter(Boolean);
   // all stat tiles (Performance): a row of figures rather than image cards
   block.classList.toggle('is-stats', items.length > 0 && items.every((li) => li.classList.contains('is-stat')));
   if (!authoring && block.classList.contains('is-stats')) {

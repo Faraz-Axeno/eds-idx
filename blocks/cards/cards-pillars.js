@@ -112,6 +112,7 @@ export default function decoratePillars(block, ul) {
   // progress rail, one mark per pillar
   const rail = document.createElement('div');
   rail.className = 'pl-rail';
+  rail.style.setProperty('--pl-count', cards.length);
   const marks = cards.map((li, i) => {
     const mark = document.createElement('button');
     mark.type = 'button';

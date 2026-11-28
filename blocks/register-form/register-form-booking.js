@@ -1,32 +1,10 @@
-// Register Form "Booking" style, loaded by register-form.js only when the style is used: the
-// dealer microsite's "Get a quote" request, as in the dealer design:
-//   the details screen ("Tell us about you": names, email optional, pincode, mobile, consent;
-//     the privacy notice above "Continue"), then the existing journey:
-//   the OTP screen in a pop-up ("Verify your number": the code boxes, resend, Change number
-//     and Submit, a close button), and after the lead is created
-//   the "Request sent" pop-up: the authored Request Sent field (title, label rows, status line,
-//     a link as the outlined button) plus the visitor's email and their contact;
-//     Done closes it and clears the form.
-// On phones (below 900px) the map card moves under the details, above Continue, as in the
-// dealer mobile design; desktop keeps it beside the form.
-// The pop-ups are <dialog>s inside the form (the screens keep their data-screen and the
-// form's own handlers); the details stay behind them; on phones they are bottom sheets
-// (register-form-booking.css). A Thank-you Page Link still wins over
-// the Request sent pop-up (register-form.js redirects).
-// The lead-submit payload gains only the dealer microsite's lead source: source "Dealer
-// Microsite", channel "Digital", subsource "" (placeholders registerFormBookingSource /
-// Channel / Subsource override them); the lead API takes no other extra fields.
-// The deep links #quote and #test-drive (the hero's and price bar's buttons) bring the form
-// into view.
-
+import { getMetadata } from '../../scripts/aem.js';
 import decorateGlitch from '../../scripts/utils/glitch.js';
+import { inEditor } from '../../scripts/utils/common.js';
+import { getPageDealer } from '../../scripts/utils/dealer-api.js';
 
 const ANCHORS = ['quote', 'test-drive'];
-const LEAD_SOURCE = {
-  source: 'Dealer Microsite',
-  channel: 'Digital',
-  subsource: '',
-};
+const FORM_TYPE = 'Dealer Form';
 const MODAL_OPEN = 'is-modal-open'; // pauses the section snap (scripts/section-snap.js)
 const CLOSE_ICON = '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false">'
   + '<path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
@@ -98,54 +76,6 @@ function mapPoint(text) {
     ? `${lat},${lng}` : '';
 }
 
-/**
- * The map card: with a Map Address, a Google Maps embed of that address (centred on it, in
- * grey) over the authored image (kept as the fallback while it loads or if it can't), the
- * dealer's pin on the address and the pop-up above it (Map Pop-up Name + the address). The
- * embed is a still picture (it would otherwise take the wheel and stop the section snap):
- * the whole card opens the address in Google Maps instead.
- * @param {Element} block the register form
- * @param {{name: string, address: string, coordinates: string}} map the authored map fields
- * @param {Function} createEl register-form.js's element helper
- * @param {Function} ph placeholder lookup
- */
-function buildMap(block, map, createEl, ph) {
-  const media = block.querySelector(':scope > .media');
-  const address = map?.address || '';
-  if (!media || !address) return;
-  const name = map.name || '';
-  const query = encodeURIComponent(address);
-  const label = [name, address].filter(Boolean).join(', ');
-  // the pop-up opens the dealer's exact point (Map Coordinates), else a search of the address
-  const point = mapPoint(map.coordinates);
-  const frame = createEl('iframe', {
-    class: 'booking-map-frame',
-    src: `https://maps.google.com/maps?q=${query}&z=15&output=embed`,
-    title: `${ph('registerFormBookingMapTitle', 'Map')}: ${label}`,
-    loading: 'lazy',
-    referrerpolicy: 'no-referrer-when-downgrade',
-    tabindex: '-1',
-    'aria-hidden': 'true',
-  });
-  frame.addEventListener('load', () => media.classList.add('is-map-loaded'));
-  const pin = createEl('span', { class: 'booking-map-pin', 'aria-hidden': 'true' });
-  const tip = createEl(
-    'div',
-    { class: 'booking-map-tip', 'aria-hidden': 'true' },
-    name ? createEl('strong', { class: 'booking-map-name' }, name) : null,
-    createEl('span', { class: 'booking-map-address' }, address),
-  );
-  const open = createEl('a', {
-    class: 'booking-map-open',
-    href: `https://www.google.com/maps/search/?api=1&query=${point || query}`,
-    target: '_blank',
-    rel: 'noopener',
-    'aria-label': `${ph('registerFormBookingMapOpen', 'Open in Google Maps')}: ${label}`,
-  });
-  media.classList.add('has-map');
-  media.append(frame, pin, tip, open);
-}
-
 const PIN_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">'
   + '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>'
   + '<circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.5"/></svg>';
@@ -157,11 +87,11 @@ const ARROW_DOWN_ICON = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"
   + '<path d="M4 4l8 8M12 5.5V12H5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 /**
- * The Find Us Card (Booking style option classes_wayfind): the right side becomes a card in
- * place of the map: "Our showroom" over a drawing of the location (rings and crosshairs, the
- * coordinates at its top corners, the region under the pin), then "Find us", the dealer's
- * name (Map Pop-up Name), the address (Map Address: two lines, split after its second comma),
- * the city and PIN, a Get directions button (Google Maps directions to the address, new tab)
+ * The Find Us card, the Booking style's right side: "Our showroom" over a drawing of the
+ * location (rings and crosshairs, the coordinates at its top corners, the region under the
+ * pin), then "Find us", the dealer's name (Dealer Name), the address (Dealer Address: two
+ * lines, split after its second comma), the city and PIN, a Get directions button (Google Maps
+ * directions to the Map Coordinates, else the address, new tab)
  * and the closing line. Labels are placeholders (registerFormBookingWayfind*).
  * @param {Element} block the register form
  * @param {{name: string, address: string, coordinates: string}} map the authored map fields
@@ -170,7 +100,8 @@ const ARROW_DOWN_ICON = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"
  * @param {Function} ph placeholder lookup
  */
 function buildWayfind(block, map, wayfind, createEl, ph) {
-  const media = block.querySelector(':scope > .media');
+  // the form moves the media into its layout once built, so a rebuild finds it there
+  const media = block.querySelector('.media.has-wayfind') || block.querySelector(':scope > .media');
   if (!media) return;
   const name = map?.name || '';
   const address = map?.address || '';
@@ -184,7 +115,8 @@ function buildWayfind(block, map, wayfind, createEl, ph) {
   const lines = parts.length > 2 ? [parts.slice(0, 2).join(', '), parts.slice(2).join(', ')] : [parts.join(', ')];
   const [lat, long] = (map?.coordinates || '').split(',').map((x) => x.trim());
   // directions to the dealer's exact point (Map Coordinates), else to the address
-  const destination = mapPoint(map?.coordinates) || encodeURIComponent(address);
+  const destination = map?.point || mapPoint(map?.coordinates)
+    || encodeURIComponent(map?.fullAddress || address);
 
   const head = createEl(
     'div',
@@ -228,7 +160,9 @@ function buildWayfind(block, map, wayfind, createEl, ph) {
       rel: 'noopener',
     });
     html(go, NAV_ICON);
-    const label = createEl('span', { class: 'wayfind-directions-label' }, ph('registerFormBookingWayfindDirections', 'Get directions'));
+    // cta-label: where the hover glitch finds the letters (scripts/utils/glitch.js), the
+    // button also holding its two icons
+    const label = createEl('span', { class: 'wayfind-directions-label cta-label' }, ph('registerFormBookingWayfindDirections', 'Get directions'));
     go.append(label);
     html(go, ARROW_ICON);
     details.append(go);
@@ -253,10 +187,35 @@ export default function decorateBooking(block, {
   form, fields, ph, createEl, setScreen, requestSent, map, wayfind, setLeadExtras,
 }) {
   const sent = readRequestSent(requestSent);
-  // the right side: the Find Us Card, or the Google map of the Map Address
-  if (block.classList.contains('wayfind')) buildWayfind(block, map, wayfind, createEl, ph);
-  // eslint-disable-next-line no-use-before-define -- a function declaration below
-  else buildMap(block, map, createEl, ph);
+  // the dealer's exact point, for other links to the showroom (the footer's Open in maps)
+  const point = mapPoint(map?.coordinates);
+  if (point) block.dataset.mapPoint = point;
+  // the right side: the Find Us card (its styles: .register-form.booking.wayfind)
+  block.classList.add('wayfind');
+  buildWayfind(block, map, wayfind, createEl, ph);
+  // the Find Us card rebuilt from the Dealer API (by the page's Dealer Code), once it answers
+  if (!inEditor()) {
+    getPageDealer().then((dealer) => {
+      if (!dealer) return;
+      // the API dealer's own point only; never the authored one with the API's address
+      if (dealer.point) block.dataset.mapPoint = dealer.point;
+      else delete block.dataset.mapPoint;
+      const [lat, lng] = dealer.point ? dealer.point.split(',').map(Number) : [];
+      const degrees = (v, pos, neg) => `${Math.abs(v).toFixed(4)}° ${v < 0 ? neg : pos}`;
+      buildWayfind(block, {
+        name: dealer.name || map?.name,
+        address: dealer.street || map?.address,
+        fullAddress: dealer.full,
+        point: dealer.point,
+        coordinates: dealer.point ? `${degrees(lat, 'N', 'S')}, ${degrees(lng, 'E', 'W')}` : '',
+      }, {
+        ...wayfind,
+        region: [dealer.city, dealer.state].filter(Boolean).join(' · ') || wayfind?.region,
+        city: [dealer.city, dealer.state].filter(Boolean).join(', ') || wayfind?.city,
+        pin: dealer.pin || wayfind?.pin,
+      }, createEl, ph);
+    });
+  }
 
   const actions = (...buttons) => createEl('div', { class: 'booking-actions' }, ...buttons);
 
@@ -276,8 +235,9 @@ export default function decorateBooking(block, {
   // the notice goes with the details the visitor gives, above the button
   if (notice) fieldsActions.before(notice);
 
-  // phones: the map card sits under the details, above Continue, as the mobile design orders
-  // them; desktop keeps it beside the form (first in the block, where register-form.js put it)
+  // phones: the Find Us card sits under the details, above Continue, as the mobile design
+  // orders them; desktop keeps it beside the form (first in the block, where register-form.js
+  // put it)
   const media = block.querySelector(':scope > .media');
   const onPhone = window.matchMedia('(width < 900px)');
   const placeMap = () => {
@@ -287,15 +247,6 @@ export default function decorateBooking(block, {
   if (media) {
     placeMap();
     onPhone.addEventListener('change', placeMap);
-    // squeezed below 90 design px (short screens, error lines) it hides and keeps its room,
-    // as in the design; 1 design px = the phone CSS's --rfb-u
-    const designPx = () => Math.max(
-      0.8,
-      Math.min(window.innerWidth / 375, window.innerHeight / 640, 1.6),
-    );
-    new ResizeObserver(() => {
-      media.classList.toggle('is-tiny', onPhone.matches && media.clientHeight < 90 * designPx());
-    }).observe(media);
   }
 
   // --- the pop-ups: <dialog>s in the form, each holding one of its screens ---
@@ -404,7 +355,7 @@ export default function decorateBooking(block, {
       el.value = '';
       el.dispatchEvent(new Event('input', { bubbles: true }));
     });
-    if (fields.consent?.checked) fields.consent.click();
+    ['consent', 'marketingConsent'].forEach((name) => { if (fields[name]?.checked) fields[name].click(); });
     setScreen('fields');
   };
   doneBtn.addEventListener('click', done);
@@ -420,10 +371,12 @@ export default function decorateBooking(block, {
     done();
   });
 
-  setLeadExtras(() => ({
-    source: ph('registerFormBookingSource', LEAD_SOURCE.source),
-    channel: ph('registerFormBookingChannel', LEAD_SOURCE.channel),
-    subsource: ph('registerFormBookingSubsource', LEAD_SOURCE.subsource),
+  // the dealer form type, Dealer Code and the dealer's name from the API (fetched on page load)
+  setLeadExtras(async () => ({
+    formType: FORM_TYPE,
+    dealerCodeSalesUnit: getMetadata('dealercode').trim(),
+    // the API's name, else the page title (page property Title)
+    dealerName: (await getPageDealer())?.name || getMetadata('og:title') || document.title.trim(),
   }));
 
   // #quote / #test-drive: bring the form into view

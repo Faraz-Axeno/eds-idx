@@ -496,3 +496,16 @@ main > .section:has(.columns.reach-us.photo):has(> .reach-us-photo-footer) ~ .se
   min-height: 0;
   padding: 0;
 }
+
+/* Universal Editor: its canvas grows to fit the page, so no size here may follow the screen's
+   height (it would grow with the canvas, without end): no leftover-height padding, the phone
+   unit from the width only */
+/* stylelint-disable-next-line no-descending-specificity */
+body:has([data-aue-resource]) main > .section:has(.columns.reach-us.photo) {
+  --reach-us-photo-u: clamp(0.8px, 100vw / 375, 1.6px);
+
+  @media (width >= 900px) {
+    --reach-us-pad-top: max(96px, 102 * var(--ru));
+    --reach-us-pad-bottom: 0px;
+  }
+}

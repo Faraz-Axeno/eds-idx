@@ -2,6 +2,28 @@ import { inEditor } from '../../scripts/utils/common.js';
 import decorateBrochure from '../../scripts/utils/brochure.js';
 
 const SHOWN = 'is-shown';
+const MAX_CHARS = 18;
+
+// cuts the text to MAX_CHARS, ending in …; the whole text stays the tooltip and accessible name
+function limitText(el) {
+  const whole = el.textContent.replace(/\s+/g, ' ').trim();
+  if (whole.length <= MAX_CHARS) return;
+  let left = MAX_CHARS;
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const texts = [];
+  while (walker.nextNode()) texts.push(walker.currentNode);
+  texts.forEach((node) => {
+    const text = left === MAX_CHARS ? node.textContent.trimStart() : node.textContent;
+    if (left <= 0) {
+      node.remove();
+      return;
+    }
+    node.textContent = text.length > left ? `${text.slice(0, left).trimEnd()}…` : text;
+    left -= text.length;
+  });
+  el.title = whole;
+  if (el.matches('a, button')) el.setAttribute('aria-label', whole);
+}
 
 /**
  * A links line followed by a plain label line becomes a brochure popup (scripts/utils/brochure.js).
@@ -47,6 +69,21 @@ function buildItems(cell) {
     if (/\.pdf$/i.test(new URL(a.href).pathname)) a.setAttribute('download', '');
   });
   return items;
+}
+
+/**
+ * Phones: the items swipe sideways when they don't fit; a fade marks each side with more.
+ * @param {HTMLElement} track
+ */
+function wireTrack(track) {
+  const mark = () => {
+    const more = track.scrollWidth - track.clientWidth;
+    track.classList.toggle('has-more-start', more > 1 && track.scrollLeft > 1);
+    track.classList.toggle('has-more-end', more > 1 && track.scrollLeft < more - 1);
+  };
+  track.addEventListener('scroll', mark, { passive: true });
+  const resized = new ResizeObserver(mark);
+  [track, ...track.children].forEach((el) => resized.observe(el));
 }
 
 /**
@@ -108,6 +145,7 @@ export default function decorate(block) {
       const span = document.createElement('span');
       span.className = className;
       span.textContent = value;
+      limitText(span);
       intro.append(span);
     });
     parts.push(intro);
@@ -118,7 +156,12 @@ export default function decorate(block) {
     rule.setAttribute('aria-hidden', 'true');
     parts.push(rule);
   }
-  block.replaceChildren(...parts, ...items);
+  items.forEach((el) => limitText(el.matches('a') ? el : el.querySelector('.brochure-toggle') || el));
+  const track = document.createElement('div');
+  track.className = 'floater-items';
+  track.append(...items);
+  block.replaceChildren(...parts, ...(items.length ? [track] : []));
+  if (items.length) wireTrack(track);
   block.setAttribute('role', 'region');
   block.setAttribute('aria-label', name ? `${name} quick links` : 'Quick links');
   block.inert = true;

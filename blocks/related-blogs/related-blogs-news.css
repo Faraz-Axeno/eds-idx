@@ -274,3 +274,15 @@ main .related-blogs.news a.related-blogs-view-all.button:any-link:focus-visible 
     font-size: max(12px, calc(14 * var(--rbn-u)));
   }
 }
+
+/* Universal Editor: its canvas grows to fit the page, so no size here may follow the screen's
+   height (it would grow with the canvas, without end): the frame follows the width only */
+body:has([data-aue-resource]) main > .section:has(> .related-blogs-wrapper > .related-blogs.news) {
+  --rbn-u: clamp(0.85px, 100vw / 390, 1.3px);
+
+  @media (width >= 900px) {
+    --rbn-u: calc(100vw / 1280);
+
+    padding-top: calc(116 * var(--rbn-u));
+  }
+}

@@ -1,0 +1,645 @@
+/* Dealer Locator (dealer-locator.js): the finder on the section's light surface, then the
+   results on a warm grey band that runs the full width of the page. Light only. */
+
+.dealer-locator {
+  --dl-ink: var(--color-gray-90);
+  --dl-muted: var(--color-gray-60); /* #666: AA on white, the band and the cards */
+  --dl-line: #d9d9d5;
+  --dl-line-soft: #e6e6e2;
+  --dl-panel: var(--color-white);
+  --dl-surface: #f5f5f3; /* the finder's ground, so its white panel stands out */
+  --dl-band: #ebebe7;
+  --dl-card: #f7f7f5;
+  --dl-caps: 10px;
+  --dl-caps-tracking: 0.16em;
+  --dl-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  color: var(--dl-ink);
+  font-family: var(--font-family-base);
+}
+
+/* the small capitals used for labels and lines */
+.dealer-locator :where(.dl-rule, .dl-eyebrow, .dl-note, .dl-field label, .dl-count-words,
+  .dl-card-number, .dl-card-type, .dl-card-directions, .dl-closing) {
+  font-size: var(--dl-caps);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  letter-spacing: var(--dl-caps-tracking);
+  text-transform: uppercase;
+}
+
+.dealer-locator .dl-icon {
+  display: inline-flex;
+  flex: none;
+  width: var(--dl-icon-size, 14px);
+  height: var(--dl-icon-size, 14px);
+  margin-top: var(--dl-icon-offset, 0);
+  color: var(--dl-icon-color, currentcolor);
+  translate: var(--dl-icon-nudge, 0);
+  transition: translate 0.3s var(--dl-ease);
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* the dropdown's arrow, over the select's right end */
+.dealer-locator .dl-select > .dl-icon {
+  position: absolute;
+  right: 0;
+  pointer-events: none;
+}
+
+/* ----- shared heading row: eyebrow + heading, something on the right ----- */
+.dealer-locator .dl-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.dealer-locator .dl-eyebrow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 0 0 20px;
+  color: var(--dl-ink);
+  font-weight: var(--font-weight-semibold);
+
+  &::before {
+    width: 24px;
+    height: 1px;
+    background: currentcolor;
+    content: '';
+  }
+}
+
+.dealer-locator .dl-head h2 {
+  margin: 0;
+  color: var(--dl-ink);
+  font-family: var(--font-family-base);
+  font-size: clamp(36px, 3.6vw, 52px);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+}
+
+/* ----- finder ----- */
+.dealer-locator .dl-finder {
+  /* clears the floating header when the section reaches the top */
+  padding: calc(var(--nav-height, 64px) + 56px) 0 64px;
+  background: var(--dl-surface);
+  box-shadow: 0 0 0 100vmax var(--dl-surface);
+  clip-path: inset(0 -100vmax);
+}
+
+.dealer-locator .dl-rule {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--dl-line);
+  padding-bottom: 16px;
+  color: var(--dl-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.dealer-locator .dl-intro {
+  max-width: 264px;
+  margin: 0;
+  color: var(--dl-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.dealer-locator .dl-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-top: 32px;
+  background: var(--dl-panel);
+}
+
+.dealer-locator .dl-field {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-bottom: 1px solid var(--dl-line-soft);
+  padding: 20px 20px 18px;
+
+  label {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    color: var(--dl-muted);
+    font-weight: var(--font-weight-regular);
+  }
+}
+
+.dealer-locator .dl-field-number {
+  display: inline-flex;
+  gap: 12px;
+  align-items: center;
+
+  &::after {
+    width: 16px;
+    height: 1px;
+    background: var(--dl-line);
+    content: '';
+  }
+}
+
+.dealer-locator .dl-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  select {
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 4px;
+    padding: 4px 28px 4px 0;
+    background: transparent;
+    color: var(--dl-ink);
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+    cursor: pointer;
+    appearance: none;
+  }
+
+  select:focus-visible {
+    outline: 2px solid var(--dl-ink);
+    outline-offset: 4px;
+  }
+
+  select:disabled {
+    color: var(--dl-muted);
+    cursor: not-allowed;
+  }
+
+  --dl-icon-size: 16px;
+
+  /* the arrow (currentcolor) dims with a disabled dropdown */
+  &:has(select:disabled) {
+    color: var(--dl-muted);
+  }
+}
+
+.dealer-locator .dl-actions {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px 20px;
+}
+
+.dealer-locator .dl-submit {
+  gap: 24px;
+  width: 100%;
+  height: 56px;
+  padding: 0 20px;
+  font-size: 14px;
+  text-transform: uppercase;
+
+  --dl-icon-size: 16px;
+
+  &:hover {
+    --dl-icon-nudge: 2px -2px;
+  }
+}
+
+.dealer-locator .dl-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+  margin: 16px 0 0;
+  color: var(--dl-muted);
+  font-weight: var(--font-weight-regular);
+
+  --dl-icon-size: 14px;
+
+  span:not(.dl-icon) + span::before {
+    display: inline-block;
+    width: 10px;
+    height: 1px;
+    margin-right: 14px;
+    background: var(--dl-line);
+    vertical-align: middle;
+    content: '';
+  }
+}
+
+/* ----- results: a band the full width of the page ----- */
+.dealer-locator .dl-results {
+  position: relative;
+  padding: 72px 0 24px;
+  background: var(--dl-band);
+  box-shadow: 0 0 0 100vmax var(--dl-band);
+  clip-path: inset(0 -100vmax);
+}
+
+.dealer-locator :where(.dl-results, .dl-results .dl-head) {
+  scroll-margin-top: calc(var(--nav-height, 64px) + 24px);
+}
+
+.dealer-locator .dl-count {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 0;
+}
+
+.dealer-locator .dl-count-number {
+  font-size: clamp(32px, 2.8vw, 40px);
+  font-weight: var(--font-weight-regular);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.dealer-locator .dl-count-words {
+  max-width: 96px;
+  color: var(--dl-muted);
+  font-size: 9px;
+}
+
+.dealer-locator .dl-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.dealer-locator .dl-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin: 32px 0 0;
+  border: 1px solid var(--dl-line);
+  padding: 0;
+  list-style: none;
+  gap: 1px;
+  background: var(--dl-line);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.dealer-locator .dl-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  padding: 24px;
+  background: var(--dl-card);
+}
+
+.dealer-locator .dl-card-loading {
+  background:
+    linear-gradient(90deg, transparent, rgb(255 255 255 / 70%), transparent) -100% 0 / 50% 100% no-repeat,
+    var(--dl-card);
+  animation: dl-shimmer 1.4s linear infinite;
+}
+
+@keyframes dl-shimmer {
+  to {
+    background-position: 200% 0, 0 0;
+  }
+}
+
+.dealer-locator .dl-card-top {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: 32px;
+}
+
+.dealer-locator .dl-card-number {
+  margin: 0;
+  color: var(--dl-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.dealer-locator .dl-card-go {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--dl-line);
+  border-radius: 50%;
+  background: var(--color-white);
+  color: var(--dl-ink);
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  --dl-icon-size: 14px;
+
+  &:hover {
+    background: var(--dl-ink);
+    color: var(--color-white);
+  }
+}
+
+.dealer-locator .dl-card-type {
+  margin: 6px 0 0;
+  color: var(--dl-muted);
+  font-size: 9px;
+  font-weight: var(--font-weight-regular);
+}
+
+.dealer-locator .dl-card-name {
+  margin: 10px 0 0;
+  color: var(--dl-ink);
+  font-family: var(--font-family-base);
+  font-size: 18px;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  text-transform: none;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.dealer-locator .dl-card-line {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 16px 0 0;
+  color: var(--dl-muted);
+  font-size: 12px;
+  line-height: 1.6;
+
+  --dl-icon-size: 14px;
+  --dl-icon-offset: 2px;
+  --dl-icon-color: var(--dl-ink);
+
+  & + .dl-card-line {
+    margin-top: 10px;
+  }
+}
+
+.dealer-locator .dl-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  border-top: 1px solid var(--dl-line);
+  padding-top: 16px;
+
+  > * {
+    min-height: 20px;
+  }
+}
+
+/* the foot sits at the card's bottom, at least 24px under the address */
+.dealer-locator .dl-card > :has(+ .dl-card-foot) {
+  margin-bottom: 24px;
+}
+
+.dealer-locator .dl-card-phone,
+.dealer-locator .dl-card-directions {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--dl-ink);
+  text-decoration: none;
+
+  --dl-icon-size: 14px;
+
+  &:hover {
+    color: var(--dl-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.dealer-locator .dl-card-phone {
+  font-size: 12px;
+}
+
+.dealer-locator .dl-card-directions {
+  font-size: 9px;
+
+
+
+  &:hover {
+    --dl-icon-nudge: 2px -2px;
+  }
+}
+
+/* ----- no matches, or the list didn't load ----- */
+.dealer-locator .dl-message {
+  margin-top: 32px;
+  border: 1px solid var(--dl-line);
+  padding: 48px 24px;
+  background: var(--dl-card);
+  text-align: center;
+
+  p {
+    margin: 0 auto 8px;
+    max-width: 420px;
+    color: var(--dl-muted);
+    font-size: 14px;
+  }
+
+  .dl-message-title {
+    color: var(--dl-ink);
+    font-size: 20px;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: -0.02em;
+  }
+
+  .button {
+    margin-top: 16px;
+    border-color: var(--button-outlined-border);
+    color: var(--button-outlined-color);
+    height: 48px;
+    padding: 0 20px;
+    font-size: 14px;
+  }
+
+  .button:hover,
+  .button:focus-visible {
+    border-color: var(--button-outlined-border);
+    background-color: var(--button-outlined-hover-bg);
+    color: var(--button-outlined-color);
+  }
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+/* ----- pages ----- */
+.dealer-locator .dl-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.dealer-locator .dl-showing {
+  margin: 0;
+  color: var(--dl-muted);
+  font-size: 13px;
+}
+
+.dealer-locator .dl-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.dealer-locator .dl-page {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  margin: 0;
+  border: 1px solid var(--dl-line);
+  border-radius: 6px;
+  padding: 0 12px;
+  background: var(--dl-card);
+  color: var(--dl-ink);
+  font: inherit;
+  font-size: 12px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+
+  --dl-icon-size: 14px;
+
+  &:hover:not(:disabled, [aria-current]) {
+    border-color: var(--dl-ink);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--dl-ink);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    color: var(--dl-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &[aria-current='page'] {
+    border-color: var(--dl-ink);
+    background: var(--dl-ink);
+    color: var(--color-white);
+  }
+}
+
+.dealer-locator .dl-page-gap {
+  padding: 0 4px;
+  color: var(--dl-muted);
+}
+
+.dealer-locator .dl-closing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 56px;
+  border-top: 1px solid var(--dl-line);
+  padding-top: 18px;
+  color: var(--dl-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.dealer-locator .dl-closing-link {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--dl-ink);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+
+  --dl-icon-size: 12px;
+
+  &:hover {
+    color: var(--dl-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+/* ----- tablet ----- */
+@media (width >= 600px) {
+  .dealer-locator .dl-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dealer-locator .dl-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dealer-locator .dl-field:nth-child(odd) {
+    border-right: 1px solid var(--dl-line-soft);
+  }
+}
+
+/* ----- desktop: the three dropdowns and the button in one row ----- */
+@media (width >= 900px) {
+  .dealer-locator .dl-finder {
+    padding: calc(var(--nav-height, 64px) + 64px) 0 80px;
+  }
+
+  .dealer-locator .dl-rule {
+    margin-bottom: 48px;
+  }
+
+  .dealer-locator .dl-form {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  }
+
+  .dealer-locator .dl-field {
+    gap: 28px;
+    border-right: 1px solid var(--dl-line-soft);
+    border-bottom: 0;
+    padding: 24px 24px 22px;
+  }
+
+  .dealer-locator .dl-actions {
+    padding: 0 22px;
+  }
+
+  .dealer-locator .dl-submit {
+    width: auto;
+    min-width: 156px;
+  }
+
+  .dealer-locator .dl-results {
+    padding-top: 112px;
+  }
+
+  .dealer-locator .dl-card {
+    min-height: 240px;
+    padding: 24px 24px 18px;
+  }
+}

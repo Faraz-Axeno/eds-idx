@@ -276,8 +276,9 @@ export default function decorateRoller(block, ul) {
   }
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Universal Editor, reduced motion or a single card: a plain stack
-  if (authoring || reduce || cards.length < 2) {
+  // Universal Editor, reduced motion or no card: a plain stack (a single card keeps the drum, so
+  // it sits where the first of several does)
+  if (authoring || reduce || !cards.length) {
     block.classList.add('is-static');
     return;
   }
@@ -288,6 +289,8 @@ export default function decorateRoller(block, ul) {
     return;
   }
   const count = cards.length;
+  // a single card: shown flat with the title and the price bar, and one gesture moves the page on
+  const single = count === 1;
   const titleBox = section.querySelector(':scope > .default-content-wrapper:first-child') || section;
   ul.classList.add('rl-drum');
 
@@ -381,15 +384,21 @@ export default function decorateRoller(block, ul) {
   let fresh = false;
   window.addEventListener('touchstart', () => { fresh = true; }, { capture: true, passive: true });
   window.addEventListener('keydown', (e) => { if (!e.repeat) fresh = true; }, { capture: true });
-  const placeOf = (k) => (k < 0 ? introAt : k);
+  const placeOf = (k) => (k < 0 && !single ? introAt : Math.max(k, 0));
+  // an intro all but at the first card (phones, --rl-intro-at) is that card's own screen: the first
+  // gesture turns on to the second card, and the title fades over that turn
+  const introIsFirst = () => introAt > -0.01;
   const paint = (s) => {
     render(s);
+    // over the turn to the first stop: the second card, or the only one
+    const span = (introIsFirst() ? Math.min(1, count - 1) : 0) - introAt;
     // set on the title only, so nothing else restyles
-    titleBox.style.setProperty('--rl-q', clamp((s - introAt) / -introAt, 0, 1).toFixed(3));
+    const q = single ? 0 : clamp((s - introAt) / span, 0, 1);
+    titleBox.style.setProperty('--rl-q', q.toFixed(3));
   };
   const playTo = (k) => {
     step = clamp(k, -1, count - 1);
-    block.classList.toggle('is-intro', step < 0);
+    block.classList.toggle('is-intro', step < 0 && !single);
     cancelAnimationFrame(tween);
     fresh = false;
     const from = shown;
@@ -411,15 +420,15 @@ export default function decorateRoller(block, ul) {
     tween = 0;
     step = k;
     shown = placeOf(k);
-    block.classList.toggle('is-intro', k < 0);
+    block.classList.toggle('is-intro', k < 0 && !single);
     paint(shown);
   };
   // the snap engine asks before it pages on; a later gesture turns on from where the drum is
   const stepper = {
-    canScrollDown: () => step < count - 1,
-    canScrollUp: () => step > -1,
-    scrollDown: () => playTo(step + 1),
-    scrollUp: () => playTo(step - 1),
+    canScrollDown: () => !single && step < count - 1,
+    canScrollUp: () => !single && step > -1,
+    scrollDown: () => playTo(step < 0 && introIsFirst() ? 1 : step + 1),
+    scrollUp: () => playTo(step === 1 && introIsFirst() ? -1 : step - 1),
     isBusy: () => tween !== 0 && !fresh && performance.now() - turnedAt < STEP_HOLD_MS,
     destroy: () => cancelAnimationFrame(tween),
   };
@@ -458,8 +467,8 @@ export default function decorateRoller(block, ul) {
       const { p } = runway();
       target = toDrum(p);
       // set on the title only, so nothing else restyles
-      titleBox.style.setProperty('--rl-q', clamp(p / T_IN, 0, 1).toFixed(3));
-      block.classList.toggle('is-intro', p <= BAR_FROM);
+      titleBox.style.setProperty('--rl-q', single ? '0' : clamp(p / T_IN, 0, 1).toFixed(3));
+      block.classList.toggle('is-intro', p <= BAR_FROM && !single);
       if (!frame) frame = requestAnimationFrame(tick);
     };
 
@@ -553,12 +562,44 @@ export default function decorateRoller(block, ul) {
     section.classList.toggle('is-crossing', crossing);
   });
   document.addEventListener('snap:end', () => section.classList.remove('is-crossing'));
+  // the price bar is the section's own: gone the moment a move leaves or enters, back on arrival
+  document.addEventListener('snap:start', ({ detail: { from, to } }) => {
+    if ((from === section || to === section) && from !== to) section.classList.add('is-away');
+  });
+  document.addEventListener('snap:end', ({ detail }) => {
+    if (detail?.to === section) section.classList.remove('is-away');
+  });
   section.style.setProperty('--rl-count', count);
   // the snap engine treats the block as one screen, not an inner scroller
   block.dataset.snapPassthrough = '';
   block.append(rail, ...washes);
   readIntroAt();
   jumpTo(-1);
+
+  // a single card is centred between the site header and the price bar (or the screen's foot),
+  // and the title centred in the space above it; the drum and the title are centred in the screen
+  if (single) {
+    block.classList.add('is-single');
+    // the site header's height (--nav-offset), read off a hidden probe
+    const probe = document.createElement('div');
+    probe.className = 'rl-probe';
+    probe.setAttribute('aria-hidden', 'true');
+    block.append(probe);
+    const centre = () => {
+      const box = block.getBoundingClientRect();
+      if (!box.height) return;
+      const head = probe.offsetHeight;
+      const foot = bar?.textContent.trim() ? bar.getBoundingClientRect().top - box.top : box.height;
+      const card = (head + foot) / 2;
+      const title = (head + card - ul.offsetHeight / 2) / 2;
+      block.style.setProperty('--rl-single-shift', `${Math.round(card - box.height / 2)}px`);
+      section.style.setProperty('--rl-single-title', `${Math.round(title - box.height / 2)}px`);
+    };
+    // measured as soon as these get their size (the section is hidden until loaded) and whenever
+    // it changes, never on arrival, so the card is already in place when the section shows
+    const sizes = new ResizeObserver(centre);
+    [block, bar].forEach((el) => { if (el) sizes.observe(el); });
+  }
 
   // the stepper is registered with the snap engine at once and kept only if the engine starts
   // (`snap-active`, before `snap-settled`); without it the section becomes the scroll runway

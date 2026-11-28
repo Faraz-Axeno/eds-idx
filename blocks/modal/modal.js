@@ -2,6 +2,7 @@ import { buildBlock, decorateBlock, loadBlock } from '../../scripts/aem.js';
 
 // html class read by section-snap.js (navOpen) and styles.css to hold the page still
 const OPEN_CLASS = 'is-modal-open';
+const QUIET_FOCUS = 'is-quiet-focus';
 
 let idCounter = 0;
 
@@ -81,12 +82,22 @@ export async function createModal(contentNodes) {
   block.parentElement?.classList.remove('modal-wrapper');
 
   let opener = null;
+  let byPointer = false;
+  dialog.addEventListener('pointerdown', () => { byPointer = true; });
+  dialog.addEventListener('keydown', () => { byPointer = false; });
 
   // Escape fires `cancel` then `close`; the close button and backdrop fire `close`
   dialog.addEventListener('close', () => {
     document.documentElement.classList.remove(OPEN_CLASS);
     block.remove();
-    if (opener?.isConnected) opener.focus({ preventScroll: true });
+    if (!opener?.isConnected) return;
+    if (byPointer) {
+      opener.classList.add(QUIET_FOCUS);
+      const end = () => opener.classList.remove(QUIET_FOCUS);
+      opener.addEventListener('blur', end, { once: true });
+      opener.addEventListener('keydown', end, { once: true });
+    }
+    opener.focus({ preventScroll: true, focusVisible: !byPointer });
   });
 
   const showModal = (trigger) => {

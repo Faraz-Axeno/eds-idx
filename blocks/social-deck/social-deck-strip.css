@@ -285,6 +285,17 @@ main .section.social-deck-container:has(.social-deck.strip) {
     white-space: nowrap;
   }
 
+  /* each part keeps its own row, so a missing eyebrow can't push the heading onto the icons */
+  /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
+  & .default-content-wrapper > p:not(:has(a, img)) {
+    grid-row: 1;
+  }
+
+  /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
+  & .default-content-wrapper > p:has(> a) {
+    grid-row: 3;
+  }
+
   /* eyebrow */
   /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
   & .default-content-wrapper > p {
@@ -300,6 +311,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
   & .default-content-wrapper > h2 {
     --sd-lh: calc(26.7 / 22);
 
+    grid-row: 2;
     min-height: var(--sd-h-row);
     margin-top: 7px;
     font-family: var(--font-family-display);
@@ -310,6 +322,7 @@ main .section.social-deck-container:has(.social-deck.strip) {
 
   /* social icon links */
   & .default-content-wrapper > ul {
+    grid-row: 3;
     display: flex;
     gap: 8px;
     margin: 20px 0 0;
@@ -321,7 +334,8 @@ main .section.social-deck-container:has(.social-deck.strip) {
     margin: 0;
   }
 
-  & .default-content-wrapper > ul a:any-link {
+  /* a tile: a link, or an icon image authored without one (social-deck-icons.js) */
+  & .default-content-wrapper > ul :is(a:any-link, span.social-deck-icon) {
     display: grid;
     place-items: center;
     width: 40px;
@@ -339,17 +353,31 @@ main .section.social-deck-container:has(.social-deck.strip) {
     background: rgb(255 255 255 / 22%);
   }
 
-  /* 16.67 glyph */
-  & .default-content-wrapper > ul .icon {
+  /* 16.67 glyph: an icon token, or an authored icon image */
+  & .default-content-wrapper > ul :is(.icon, .social-deck-icon > picture, .social-deck-icon > img) {
     display: block;
     width: calc(100% - 23.33px);
     height: calc(100% - 23.33px);
   }
 
-  & .default-content-wrapper > ul .icon img {
+  & .default-content-wrapper > ul :is(.icon, picture) img {
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  & .default-content-wrapper > ul .social-deck-icon img {
+    object-fit: contain;
+  }
+
+  /* an authored icon that brings its own tile fills it, and the tile drops its own fill */
+  & .default-content-wrapper > ul .social-deck-icon.has-own-tile {
+    background: none;
+
+    > :is(picture, img) {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   /* desktop frame (1280×720) */
@@ -406,6 +434,11 @@ main .section.social-deck-container:has(.social-deck.strip) {
       letter-spacing: -0.04em;
     }
 
+    /* stylelint-disable-next-line no-descending-specificity -- unrelated to the card caption p */
+    & .default-content-wrapper > p:has(> a) {
+      grid-row: auto;
+    }
+
     & .default-content-wrapper > ul {
       grid-row: 1 / span 2;
       grid-column: 2;
@@ -414,16 +447,21 @@ main .section.social-deck-container:has(.social-deck.strip) {
       margin: 0;
     }
 
-    & .default-content-wrapper > ul a:any-link {
+    & .default-content-wrapper > ul :is(a:any-link, span.social-deck-icon) {
       width: calc(40 * var(--sd-u));
       height: calc(40 * var(--sd-u));
       border-radius: calc(8 * var(--sd-u));
     }
 
     /* 16.67 glyph */
-    & .default-content-wrapper > ul .icon {
+    & .default-content-wrapper > ul :is(.icon, .social-deck-icon > picture, .social-deck-icon > img) {
       width: calc(100% - 23.33 * var(--sd-u));
       height: calc(100% - 23.33 * var(--sd-u));
+    }
+
+    & .default-content-wrapper > ul .social-deck-icon.has-own-tile > :is(picture, img) {
+      width: 100%;
+      height: 100%;
     }
   }
 }
@@ -503,7 +541,7 @@ main .section.light.social-deck-container:has(.social-deck.strip) {
 
   /* social tiles: icon list or text links (white icon glyphs are inverted to
      black, as on the source) */
-  & .default-content-wrapper > ul a:any-link,
+  & .default-content-wrapper > ul :is(a:any-link, span.social-deck-icon),
   & .default-content-wrapper > p > a:any-link {
     background: rgb(0 0 0 / 7%);
     color: rgb(0 0 0);
@@ -518,7 +556,27 @@ main .section.light.social-deck-container:has(.social-deck.strip) {
     text-decoration-color: transparent;
   }
 
+  & .default-content-wrapper > ul .social-deck-icon.has-own-tile {
+    background: none;
+  }
+
   & .default-content-wrapper > ul .icon img {
     filter: invert(1);
+  }
+}
+
+/* Universal Editor: its canvas grows to fit the page, so the fold isn't one screen tall there
+   and no size follows the screen's height (it would grow with the canvas, without end) */
+body:has([data-aue-resource]) main .section.social-deck-container:has(.social-deck.strip) {
+  --sd-top: 100px;
+  --sd-u: calc(100vw / 420);
+
+  height: auto;
+  min-height: 0;
+
+  @media (width >= 1200px), (width >= 900px) and (not ((hover: none) and (pointer: coarse))) {
+    --sd-u: calc(100vw / 1280);
+
+    height: auto;
   }
 }

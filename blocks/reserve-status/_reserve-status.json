@@ -1,0 +1,101 @@
+{
+  "definitions": [
+    {
+      "title": "Reserve Status",
+      "id": "reserve-status",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Reserve Status",
+              "model": "reserve-status",
+              "priceLabel": "Reservation amount",
+              "price": "₹10,000",
+              "priceMobile": "Total payable today"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "reserve-status",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Car Image",
+          "description": "The car beside the Payment pending and Payment failed screens.",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "priceLabel",
+          "label": "Price Label",
+          "value": "Reservation amount"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "price",
+          "label": "Price",
+          "value": "₹10,000"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "priceNote",
+          "label": "Price Note",
+          "description": "Under the price on desktop."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "priceMobile",
+          "label": "Price Label on Mobile",
+          "value": "Total payable today"
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "pending",
+          "label": "Payment Pending",
+          "description": "A short tag line (e.g. Payment pending), the heading, the text, a link as the Retry button (it checks the payment again) and a closing note."
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "failed",
+          "label": "Payment Failed",
+          "description": "A short tag line (e.g. Payment failed), the heading, the text, a link as the Try again button (back to Build your Combat with the buyer's choices) and a closing note."
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "reserved",
+          "label": "Reserved",
+          "description": "The big word (Heading 2, e.g. Reserved), the greeting (Heading 3, {firstName} is the buyer's first name) and the text ({email} is the buyer's email)."
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "reservedBackground",
+          "label": "Reserved Background",
+          "multi": false
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "reservedCar",
+          "label": "Reserved Car Image",
+          "multi": false
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

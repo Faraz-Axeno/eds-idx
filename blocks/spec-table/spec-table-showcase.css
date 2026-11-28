@@ -34,6 +34,9 @@ main > .section.light:has(.spec-table.showcase) {
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   justify-content: stretch;
   height: calc(var(--stage) + var(--shift));
+
+  /* whole pixels, to avoid hairlines between sections */
+  height: round(calc(var(--stage) + var(--shift)), 1px);
   padding: 0;
   overflow: clip;
   color: #2e2e2e;
@@ -124,6 +127,7 @@ main > .section.light:has(.spec-table.showcase) {
     --after: 0px;
 
     height: calc(var(--stage) * 2.2);
+    height: round(calc(var(--stage) * 2.2), 1px);
 
     > * {
       position: sticky;
@@ -139,6 +143,16 @@ main > .section.light:has(.spec-table.showcase) {
         position: relative;
         height: auto;
       }
+    }
+  }
+
+  /* stepped by the snap engine (spec-table-showcase.js): one screen, the reveal played by a
+     gesture rather than scrubbed through a runway */
+  &.specs-scrub.specs-stepped {
+    height: var(--stage);
+
+    @media (height < 500px) {
+      height: auto;
     }
   }
 
@@ -169,8 +183,13 @@ main > .section.light:has(.spec-table.showcase) {
       text-transform: uppercase;
       text-wrap: balance;
 
+      /* at most 3 lines on phones and tablets, 1 on desktop; the rest is clipped off */
+      max-height: 3lh;
+      overflow: hidden;
+
       @media (width >= 900px) {
         top: 104px;
+        max-height: none;
         font-size: clamp(26px, 3.125vw, 44px);
         white-space: nowrap;
       }
@@ -354,6 +373,10 @@ main > .section.light:has(.spec-table.showcase) {
     text-transform: uppercase;
     color: rgb(0 0 0 / 55%);
 
+    /* group label: one line, the rest is clipped off */
+    overflow: hidden;
+    white-space: nowrap;
+
     @media (height < 500px) {
       grid-row: 3;
       margin: 24px 0 8px;
@@ -495,7 +518,12 @@ main > .section.light:has(.spec-table.showcase) {
       text-transform: uppercase;
       text-wrap: balance;
 
+      /* at most 3 lines on phones and tablets, 2 on desktop; the rest is clipped off */
+      max-height: 3lh;
+      overflow: hidden;
+
       @media (width >= 900px) {
+        max-height: 2lh;
         top: calc(var(--stage) * 0.69 + var(--after));
         bottom: auto;
         inset-inline: 0;

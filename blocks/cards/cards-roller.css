@@ -327,6 +327,13 @@ main > .section.cards-container:has(.cards.roller.is-stepped) {
     margin: 0 auto;
   }
 
+  /* a move out of or into the section: gone at once, so it never shows on a neighbouring fold */
+  &.is-away .cards-wrapper ~ .default-content-wrapper {
+    visibility: hidden;
+    opacity: 0;
+    transition: none;
+  }
+
   /* away at the start of the intro; hidden once faded, so its link leaves the tab order */
   &:has(.cards.roller.is-intro) .cards-wrapper ~ .default-content-wrapper {
     visibility: hidden;
@@ -348,6 +355,29 @@ main > .section.cards-container:has(.cards.roller.is-stepped) {
 
     h2 {
       translate: none;
+    }
+  }
+}
+
+/* phones: the intro is the first card's own screen (the next card below it), with the title
+   centred in the space between the header and the first card; the first turn fades the title */
+@media (width < 900px) {
+  main > .section.cards-container:has(.cards.roller.is-stepped) {
+    /* from the screen's middle to the middle of the space above the front card */
+    --rl-title-shift: calc((var(--nav-offset, 94px) - 50svh - 92vw * 394 / 663 / 2) / 2);
+
+    > .default-content-wrapper:first-child h2 {
+      translate: 0 calc(-50% + var(--rl-title-shift));
+    }
+
+    &.is-crossing > .default-content-wrapper:first-child {
+      translate: 0 calc(-50% + var(--rl-title-shift));
+    }
+
+    /* the intro all but at the first card (not 0: the turns are reckoned from it) */
+    .cards.roller.is-stepped {
+      --rl-intro-at: -0.001;
+      --rl-shown-to-intro: var(--rl-shown-to);
     }
   }
 }
@@ -537,6 +567,21 @@ main > .section.cards-container:has(.cards.roller.is-stepped) {
       pointer-events: auto;
     }
 
+    /* a single card: centred between the site header and the price bar (cards-roller.js) */
+    &.is-single .rl-drum {
+      translate: 0 var(--rl-single-shift, 0);
+    }
+
+    /* the site header's height, measured by cards-roller.js */
+    .rl-probe {
+      position: absolute;
+      top: 0;
+      width: 0;
+      height: var(--nav-offset, 94px);
+      visibility: hidden;
+      pointer-events: none;
+    }
+
     /* each card turns on an arc around an axis behind the screen */
     .card {
       --rl-at: clamp(-2.4, var(--rl-offset), 2.4);
@@ -688,5 +733,18 @@ main > .section.cards-container:has(.cards.roller.is-stepped) {
     .rl-copy > * {
       transition: none;
     }
+  }
+}
+
+/* a single card: the title centred in the space above the card (--rl-single-title, cards-roller.js),
+   at every width */
+main > .section.cards-container:has(.cards.roller.is-stepped.is-single) {
+  > .default-content-wrapper:first-child h2 {
+    translate: 0 calc(-50% + var(--rl-single-title, 0px));
+  }
+
+  /* stylelint-disable-next-line no-descending-specificity -- the title, not the price bar */
+  &.is-crossing > .default-content-wrapper:first-child {
+    translate: 0 calc(-50% + var(--rl-single-title, 0px));
   }
 }

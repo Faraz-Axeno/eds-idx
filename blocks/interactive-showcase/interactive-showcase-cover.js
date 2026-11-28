@@ -323,7 +323,7 @@ export default function decorateCover(block, {
   const stage = block.querySelector('.stage');
   const copy = block.querySelector('.copy');
   const rail = block.querySelector('.thumbs');
-  // settled with the Wave In cut as full-bleed media are, not risen as content (wave-cut.js)
+  // full-bleed media to the Wave In cut, not content (wave-cut.js)
   stage.classList.add('backdrop');
   rail?.setAttribute('aria-label', label ? `${label} colours` : 'Colours');
 

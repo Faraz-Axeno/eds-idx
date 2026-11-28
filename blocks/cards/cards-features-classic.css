@@ -417,6 +417,11 @@
     cursor: auto;
   }
 
+  /* no description: no "+" and no pop-up (cards-features.js), so not clickable */
+  .ft-card.ft-static {
+    cursor: auto;
+  }
+
   &.is-authoring .ft-more {
     margin-top: 16px;
     padding-top: 8px;
@@ -1230,6 +1235,15 @@ main > .section.light:has(.cards.features-classic) > .default-content-wrapper {
     text-transform: uppercase;
     text-wrap: balance;
     flex: none;
+
+    /* three lines (two from 900px), the rest cut off (no ellipsis), as the card titles */
+    max-height: 3lh;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+
+    @media (width >= 900px) {
+      max-height: 2lh;
+    }
 
     /* phones: Figma's width (14.69em, about 92.5% of the screen with the 6.3vw font), not capped at
        the column, so every phone breaks the lines as Figma does */

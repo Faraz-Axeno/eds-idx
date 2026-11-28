@@ -377,10 +377,16 @@ main > .section.cards-container:has(.cards.pillars) {
 
     @media (width >= 900px) {
       --mark-on: calc(50 * var(--p-u));
+      --gaps: max(var(--pl-count, 3) - 1, 1);
 
-      top: calc(554.7 * var(--p-u));
+      top: auto;
+      bottom: calc((720 - 648.7) * var(--p-u));
       left: calc(53 * var(--p-u));
-      gap: calc(16 * var(--p-u));
+      gap: clamp(
+        0px,
+        (520.2 * var(--p-u) - var(--mark-on) - (var(--gaps) * var(--mark))) / var(--gaps),
+        16 * var(--p-u)
+      );
       padding: 0 calc(12 * var(--p-u));
     }
   }
@@ -508,7 +514,9 @@ main > .section.cards-container:has(.cards.pillars) {
 
       @media (width >= 900px) {
         top: calc((128.5 + 564 - 24 - 6) * var(--p-u));
+        bottom: auto;
         left: calc((102 + 24) * var(--p-u));
+        gap: calc(16 * var(--p-u));
         padding: 0;
       }
     }

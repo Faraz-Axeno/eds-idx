@@ -1,6 +1,7 @@
 import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 import { token } from '../../scripts/utils/datalayer.js';
+import decorateSocialIcons from './social-deck-icons.js';
 
 // per-slot tilt in degrees, per breakpoint
 // desktop 18.85° matches the Figma arc (≈18.85° between cards)
@@ -97,8 +98,9 @@ export default async function decorate(block) {
   // Stable anchor id for in-page links (e.g. #social); only set once per page.
   if (!document.getElementById('social')) block.id = 'social';
 
-  // the section's social icon links open in a new tab
-  block.closest('.section')?.querySelectorAll('.default-content-wrapper > ul a[href]').forEach((a) => {
+  // the section's social icons become one row of tiles; their links open in a new tab
+  const head = block.closest('.section')?.querySelector(':scope > .default-content-wrapper');
+  decorateSocialIcons(head, moveInstrumentation)?.querySelectorAll('a[href]').forEach((a) => {
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
   });

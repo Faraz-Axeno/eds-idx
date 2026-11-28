@@ -863,6 +863,65 @@ body.combat .cards.carousel .card-body > p > a:only-child:focus-visible {
   outline-offset: 2px;
 }
 
+/* short phones (the iPhone SE's 667 and less): the copy a little smaller and tighter, so the
+   photo keeps its room and all the copy shows; the Figma 375 x 815 and taller are unchanged */
+@media (width < 768px) and (height < 760px) {
+  body.combat .cards.carousel .card-body {
+    padding: 14px 12px 12px;
+  }
+
+  body.combat .cards.carousel .card-body > p:has(+ h2, + h3) {
+    padding: 5px 8px 4px;
+    font-size: 11px;
+  }
+
+  body.combat .cards.carousel .card-body :is(h2, h3) {
+    margin-top: 8px;
+    font-size: 19px;
+  }
+
+  body.combat .cards.carousel .card-body :is(h2, h3) + p:not(:has(> a:only-child)) {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  body.combat .cards.carousel .card-body > p:has(> a:only-child) {
+    margin-top: 12px;
+  }
+
+  body.combat .cards.carousel .card-body > p > a:only-child:any-link {
+    height: 36px;
+    padding: 0 18px;
+    font-size: 11px;
+  }
+}
+
+/* very short phones (e.g. 320 x 568): one step smaller again */
+@media (width < 768px) and (height < 620px) {
+  body.combat .cards.carousel .card-body {
+    padding: 12px 10px 10px;
+  }
+
+  body.combat .cards.carousel .card-body :is(h2, h3) {
+    margin-top: 6px;
+    font-size: 17px;
+  }
+
+  body.combat .cards.carousel .card-body :is(h2, h3) + p:not(:has(> a:only-child)) {
+    margin-top: 6px;
+    font-size: 12px;
+  }
+
+  body.combat .cards.carousel .card-body > p:has(> a:only-child) {
+    margin-top: 10px;
+  }
+
+  body.combat .cards.carousel .card-body > p > a:only-child:any-link {
+    height: 34px;
+  }
+}
+
 /* count and arrows: below the cards, on the right (the count on the left on
    phones); the row lets clicks through to the brochure link beside it */
 body.combat .cards.carousel .carousel-nav {

@@ -24,20 +24,30 @@
           "component": "text",
           "valueType": "string",
           "name": "title",
-          "label": "Name"
+          "label": "Name",
+          "description": "Maximum character limit: 18 characters.",
+          "validation": {
+            "maxLength": 18,
+            "customErrorMsg": "Name must be 18 characters or fewer."
+          }
         },
         {
           "component": "text",
           "valueType": "string",
           "name": "text",
-          "label": "Text"
+          "label": "Text",
+          "description": "Maximum character limit: 18 characters.",
+          "validation": {
+            "maxLength": 18,
+            "customErrorMsg": "Text must be 18 characters or fewer."
+          }
         },
         {
           "component": "richtext",
           "valueType": "string",
           "name": "links",
           "label": "Links",
-          "description": "As anywhere on the site: bold = primary button, italic = secondary, plain = text link; with no button, the last link is the primary one. Brochure: its two links on one line, then a line with the label."
+          "description": "Bold = primary button, italic = secondary, plain = text link; with no button, the last link is primary. Brochure: two links, then a label line."
         },
         {
           "component": "select",

@@ -241,3 +241,80 @@ never surface — the countdown prevents it; **treat it as a defect if seen**.
 A rejected origin arrives as a generic network failure, because the 403 carries
 no CORS headers and the browser blocks the read. That is expected, and is why
 `ALLOWED_ORIGINS` must include the preview origins for Stage.
+
+## Style: Booking (`booking`)
+
+The model now has a **Style** select (`classes`): Default (`""`, the registration form
+above, unchanged) or Booking. It adds no row: existing content keeps working as authored.
+The Booking code is in `register-form-booking.js` / `.css`, loaded only when the class is
+present; `register-form.js` exposes two hooks to it and is otherwise unchanged for Default.
+
+Authoring: the same fields.
+
+| Field | Holds (dealer "Get in touch") |
+| --- | --- |
+| Decorative Image | required by the model, not shown in Booking (the Find Us card takes its place) |
+| Image Alt Text | its description |
+| Heading & Intro | `Get in touch with Meridian Motors` (H2); the intro paragraph is optional |
+| Consent Text | the consent line next to the (still required) checkbox |
+| Privacy Notice | the DPDP notice |
+| Thank-you Page Link | optional; empty shows the in-page "Request sent" screen |
+
+Journey: the dealer microsite's **quote request** (the deep links `#quote` and `#test-drive`,
+used by the hero's and the price bar's buttons, scroll to the form), as in the dealer design:
+
+1. **fields** ("Tell us about you"): the existing details screen, email optional and the
+   pincode as in Default (required when the `registerFormRequirePincode` placeholder says so);
+   the privacy notice sits above **Continue**, which sends the OTP;
+2. **OTP pop-up** ("Verify your number"): the existing code boxes and resend, then
+   **Change number** (back to the details; also the close button, desktop only as in the
+   designs, and Esc) or **Submit**;
+3. **Request sent pop-up** (unless a Thank-you Page Link is set, which still redirects):
+   the **Request Sent Pop-up** field (Booking only): its heading is the title
+   (`Request sent to Meridian Motors`), each paragraph starting with a bold label is a row
+   (`**Dealer** Meridian Motors, Plot 14, …`), a plain paragraph is the status line
+   (`Waiting for Meridian Motors to call you`) and a link is the outlined button
+   (`Explore the Combat` → `#combat`). The block adds "A copy is on its way to {email}"
+   (or "We will call you on {mobile}" without an email) and a **Contact** row; **Done** closes it and clears the form.
+
+**Find Us card** (Booking only), the right side: "Our showroom" over a drawing of the
+location (rings and a crosshair, the **Map Coordinates** at its top corners, **Find Us: Region**
+under the pin), then "Find us", **Dealer Name**, **Dealer Address** (two lines, split after the
+second comma), **Find Us: City** and **Find Us: PIN Code**, a **Get directions** button and
+**Find Us: Closing Line**. Get directions opens Google Maps directions to the Map Coordinates
+(e.g. `28°26' N, 77°06' E` or `28.4333, 77.1`), else to the Dealer Address; the dealer
+footer's Open in maps link goes to the same point.
+
+The pop-ups are `<dialog>`s (focus stays inside, the page behind is inert, the section snap
+pauses via `html.is-modal-open`).
+
+Look: the light dealer "Get in touch" design (`register-form-booking.css`): the form on the
+left and the Find Us card on the right on desktop, sized on the prototype's 1280 × 720
+frame. Below 900px it follows the dealer mobile design (its 375 frame): the heading, "Tell us
+about you", the details, consent and notice, then the Find Us card (moved there by the block,
+at its own height), then **Continue** at the foot of the screen; the OTP and Request sent pop-ups are the
+design's 343 card centred on the screen, Request sent's two
+buttons one under the other. Use it in a section with the **Light** style. If a step is
+taller than the panel the form column scrolls on its own and the page snaps on once it
+reaches the end.
+
+**Consents** (as in Default): the Consent Text's first paragraph is the required privacy
+consent (e.g. `I have read and understood the Terms of Use.`, a link on *Terms of Use*); a
+second paragraph, typed after Enter, is the required marketing consent (e.g. `I agree to JSW
+Motors storing my details … as in the Privacy Policy. Click on Know More.`). Its tick is sent
+as `marketingConsent`, `personalization` and `modelEventInvites`. In Booking the consents'
+links are underlined.
+
+`lead-submit` receives the existing payload (with `pincode`, `consent` and the three
+marketing flags) plus:
+
+| Key | Value | Placeholder to override |
+| --- | --- | --- |
+| `source` | `Dealer Microsite` | `registerFormBookingSource` |
+| `channel` | `Digital` | `registerFormBookingChannel` |
+| `subsource` | empty for now | `registerFormBookingSubsource` |
+| `dealerCodeSalesUnit` | the page property **Dealer Code** (page metadata `dealercode`); empty if not set | — |
+
+No other keys are added: the lead API takes these four and nothing else beyond the
+default payload. Labels are placeholders (`registerFormBooking*`) with English
+fallbacks.

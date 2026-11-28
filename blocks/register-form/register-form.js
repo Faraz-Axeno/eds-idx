@@ -43,6 +43,21 @@ const UTM_PARAMS = {
   fbclid: 'fbclid',
 };
 
+// the lead API's name for each attribution value, sent flat in the lead (utmSource …)
+const UTM_LEAD_KEYS = {
+  source: 'utmSource',
+  medium: 'utmMedium',
+  campaign: 'utmCampaign',
+  term: 'utmTerm',
+  content: 'utmContent',
+  gclid: 'gclId',
+  fbclid: 'fbclId',
+};
+
+// the lead's formType; the Booking style (dealer microsite) sends its own
+// (register-form-booking.js)
+const FORM_TYPE = 'Register Form';
+
 const LOCKOUT = {
   at: 'boxes', msg: 'Too many incorrect attempts.', retry: 1, noResend: 1, lockout: 1,
 };
@@ -277,6 +292,8 @@ export default async function decorate(block) {
   let intro = null;
   let redirectFromField = '';
   const textRows = [];
+  // every paragraph of a text row (the consent takes a second one, typed after Enter)
+  const rowParas = new Map();
 
   [...block.children].forEach((row) => {
     const img = row.querySelector('img');
@@ -303,7 +320,11 @@ export default async function decorate(block) {
       intro = row.querySelector('p');
     } else {
       // blank rows kept too, so the fallback order below doesn't shift
-      textRows.push(row.querySelector('p') || row);
+      // innermost paragraphs: in the editor the field's own wrapper gets wrapped in a <p> too
+      const paras = [...row.querySelectorAll('p')].filter((p) => !p.querySelector('p'));
+      const first = paras[0] || row;
+      textRows.push(first);
+      rowParas.set(first, paras.length ? paras : [row]);
     }
   });
 
@@ -341,12 +362,13 @@ export default async function decorate(block) {
 
   // Consent vs notice by content, not position (authored order has drifted before):
   // the consent row carries the Privacy Notice link, the notice is plain prose
-  const withLink = textRows.filter((r) => r.querySelector('a[href]'));
+  const hasLink = (r) => rowParas.get(r).some((p) => p.querySelector('a[href]'));
+  const withLink = textRows.filter(hasLink);
   let consentRow = null;
   let notice = null;
   if (withLink.length === 1) {
     [consentRow] = withLink;
-    [notice = null] = textRows.filter((r) => !r.querySelector('a[href]'));
+    [notice = null] = textRows.filter((r) => !hasLink(r));
   } else {
     [consentRow = null, notice = null] = textRows; // model order: consent, then notice
   }
@@ -357,6 +379,10 @@ export default async function decorate(block) {
       document.createTextNode(DEFAULT_CONSENT_TEXT),
       createEl('a', { href: DEFAULT_CONSENT_LINK_HREF }, DEFAULT_CONSENT_LINK_TEXT),
     ];
+  // the second consent (marketing): the next paragraph; any after it join it, line by line
+  const marketingNodes = (consentRow ? rowParas.get(consentRow).slice(1) : [])
+    .filter((p) => p.textContent.trim())
+    .flatMap((p, i) => (i ? [document.createElement('br'), ...p.childNodes] : [...p.childNodes]));
 
   const media = createEl('div', { class: 'media' }, picture);
   const body = createEl('div', { class: 'content' });
@@ -481,19 +507,22 @@ export default async function decorate(block) {
     createEl('p', { class: 'error', 'data-for': 'mobile', id: `${formId}-mobile-error` }, mobileRequired),
   );
 
-  const consentField = createEl(
+  // a required checkbox with its text and error line
+  const buildConsent = (name, nodes) => createEl(
     'div',
     { class: 'field' },
     createEl(
       'label',
-      { class: 'consent', for: `${formId}-consent` },
+      { class: 'consent', for: `${formId}-${name}` },
       createEl('input', {
-        class: 'consent-check', id: `${formId}-consent`, type: 'checkbox', name: 'consent', required: true,
+        class: 'consent-check', id: `${formId}-${name}`, type: 'checkbox', name, required: true,
       }),
-      createEl('span', { class: 'consent-text' }, ...consentNodes),
+      createEl('span', { class: 'consent-text' }, ...nodes),
     ),
-    createEl('p', { class: 'error', 'data-for': 'consent', id: `${formId}-consent-error` }, consentRequired),
+    createEl('p', { class: 'error', 'data-for': name, id: `${formId}-${name}-error` }, consentRequired),
   );
+  const consentField = buildConsent('consent', consentNodes);
+  const marketingField = marketingNodes.length ? buildConsent('marketingConsent', marketingNodes) : null;
 
   const fieldsScreen = createEl(
     'div',
@@ -503,6 +532,7 @@ export default async function decorate(block) {
     pincodeField,
     mobileField,
     consentField,
+    marketingField,
     createEl('button', { class: 'submit', type: 'submit', 'data-action': 'get-otp' }, ph('registerFormGetOtp', 'Get OTP')),
     createEl('p', {
       class: 'status', role: 'status', 'aria-live': 'polite', 'data-status': 'fields',
@@ -582,7 +612,7 @@ export default async function decorate(block) {
     fields: form.querySelector('[data-status="fields"]'),
     otp: form.querySelector('[data-status="otp"]'),
   };
-  const fields = Object.fromEntries(['firstname', 'lastname', 'email', 'pincode', 'mobile', 'consent']
+  const fields = Object.fromEntries(['firstname', 'lastname', 'email', 'pincode', 'mobile', 'consent', 'marketingConsent']
     .filter((name) => form[name])
     .map((name) => [name, form[name]]));
 
@@ -667,6 +697,7 @@ export default async function decorate(block) {
       return MOBILE_RE.test(digits) ? valid : { msg: mobileInvalid, code: 'mobile-invalid-format' };
     },
     consent: (el) => (el.checked ? valid : { msg: consentRequired, code: 'consent-required' }),
+    marketingConsent: (el) => (el.checked ? valid : { msg: consentRequired, code: 'marketing-consent-required' }),
   };
 
   const fieldWrap = (el) => el.closest('.field');
@@ -1015,38 +1046,45 @@ export default async function decorate(block) {
     verificationToken = verified.data.verificationToken;
     track('otpVerified', { step: 'otp-verify', otpStatus: 'verified' });
 
-    // everything was collected on the first screen, so the lead is submitted now;
-    // the API still takes a single fullName as well as the parts
+    // everything was collected on the first screen, so the lead is submitted now, in the
+    // lead API's shape (the same on the home page and the dealer microsite, which only
+    // changes the form type and adds the dealer: register-form-booking.js)
     const q = new URLSearchParams(window.location.search);
     const firstName = fields.firstname.value.trim();
     const lastName = fields.lastname.value.trim();
     const email = fields.email.value.trim().toLowerCase();
     const pincode = fields.pincode?.value.trim() || '';
     const phone = phoneDigits();
+    // the second consent covers marketing, personalisation and advertising (event invites)
+    const marketing = !!fields.marketingConsent?.checked;
     track('formSubmitAttempt', { step: 'confirm' });
+    // attribution: current-page params win; persisted ones (scripts/utils/attribution.js)
+    // fill in whatever this page doesn't carry; only the values there are, flat
+    const utm = {
+      ...getAttribution(),
+      ...Object.fromEntries(
+        Object.entries(UTM_PARAMS)
+          .map(([k, param]) => [k, q.get(param) || ''])
+          .filter(([, v]) => v !== ''),
+      ),
+    };
     const created = await api('lead-submit', {
-      fullName: `${firstName} ${lastName}`.trim(),
-      firstName,
+      firstMiddleName: firstName,
       lastName,
       email,
-      pincode,
-      phone,
-      consent: {
-        granted: fields.consent.checked,
-        text: form.querySelector('.consent-text').textContent.trim(),
-      },
+      mobile: phone,
       verificationToken,
-      ...leadExtras(),
-      // current-page params win; persisted ones (scripts/utils/attribution.js)
-      // fill in whatever this page doesn't carry
-      utm: {
-        ...getAttribution(),
-        ...Object.fromEntries(
-          Object.entries(UTM_PARAMS)
-            .map(([k, param]) => [k, q.get(param) || ''])
-            .filter(([, v]) => v !== ''),
-        ),
-      },
+      pinCode: pincode,
+      formType: FORM_TYPE,
+      privacyConsent: fields.consent.checked,
+      marketingConsent: marketing,
+      personalization: marketing,
+      modelEventInvites: marketing,
+      ...Object.fromEntries(Object.entries(UTM_LEAD_KEYS)
+        .filter(([k]) => utm[k])
+        .map(([k, key]) => [key, utm[k]])),
+      // the Booking style's form type and dealer (register-form-booking.js) replace or add to these
+      ...(await leadExtras()),
     });
     verificationToken = null; // single-use, consumed by the server either way
     busy(false);

@@ -6,6 +6,12 @@ import decorateBrochure from '../../scripts/utils/brochure.js';
 // a paragraph holding only pictures (and spaces)
 const pictureOnly = (p) => !!p.querySelector('picture, img') && !p.textContent.trim();
 
+// an image whose asset was removed: the backend delivers <img src="about:error">
+const emptyPicture = (p) => {
+  const src = p?.querySelector('img')?.getAttribute('src') || '';
+  return !src || src.startsWith('about:');
+};
+
 /**
  * Sets a car's proportions (--car1-ar / --car2-ar) from its image.
  * @param {Element} section
@@ -36,6 +42,8 @@ const EASE = {
 const TIMELINE = 1.36;
 // how long .specs-arrive stays on: past the dimension lines' fade-in (spec-table-showcase.css)
 const ARRIVE_MS = 2000;
+// the gesture from the heading and the cars to the final view plays the reveal over this long
+const REVEAL_MS = 1200;
 
 /**
  * Scroll-driven reveal (prototype .fold--specs); not in Universal Editor or reduced motion.
@@ -158,10 +166,16 @@ function wireReveal(section) {
   // under 500px tall the section is a plain stack (spec-table-showcase.css): nothing plays there
   const pinned = window.matchMedia('(height >= 500px)');
   const runway = () => {
-    const total = section.offsetHeight - window.innerHeight;
+    // the layers' height (100svh), as the snap measures the runway: not innerHeight, which
+    // changes with a phone's toolbars and moved the reveal
+    const total = section.offsetHeight - first.offsetHeight;
     const p = total > 0 ? clamp(-section.getBoundingClientRect().top / total, 0, 1) : 0;
     return { total, p };
   };
+  // with the snap engine the reveal is two steps (stepped below), played on its own: the
+  // heading and the cars, then one gesture plays it to the end; without it the scroll scrubs it
+  let stepped = true;
+  let shown = 0;
   let frame = 0;
   const render = () => {
     frame = 0;
@@ -171,7 +185,7 @@ function wireReveal(section) {
       return;
     }
     const h = first.offsetHeight;
-    const t = runway().p * TIMELINE;
+    const t = (stepped ? shown : runway().p) * TIMELINE;
     const styles = new Map();
     tracks.forEach((track) => {
       const k = track.ease(clamp((t - track.at) / track.dur, 0, 1));
@@ -185,7 +199,9 @@ function wireReveal(section) {
         if (track.scale) style.scale = at(track.scale(h)).toFixed(4);
         if (track.fade) {
           const o = at(typeof track.fade === 'function' ? track.fade() : track.fade);
-          style.opacity = o.toFixed(3);
+          // never exactly 0: iOS Safari stops repainting a layer that reaches opacity 0 and
+          // keeps showing the frame before it (a ghost behind the groups); 0.001 draws nothing
+          style.opacity = Math.max(o, 0.001).toFixed(3);
           // still read by screen readers; only not clickable while mostly faded
           style.pointerEvents = o < 0.5 ? 'none' : '';
         }
@@ -204,9 +220,47 @@ function wireReveal(section) {
     if (!frame) frame = requestAnimationFrame(render);
   };
 
+  // the two steps: 0 the heading and the cars, 1 the final view; a gesture plays from one to
+  // the other (the tracks keep their own eases), and from the final view the page moves on
+  let target = 0;
+  let tween = 0;
+  const playTo = (to) => {
+    cancelAnimationFrame(tween);
+    target = to;
+    const from = shown;
+    const ms = REVEAL_MS * Math.abs(to - from);
+    const start = performance.now();
+    const tick = (now) => {
+      const k = ms ? Math.min(1, (now - start) / ms) : 1;
+      shown = from + (to - from) * k;
+      render();
+      tween = k < 1 ? requestAnimationFrame(tick) : 0;
+    };
+    tween = requestAnimationFrame(tick);
+  };
+  const jumpTo = (to) => {
+    cancelAnimationFrame(tween);
+    tween = 0;
+    target = to;
+    shown = to;
+    schedule();
+  };
+  const stepper = {
+    canScrollDown: () => pinned.matches && target < 1,
+    canScrollUp: () => pinned.matches && target > 0,
+    scrollDown: () => playTo(1),
+    scrollUp: () => playTo(0),
+    isBusy: () => tween !== 0,
+    destroy: () => cancelAnimationFrame(tween),
+  };
+
   // keyboard focus on a later part plays the reveal to its end
   section.addEventListener('focusin', (e) => {
     if (!pinned.matches || ![...later, links].some((el) => el?.contains(e.target))) return;
+    if (stepped) {
+      if (target < 1) playTo(1);
+      return;
+    }
     setTimeout(() => {
       const end = section.offsetTop + runway().total;
       if (Math.abs(window.scrollY - end) >= 1) window.scrollTo(0, end);
@@ -221,17 +275,42 @@ function wireReveal(section) {
   // arriving from above: dimension lines fade in after the car
   let arriveTimer;
   document.addEventListener('snap:start', ({ detail: { from, to } }) => {
-    if (to !== section || !from?.compareDocumentPosition || !pinned.matches) return;
+    if (to !== section || !from?.compareDocumentPosition) return;
     // eslint-disable-next-line no-bitwise
-    if (!(from.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING)) return;
+    const fromAbove = !!(from.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING);
+    // stepped: from above it opens on the heading and the cars, from below on the final view
+    if (stepped) jumpTo(fromAbove ? 0 : 1);
+    if (!fromAbove || !pinned.matches) return;
     clearTimeout(arriveTimer);
     section.classList.remove('specs-arrive');
     requestAnimationFrame(() => section.classList.add('specs-arrive'));
     arriveTimer = setTimeout(() => section.classList.remove('specs-arrive'), ARRIVE_MS);
   });
 
-  // before the snap engine starts, so it takes the section as a runway
-  section.classList.add('specs-scrub', 'scroll-runway', 'runway-stop');
+  // one screen, stepped by the snap engine; registered at once and kept only if the engine
+  // starts (`snap-active`, set before `snap-settled`), else the section is the scroll runway
+  section.classList.add('specs-scrub', 'specs-stepped');
+  const snap = import('../../scripts/section-snap.js').then((mod) => {
+    mod.registerBlockScroll(section, stepper);
+    return mod;
+  });
+  const root = document.documentElement;
+  const decide = () => {
+    if (!root.classList.contains('snap-settled')) return false;
+    if (!root.classList.contains('snap-active')) {
+      stepped = false;
+      stepper.destroy();
+      section.classList.remove('specs-stepped');
+      section.classList.add('scroll-runway', 'runway-stop');
+      snap.then((mod) => mod.unregisterBlockScroll(section)).catch(() => {});
+      schedule();
+    }
+    return true;
+  };
+  if (!decide()) {
+    const watch = new MutationObserver(() => { if (decide()) watch.disconnect(); });
+    watch.observe(root, { attributes: true, attributeFilter: ['class'] });
+  }
   window.addEventListener('resize', schedule, { passive: true });
   pinned.addEventListener('change', schedule);
   render();
@@ -298,14 +377,16 @@ export default function decorateShowcase(section) {
   }
   const pictures = paragraphs().filter(pictureOnly);
   let drawings;
-  if (pictures.length >= 4) {
+  const first = pictures[0]?.querySelector('img');
+  const ratio = Number(first?.getAttribute('width')) / Number(first?.getAttribute('height'));
+  if (pictures.length >= 4 || ratio < 1.6) {
     // two cars: the front view and its drawing, then the side view and its drawing
     section.classList.add('specs-two-cars');
     const [car1, dims1, car2, dims2] = pictures;
     drawings = [[car1, dims1], [car2, dims2]].map(([car, dims], i) => {
-      car.classList.add('specs-car', `specs-car-${i + 1}`);
-      dims.classList.add('specs-dims', `specs-dims-${i + 1}`);
-      carRatio(section, car, i + 1);
+      car?.classList.add('specs-car', `specs-car-${i + 1}`);
+      dims?.classList.add('specs-dims', `specs-dims-${i + 1}`);
+      if (car) carRatio(section, car, i + 1);
       return dims;
     });
   } else {
@@ -315,8 +396,13 @@ export default function decorateShowcase(section) {
     phone?.classList.add('specs-dims', 'specs-dims-phone');
     drawings = [desk, phone];
   }
+  // a removed image keeps its place, so the others stay where they belong, but shows nothing
+  pictures.filter(emptyPicture).forEach((p) => {
+    p.classList.add('specs-empty');
+    if (!editing) p.replaceChildren();
+  });
   // load drawings eagerly
-  drawings.forEach((p) => {
+  drawings.filter((p) => !p?.classList.contains('specs-empty')).forEach((p) => {
     const img = p?.querySelector('img');
     if (img) img.loading = 'eager';
     if (!editing) inlineDrawing(p);

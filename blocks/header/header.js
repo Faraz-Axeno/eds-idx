@@ -1,5 +1,5 @@
 import { getMetadata } from '../../scripts/aem.js';
-import { loadFragment } from '../fragment/fragment.js';
+import { findFragment } from '../../scripts/utils/hierarchy.js';
 import { token } from '../../scripts/utils/datalayer.js';
 
 // media query match that indicates mobile/tablet width
@@ -139,11 +139,10 @@ export default async function decorate(block) {
   if (hideHeader === 'true' || hideHeader === 'yes'
     || getMetadata('header').trim().toLowerCase() === 'hide') return;
 
-  // load nav as fragment
-  const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
-  const fragment = await loadFragment(navPath);
-  if (!fragment) return;
+  // the most specific nav in the page's hierarchy (scripts/utils/hierarchy.js)
+  const found = await findFragment('nav');
+  if (!found) return;
+  const { main: fragment, path: navPath } = found;
 
   // Data-layer component type. The header lives outside <main>, so the
   // central decorateDataLayerHooks() cannot tag it — set it on the block here.
@@ -184,12 +183,11 @@ export default async function decorate(block) {
     brandLink.className = '';
     brandLink.closest('.button-container').className = '';
   }
-  // the logo is authored as a plain image; link it to the home page (the
-  // folder the nav lives in) unless the author has already linked it
+  // an unlinked logo goes to the page the nav belongs to (/a/b/nav → /a/b)
   const logoPicture = navBrand?.querySelector('picture');
   if (logoPicture && !logoPicture.closest('a')) {
     const homeLink = document.createElement('a');
-    homeLink.href = navPath.replace(/[^/]*$/, '');
+    homeLink.href = navPath.replace(/\/[^/]*$/, '') || '/';
     logoPicture.replaceWith(homeLink);
     homeLink.append(logoPicture);
   }

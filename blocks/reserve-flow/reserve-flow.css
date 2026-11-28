@@ -1,0 +1,1134 @@
+/* full-bleed section (the journey's, or the status page's Reserve Status, which uses these
+   styles too), as tall as its step (not the snap's one screen: the block marks it No
+   Snap, reserve-flow.js); the site header floats over its top */
+main > .section:is(.reserve-flow-container, .reserve-status-container) {
+  height: auto;
+  min-height: 100svh;
+  margin: 0;
+  overflow: visible;
+  background: #000;
+
+  /* from the top: sections centre a step shorter than the screen */
+  justify-content: flex-start;
+}
+
+main > .section:is(.reserve-flow-container, .reserve-status-container) > :is(.reserve-flow-wrapper, .reserve-status-wrapper) {
+  max-width: none;
+
+  /* from the top (the sections' wrappers centre themselves with auto margins) */
+  margin: 0;
+  padding: 0;
+}
+
+.reserve-flow {
+  --rf-text: #fff;
+  --rf-muted: rgb(255 255 255 / 60%);
+  --rf-faint: rgb(255 255 255 / 30%);
+  --rf-field-bg: rgb(255 255 255 / 10%);
+  --rf-note: rgb(186 186 186 / 50%);
+  --rf-error: #ff4f69;
+  --rf-error-text: #fa6363;
+  --rf-error-bg: rgb(255 0 38 / 10%);
+  --rf-success: #3dd68c;
+  --rf-success-bg: rgb(61 214 140 / 10%);
+  --rf-warning: #ffbf47;
+  --rf-field-height: 50px;
+  --rf-field-radius: 12px;
+  --rf-field-padding: 0 20px;
+  --rf-field-font: 14px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  color: var(--rf-text);
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-medium);
+  -webkit-font-smoothing: antialiased;
+
+  /* the prototype's motion (reserve-flow.js animates arrivals, steps, the OTP drawer,
+     the dealer list and the Reserved screen) */
+  --rf-ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* expo.out */
+  --rf-ease-soft: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* power2.out */
+}
+
+.reserve-flow [hidden] {
+  display: none !important;
+}
+
+.reserve-flow p {
+  margin: 0;
+}
+
+.reserve-flow .reserve-flow-desktop-only {
+  display: none;
+}
+
+/* ---------------- media column ---------------- */
+.reserve-flow .reserve-flow-media {
+  position: relative;
+  height: 302px;
+  overflow: hidden;
+  background: #d9d9d9;
+}
+
+.reserve-flow .reserve-flow-car {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+
+  /* the car crossfades to the chosen exterior colour */
+  transition: opacity 0.6s var(--rf-ease-soft);
+}
+
+.reserve-flow .reserve-flow-car.is-active {
+  opacity: 1;
+}
+
+.reserve-flow .reserve-flow-car img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 62%;
+}
+
+.reserve-flow .reserve-flow-price {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 17px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 12px;
+  border: 1px solid rgb(255 255 255 / 5%);
+  border-radius: 12px;
+  background: rgb(0 0 0 / 40%);
+  backdrop-filter: blur(12px);
+}
+
+.reserve-flow .reserve-flow-price-label {
+  color: var(--rf-muted);
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.reserve-flow .reserve-flow-price-amount {
+  font-size: 30px;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+}
+
+.reserve-flow .reserve-flow-price-note {
+  display: none;
+  color: rgb(255 255 255 / 70%);
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  line-height: 20px;
+}
+
+/* ---------------- form column ---------------- */
+.reserve-flow .reserve-flow-panel {
+  padding: 36px 20px 48px;
+}
+
+.reserve-flow .reserve-flow-step {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.reserve-flow .reserve-flow-head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reserve-flow h2 {
+  margin: 0;
+  font-family: inherit; /* phones: New Science, as the mobile design; desktop: extended */
+  font-size: 20px;
+  font-weight: var(--font-weight-medium);
+  line-height: 26px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.reserve-flow h2:focus {
+  outline: none;
+}
+
+.reserve-flow h3 {
+  margin: 0;
+  font-family: var(--font-family-display); /* "Enter your OTP": extended on every screen */
+  font-size: 20px;
+  font-weight: var(--font-weight-medium);
+  line-height: 24px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.reserve-flow .reserve-flow-group {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.reserve-flow .reserve-flow-intro {
+  color: var(--rf-muted);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.reserve-flow .reserve-flow-legal {
+  color: var(--rf-note);
+  font-size: 12px;
+  font-weight: var(--font-weight-regular);
+  line-height: 16px;
+  letter-spacing: -0.02em;
+}
+
+.reserve-flow .reserve-flow-legal a,
+.reserve-flow .reserve-flow-consent a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* fields */
+.reserve-flow .reserve-flow-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.reserve-flow .reserve-flow-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reserve-flow .reserve-flow-row {
+  display: flex;
+  gap: 8px;
+}
+
+.reserve-flow .reserve-flow-row-name {
+  flex-direction: column;
+}
+
+.reserve-flow .reserve-flow-field {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.reserve-flow input[type="text"],
+.reserve-flow input[type="tel"],
+.reserve-flow input[type="email"],
+.reserve-flow input.reserve-flow-code,
+.reserve-flow .reserve-flow-select {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--rf-field-height);
+  margin: 0;
+  padding: var(--rf-field-padding);
+  border: 1px solid transparent;
+  border-radius: var(--rf-field-radius);
+  background: var(--rf-field-bg);
+  color: var(--rf-text);
+  font-family: inherit;
+  font-size: var(--rf-field-font);
+  font-weight: var(--font-weight-regular);
+  line-height: 18px;
+  transition: border-color 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reserve-flow input::placeholder {
+  color: rgb(255 255 255 / 40%);
+  opacity: 1;
+}
+
+.reserve-flow input:focus-visible {
+  outline: none;
+  border-color: rgb(255 255 255 / 60%);
+}
+
+/* fields lighten under the pointer and with the focus, as the prototype */
+.reserve-flow input:not(.reserve-flow-code):hover {
+  background-color: rgb(255 255 255 / 14%);
+}
+
+.reserve-flow input:not(.reserve-flow-code):focus {
+  background-color: rgb(255 255 255 / 16%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 35%);
+}
+
+.reserve-flow input.reserve-flow-code {
+  flex: 0 0 68px;
+  color: var(--rf-faint);
+  pointer-events: none;
+}
+
+.reserve-flow .reserve-flow-error {
+  display: none;
+  color: var(--rf-error-text);
+  font-size: 12px;
+  font-weight: var(--font-weight-regular);
+  line-height: 14px;
+}
+
+.reserve-flow .reserve-flow-field.has-error input {
+  border-color: var(--rf-error);
+  background: var(--rf-error-bg);
+}
+
+.reserve-flow .reserve-flow-field.has-error .reserve-flow-error {
+  display: block;
+}
+
+/* consent */
+.reserve-flow .reserve-flow-consent {
+  position: relative;
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+.reserve-flow .reserve-flow-consent input[type="checkbox"] {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  opacity: 0;
+}
+
+.reserve-flow .reserve-flow-check {
+  flex: 0 0 16px;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border: 1px solid rgb(255 255 255 / 60%);
+  border-radius: 3px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.reserve-flow .reserve-flow-consent input:checked + .reserve-flow-check {
+  border-color: #fff;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E") center / 12px no-repeat;
+}
+
+.reserve-flow .reserve-flow-consent input:focus-visible + .reserve-flow-check {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* buttons */
+.reserve-flow .reserve-flow-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.reserve-flow .reserve-flow-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 104px;
+  height: 48px;
+  margin: 0;
+  padding: 0 24px;
+  border: 1px solid #fff;
+  border-radius: 8px;
+  background: #fff;
+  color: #191919;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: var(--font-weight-regular);
+  line-height: 16px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+/* the hover glitch's letters (reserve-flow.js) keep their spaces */
+.reserve-flow .reserve-flow-btn > .reserve-flow-glitch {
+  white-space: pre;
+}
+
+.reserve-flow .reserve-flow-btn.is-outline {
+  background: transparent;
+  color: #fff;
+}
+
+.reserve-flow .reserve-flow-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.reserve-flow .reserve-flow-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.reserve-flow .reserve-flow-btn.is-busy {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.reserve-flow .reserve-flow-btn:hover:not(:disabled) {
+  background: var(--color-gray-10);
+}
+
+.reserve-flow .reserve-flow-btn.is-outline:hover:not(:disabled) {
+  background: rgb(255 255 255 / 10%);
+}
+
+/* ---------------- OTP ---------------- */
+.reserve-flow .reserve-flow-otp {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.reserve-flow .reserve-flow-otp .reserve-flow-head {
+  gap: 8px;
+}
+
+.reserve-flow .reserve-flow-otp-number {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.reserve-flow .reserve-flow-otp-number:hover,
+.reserve-flow .reserve-flow-otp[data-state="error"] .reserve-flow-otp-number,
+.reserve-flow .reserve-flow-otp[data-state="verified"] .reserve-flow-otp-number {
+  text-decoration: underline;
+}
+
+.reserve-flow .reserve-flow-otp-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reserve-flow .reserve-flow-otp-boxes {
+  display: flex;
+  gap: 8px;
+}
+
+.reserve-flow input.reserve-flow-otp-box {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 60px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.reserve-flow input.reserve-flow-otp-box::placeholder {
+  color: var(--rf-faint);
+}
+
+.reserve-flow input.reserve-flow-otp-box.is-error {
+  border-color: var(--rf-error);
+  background: var(--rf-error-bg);
+  color: var(--rf-error);
+}
+
+.reserve-flow input.reserve-flow-otp-box.is-verified {
+  border-color: var(--rf-success);
+  background: var(--rf-success-bg);
+}
+
+.reserve-flow .reserve-flow-otp-status {
+  color: var(--rf-muted);
+  font-size: 12px;
+  font-weight: var(--font-weight-regular);
+  line-height: 14px;
+}
+
+.reserve-flow .reserve-flow-otp[data-state="error"] .reserve-flow-otp-status {
+  color: var(--rf-error-text);
+}
+
+.reserve-flow .reserve-flow-verified {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--rf-success);
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+}
+
+.reserve-flow .reserve-flow-verified::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='%233dd68c' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 7.5l3 3 6-7'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.reserve-flow .reserve-flow-resend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  color: var(--rf-muted);
+  font-size: 12px;
+  font-weight: var(--font-weight-regular);
+  line-height: 14px;
+}
+
+.reserve-flow .reserve-flow-resend:empty {
+  display: none;
+}
+
+.reserve-flow .reserve-flow-link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+}
+
+.reserve-flow button.reserve-flow-link {
+  cursor: pointer;
+}
+
+/* ---------------- configure ---------------- */
+.reserve-flow .reserve-flow-config {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.reserve-flow .reserve-flow-label {
+  color: rgb(255 255 255 / 80%);
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: -0.02em;
+}
+
+.reserve-flow .reserve-flow-label.is-muted {
+  color: rgb(255 255 255 / 50%);
+}
+
+.reserve-flow .reserve-flow-variant,
+.reserve-flow .reserve-flow-colour {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reserve-flow .reserve-flow-colour[hidden],
+.reserve-flow .reserve-flow-swatch[hidden] {
+  display: none;
+}
+
+.reserve-flow .reserve-flow-variant {
+  gap: 10px;
+}
+
+.reserve-flow .reserve-flow-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--rf-field-bg);
+}
+
+.reserve-flow .reserve-flow-tabs [role="radio"] {
+  flex: 1 1 0;
+  height: 39px;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: rgb(255 255 255 / 60%);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  line-height: 14px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.3s var(--rf-ease-out), color 0.3s var(--rf-ease-out), opacity 0.3s var(--rf-ease-out);
+}
+
+.reserve-flow .reserve-flow-tabs [aria-checked="true"] {
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.reserve-flow .reserve-flow-tabs [role="radio"]:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.reserve-flow .reserve-flow-colours {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.reserve-flow .reserve-flow-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.reserve-flow .reserve-flow-swatch {
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 50%;
+  background: var(--swatch-1);
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+  transition: transform 0.25s var(--rf-ease-out), border-color 0.25s var(--rf-ease-out);
+}
+
+.reserve-flow .reserve-flow-swatch.is-split {
+  background: linear-gradient(135deg, var(--swatch-1) 50%, var(--swatch-2) 50%);
+}
+
+.reserve-flow .reserve-flow-swatch[aria-checked="true"] {
+  border: 2px solid #fff;
+}
+
+.reserve-flow .reserve-flow-swatch:hover {
+  transform: scale(1.07);
+}
+
+.reserve-flow .reserve-flow-swatch:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.reserve-flow .reserve-flow-location {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reserve-flow .reserve-flow-hint {
+  color: var(--rf-note);
+  font-size: 12px;
+  font-weight: var(--font-weight-regular);
+  line-height: 16px;
+  letter-spacing: -0.02em;
+}
+
+.reserve-flow .reserve-flow-hint:empty {
+  display: none;
+}
+
+/* dealer dropdown */
+.reserve-flow .reserve-flow-select {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  cursor: pointer;
+}
+
+.reserve-flow .reserve-flow-select:disabled {
+  cursor: not-allowed;
+}
+
+.reserve-flow .reserve-flow-select-value {
+  overflow: hidden;
+  color: rgb(255 255 255 / 95%);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reserve-flow .reserve-flow-select:disabled .reserve-flow-select-value {
+  color: rgb(255 255 255 / 40%);
+}
+
+.reserve-flow .reserve-flow-select:focus-visible {
+  outline: none;
+  border-color: rgb(255 255 255 / 60%);
+}
+
+.reserve-flow .reserve-flow-select:hover:not(:disabled) {
+  background-color: rgb(255 255 255 / 14%);
+}
+
+.reserve-flow .reserve-flow-chevron {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin: -4px 6px 0 0;
+  border-right: 1.4px solid rgb(255 255 255 / 70%);
+  border-bottom: 1.4px solid rgb(255 255 255 / 70%);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+  transition: transform 0.3s var(--rf-ease-out), margin 0.3s var(--rf-ease-out);
+}
+
+.reserve-flow .reserve-flow-select[aria-expanded="true"] .reserve-flow-chevron {
+  margin-top: 4px;
+  transform: rotate(-135deg);
+}
+
+.reserve-flow .reserve-flow-listbox {
+  position: absolute;
+  z-index: 3;
+  top: calc(var(--rf-field-height) + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  border-radius: 8px;
+  background: #212121;
+  box-shadow: 0 16px 40px rgb(0 0 0 / 50%);
+  list-style: none;
+}
+
+.reserve-flow .reserve-flow-listbox:focus {
+  outline: none;
+}
+
+.reserve-flow .reserve-flow-listbox [role="option"] {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 6px;
+  color: rgb(255 255 255 / 95%);
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.reserve-flow .reserve-flow-listbox [role="option"]:hover,
+.reserve-flow .reserve-flow-listbox [role="option"]:focus,
+.reserve-flow .reserve-flow-listbox [aria-selected="true"] {
+  outline: none;
+  background: rgb(255 255 255 / 8%);
+}
+
+.reserve-flow .reserve-flow-distance {
+  flex: 0 0 auto;
+  color: rgb(255 255 255 / 55%);
+}
+
+.reserve-flow [data-step="configure"] .reserve-flow-actions .reserve-flow-btn {
+  flex: 1 1 auto;
+}
+
+.reserve-flow [data-step="configure"] .reserve-flow-legal {
+  margin-top: 28px;
+}
+
+.reserve-flow .reserve-flow-alert {
+  margin-top: -12px;
+  color: var(--rf-error-text);
+  font-size: 12px;
+  font-weight: var(--font-weight-regular);
+  line-height: 16px;
+}
+
+/* ---------------- payment status ---------------- */
+.reserve-flow .reserve-flow-status {
+  gap: 24px;
+}
+
+.reserve-flow .reserve-flow-status .reserve-flow-head {
+  gap: 16px;
+}
+
+.reserve-flow .reserve-flow-tag {
+  align-self: flex-start;
+  margin-bottom: 4px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: var(--font-weight-regular);
+  line-height: 11px;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.reserve-flow .reserve-flow-tag.is-warning {
+  background: rgb(255 191 71 / 20%);
+  color: var(--rf-warning);
+}
+
+.reserve-flow .reserve-flow-tag.is-error {
+  background: rgb(255 79 105 / 20%);
+  color: var(--rf-error);
+}
+
+.reserve-flow .reserve-flow-status .reserve-flow-legal {
+  margin-top: 24px;
+}
+
+/* ---------------- reserved ---------------- */
+.reserve-flow .reserve-flow-reserved {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 815px;
+  padding: 0 0 64px;
+  overflow: hidden;
+  background: #000;
+  text-align: center;
+}
+
+.reserve-flow .reserve-flow-reserved-bg {
+  position: absolute;
+  top: 69px;
+  left: 0;
+  right: 0;
+  height: 458px;
+}
+
+.reserve-flow .reserve-flow-reserved-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reserve-flow .reserve-flow-reserved-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-top: 176px;
+  font-size: 48px;
+}
+
+.reserve-flow .reserve-flow-reserved h2 {
+  font-family: var(--font-family-display); /* "Reserved" in the extended face on every screen */
+  font-size: 1em;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  background: linear-gradient(149deg, #f9d68f 0%, rgb(209 174 78 / 56%) 16%, rgb(108 88 40 / 80%) 75%, rgb(83 66 30 / 86%) 90%, #180f08 100%);
+  background-clip: text;
+  color: transparent;
+  opacity: 0.67;
+}
+
+.reserve-flow .reserve-flow-reserved-car {
+  display: block;
+  width: 106%;
+  max-width: 965px;
+  margin-top: 0.75em;
+}
+
+.reserve-flow .reserve-flow-reserved-car img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.reserve-flow .reserve-flow-reserved-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 444px;
+  margin-top: 174px;
+  padding: 0 20px;
+}
+
+.reserve-flow .reserve-flow-reserved h3 {
+  color: #e6e6e6;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.01em;
+}
+
+.reserve-flow .reserve-flow-reserved-text p {
+  color: #666;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.reserve-flow .reserve-flow-highlight {
+  color: #e6e6e6;
+}
+
+/* ================= tablet / desktop ================= */
+@media (width >= 900px) {
+  .reserve-flow {
+    --rf-field-height: 48px;
+    --rf-field-radius: 8px;
+    --rf-field-padding: 0 15px;
+    --rf-field-font: 12px;
+
+    display: grid;
+    grid-template-columns: 46.8% 1fr;
+    align-items: start;
+    min-height: 100dvh;
+  }
+
+  .reserve-flow .reserve-flow-desktop-only {
+    display: inline;
+  }
+
+  .reserve-flow .reserve-flow-mobile-only {
+    display: none;
+  }
+
+  .reserve-flow .reserve-flow-media {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    min-height: 620px;
+  }
+
+  .reserve-flow .reserve-flow-car img {
+    object-position: 50% 50%;
+  }
+
+  .reserve-flow .reserve-flow-price {
+    left: 6%;
+    right: 6%;
+
+    /* stay clear of the part of the media column pushed below the fold by the header */
+    bottom: calc(36px + var(--rf-header-offset, 0px));
+    max-width: 527px;
+    padding: 20px;
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    transition: opacity 0.5s var(--rf-ease-out);
+  }
+
+  .reserve-flow .reserve-flow-price-label {
+    font-size: 10px;
+    line-height: 12px;
+    letter-spacing: 0.08em;
+  }
+
+  .reserve-flow .reserve-flow-price-amount {
+    font-size: 36px;
+    line-height: 43px;
+  }
+
+  .reserve-flow .reserve-flow-price-note {
+    display: block;
+  }
+
+  /* the price card steps back on Build your Combat and the payment screens, as the
+     prototype (phones keep it: it is part of the image band there) */
+  .reserve-flow:is([data-step="configure"], [data-step="pending"], [data-step="failed"]) .reserve-flow-price {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .reserve-flow .reserve-flow-panel {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+
+    /* the title 32px under the floating header (110px on the design's 1280 × 720 frame) */
+    padding: calc(var(--nav-offset, 78px) + 32px) 48px 108px 12%;
+  }
+
+  .reserve-flow .reserve-flow-step {
+    max-width: 511px;
+    gap: 44px;
+  }
+
+  .reserve-flow .reserve-flow-group {
+    gap: 24px;
+  }
+
+  .reserve-flow .reserve-flow-otp {
+    margin-top: 12px;
+  }
+
+  .reserve-flow h2 {
+    font-size: 30px;
+    line-height: 36px;
+  }
+
+  /* desktop: the step titles in the site's extended New Science, as the desktop design */
+  .reserve-flow :is(h2, h3) {
+    font-family: var(--font-family-display);
+  }
+
+  .reserve-flow .reserve-flow-head {
+    padding-right: 82px;
+  }
+
+  /* "Build your Combat" on one line, as the design (the 82px keeps only Step 1's intro short) */
+  .reserve-flow [data-step="configure"] .reserve-flow-head {
+    padding-right: 0;
+  }
+
+  .reserve-flow .reserve-flow-intro {
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .reserve-flow .reserve-flow-otp .reserve-flow-intro {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .reserve-flow .reserve-flow-otp .reserve-flow-head {
+    gap: 12px;
+  }
+
+  .reserve-flow .reserve-flow-form {
+    gap: 24px;
+  }
+
+  .reserve-flow .reserve-flow-fields {
+    gap: 12px;
+  }
+
+  .reserve-flow .reserve-flow-row {
+    gap: 12px;
+  }
+
+  .reserve-flow .reserve-flow-row-name {
+    flex-direction: row;
+  }
+
+  .reserve-flow input.reserve-flow-code {
+    flex-basis: 56px;
+  }
+
+  .reserve-flow .reserve-flow-consent {
+    font-size: 11px;
+    line-height: 15px;
+  }
+
+  .reserve-flow .reserve-flow-form .reserve-flow-actions {
+    margin-top: 12px;
+  }
+
+  .reserve-flow .reserve-flow-btn {
+    padding: 0 32px;
+  }
+
+  .reserve-flow .reserve-flow-otp-boxes {
+    gap: 8px;
+  }
+
+  .reserve-flow input.reserve-flow-otp-box {
+    flex: 0 0 67px;
+  }
+
+  /* configure */
+  .reserve-flow [data-step="configure"] {
+    gap: 32px;
+  }
+
+  .reserve-flow .reserve-flow-tabs {
+    align-self: flex-start;
+  }
+
+  .reserve-flow .reserve-flow-tabs [role="radio"] {
+    flex: 0 0 160px;
+  }
+
+  .reserve-flow .reserve-flow-colours {
+    flex-flow: row wrap;
+    gap: 36px 48px;
+  }
+
+  .reserve-flow .reserve-flow-colour {
+    gap: 10px;
+  }
+
+  .reserve-flow [data-step="configure"] .reserve-flow-actions .reserve-flow-btn {
+    flex: 0 0 auto;
+  }
+
+  .reserve-flow [data-step="configure"] .reserve-flow-legal {
+    display: none;
+  }
+
+  /* status: vertically centred in the column */
+  .reserve-flow .reserve-flow-panel:has(.reserve-flow-status:not([hidden])) {
+    justify-content: center;
+    padding-top: 0;
+  }
+
+  .reserve-flow .reserve-flow-status .reserve-flow-head {
+    gap: 16px;
+  }
+
+  .reserve-flow .reserve-flow-status .reserve-flow-legal {
+    margin-top: 24px;
+  }
+
+  /* reserved: full-bleed across both columns */
+  .reserve-flow .reserve-flow-reserved {
+    grid-column: 1 / -1;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 0 0 48px;
+  }
+
+  .reserve-flow .reserve-flow-reserved-bg {
+    inset: 0;
+    height: auto;
+  }
+
+  .reserve-flow .reserve-flow-reserved-hero {
+    padding-top: 40px;
+    font-size: min(13vw, 168px);
+  }
+
+  .reserve-flow .reserve-flow-reserved h2 {
+    background-image: linear-gradient(100deg, #f9d68f 0%, rgb(209 174 78 / 75%) 25%, rgb(108 88 40 / 80%) 65%, rgb(56 42 20 / 90%) 100%);
+    opacity: 0.85;
+  }
+
+  .reserve-flow .reserve-flow-reserved-car {
+    width: 75%;
+    margin-top: -0.3em;
+  }
+
+  .reserve-flow .reserve-flow-reserved-text {
+    margin-top: -8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reserve-flow :is(.reserve-flow-car, .reserve-flow-swatch, .reserve-flow-chevron, .reserve-flow-price) {
+    transition: none;
+  }
+
+  .reserve-flow .reserve-flow-swatch:hover {
+    transform: none;
+  }
+}

@@ -84,6 +84,11 @@
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
+    scrollbar-width: none; /* still scrolls, no bar */
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     /* snapping sections only: No Snap ones, and one followed by a No Snap section (the snap
        leaves that boundary to native scroll), must let the scroll carry on into the page */
@@ -204,6 +209,15 @@
     .field {
       flex: 1 1 0;
       min-width: 0;
+    }
+  }
+
+  /* the second consent, 10 under the first (with the column's gap of 8, or 16 from 900px) */
+  .field:has(.consent) + .field:has(.consent) {
+    margin-top: calc(2 * var(--rf-u));
+
+    @media (width >= 900px) {
+      margin-top: calc(-6 * var(--rf-u));
     }
   }
 

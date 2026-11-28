@@ -1,0 +1,77 @@
+{
+  "definitions": [
+    {
+      "title": "Dealer Locator",
+      "id": "dealer-locator",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Dealer Locator",
+              "model": "dealer-locator",
+              "finderHeading": "<p>The JSW Motors network</p><h2>Find your place.</h2><p>Choose a state, city, and pincode to explore the JSW Motors network near you.</p>",
+              "resultsHeading": "<p>JSW Motors network</p><h2>Closer to what's next.</h2><p>Reference listings</p>",
+              "pageSize": 4
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "dealer-locator",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "finderRule",
+          "label": "Top Line (Optional)",
+          "description": "The small line above the finder, its two ends split by a |, e.g. 01 / Find your experience | JSW Motors India."
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "finderHeading",
+          "label": "Finder Heading",
+          "description": "A short line before the heading (the eyebrow, e.g. The JSW Motors network), the heading (e.g. Find your place.), then a paragraph beside it (e.g. Choose a state, city, and pincode to explore the JSW Motors network near you.)."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "finderHint",
+          "label": "Finder Note (Optional)",
+          "description": "The small line under the filters, its parts split by a —, e.g. Filter by location — State · City · Pincode."
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "resultsHeading",
+          "label": "Results Heading",
+          "description": "A short line before the heading (the eyebrow, e.g. JSW Motors network), the heading (e.g. Closer to what's next.), then a paragraph: the words beside the dealer count (e.g. Reference listings)."
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "closingLine",
+          "label": "Closing Line (Optional)",
+          "description": "The small line under the results: a paragraph on the left (e.g. JSW Motors · Network preview) and a link on the right (e.g. Mobility, reimagined)."
+        },
+        {
+          "component": "number",
+          "valueType": "number",
+          "name": "pageSize",
+          "label": "Dealers per Page",
+          "description": "How many dealer cards each page of results shows (two per row on desktop).",
+          "value": 4,
+          "validation": {
+            "numberMin": 2,
+            "numberMax": 24
+          }
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

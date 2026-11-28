@@ -1,0 +1,3 @@
+/* Reserve Status uses the Reserve Flow's styles (the block carries the reserve-flow class,
+   reserve-status.js) */
+@import url("../reserve-flow/reserve-flow.css");

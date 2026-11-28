@@ -46,6 +46,11 @@ const TITLE_LINES = 2;
 const TABLET = window.matchMedia('(width >= 600px) and (width < 900px)');
 const TABLET_TEXT_LINES = 3;
 const TITLE_MIN = 18;
+// small phones (narrow, or short like a 375×667 iPhone SE; matches the CSS): titles shrink
+// further, to fit on one line where they can, so the card text below them isn't cut
+const SMALL = window.matchMedia('(width < 375px), (height < 760px) and (width < 600px)');
+const SMALL_TITLE_LINES = 1;
+const SMALL_TITLE_MIN = 13;
 // times (and most share of the card) a stacked card takes a line's room from its image
 const GROW_TRIES = 3;
 const GROW_MAX = 0.1;
@@ -101,12 +106,14 @@ function fitTitles(block) {
     if (px) title.style.fontSize = `${px}px`;
     else title.style.removeProperty('font-size');
   });
-  setSize(TITLE_MIN);
-  const fitting = titles.filter((title) => lines(title) <= TITLE_LINES);
+  const maxLines = SMALL.matches ? SMALL_TITLE_LINES : TITLE_LINES;
+  const min = SMALL.matches ? SMALL_TITLE_MIN : TITLE_MIN;
+  setSize(min);
+  const fitting = titles.filter((title) => lines(title) <= maxLines);
   setSize(0);
   const start = parseFloat(getComputedStyle(titles[0]).fontSize);
-  const tooLong = () => fitting.some((title) => lines(title) > TITLE_LINES);
-  for (let size = start - 1; size >= TITLE_MIN && tooLong(); size -= 1) setSize(size);
+  const tooLong = () => fitting.some((title) => lines(title) > maxLines);
+  for (let size = start - 1; size >= min && tooLong(); size -= 1) setSize(size);
 }
 
 /** Ends the text before a part left out whole with an ellipsis, so the cut shows */

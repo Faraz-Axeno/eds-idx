@@ -121,7 +121,7 @@ main > .section.events-container {
      together with the section snap. */
   & .events-title-text {
     display: inline-block;
-    transform: translateY(calc(-190 * var(--ev-u) * (1 - var(--enter-title, var(--enter, 1)))));
+    transform: translateY(calc(-1 * max(190 * var(--ev-u), 100% + 0.2em) * (1 - var(--enter-title, var(--enter, 1)))));
   }
 
   & .events-stage {

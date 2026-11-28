@@ -1,0 +1,223 @@
+{
+  "definitions": [
+    {
+      "title": "Reserve Flow",
+      "id": "reserve-flow",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Reserve Flow",
+              "model": "reserve-flow",
+              "filter": "reserve-flow"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Reserve Content",
+      "id": "reserve-flow-content",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Reserve Content",
+              "model": "reserve-flow-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Reserve Option",
+      "id": "reserve-flow-option",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Reserve Option",
+              "model": "reserve-flow-option"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "reserve-flow",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Car Image",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "priceLabel",
+          "label": "Price Label",
+          "value": "Reservation amount"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "price",
+          "label": "Price",
+          "value": "₹10,000"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "priceNote",
+          "label": "Price Note"
+        }
+      ]
+    },
+    {
+      "id": "reserve-flow-content",
+      "fields": [
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "key",
+          "label": "Content For",
+          "value": "details",
+          "options": [
+            {
+              "name": "Step 1 – heading and intro",
+              "value": "details"
+            },
+            {
+              "name": "Step 1 – consent text",
+              "value": "consent"
+            },
+            {
+              "name": "Data-protection notice",
+              "value": "legal"
+            },
+            {
+              "name": "Step 2 – heading and variant label",
+              "value": "configure"
+            },
+            {
+              "name": "Payment pending",
+              "value": "pending"
+            },
+            {
+              "name": "Payment failed",
+              "value": "failed"
+            },
+            {
+              "name": "Reserved screen (text + background)",
+              "value": "reserved"
+            },
+            {
+              "name": "Reserved screen – car image",
+              "value": "reserved-car"
+            },
+            {
+              "name": "Price label on mobile",
+              "value": "price-mobile"
+            }
+          ]
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "text",
+          "label": "Text"
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "contentImage",
+          "label": "Image",
+          "multi": false
+        }
+      ]
+    },
+    {
+      "id": "reserve-flow-option",
+      "fields": [
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "type",
+          "label": "Option Type",
+          "value": "exterior",
+          "options": [
+            {
+              "name": "Variant",
+              "value": "variant"
+            },
+            {
+              "name": "Exterior Colour",
+              "value": "exterior"
+            },
+            {
+              "name": "Interior Colour",
+              "value": "interior"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "optionName",
+          "label": "Name"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "swatch",
+          "label": "Swatch Colour(s) (one or two hex values)"
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "optionImage",
+          "label": "Car Image for this Colour",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "code",
+          "label": "Code",
+          "description": "Code sent with the reservation to identify this variant or colour (e.g. NG01). Shoppers see the name, not the code."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "exteriors",
+          "label": "Available with Exterior Colour(s)",
+          "description": "Interior colours only. Exterior colour names or codes this interior is offered with, separated by commas (e.g. Nilgiri Green, Arakan Black). Leave empty to offer it with every exterior colour.",
+          "condition": {
+            "===": [
+              {
+                "var": "type"
+              },
+              "interior"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "reserve-flow",
+      "components": [
+        "reserve-flow-content",
+        "reserve-flow-option"
+      ]
+    }
+  ]
+}

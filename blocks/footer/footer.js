@@ -1,12 +1,13 @@
 import {
   getMetadata, decorateIcons, createOptimizedPicture, loadCSS,
 } from '../../scripts/aem.js';
-import { loadFragment } from '../fragment/fragment.js';
+import { findFragment } from '../../scripts/utils/hierarchy.js';
 import {
   DEFAULT_CTA, socialCta, legalCta, token,
 } from '../../scripts/utils/datalayer.js';
 import { decorateExternalLinks } from '../../scripts/scripts.js';
 import decorateGlitch from '../../scripts/utils/glitch.js';
+import { getPageDealer } from '../../scripts/utils/dealer-api.js';
 
 // accessible-name labels per platform key (used when the link has no visible text)
 const SOCIAL_LABELS = {
@@ -395,6 +396,25 @@ function visitFold() {
   return last?.querySelector('.columns.reach-us.photo') ? last : null;
 }
 
+// Google Maps links in the footer (the dealer footer's Open in maps) go to the dealer's exact
+// point when the page has one: the Map Coordinates of its Get in touch block (register-form
+// Booking sets data-map-point). Without coordinates the authored link stays as it is.
+function pointMapLinks(footer, point) {
+  const mapPoint = point || document.querySelector('main .register-form[data-map-point]')?.dataset.mapPoint;
+  if (!mapPoint) return;
+  footer.querySelectorAll('a[href]').forEach((link) => {
+    let url;
+    try {
+      url = new URL(link.href);
+    } catch {
+      return;
+    }
+    const google = /(^|\.)google\.[a-z.]+$/.test(url.hostname) && url.pathname.startsWith('/maps');
+    if (!google && !/^maps\.(google\.[a-z.]+|app\.goo\.gl)$/.test(url.hostname)) return;
+    link.href = `https://www.google.com/maps/search/?api=1&query=${mapPoint}`;
+  });
+}
+
 // The Dealer footer inside the Visit fold, as the dealer prototypes have it (#garage): the
 // built block moves into the fold's .reach-us-photo-footer container, its parts marked to come
 // in with the Visit content (.reach-us-photo-item, columns-reach-us-photo.js), and the site
@@ -420,20 +440,8 @@ function mergeIntoFold(block, inner) {
 
 /** Loads and decorates the footer. */
 export default async function decorate(block) {
-  // the page's own footer (metadata) first, then the site's /footer
-  const footerMeta = getMetadata('footer');
-  const paths = [
-    footerMeta && new URL(footerMeta, window.location).pathname,
-    '/footer',
-  ].filter((path, index, all) => path && all.indexOf(path) === index);
-
-  let fragment;
-  // eslint-disable-next-line no-restricted-syntax
-  for (const path of paths) {
-    // eslint-disable-next-line no-await-in-loop
-    fragment = await loadFragment(path);
-    if (fragment) break;
-  }
+  // the most specific footer in the page's hierarchy (scripts/utils/hierarchy.js)
+  const fragment = (await findFragment('footer'))?.main;
   // no footer content anywhere: leave the block empty rather than fail
   if (!fragment) return;
 
@@ -494,6 +502,12 @@ export default async function decorate(block) {
   if (dealer) {
     block.classList.add('dealer');
     await loadCSS(`${window.hlx.codeBasePath}/blocks/footer/footer-dealer.css`);
+  }
+  // Glass (footer-glass.css): Footer Style Glass, or unset with no logo and no link columns
+  const glass = footerStyle ? footerStyle === 'glass' : !columns && !logoImg;
+  if (glass) {
+    block.classList.add('glass');
+    await loadCSS(`${window.hlx.codeBasePath}/blocks/footer/footer-glass.css`);
   }
   const explore = !!(exploreSection || logoImg);
   if (explore) block.classList.add('explore');
@@ -652,6 +666,11 @@ export default async function decorate(block) {
   footer.append(inner);
   // social links (facebook, instagram, x, linkedin) open in a new tab
   decorateExternalLinks(footer);
+  pointMapLinks(footer);
+  // the Dealer API's point, once it answers (dealer pages only)
+  getPageDealer().then((info) => {
+    if (info) pointMapLinks(footer, info.point || encodeURIComponent(info.full));
+  });
   block.append(footer);
 
   // the Dealer footer of a page that ends on the Visit fold goes into that fold

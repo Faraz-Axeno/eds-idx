@@ -158,6 +158,8 @@ function wireCtaGlitch(block) {
  * allowed (checked at each click); otherwise, and for anything else that opens an item (find in
  * page, a link), the details open and close at once as everywhere else.
  */
+// how long an item takes to close (Combat motion)
+const CLOSE_MS = 400;
 const COMBAT_EASE = {
   power2In: 'cubic-bezier(0.32, 0, 0.67, 0)',
   power3Out: 'cubic-bezier(0.25, 1, 0.5, 1)',
@@ -181,7 +183,11 @@ function keepInView(details) {
     }
   }
   const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
-  const until = performance.now() + 900;
+  // follow it only once another item has closed (both at once shook the list)
+  const closing = [...details.parentElement.children]
+    .some((item) => item !== details && item.classList?.contains('is-closing'));
+  const wait = closing && smooth ? CLOSE_MS + 20 : 0;
+  const until = performance.now() + wait + 900;
   let cancelled = false;
   const cancel = () => { cancelled = true; };
   const stops = [[window, 'wheel'], [window, 'touchstart'], [document, 'snap:start']];
@@ -213,7 +219,7 @@ function keepInView(details) {
     }
     requestAnimationFrame(step);
   };
-  requestAnimationFrame(step);
+  setTimeout(() => requestAnimationFrame(step), wait);
 }
 
 /**
@@ -248,7 +254,7 @@ function wireCombatMotion(block, items) {
     const to = open ? details.offsetHeight : summary.offsetHeight + borders;
     details.classList.add('is-animating');
     const size = details.animate([{ height: `${height}px` }, { height: `${to}px` }], {
-      duration: open ? 550 : 400, easing: COMBAT_EASE.power3InOut,
+      duration: open ? 550 : CLOSE_MS, easing: COMBAT_EASE.power3InOut,
     });
     const anims = [size];
     if (answer) {
@@ -375,27 +381,79 @@ function wireFaqRunway(section) {
     arriving = false;
   });
 
-  let release = 0;
+  // while items close the section keeps its height, then the page glides to the new end once
+  const SETTLE_MS = 120;
+  const GLIDE_MS = 350;
   let lastHeight = 0;
-  const fit = new ResizeObserver(() => {
-    if (!document.documentElement.classList.contains('snap-active')) return;
-    const top = section.offsetTop;
-    const before = section.offsetHeight;
+  let settle = 0;
+  let glide = 0;
+  let holding = false;
+  const release = () => {
+    holding = false;
+    section.style.minHeight = '';
+  };
+  // the section's height without the hold
+  const naturalHeight = () => {
     const held = section.style.minHeight;
     section.style.minHeight = '';
     const height = section.offsetHeight;
-    const shrank = height < lastHeight - 0.5;
-    lastHeight = height;
-    const end = Math.max(top, top + height - screenHeight());
-    const y = window.scrollY;
-    if (snapping || !shrank || y <= end || y >= top + before) {
-      section.style.minHeight = held;
+    section.style.minHeight = held;
+    return height;
+  };
+  const glideTo = (y, done) => {
+    cancelAnimationFrame(glide);
+    const start = window.scrollY;
+    const by = y - start;
+    const begun = performance.now();
+    const step = (now) => {
+      if (snapping) {
+        glide = 0;
+        done();
+        return;
+      }
+      // never below 0 (a frame can predate the start)
+      const t = Math.min(1, Math.max(0, (now - begun) / GLIDE_MS));
+      window.scrollTo({ top: start + by * (1 - (1 - t) ** 3), behavior: 'instant' });
+      if (t < 1) {
+        glide = requestAnimationFrame(step);
+      } else {
+        glide = 0;
+        done();
+      }
+    };
+    glide = requestAnimationFrame(step);
+  };
+  const settleDown = () => {
+    const top = section.offsetTop;
+    const end = Math.max(top, top + naturalHeight() - screenHeight());
+    if (snapping || window.scrollY <= end + 0.5) {
+      release();
       return;
     }
-    window.scrollTo({ top: end, behavior: 'instant' });
-    section.style.minHeight = `${height}px`;
-    clearTimeout(release);
-    release = setTimeout(() => { section.style.minHeight = ''; }, 150);
+    glideTo(end, release);
+  };
+  const fit = new ResizeObserver(() => {
+    if (!document.documentElement.classList.contains('snap-active') || glide) return;
+    const top = section.offsetTop;
+    const shown = section.offsetHeight;
+    const height = naturalHeight();
+    const before = lastHeight;
+    const shrank = height < before - 0.5;
+    lastHeight = height;
+    if (holding) {
+      // still closing
+      clearTimeout(settle);
+      settle = setTimeout(settleDown, SETTLE_MS);
+      return;
+    }
+    const end = Math.max(top, top + height - screenHeight());
+    const y = window.scrollY;
+    if (snapping || !shrank || y <= end || y >= top + shown) return;
+    // hold the height it had before the close
+    holding = true;
+    section.style.minHeight = `${Math.max(shown, before)}px`;
+    clearTimeout(settle);
+    settle = setTimeout(settleDown, SETTLE_MS);
   });
   [section, ...section.children].forEach((el) => fit.observe(el));
 

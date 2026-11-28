@@ -109,6 +109,11 @@
     outline-offset: 2px;
   }
 
+  /* the links, brochure and buttons; a row of their own only on phones */
+  .floater-items {
+    display: contents;
+  }
+
   /* brochure popup */
   .floater-brochure {
     position: relative;
@@ -211,6 +216,53 @@
     --button-font-size: 10.5px;
     --button-padding: 0 12px;
     --button-radius: 12px;
+
+    /* items that don't fit swipe sideways (wireTrack) */
+    .floater-items {
+      display: flex;
+      flex: 1 1 auto;
+      align-items: center;
+      justify-content: inherit;
+      gap: inherit;
+      min-width: 0;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      > * {
+        flex: none;
+      }
+    }
+
+    /* a fade on each side with more; none while the brochure popup is open, as it would hide it */
+    .floater-items:not(:has(.is-open)) {
+      &.has-more-end {
+        mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+      }
+
+      &.has-more-start {
+        mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent);
+      }
+
+      &.has-more-start.has-more-end {
+        mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+      }
+    }
+
+    /* the popup sits on the bar, so the swiping row doesn't clip it */
+    .floater-brochure {
+      position: static;
+    }
+
+    /* room for the first link's -8px margin */
+    &:not(.dark, .dark-translucent) .floater-items {
+      margin-inline-start: -8px;
+      padding-inline-start: 8px;
+    }
   }
 
   &:is(.dark, .dark-translucent) {
@@ -336,13 +388,19 @@
       }
 
       /* Name + Text + one button */
-      &:has(.floater-text):not(:has(.floater-link, .floater-brochure)) .floater-intro {
-        display: flex;
-        flex: 0 1 auto;
-        flex-wrap: wrap;
-        gap: 2px 8px;
-        min-width: 0;
-        padding-left: 12px;
+      &:has(.floater-text):not(:has(.floater-link, .floater-brochure)) {
+        .floater-intro {
+          display: flex;
+          flex: 0 1 auto;
+          flex-wrap: wrap;
+          gap: 2px 8px;
+          min-width: 0;
+          padding-left: 12px;
+        }
+
+        .floater-items {
+          justify-content: flex-end;
+        }
       }
     }
   }

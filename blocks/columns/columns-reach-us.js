@@ -17,6 +17,8 @@
  */
 
 import { token } from '../../scripts/utils/datalayer.js';
+import { inEditor } from '../../scripts/utils/common.js';
+import { getPageDealer } from '../../scripts/utils/dealer-api.js';
 
 const LOCATION = 'reach-us';
 const NEW_TAB_HINT = '(opens in a new tab)';
@@ -129,4 +131,12 @@ export default function decorate(block) {
   });
 
   hours?.classList.add('reach-us-foot');
+
+  // the Address column's first line from the Dealer API (dealer pages only), once it answers
+  const heading = [...block.querySelectorAll('h1, h2, h3, h4, h5, h6')]
+    .find((h) => /^address$/i.test(h.textContent.trim()));
+  const line = heading?.nextElementSibling?.matches('p') ? heading.nextElementSibling : null;
+  if (line && !inEditor()) {
+    getPageDealer().then((dealer) => { if (dealer?.full) line.textContent = dealer.full; });
+  }
 }
