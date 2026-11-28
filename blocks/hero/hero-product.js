@@ -15,7 +15,8 @@
 import {
   createLoopVideo, createPlayBadge, findVideoLink, openFilm, playWhileVisible,
 } from '../../scripts/utils/film.js';
-import decorateBrochure from '../../scripts/utils/brochure.js';
+import { loadCSS } from '../../scripts/aem.js';
+import decorateReserve from '../../scripts/section-reserve.js';
 import { inEditor } from '../../scripts/utils/common.js';
 
 const isPictureLine = (el) => el?.tagName === 'P' && !!el.querySelector('img')
@@ -110,6 +111,34 @@ function buildFilmCard(film, thumb, title, name, { moveInstrumentation, optimize
   return card;
 }
 
+// the price line's most characters, spaces and the footnote mark included
+const PRICE_MAX = 31;
+
+// cuts the price line to PRICE_MAX characters, ending in … (not in Universal Editor)
+function limitPrice(line) {
+  let left = PRICE_MAX;
+  const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+  const texts = [];
+  while (walker.nextNode()) texts.push(walker.currentNode);
+  let cut = false;
+  texts.forEach((node) => {
+    const text = node.textContent.replace(/\s+/g, ' ');
+    if (cut || left <= 0) {
+      cut = cut || !!text.trim();
+      node.remove();
+      return;
+    }
+    if (text.length > left) {
+      node.textContent = `${text.slice(0, left).trimEnd()}…`;
+      cut = true;
+    }
+    left -= text.length;
+  });
+  line.querySelectorAll('strong, b, em, i, span').forEach((el) => {
+    if (!el.textContent) el.remove();
+  });
+}
+
 /**
  * Sets the footnote mark after the price amount ("₹XX,XXX*") as a superscript, as on the
  * launch page. Not in Universal Editor, where the Text is edited as authored.
@@ -128,16 +157,23 @@ function raiseFootnoteMark(amount) {
 }
 
 /**
- * The page's end bar (hero-product.css): the last section, default content only (a heading,
- * the brochure links and their label, a "Find a dealer" link, the two buttons). Its brochure
- * links become a "Download the brochure" menu. Left as authored in Universal Editor.
+ * The page's end bar: its last section, when that is default content only, takes the Reserve
+ * Band section style (styles/section-reserve.css) without the author choosing it. Left alone
+ * when a section already has the style.
  * @param {Element} block the hero
  */
 function decorateEndBar(block) {
-  const end = block.closest('main')?.querySelector(':scope > .section:last-of-type');
-  if (!end || inEditor() || end.querySelector('[data-block-name]')) return;
-  const content = end.querySelector(':scope > .default-content-wrapper');
-  if (content) decorateBrochure(content, 'end-brochure-links');
+  const main = block.closest('main');
+  if (!main || main.querySelector(':scope > .section.reserve-band')) return;
+  // a section holding only the Floater doesn't count: the Floater takes it off the page, but
+  // it is still there while the hero loads
+  const end = [...main.querySelectorAll(':scope > .section')]
+    .reverse()
+    .find((section) => section.querySelector(':scope > :not(.floater-wrapper)'));
+  if (!end || end.querySelector('[data-block-name]')) return;
+  end.classList.add('reserve-band');
+  loadCSS(`${window.hlx.codeBasePath}/styles/section-reserve.css`);
+  decorateReserve(end);
 }
 
 // --- the load intro (hero-product.css .product-intro, then .is-intro-playing) ---
@@ -323,7 +359,9 @@ export default function decorateProduct(block, {
   const priceLines = [...textCell.querySelectorAll(':scope > p.subtext')];
   priceLines.forEach((p) => {
     p.classList.add('product-price');
-    if (!inEditor()) p.querySelectorAll('strong, b').forEach(raiseFootnoteMark);
+    if (inEditor()) return;
+    limitPrice(p);
+    p.querySelectorAll('strong, b').forEach(raiseFootnoteMark);
   });
   const cta = textCell.querySelector(':scope > .cta-wrapper');
   const buyParts = [...priceLines, cta].filter(Boolean);

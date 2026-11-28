@@ -756,3 +756,18 @@ main .section.hero-container .hero-wrapper > .hero.carousel.showroom {
     }
   }
 }
+
+/* Universal Editor: its canvas grows to fit the page, so no size here may follow the screen's
+   height (it would grow with the canvas, without end): the frame follows the width only */
+body:has([data-aue-resource]) main .section.hero-container .hero-wrapper > .hero.carousel.showroom {
+  --sr-m: clamp(0.75px, 100vw / 390, 1.4px);
+
+  @media (width >= 900px) {
+    --sr-u: calc(100vw / 1280);
+    --sr-ey: 0px;
+  }
+
+  @media (width < 900px) {
+    --sr-p: clamp(0.75px, 100vw / 375, 1.6px);
+  }
+}

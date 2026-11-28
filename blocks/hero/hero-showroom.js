@@ -4,6 +4,7 @@
 // paragraph followed by its value) becomes a row of the info card under the slide's text.
 
 import { inEditor } from '../../scripts/utils/common.js';
+import { getPageDealer } from '../../scripts/utils/dealer-api.js';
 
 /**
  * The bold label a paragraph starts with, or null.
@@ -243,6 +244,14 @@ export default function decorateShowroom(block, textCell) {
   rows.forEach(({ source }) => source.forEach((p) => p.remove()));
   const contents = block.querySelector(':scope > .slide-contents');
   (contents || textCell).after(card);
+  // the Address row from the Dealer API (by the page's Dealer Code), once it answers
+  const isAddress = (row) => /^address$/i.test(row.firstChild.textContent.trim());
+  const addressRow = [...card.children].find(isAddress);
+  if (addressRow) {
+    getPageDealer().then((dealer) => {
+      if (dealer?.full) addressRow.lastChild.textContent = dealer.full;
+    });
+  }
   if (contents) {
     breakSentences(contents);
     fitHeadings(contents);

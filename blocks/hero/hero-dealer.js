@@ -17,6 +17,7 @@
 // so each rises out of its own mask, and put back once they have.
 
 import { inEditor } from '../../scripts/utils/common.js';
+import { getPageDealer } from '../../scripts/utils/dealer-api.js';
 
 const SEPARATOR = /\s+·\s+/;
 const TAG = /^(\s*\[[^\]]*\])\s*/;
@@ -58,6 +59,15 @@ function markTag(title) {
   first.textContent = first.textContent.slice(match[0].length);
   title.insertBefore(tag, first);
   title.insertBefore(document.createTextNode(' '), first);
+}
+
+/** Puts the API address in the hero, keeping an authored "Authorised Dealer" lead-in. */
+function setAddress([first, ...rest], full) {
+  const lead = first.textContent.split(',')[0].trim();
+  const parts = [/authori[sz]ed/i.test(lead) ? lead : '', ...full.split(',').map((x) => x.trim())].filter(Boolean);
+  const lines = parts.length > 3 ? [`${parts.slice(0, 3).join(', ')},`, parts.slice(3).join(', ')] : [parts.join(', ')];
+  first.replaceChildren(...lines.flatMap((line, i) => (i ? [document.createElement('br'), line] : [line])));
+  rest.forEach((p) => p.remove());
 }
 
 /**
@@ -226,5 +236,10 @@ export default function decorateDealer(block, {
   cta?.querySelectorAll('a.cta-secondary').forEach((a) => { a.dataset.glitch = ''; });
 
   block.replaceChildren(bg, textCell, ...rest);
+  // the address from the Dealer API (by the page's Dealer Code), once it answers
+  const addressEls = [...textCell.querySelectorAll('.dealer-address')];
+  if (addressEls.length && !inEditor()) {
+    getPageDealer().then((dealer) => { if (dealer?.full) setAddress(addressEls, dealer.full); });
+  }
   stageEntrance(block, title?.matches('.heading') ? title : title?.querySelector('.heading'));
 }

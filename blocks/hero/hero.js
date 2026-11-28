@@ -52,8 +52,7 @@ function addVideoSource(video, src) {
   return source;
 }
 
-// builds a still frame of a video to stand in for an image
-// (one for the other screen size waits: it loads once the screen crosses the breakpoint)
+// builds a video's still frame to stand in for an image (the other screen size's loads on crossing)
 function createVideoStill(src, className, shown = true) {
   const still = createBgVideo();
   still.className = className;
@@ -69,22 +68,66 @@ function createVideoStill(src, className, shown = true) {
   return still;
 }
 
-// the poster in `holder` that is src's own first frame (no thumbnail) and on show, if any:
-// it plays in place, so the video downloads once and its frame shows as soon as it arrives
+// the shown poster in `holder` that is src's own first frame: it plays in place, one download
 function shownStill(holder, src) {
   const url = new URL(src, window.location.href).href;
   return [...holder.querySelectorAll('video.video-still')].find((still) => getComputedStyle(still).display !== 'none'
     && still.querySelector('source')?.src.split('#')[0] === url);
 }
 
-// loops a muted background video, the one for the screen size (videoSources), once the page
-// has loaded and the hero is on screen
-function wireVideo(block, bg, sources) {
+// video control icons (the carousel and a single video)
+const SPEAKER = '<path d="M1.125 4.25a.5.5 0 0 1 .5-.5H4.5l3.375-2.625v9.75L4.5 8.25H1.625a.5.5 0 0 1-.5-.5z"/>';
+const CONTROL_ICONS = {
+  sound: `${SPEAKER}<path d="M9.5 4.5c.67.83.67 2.17 0 3M10.75 3.25c1.33 1.6 1.33 3.9 0 5.5" fill="none" stroke="currentColor" stroke-linecap="round"/>`,
+  muted: `${SPEAKER}<path d="M9.5 5l2 2M11.5 5l-2 2" fill="none" stroke="currentColor" stroke-linecap="round"/>`,
+  play: '<path d="M.5.93v10.14a.5.5 0 0 0 .74.44l9.2-5.07a.5.5 0 0 0 0-.88L1.24.49A.5.5 0 0 0 .5.93z"/>',
+  pause: '<path d="M0 .5A.5.5 0 0 1 .5 0H4a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1-.5-.5zM6.5.5A.5.5 0 0 1 7 0h3.5a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5H7a.5.5 0 0 1-.5-.5z"/>',
+};
+
+// builds a control icon
+function controlIcon(name) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', name === 'play' || name === 'pause' ? '0 0 11 12' : '0 0 12 12');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  svg.setAttribute('fill', 'currentColor');
+  svg.innerHTML = CONTROL_ICONS[name];
+  return svg;
+}
+
+// builds a toggle button whose icon and label follow its state
+function createToggle(className, look, onToggle) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = className;
+  let state = false;
+  const set = (on) => {
+    state = on;
+    const { icon, label } = look(on);
+    button.replaceChildren(controlIcon(icon));
+    button.setAttribute('aria-label', label);
+  };
+  set(state);
+  button.addEventListener('click', () => {
+    state = !state;
+    set(state);
+    onToggle(state);
+  });
+  return { button, set };
+}
+
+// loops the screen size's muted background video once loaded and on screen; `controls`: its buttons
+function wireVideo(block, bg, sources, { controls: withControls = false } = {}) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const authoring = !!block.closest('[data-aue-resource]') || !!document.querySelector('[data-aue-resource]');
-  if (!sources?.desktop && !sources?.mobile) return;
-  if (reduce || navigator.connection?.saveData || authoring) return;
+  if (!sources?.desktop && !sources?.mobile) return null;
+  if (reduce || navigator.connection?.saveData || authoring) return null;
   const mobile = window.matchMedia(MOBILE_MEDIA);
+  // the visitor's choices: sound (heard once the hero has settled on screen) and pause
+  let soundWanted = false;
+  let heard = false;
+  let settled = false;
+  let userPaused = false;
 
   // the video over a thumbnail, faded in once it plays (hero.css)
   const video = createBgVideo();
@@ -93,12 +136,18 @@ function wireVideo(block, bg, sources) {
 
   let loaded = document.readyState === 'complete';
   let visible = false;
-  // the source loaded, '' until the video starts, and what plays it: the video above, or the
-  // poster that is the video's first frame
+  // the source loaded ('' until it starts) and what plays it: the video, or its first-frame poster
   let src = '';
   let player = null;
   let awaitingTouch = false;
   let sync;
+  let refresh = () => {};
+  const applySound = () => {
+    const audible = soundWanted && settled && !!player;
+    if (audible === heard) return;
+    heard = audible;
+    setAudible(player, audible);
+  };
   // if iOS refuses autoplay, retry on the first touch or key press
   const play = () => {
     player.play().catch(() => {
@@ -116,13 +165,14 @@ function wireVideo(block, bg, sources) {
   };
   sync = () => {
     const wanted = mobile.matches ? sources.mobile : sources.desktop;
-    // the first start, or the screen crossed the breakpoint: load that screen's video (none
-    // where its field is an image, which then shows)
-    // (or the same video, when the poster playing it is now hidden: the other size's)
+    // first start, breakpoint cross or hidden poster: load this screen's video (none for an image)
     const hidden = player && player !== video && getComputedStyle(player).display === 'none';
     if ((wanted !== src || hidden) && (src || (loaded && visible))) {
       bg.classList.remove('is-playing');
       player?.pause();
+      // the next player starts silent; the visitor's sound choice carries over to it
+      if (heard) setAudible(player, false);
+      heard = false;
       if (player === video) {
         video.replaceChildren();
         video.load();
@@ -141,9 +191,11 @@ function wireVideo(block, bg, sources) {
         player.preload = 'auto';
       }
     }
+    refresh();
     if (!player) return;
-    if (visible && !document.hidden) play();
+    if (visible && !document.hidden && !userPaused) play();
     else player.pause();
+    applySound();
   };
 
   if (!loaded) {
@@ -155,10 +207,37 @@ function wireVideo(block, bg, sources) {
     visible = entry.isIntersecting;
     sync();
   }).observe(block);
+  if (!withControls) return null;
+
+  trackSettled(block, (value) => {
+    settled = value;
+    applySound();
+  });
+  const controls = document.createElement('div');
+  controls.className = 'slide-controls';
+  controls.setAttribute('role', 'group');
+  controls.setAttribute('aria-label', 'Video controls');
+  const sound = createToggle('slide-sound', (on) => (on
+    ? { icon: 'sound', label: 'Mute video' }
+    : { icon: 'muted', label: 'Unmute video' }), (on) => {
+    soundWanted = on;
+    applySound();
+  });
+  const playToggle = createToggle('slide-play', (on) => (on
+    ? { icon: 'play', label: 'Play video' }
+    : { icon: 'pause', label: 'Pause video' }), (on) => {
+    userPaused = on;
+    sync();
+  });
+  controls.append(sound.button, playToggle.button);
+  // shown while this screen size has a video (none where its field is an image)
+  refresh = () => { controls.hidden = !player; };
+  refresh();
+  block.classList.add('has-video-controls');
+  return controls;
 }
 
-// createOptimizedPicture keeps only the image's path, so it only suits this site's own raster
-// images; an image from another origin, or an SVG, keeps its own URL in a plain picture
+// this site's own raster images are optimised; another origin's or an SVG keeps its URL
 function optimizedPicture(src, alt, eager, breakpoints) {
   const url = new URL(src, window.location.href);
   if (url.origin === window.location.origin && !/\.svg$/i.test(url.pathname)) {
@@ -210,12 +289,14 @@ const MEDIA_FIELDS = ['image', 'mobileImage', 'thumbnail', 'mobileThumbnail'];
 // a field cell's Universal Editor prop
 const propOf = (c) => c.dataset.aueProp || c.querySelector('[data-aue-prop]')?.dataset.aueProp;
 
-// the Hero's Background Image: its 7th field, after Text and Manifesto (content from before
-// it has six rows or fewer)
+// the Hero's Enable Video Control cell: by its Universal Editor prop, else a bare true / false
+const isVideoSwitch = (c) => propOf(c) === 'videoControls'
+  || (!propOf(c) && !c.querySelector('img, a') && /^(true|false)$/.test(c.textContent.trim()));
+
+// the Hero's Background Image: its 7th field, after Text and Manifesto (older content has fewer)
 const BACKDROP_AT = MEDIA_FIELDS.length + 2;
 
-// the Hero's Background Image cell, by its Universal Editor prop, else by its place when it
-// holds an image; null when absent
+// the Background Image cell, by its Universal Editor prop, else by its place; null when absent
 function readBackdropField(cells) {
   const named = cells.find((c) => propOf(c) === 'backgroundImage');
   if (named) return named;
@@ -233,8 +314,7 @@ function onImageIn(img, fn) {
   img.addEventListener('error', fn, { once: true });
 }
 
-// the Background Image: a decorative layer behind the image (hero.css .bg-backdrop), loaded
-// lazily at low priority so it never competes with the image, the LCP
+// the Background Image: a decorative layer behind the image, lazy and low priority (never the LCP)
 function createBackdrop(cell) {
   const img = cell?.querySelector('img');
   if (!img) return null;
@@ -248,8 +328,7 @@ function createBackdrop(cell) {
   return pic;
 }
 
-// reads Background Image or Video (Desktop), (Mobile) and Video Thumbnail (Desktop), (Mobile):
-// the cells before the first text, matched by their Universal Editor prop, else by their place
+// the four media fields: the cells before the first text, by Universal Editor prop, else by place
 function readMediaFields(cells) {
   const end = cells.findIndex((c) => !isMedia(c) && c.textContent.trim());
   const slots = end < 0 ? cells : cells.slice(0, end);
@@ -271,16 +350,14 @@ function readMediaFields(cells) {
   };
 }
 
-// what a screen shows until, or instead of, its video: its image, the Video Thumbnail, or
-// the video's first frame
+// what a screen shows until, or instead of, its video: its image, the thumbnail, or the first frame
 function posterOf(media, thumb) {
   if (!media) return null;
   if (media.img) return { img: media.img };
   return thumb ? { img: thumb } : { still: media.video, link: media.link };
 }
 
-// each screen's poster: desktop's with the desktop thumbnail; mobile's (its own field, else the
-// desktop's) with the mobile thumbnail, else the desktop one
+// each screen's poster: desktop's with its thumbnail; mobile's with its own (else desktop's)
 function screenPosters({
   desktop, mobile, thumb, mobileThumb,
 }) {
@@ -295,14 +372,12 @@ function posterImages(media) {
   return { desktop, mobile: mobile === desktop ? null : mobile };
 }
 
-// the video each screen size plays: the mobile field's, else the desktop's (none on mobile
-// when its field is an image)
+// the video each screen plays: the mobile field's, else the desktop's (none where it's an image)
 function videoSources({ desktop, mobile }) {
   return { desktop: desktop?.video || '', mobile: (mobile || desktop)?.video || '' };
 }
 
-// a background's poster: one picture (the mobile image a source of it), else one element
-// per screen size (only-desktop / only-mobile, hero.css) when either shows a video's frame
+// a background's poster: one picture, else one per screen size when either shows a video's frame
 function createPoster(media, eager) {
   const { d, m } = screenPosters(media);
   const onMobile = window.matchMedia(MOBILE_MEDIA).matches;
@@ -313,8 +388,7 @@ function createPoster(media, eager) {
     picImg.classList.add('bg-img');
     if (load) picImg.setAttribute('fetchpriority', 'high');
     moveInstrumentation(img, picImg);
-    // phones get their own sizes (750/1200), of the mobile image or else the same one: never the
-    // 2000px desktop file
+    // phones get their own sizes (750/1200), never the 2000px desktop file
     addMobileSource(pic, mobileImg || img);
     return pic;
   };
@@ -343,8 +417,7 @@ function unwrapRichtext(cell) {
   group.replaceWith(...group.childNodes);
 }
 
-// cuts the title (a heading, or a group of heading lines) off after --hero-title-lines lines
-// (hero.css), only when it runs longer, so a title that fits is never clipped
+// cuts the title after --hero-title-lines lines (hero.css), only when it runs longer
 function capTitle(block, title, line) {
   const update = () => {
     const lineHeight = parseFloat(getComputedStyle(line).lineHeight);
@@ -475,49 +548,7 @@ function decorateContent(block, textCell, { inlineLinks = false } = {}) {
 const SLIDE_MS = 6000;
 const MAX_SLIDES = 3;
 
-// carousel control icons
-const SPEAKER = '<path d="M1.125 4.25a.5.5 0 0 1 .5-.5H4.5l3.375-2.625v9.75L4.5 8.25H1.625a.5.5 0 0 1-.5-.5z"/>';
-const CONTROL_ICONS = {
-  sound: `${SPEAKER}<path d="M9.5 4.5c.67.83.67 2.17 0 3M10.75 3.25c1.33 1.6 1.33 3.9 0 5.5" fill="none" stroke="currentColor" stroke-linecap="round"/>`,
-  muted: `${SPEAKER}<path d="M9.5 5l2 2M11.5 5l-2 2" fill="none" stroke="currentColor" stroke-linecap="round"/>`,
-  play: '<path d="M.5.93v10.14a.5.5 0 0 0 .74.44l9.2-5.07a.5.5 0 0 0 0-.88L1.24.49A.5.5 0 0 0 .5.93z"/>',
-  pause: '<path d="M0 .5A.5.5 0 0 1 .5 0H4a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1-.5-.5zM6.5.5A.5.5 0 0 1 7 0h3.5a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5H7a.5.5 0 0 1-.5-.5z"/>',
-};
-
-// builds a control icon
-function controlIcon(name) {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', name === 'play' || name === 'pause' ? '0 0 11 12' : '0 0 12 12');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.setAttribute('focusable', 'false');
-  svg.setAttribute('fill', 'currentColor');
-  svg.innerHTML = CONTROL_ICONS[name];
-  return svg;
-}
-
-// builds a toggle button whose icon and label follow its state
-function createToggle(className, look, onToggle) {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = className;
-  let state = false;
-  const set = (on) => {
-    state = on;
-    const { icon, label } = look(on);
-    button.replaceChildren(controlIcon(icon));
-    button.setAttribute('aria-label', label);
-  };
-  set(state);
-  button.addEventListener('click', () => {
-    state = !state;
-    set(state);
-    onToggle(state);
-  });
-  return { button, set };
-}
-
-// rotates the carousel slides; returns the video controls, or null.
-// options (Tech Slides): webgl, slideMs, resume, navHold; reports hero:running
+// rotates the carousel slides; returns the video controls, or null (options: Tech Slides)
 function wireCarousel(block, items, slides, thumbs, nav, fill, onShow, options = {}) {
   const {
     webgl: useWebgl = true, slideMs = SLIDE_MS, resume = false, navHold = true,
@@ -542,8 +573,7 @@ function wireCarousel(block, items, slides, thumbs, nav, fill, onShow, options =
   let refused = false;
   const playable = (i) => (failed.has(i) || refused ? null : videos[i]);
 
-  // the visitor's sound choice per slide; heard only once the hero has settled on screen,
-  // rising from silence (muted while it is scrolled to or from)
+  // the visitor's sound choice per slide, heard once the hero has settled on screen
   const wanted = [];
   const heard = [];
   let settled = false;
@@ -686,8 +716,7 @@ function wireCarousel(block, items, slides, thumbs, nav, fill, onShow, options =
   }, true);
 
   thumbs.forEach((thumb, i) => thumb.addEventListener('click', () => {
-    // a step that wraps round the loop (swipe on from the last slide) says
-    // which way it goes in data-direction; a plain pick compares positions
+    // a wrapping step says its way in data-direction; a plain pick compares positions
     const { direction } = thumb.dataset;
     delete thumb.dataset.direction;
     show(i, direction ? direction === 'back' : i < index);
@@ -778,8 +807,7 @@ function slideText(row) {
   const cells = [...row.children].slice(1);
   const cell = cells.find((c) => c.dataset.aueProp === 'text'
     || c.querySelector(':scope > [data-aue-prop="text"]'))
-    // published: the cell with text that isn't the video, the video controls toggle or a
-    // Tile Position
+    // published: the cell with text that isn't the video, the controls toggle or a Tile Position
     || cells.find((c) => {
       const text = c.textContent.trim();
       return !videoHref(c) && !/^(true|false)?$/.test(text) && !POSITION_RE.test(text);
@@ -788,9 +816,7 @@ function slideText(row) {
   return cell;
 }
 
-// each slide's content: its own Text, else the hero's (null without either); shows the
-// first slide's and returns the wrapper holding them and where the current one is (for the
-// video controls), or null if no slide has its own
+// each slide's content (its Text, else the hero's), the first shown; null if no slide has its own
 function buildSlideContents(block, items, globalText, nav = null) {
   if (!items.some((item) => item.text)) return null;
   const contents = items.map((item) => {
@@ -804,8 +830,7 @@ function buildSlideContents(block, items, globalText, nav = null) {
   const all = [...new Set([...contents, globalText].filter(Boolean))];
   wrapper.append(...all);
   let current = 0;
-  // Thumbnails at the Bottom, on phones: the thumbnails join the video controls' line, inside
-  // the current slide's content; otherwise they stay in the hero
+  // Thumbnails at the Bottom, on phones: in the current slide's content, by the video controls
   const narrow = window.matchMedia('(width < 900px)');
   const placeThumbs = () => {
     if (!nav || !block.classList.contains('thumbs-bottom')) return;
@@ -875,8 +900,7 @@ function buildCarousel(block, bg, rows, firstScreen, globalText) {
   });
   if (!items.length) return null;
 
-  // Showroom layout: the hero's own Text stays beside every slide (hero-showroom.js), so it
-  // isn't one of the slide contents that take turns
+  // Showroom layout: the hero's own Text stays beside every slide, not one of the slide contents
   const shared = block.classList.contains('showroom');
   const slideFallback = shared ? null : globalText;
 
@@ -907,8 +931,7 @@ function buildCarousel(block, bg, rows, firstScreen, globalText) {
     return slide;
   });
   bg.classList.add('slides');
-  // the slides are absolute and clipped, which section-snap reads as a floating layer
-  // and would swallow the scroll over them
+  // the clipped, absolute slides would read as a floating layer to section-snap and swallow scroll
   bg.dataset.snapPassthrough = '';
   bg.replaceChildren(...slides);
 
@@ -948,10 +971,7 @@ function buildCarousel(block, bg, rows, firstScreen, globalText) {
 
   const contents = authoring ? null : buildSlideContents(block, items, slideFallback, nav);
   const onShow = authoring ? cover : contents?.show;
-  // Combat theme: the narrative's clips change on a pick only, as on the prototype. Showroom
-  // layout: no autoplay either (a thumbnail pick or a phone swipe changes the slide,
-  // hero-showroom.js), and its
-  // own photo wipe in place of the WebGL one
+  // no autoplay for the Combat narrative (pick only) or Showroom (pick or swipe, own photo wipe)
   const controls = wireCarousel(block, items, slides, thumbs, nav, fill, onShow, {
     rotate: !isCombatNarrative(block) && !shared,
     webgl: !shared,
@@ -970,8 +990,7 @@ function buildCarousel(block, bg, rows, firstScreen, globalText) {
   };
 }
 
-// places the controls above the heading on mobile, top right on desktop; `host` is the
-// content they go in, or a function giving the current slide's
+// places the controls above the heading on mobile, top right on desktop (`host`: their content)
 function placeControls(block, host, controls) {
   const desktop = window.matchMedia('(width >= 900px)');
   const place = () => {
@@ -1001,8 +1020,10 @@ function render(block, p) {
   block.style.setProperty('--mtn-in', `${range(p, 0.04, 0.14)}`);
   block.style.setProperty('--fold2-op', `${range(p, 0.06, 0.18)}`);
 
-  // content fades out as the card shrinks
+  // content fades out as the card shrinks (the video's buttons with it, out of reach once gone)
   block.style.setProperty('--content-op', `${1 - range(p, 0.06, 0.45)}`);
+  const controls = block.querySelector(':scope > .slide-controls');
+  if (controls) controls.inert = p >= 0.45;
 
   // image shrinks to a centred card
   block.style.setProperty('--cardness', `${range(p, 0.12, 0.45)}`);
@@ -1033,9 +1054,7 @@ const SHARP_P = 0.98;
 const SHOWN_P = 0.62 + 0.16 * (1 - 0.1 ** (1 / 3));
 // wheel pause that starts a new gesture
 const GESTURE_GAP_MS = 200;
-// after the reveal was hurried, a scroll moves the page on only once this long
-// has passed (the hurried reveal plays out, plus a little): the rest of the
-// same wheel flick would otherwise page on as soon as it ends
+// after a hurried reveal, how long before a scroll moves the page on (the same flick ends first)
 const HURRY_SETTLE_MS = 1200;
 const easeInOut = (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
 const SHOWN_MS = (() => {
@@ -1055,9 +1074,7 @@ function createStepper(block, lines) {
   let hurried = false; // the reveal under way was sped up (hurryDown)
   let lastWheel = -Infinity;
   let lastMag = 0;
-  // after a hurried reveal, the gesture that hurried it is used up for
-  // HURRY_SETTLE_MS; after that, the next scroll the snap engine takes as a
-  // gesture moves the page on (it already ignores trackpad momentum)
+  // after a hurried reveal, its gesture is used up for HURRY_SETTLE_MS; the next moves the page
   let settling = false;
   let settleUntil = 0;
   const animating = () => frame !== 0 || pause !== 0;
@@ -1137,10 +1154,7 @@ function createStepper(block, lines) {
       }
       return settling || animating() || consumed;
     },
-    // a new scroll down during the manifesto's reveal (once it is on screen,
-    // while its lines sharpen) plays the rest of it quickly; the page stays,
-    // and the next scroll moves it on. Before that, the image shrinking to the
-    // card plays out
+    // a scroll while the manifesto's lines sharpen plays the rest quickly; the next moves the page
     hurryDown: () => {
       if (consumed || hurried || step !== 1 || (!frame && !pause) || p < SHOWN_P) return;
       stop();
@@ -1224,10 +1238,7 @@ function wireScrollFolds(block) {
 
 /* ---------- Combat motion: the hero's load intro and the narrative statement's lines ---------- */
 
-// Combat theme: splits a plain-text element into the lines it renders on (span.text-line, each
-// holding a span.text-line-inner) for a line-by-line reveal, the line breaks frozen. Returns the
-// lines and a function putting the original text back, or null when it can't: inline markup,
-// or not laid out yet
+// Combat theme: splits plain text into its rendered lines; returns them and an undo, or null
 function splitLines(el) {
   if (!el?.getClientRects().length) return null;
   if ([...el.childNodes].some((node) => node.nodeType === Node.ELEMENT_NODE)) return null;
@@ -1264,17 +1275,11 @@ function splitLines(el) {
   return { lines: lineEls, restore: () => el.replaceChildren(...original) };
 }
 
-// Combat theme: the hero intro's length (hero.css .combat-intro), and how long it waits for the
-// photo before it starts anyway
+// Combat theme: the hero intro's length, and how long it waits for the photo
 const COMBAT_INTRO_MS = 2700;
 const COMBAT_INTRO_WAIT_MS = 800;
 
-// Combat theme, the first section's Showcase: the load intro (hero.css .combat-intro). The hero
-// opens from a card to full screen as its photo settles, then the lockup and title lines rise,
-// then the CTA, price and description card. The photo is painted from the first frame (clipped
-// and scaled, never transparent). Not under reduced motion, in Universal Editor, or when the
-// page opens scrolled or deep-linked away from the hero; any scroll or snap move ends it.
-// backdropImg: the Background Image's, if any
+// Combat theme, first Showcase: the load intro (card to full screen, then text); scroll ends it
 function playCombatIntro(block, backdropImg) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (block.closest('[data-aue-resource]') || document.querySelector('[data-aue-resource]')) return;
@@ -1324,9 +1329,7 @@ function playCombatIntro(block, backdropImg) {
     setTimeout(finish, COMBAT_INTRO_MS);
   };
   block.classList.add('combat-intro');
-  // starts once the photo is in, then the Background Image (added after it) has painted too, as
-  // on the prototype, or after COMBAT_INTRO_WAIT_MS. The backdrop paints in the first frame's
-  // card, no larger than the photo did, so the photo stays the LCP
+  // starts once the photo and backdrop are in, or after COMBAT_INTRO_WAIT_MS (photo stays the LCP)
   const img = block.querySelector(':scope > .bg img.bg-img');
   onImageIn(img, () => onImageIn(backdropImg, () => {
     requestAnimationFrame(() => requestAnimationFrame(start));
@@ -1334,9 +1337,7 @@ function playCombatIntro(block, backdropImg) {
   setTimeout(start, COMBAT_INTRO_WAIT_MS);
 }
 
-// Combat theme: the statement's lines after the first are dimmed and blurred while it comes in
-// from above, then sharpen in turn once it arrives (hero.css .is-dim/.is-sharpening); split for
-// the reveal only, then put back. Combat motion's events only fire when it runs
+// Combat theme: the statement's later lines blur in, then sharpen in turn (split for it only)
 const STATEMENT_SHARPEN_MS = 300;
 const STATEMENT_STAGGER_MS = 120;
 function wireStatementReveal(section, statement) {
@@ -1369,10 +1370,7 @@ function wireStatementReveal(section, statement) {
 // Combat theme: how long the narrative's clip takes to open (hero.css --hero-narrative-ms)
 const NARRATIVE_MS = 900;
 
-// Combat theme, a carousel right after default content (the narrative statement): the
-// statement shows first with the clip in a card below it, the next scroll opens the clip to
-// full screen (hero.css .is-narrative/.is-open). Needs the snap engine; without it the two
-// share the screen instead (hero.css)
+// Combat theme, carousel after the narrative statement: the clip in a card, a scroll opens it
 function wireCombatNarrative(block) {
   const section = block.closest('.section');
   const wrapper = block.parentElement;
@@ -1426,21 +1424,14 @@ function wireCombatNarrative(block) {
   }
 }
 
-/**
- * Product: moves the Logo field into the Text, before the title. It is found by field name in
- * Universal Editor, else by row: after Text, Scroll Manifesto and Background Image comes Logo
- * (_hero.json field order).
- * @param {Element[]} ownCells all the hero's own field cells, in order (Background Image too)
- * @param {Element} textCell the Text cell
- */
+/** Product: moves the Logo field into the Text, before the title (by field name, else its row) */
 function placeProductImages(ownCells, textCell) {
   let logo = ownCells.find((c) => propOf(c) === 'logo');
   if (!logo) {
     const at = ownCells.indexOf(textCell);
     if (at >= 0) logo = ownCells[at + 3];
   }
-  // the field's image; a reference to an image outside AEM Assets (e.g. https://…/logo.png) is
-  // delivered as a link to it, so the link becomes the image
+  // the field's image; one outside AEM Assets arrives as a link, which becomes the image
   const imageOf = (cell) => {
     const pic = cell?.querySelector('picture') || cell?.querySelector('img');
     if (pic) return pic;
@@ -1457,8 +1448,7 @@ function placeProductImages(ownCells, textCell) {
   const pictureLine = (cell) => {
     const pic = imageOf(cell);
     if (!pic) return null;
-    // the logo sits on the first screen: never lazy (the delivery marks every image but the
-    // page's first as lazy)
+    // the logo is on the first screen: never lazy
     const img = pic.matches('img') ? pic : pic.querySelector('img');
     if (img) img.loading = 'eager';
     const line = document.createElement('p');
@@ -1470,10 +1460,7 @@ function placeProductImages(ownCells, textCell) {
   if (logoLine) textCell.insertBefore(logoLine, title || textCell.firstChild);
 }
 
-/**
- * loads and decorates the block
- * @param {Element} block The block element
- */
+/** loads and decorates the block */
 export default async function decorate(block) {
   // Hero Slide rows, set aside from the hero's own fields
   const slideRows = [...block.children]
@@ -1482,8 +1469,12 @@ export default async function decorate(block) {
   if (block.dataset.aueFilter) {
     block.dataset.aueFilter = slideRows.length >= MAX_SLIDES ? 'hero-full' : 'hero';
   }
-  const ownCells = [...block.querySelectorAll(':scope > div > div')]
+  const rowCells = [...block.querySelectorAll(':scope > div > div')]
     .filter((c) => !slideRows.includes(c.parentElement));
+  // Enable Video Control: set aside first, so its "true" is never read as Text or Manifesto
+  const switchCell = rowCells.find(isVideoSwitch);
+  const videoControlsOn = switchCell?.textContent.trim() === 'true';
+  const ownCells = rowCells.filter((c) => c !== switchCell);
   // the Background Image, set aside from the other fields
   const backdropCell = readBackdropField(ownCells);
   const allCells = ownCells.filter((c) => c !== backdropCell);
@@ -1521,8 +1512,7 @@ export default async function decorate(block) {
   // the image, or the video's thumbnail (else its first frame) until it plays
   const posters = posterImages(posterMedia);
   if (!carouselSlides) bg.append(...createPoster(posterMedia, firstScreen));
-  // the Background Image, behind it; in the first section added once the image is in, so the
-  // image paints first and stays the LCP, the backdrop painting no larger after it
+  // the Background Image, behind it; first section: added once the image is in (it stays the LCP)
   const backdrop = carouselSlides ? null : createBackdrop(backdropCell);
   if (backdrop) {
     onImageIn(firstScreen ? bg.querySelector('img.bg-img') : null, () => bg.prepend(backdrop));
@@ -1558,8 +1548,7 @@ export default async function decorate(block) {
     await loadCSS(`${window.hlx.codeBasePath}/blocks/hero/hero-statement.css`);
   }
 
-  // Statement with Hero Slides: the clips grow from a thumbnail slot (hero-statement.js);
-  // a Statement without slides stays a still, centred statement
+  // Statement with Hero Slides: the clips grow from a thumbnail slot; without slides it stays still
   const editing = !!block.closest('[data-aue-resource]') || !!document.querySelector('[data-aue-resource]');
   if (statement && slideRows.length && (editing || slideRows.some((row) => row.querySelector('img')
     || [...row.children].some(videoHref)))) {
@@ -1631,8 +1620,7 @@ export default async function decorate(block) {
 
   // Product: load its CSS and JS
   if (product) {
-    // its Logo field goes into the Text, before the title, where hero-product.js lays it out
-    // (images can't be authored inside a Universal Editor text)
+    // its Logo field goes into the Text, before the title (images can't be authored in a UE text)
     if (textCell) placeProductImages(ownCells, textCell);
     const [, { default: decorateProduct }] = await Promise.all([
       loadCSS(`${window.hlx.codeBasePath}/blocks/hero/hero-product.css`),
@@ -1652,7 +1640,8 @@ export default async function decorate(block) {
         optimizedPicture,
       },
     });
-    wireVideo(block, bg, sources);
+    const productControls = wireVideo(block, bg, sources, { controls: videoControlsOn });
+    if (productControls) placeControls(block, textCell, productControls);
     return;
   }
 
@@ -1669,7 +1658,8 @@ export default async function decorate(block) {
       rest: keepUnusedSlides(slideRows),
       helpers: { moveInstrumentation, optimizedPicture },
     });
-    wireVideo(block, bg, sources);
+    const dealerControls = wireVideo(block, bg, sources, { controls: videoControlsOn });
+    if (dealerControls) placeControls(block, textCell, dealerControls);
     return;
   }
 
@@ -1697,8 +1687,7 @@ export default async function decorate(block) {
     });
     manifesto.style.setProperty('--lines', manifestoLines.length);
 
-    // one mountain layer animates from full screen to card to gone
-    // (the poster image: a video plays in the background until the card takes over)
+    // one mountain layer: full screen, then card, then gone (a video plays behind until the card)
     let mountain = null;
     const mountainImg = posters.desktop || posters.mobile;
     if (mountainImg) {
@@ -1717,7 +1706,9 @@ export default async function decorate(block) {
     pin.append(manifesto);
     block.replaceChildren(pin, ...keepUnusedSlides(slideRows));
 
-    wireVideo(block, bg, sources);
+    // its buttons fade with the first fold's content (render), above the header like the others
+    const foldControls = wireVideo(block, bg, sources, { controls: videoControlsOn });
+    if (foldControls) placeControls(block, textCell, foldControls);
     wireScrollFolds(block);
     return;
   }
@@ -1725,7 +1716,8 @@ export default async function decorate(block) {
   let carouselControls = null;
   let placeThumbs = null;
   // every style but the carousel (its slides play their own) loops its video
-  if (!carousel) wireVideo(block, bg, sources);
+  const videoControls = carousel ? null
+    : wireVideo(block, bg, sources, { controls: videoControlsOn });
   let controlsHost = textCell;
   const opening = carousel && block.classList.contains('opening');
   // Opening Animation: the Hero Text's first two paragraphs are its lines
@@ -1733,8 +1725,7 @@ export default async function decorate(block) {
   lines.forEach((p) => p.classList.add('opening-line'));
   if (carousel) {
     const carouselParts = buildCarousel(block, bg, slideRows, firstScreen, textCell);
-    // slides with their own Text: their contents take the hero's content's place (Showroom
-    // layout: they go after it, the hero's content stays)
+    // slides with their own Text take the hero content's place (Showroom: after it, which stays)
     if (carouselParts?.contents) {
       const at = fold1Children.indexOf(textCell);
       const keep = block.classList.contains('showroom') ? 1 : 0;
@@ -1757,6 +1748,7 @@ export default async function decorate(block) {
   }
   block.replaceChildren(...fold1Children, ...keepUnusedSlides(slideRows));
   if (carouselControls) placeControls(block, controlsHost, carouselControls);
+  if (videoControls) placeControls(block, textCell, videoControls);
   placeThumbs?.();
   if (carousel && !opening && document.body.classList.contains('combat')) wireCombatNarrative(block);
   // Combat theme: the first section's Showcase plays the load intro
@@ -1764,9 +1756,7 @@ export default async function decorate(block) {
     playCombatIntro(block, backdrop?.querySelector('img'));
   }
 
-  // Carousel "Opening Animation": the film plays in a small card on load, then
-  // grows to full screen (hero-opening.js); its CSS also hides the two lines
-  // it uses, so it loads whenever the option is on
+  // Carousel Opening Animation: the film grows from a small card to full screen (hero-opening.js)
   if (opening) {
     const [, { default: playOpening }] = await Promise.all([
       loadCSS(`${window.hlx.codeBasePath}/blocks/hero/hero-opening.css`),
@@ -1780,8 +1770,7 @@ export default async function decorate(block) {
     });
   }
 
-  // Carousel "Showroom Layout": the hero's own Text (eyebrow + label/value lines) stays beside
-  // every slide as an eyebrow and an info card (hero-showroom.js)
+  // Carousel Showroom Layout: the hero's Text stays beside every slide as eyebrow and info card
   if (carousel && block.classList.contains('showroom')) {
     const [, { default: decorateShowroom }] = await Promise.all([
       loadCSS(`${window.hlx.codeBasePath}/blocks/hero/hero-showroom.css`),
