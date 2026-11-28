@@ -465,10 +465,20 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
   --accordion-section-background: #fcfdfc;
 
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
   align-content: start;
   row-gap: 19.8px;
   padding: max(84px, var(--nav-offset, 0px) + 10px) 20px 32px;
+
+  @media (600px <= width < 900px) {
+    grid-template-columns: minmax(0, min(640px, 100% - 40px));
+    justify-content: center;
+  }
+
+  @media (768px <= width < 900px) {
+    grid-template-columns: minmax(0, min(640px, 100% - 72px));
+  }
 
   &.scroll-runway {
     height: auto;

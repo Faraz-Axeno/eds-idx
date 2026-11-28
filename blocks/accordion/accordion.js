@@ -347,17 +347,51 @@ function wireFaqRunway(section) {
   let holdWheel = false;
   let touching = false;
   let holdTouch = false;
+  // deliberate scrolling (a wheel notch, a steady or rising trackpad scroll) as against a
+  // momentum tail, which only slows
+  const EDGE_HOLD_MS = 400;
+  let snapping = false;
+  let lastMag = 0;
+  let steady = 0;
+  let edgeSince = 0;
+  let edgeWay = 0;
+  const swallow = (e) => {
+    if (e.cancelable) e.preventDefault();
+    e.stopImmediatePropagation();
+  };
   window.addEventListener('wheel', (e) => {
     const now = e.timeStamp || performance.now();
     const quiet = now - lastWheelAt > QUIET_MS;
     lastWheelAt = now;
-    if (arriving || !holdWheel) return;
-    if (quiet) {
+    const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+    const mag = Math.abs(delta);
+    steady = !quiet && mag >= lastMag ? steady + 1 : 0;
+    const deliberate = quiet || (mag >= 50 && mag >= lastMag) || (steady >= 4 && mag >= 6)
+      || mag > lastMag * 1.5 + 2;
+    lastMag = mag;
+    if (arriving) return;
+    if (holdWheel) {
+      if (!deliberate) {
+        swallow(e);
+        return;
+      }
       holdWheel = false;
+    }
+    // at the FAQ's top or bottom edge, deliberate scrolling on out waits a moment, then goes
+    const top = section.offsetTop;
+    const end = Math.max(top, top + section.offsetHeight - screenHeight());
+    const y = window.scrollY;
+    const way = Math.sign(delta);
+    const atEdge = (way > 0 && Math.abs(y - end) <= 1) || (way < 0 && Math.abs(y - top) <= 1);
+    if (!atEdge || !deliberate || snapping || quiet) {
+      edgeSince = 0;
       return;
     }
-    if (e.cancelable) e.preventDefault();
-    e.stopImmediatePropagation();
+    if (!edgeSince || edgeWay !== way) {
+      edgeSince = now;
+      edgeWay = way;
+    }
+    if (now - edgeSince < EDGE_HOLD_MS) swallow(e);
   }, { capture: true, passive: false });
   window.addEventListener('touchstart', () => { touching = true; }, { capture: true, passive: true });
   ['touchend', 'touchcancel'].forEach((type) => window.addEventListener(type, (e) => {
@@ -368,7 +402,6 @@ function wireFaqRunway(section) {
   window.addEventListener('touchmove', (e) => {
     if (holdTouch && e.cancelable) e.preventDefault();
   }, { capture: true, passive: false });
-  let snapping = false;
   document.addEventListener('snap:start', ({ detail: { to } }) => {
     snapping = true;
     if (to !== section) return;
