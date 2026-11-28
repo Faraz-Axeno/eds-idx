@@ -465,6 +465,7 @@ main > .section:is(.faq-columns, .faq-center):is(:has(.block.accordion:not(.dark
   --accordion-section-background: #fcfdfc;
 
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
   align-content: start;
   row-gap: 19.8px;
