@@ -310,6 +310,31 @@ function wireFaqRunway(section) {
   };
   window.addEventListener('resize', () => { screen = 0; }, { passive: true });
 
+  const tabLists = [...section.querySelectorAll('.tabs.faq > .tabs-list')];
+  const recheckTabArrows = () => tabLists.forEach((list) => list.dispatchEvent(new Event('scroll')));
+  const tabSizes = new ResizeObserver(recheckTabArrows);
+  tabLists.forEach((list) => list.querySelectorAll('.tabs-tab').forEach((tab) => tabSizes.observe(tab)));
+  document.addEventListener('snap:start', ({ detail: { to } }) => {
+    if (to === section) recheckTabArrows();
+  });
+
+  const arrowTargets = new Map();
+  section.addEventListener('click', (e) => {
+    const arrow = e.target.closest?.('.tabs.faq > .tabs-scroll');
+    const list = arrow?.parentElement.querySelector(':scope > .tabs-list');
+    if (!list) return;
+    e.stopPropagation();
+    const room = Math.max(0, list.scrollWidth - list.clientWidth);
+    const step = (arrow.classList.contains('tabs-scroll-next') ? 1 : -1) * list.clientWidth * 0.8;
+    const pending = arrowTargets.get(list);
+    clearTimeout(pending?.timer);
+    const left = Math.min(room, Math.max(0, (pending?.left ?? list.scrollLeft) + step));
+    const timer = setTimeout(() => arrowTargets.delete(list), 600);
+    arrowTargets.set(list, { left, timer });
+    const smooth = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    list.scrollTo({ left, behavior: smooth });
+  }, true);
+
   const QUIET_MS = 200;
   let lastWheelAt = -Infinity;
   let arriving = false;
