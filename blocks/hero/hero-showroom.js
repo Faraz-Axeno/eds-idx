@@ -16,6 +16,21 @@ function leadingLabel(p) {
   return first?.nodeType === Node.ELEMENT_NODE && first.matches('strong, b') ? first : null;
 }
 
+/**
+ * A link in a card value (e.g. a tel: phone number) back to a plain link: hero.js has made every
+ * link of the Text a CTA button by the time the card is built.
+ * @param {HTMLAnchorElement} link
+ */
+function plainLink(link) {
+  if (!link.classList.contains('cta')) return;
+  const text = (link.querySelector('.cta-label') || link).textContent.trim();
+  if (link.getAttribute('aria-label') === text) link.removeAttribute('aria-label');
+  link.classList.remove('cta', 'button', 'cta-primary', 'cta-secondary', 'cta-v2', 'glitch');
+  if (!link.classList.length) link.removeAttribute('class');
+  delete link.dataset.cta;
+  link.textContent = text;
+}
+
 // how long the photo wipe runs (hero-showroom.css --sr-wipe-ms), plus a frame to settle
 const WIPE_MS = 950;
 const SETTLE_MS = 50;
@@ -210,7 +225,10 @@ export default function decorateShowroom(block, textCell) {
     const dt = document.createElement('dt');
     dt.textContent = label;
     const dd = document.createElement('dd');
-    if (value) dd.append(...value.childNodes);
+    if (value) {
+      value.querySelectorAll('a').forEach(plainLink);
+      dd.append(...value.childNodes);
+    }
     item.append(dt, dd);
     card.append(item);
   });
